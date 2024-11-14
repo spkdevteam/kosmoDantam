@@ -117,7 +117,7 @@ async function createSuperAdmin() {
 
         const create = await User.create({
             role: role._id,
-            roleId : 1,
+            roleId: 1,
             firstName: "Super",
             lastName: "Admin",
             email: email,
@@ -137,6 +137,18 @@ async function createSuperAdmin() {
 }
 
 // createSuperAdmin()
+
+
+
+// clients role
+const clientRoles = [
+    { id: 1, name: 'Partner' },
+    { id: 2, name: 'Business Unit' },
+    { id: 3, name: 'Duty Doctor' },
+    { id: 4, name: 'Dental Assistant' },
+    { id: 5, name: "Front Desk Officer" },
+    { id: 6, name: "Fellow Member" }
+];
 
 // insert dummy clinet
 async function createDummyClient() {
