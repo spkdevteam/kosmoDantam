@@ -140,15 +140,6 @@ async function createSuperAdmin() {
 
 
 
-// clients role
-const clientRoles = [
-    { id: 1, name: 'Partner' },
-    { id: 2, name: 'Business Unit' },
-    { id: 3, name: 'Duty Doctor' },
-    { id: 4, name: 'Dental Assistant' },
-    { id: 5, name: "Front Desk Officer" },
-    { id: 6, name: "Fellow Member" }
-];
 
 // insert dummy clinet
 async function createDummyClient() {

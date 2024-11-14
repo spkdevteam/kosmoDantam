@@ -8,12 +8,22 @@ const mongoose = require("mongoose");
 const User = require("../../model/user");
 const Roles = require("../../model/role");
 
+const clientRoleSchema = require("../../client/model/role");
+const clinetUserSchema = require("../../client/model/user");
+const clinetBranchSchema = require("../../client/model/branch");
+
+
+
+const { clientRoles } = require("../../utils/constant")
+
 
 
 const { generateOtp } = require("../../helper/common");
 const { mailSender } = require("../../email/emailSend");
 const statusCode = require("../../utils/http-status-code");
 const message = require("../../utils/message");
+
+const { createClientDatabase } = require("../../db/connection");
 
 
 // env 
@@ -31,6 +41,9 @@ exports.createBusinessUnit = async (req, res) => {
 
   try {
     session.startTransaction(); // Start transaction
+
+
+    const superAdmin =  req.user
 
     // Destructure fields from request body
     const { firstName, lastName, middleName, email, phone, password } = req.body;
@@ -78,18 +91,54 @@ exports.createBusinessUnit = async (req, res) => {
           isActive: true,
           isUserVerified: true,
           tc: true,
+          isCreatedBySuperAdmin: true,
+          createdBy : superAdmin._id,
         },
       ],
       { session }
     );
 
+    // const clientConnection = await getClientDatabaseConnection(newUser._id);
+    const clientConnection = await createClientDatabase(newUser[0]._id);
+
+    // Use the imported schema to create the roles model in the client database
+    const clientRole = clientConnection.model('clientRoles', clientRoleSchema);
+    const roles = clientRoles;
+
+    // insert fixed
+    const createdRole = await clientRole.insertMany(roles);
+
+    const buRoleId = createdRole.find((item) => {
+
+      return item?.id == 2
+
+    })
+
+    const clientUser = clientConnection.model('clientUsers', clinetUserSchema);
+
+
+    await clientUser.create({
+
+      role: buRoleId?._id,
+      roleId: 2,
+      firstName: newUser[0].firstName,
+      lastName: newUser[0].lastName,
+      email: newUser[0].email,
+      phone: newUser[0].phone,
+      password: newUser[0].password,
+      tc: true,
+      isUserVerified: true,
+      isActive: true,
+
+    });
+
+
     // Commit the transaction (if everything goes well)
     await session.commitTransaction();
-    session.endSession(); // End session
-
+    session.endSession();
     return res.status(statusCode.OK).send({
       message: message.lblBusinessUnitCreatedSuccess,
-      data: { userId: newUser[0]._id, email: newUser[0].email }, // Return relevant data
+      data: { userId: newUser[0]._id, email: newUser[0].email },
     });
 
   } catch (error) {
@@ -364,7 +413,7 @@ exports.softDeleteBusinessUnit = async (req, res) => {
 
 // restore business unit
 exports.restoreBusinessUnit = async (req, res) => {
-  
+
   const session = await mongoose.startSession();
 
   try {
