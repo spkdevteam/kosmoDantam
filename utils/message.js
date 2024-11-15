@@ -66,6 +66,19 @@ module.exports = {
     lblBusinessUnitUpdatedSuccess : "Business unit updated successfully!",
     lblBusinessUnitFoundSuccessfully : "Business unit found successfully!",
     lblBusinessUnitSoftDeletedSuccess : "Business unit soft deleted successfully!",
-    lblBusinessUnitRestoredSuccess : "Business unit restored succesfully!"
+    lblBusinessUnitRestoredSuccess : "Business unit restored succesfully!",
+    lblClinetIdIsRequired: "Client Id is required!",
+
+
+
+    // branch
+    lblBranchAlreadyExists : "Branch already exists with this email or phone!",
+    lblBranchCreatedSuccess : "Branch created successfully!",
+    lblBranchUpdatedSuccess : "Business unit updated successfully!",
+    lblBranchIdAndClientIdRequired: " Brach Id and Client Id are required!",
+    lblBranchNotFound : "Branch not found!",
+    lblBranchFoundSucessfully : "Branch found successfully!",
+
+
 
   };

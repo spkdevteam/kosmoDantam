@@ -49,7 +49,7 @@ const getClientDatabaseConnection = async (clientId) => {
     }
 
     // Create a new connection if none exists
-    const clientData = await User.findOne({ clientId });
+    const clientData = await User.findById( clientId );
     if (!clientData) throw new Error('Client not found');
 
     // Append the client-specific database name to the base URL

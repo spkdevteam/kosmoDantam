@@ -11,6 +11,9 @@ const clinetBranchSchema = new Schema(
         branchHead: { type: ObjectId, ref: "user", default:null, index: true }, // Index for admin/user relationships
 
         name: { type: String, required: true },
+        incorporationName: { type: String, required: true },
+        cinNumber:  { type: String },
+        gstNumber:  { type: String },
 
         emailContact: {
             type: String,
@@ -48,6 +51,12 @@ const clinetBranchSchema = new Schema(
             trim: true,
         },
 
+        country: {
+            type: String,
+            trim: true,
+        },
+
+
         ZipCode: {
             type: String,
             trim: true,
@@ -58,7 +67,7 @@ const clinetBranchSchema = new Schema(
             trim: true,
         },
 
-        isActive: { type: Boolean, default: true },
+        isActive: { type: Boolean, default: false },
 
         // handlign created by
         createdBy: { type: ObjectId, ref: "user", default:null, index: true }, // Index for admin/user relationships

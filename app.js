@@ -10,7 +10,6 @@ const bcrypt = require("bcrypt");
 const cors = require("cors");
 
 
-
 // env setup
 const dotnev = require("dotenv");
 dotnev.config();
@@ -23,12 +22,11 @@ const { app, server } = require("./socket/socket.js");
 const { ConnectDb, createClientDatabase } = require("./db/connection.js");
 
 
-
 // routes import
 const welcomeRouter = require("./routes/welcome");
 const superAdminRouter = require("./superAdminManagement/routes/superAdmin.routes.js");
-const superAdminBuRouter = require("./superAdminBuManagement/routes/superAdminBu.routes.js")
-
+const superAdminBuRouter = require("./superAdminBuManagement/routes/superAdminBu.routes.js");
+const clinetBranchRouter = require("./businessUnitAdministration/routes/branch.routes.js")
 
 
 
@@ -54,11 +52,11 @@ const DATABASE_URL = process.env.DATABASE_URL;
 ConnectDb(DATABASE_URL);
 
 
-
 // routes setup
 app.use("/api", welcomeRouter.router);
-app.use("/api/superAdmin", superAdminRouter.router)
-app.use("/api/superAdmin/bu/", superAdminBuRouter.router)
+app.use("/api/superAdmin", superAdminRouter.router);
+app.use("/api/superAdmin/bu/", superAdminBuRouter.router);
+app.use("/api/clinet/bu/branch", clinetBranchRouter.router);
 
 
 // insert role
