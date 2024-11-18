@@ -8,7 +8,7 @@ const clinetBranchSchema = new Schema(
     {
 
 
-        branchHead: { type: ObjectId, ref: "user", default:null, index: true }, // Index for admin/user relationships
+        branchHead: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
 
         name: { type: String, required: true },
         incorporationName: { type: String, required: true },

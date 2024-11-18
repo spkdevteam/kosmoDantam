@@ -26,7 +26,8 @@ const { ConnectDb, createClientDatabase } = require("./db/connection.js");
 const welcomeRouter = require("./routes/welcome");
 const superAdminRouter = require("./superAdminManagement/routes/superAdmin.routes.js");
 const superAdminBuRouter = require("./superAdminBuManagement/routes/superAdminBu.routes.js");
-const clinetBranchRouter = require("./businessUnitAdministration/routes/branch.routes.js")
+const clinetBranchRouter = require("./businessUnitAdministration/routes/branch.routes.js");
+const clinetChairhRouter = require("./businessUnitAdministration/routes/chair.routes.js");
 
 
 
@@ -57,6 +58,7 @@ app.use("/api", welcomeRouter.router);
 app.use("/api/superAdmin", superAdminRouter.router);
 app.use("/api/superAdmin/bu/", superAdminBuRouter.router);
 app.use("/api/clinet/bu/branch", clinetBranchRouter.router);
+app.use("/api/clinet/bu/chair", clinetChairhRouter.router);
 
 
 // insert role

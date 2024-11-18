@@ -81,4 +81,17 @@ module.exports = {
 
 
 
+    // chair 
+    lblChairhAlreadyExists : "Chair already exists!",
+    lblChairCreatedSuccess : "Chair created successfully!",
+    lblChairIdIdAndClientIdRequired: "Chair Id and Client Id are required!",
+    lblChairNotFound : "Chair not found!",
+    lblChairFoundSucessfully : "Chair found successfully!",
+
+
+
+
+
+
+
   };
