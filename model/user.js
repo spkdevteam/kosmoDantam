@@ -6,26 +6,21 @@ const ObjectId = Schema.ObjectId;
 
 const userSchema = new Schema(
   {
+    userId:{type:String},
     role: { type: ObjectId, ref: "role", index: true }, // Index for role-based queries
     roleId: { type: Number },
-
     firstName: { type: String, required: true },
     lastName: { type: String },
     middleName: { type: String },
-
     email: {
       type: String, unique: true, lowecase: true,
       trim: true, sparse: true, index: true
     }, 
     phone: { type: String, unique: true, sparse: true, trim: true, index: true }, 
-
     password: { type: String, required: true },
     tc: { type: Boolean, required: true },
-
     isUserVerified: { type: Boolean, default: false },
-
     isActive: { type: Boolean, default: true },
-
     // fields for profile
     gender: {
       type: String,
@@ -33,8 +28,6 @@ const userSchema = new Schema(
       default: 'Prefer not to say',
       trim: true, 
     },
-
-    
     dateOfBirth: {
       type: Date,
       validate: {
@@ -83,7 +76,7 @@ const userSchema = new Schema(
       type: String,
       trim: true,
     },
-
+    
     address: {
       type: String,
       trim: true, 

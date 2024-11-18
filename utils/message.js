@@ -14,7 +14,8 @@ module.exports = {
 
     //Role
     lblNotFoundRole: 'This role has not been set up on the platform!',
-    lblRoleNotFound: "Role not found.",
+    lblRoleNotFound: 'Role not found.',
+    lblMenuHeadNotFound: "menu head could not be blank" ,
 
 
 

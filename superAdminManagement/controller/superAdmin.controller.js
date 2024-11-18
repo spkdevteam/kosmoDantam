@@ -85,7 +85,7 @@ exports.signIn = async (req, res) => {
         }
 
         // Validate password
-        const isPasswordValid = await user.isPasswordCorrect(password);
+        const isPasswordValid = await user.isPasswordCorrect(password); 
         if (!isPasswordValid) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblIncorrectPassword

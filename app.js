@@ -6,6 +6,10 @@ const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
 
+const swaggerDocs = require("./documentation/swagger.js");  
+
+const swaggerUi = require('swagger-ui-express');
+
 // cors setup
 const cors = require("cors");
 
@@ -27,7 +31,7 @@ const welcomeRouter = require("./routes/welcome");
 const superAdminRouter = require("./superAdminManagement/routes/superAdmin.routes.js");
 const superAdminBuRouter = require("./superAdminBuManagement/routes/superAdminBu.routes.js");
 const clinetBranchRouter = require("./businessUnitAdministration/routes/branch.routes.js")
-
+const humanRouter = require("./HumanResource/router.js");
 
 
 
@@ -38,25 +42,31 @@ const User = require("./model/user.js");
 const appointmentSchema = require("./model/patient.js"); // Import the Appointment schema
 
 
-// middleware setup
 
+// middleware setup
 app.use(cors());
 app.use(express.json())
 app.use(express.static('public'))
 app.use(bodyParser.json());
-
+app.use(express.urlencoded({extended:true}))
 
 
 // connecting database
 const DATABASE_URL = process.env.DATABASE_URL;
 ConnectDb(DATABASE_URL);
-
+app.use((req,res,next)=>{
+    console.log(req.path)
+    next()
+})
 
 // routes setup
+app.use("/human", humanRouter);
 app.use("/api", welcomeRouter.router);
 app.use("/api/superAdmin", superAdminRouter.router);
 app.use("/api/superAdmin/bu/", superAdminBuRouter.router);
 app.use("/api/clinet/bu/branch", clinetBranchRouter.router);
+app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocs))
+ 
 
 
 // insert role
