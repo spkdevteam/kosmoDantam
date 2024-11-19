@@ -5,6 +5,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
+const swaggerDocs = require("./documentation/swagger.js");  
+const swaggerUi = require('swagger-ui-express');
+
 
 // cors setup
 const cors = require("cors");
@@ -28,6 +31,8 @@ const superAdminRouter = require("./superAdminManagement/routes/superAdmin.route
 const superAdminBuRouter = require("./superAdminBuManagement/routes/superAdminBu.routes.js");
 const clinetBranchRouter = require("./businessUnitAdministration/routes/branch.routes.js");
 const clinetChairhRouter = require("./businessUnitAdministration/routes/chair.routes.js");
+const clientDepartment = require("./businessUnitAdministration/routes/department.routes.js");
+const clientservicesRouter= require("./businessUnitAdministration/routes/service.routes.js");
 
 
 
@@ -45,6 +50,7 @@ app.use(cors());
 app.use(express.json())
 app.use(express.static('public'))
 app.use(bodyParser.json());
+app.use(express.urlencoded({extended:true}))
 
 
 
@@ -59,7 +65,9 @@ app.use("/api/superAdmin", superAdminRouter.router);
 app.use("/api/superAdmin/bu/", superAdminBuRouter.router);
 app.use("/api/clinet/bu/branch", clinetBranchRouter.router);
 app.use("/api/clinet/bu/chair", clinetChairhRouter.router);
-
+app.use("/api/client/bu/department", clientDepartment);
+app.use("/api/client/bu/services", clientservicesRouter);
+app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 
 // insert role
 const roles = [

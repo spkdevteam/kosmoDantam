@@ -14,7 +14,8 @@ const clinetBranchSchema = new Schema(
         incorporationName: { type: String, required: true },
         cinNumber:  { type: String },
         gstNumber:  { type: String },
-
+        branchPrefix:  { type: String },
+        branchId:{type:String},
         emailContact: {
             type: String,
             unique: true,

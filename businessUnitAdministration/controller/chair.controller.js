@@ -20,7 +20,7 @@ exports.createChairByBusinessUnit = async (req, res) => {
 
         // Destructure fields from request body
         const { clientId, chairLocation, chairNumber, createdBy, branchId } = req.body;
-
+        console.log(req.body)
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,

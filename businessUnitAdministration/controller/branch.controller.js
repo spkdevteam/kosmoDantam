@@ -14,18 +14,14 @@ const clinetBranchSchema = require("../../client/model/branch");
 
 // create branch by business unit
 exports.createBranchByBusinessUnit = async (req, res) => {
-
     try {
-
         // Destructure fields from request body
         const { clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber } = req.body;
-
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
             });
         }
-
         // Check if required fields are missing
         if (!name || !incorporationName || !emailContact || !contactNumber) {
             return res.status(statusCode.BadRequest).send({
@@ -34,19 +30,15 @@ exports.createBranchByBusinessUnit = async (req, res) => {
         }
 
         const clientConnection = await getClientDatabaseConnection(clientId);
-
         const Branch = clientConnection.model('branch', clinetBranchSchema);
-
         const existingBranch = await Branch.findOne({
             $or: [{ emailContact: emailContact.toLowerCase() }, { contactNumber }],
         });
-
         if (existingBranch) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblBranchAlreadyExists,
             });
         }
-
         // Create new brnanch 
         const newBranch = await Branch.create(
             [

@@ -88,6 +88,12 @@ module.exports = {
     lblChairNotFound : "Chair not found!",
     lblChairFoundSucessfully : "Chair found successfully!",
 
+    lblDepartmentalreadyExist:"department already exist in the same name",
+    lblDpartmentCreationSuccess:"New department created",
+    lblDpartmentModified:"Department modified",
+    lblNoChanges:"No changes found ",
+    lblCredentialMissing:"requiered information is missing ",
+    lblDepartmentDeleted:"Department deleted successfully "
 
 
 
