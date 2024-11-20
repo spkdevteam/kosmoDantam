@@ -33,6 +33,7 @@ const clinetBranchRouter = require("./businessUnitAdministration/routes/branch.r
 const clinetChairhRouter = require("./businessUnitAdministration/routes/chair.routes.js");
 const clientDepartment = require("./businessUnitAdministration/routes/department.routes.js");
 const clientservicesRouter= require("./businessUnitAdministration/routes/service.routes.js");
+const clientProcedureRouter= require("./businessUnitAdministration/routes/procedure.routes.js");
 
 
 
@@ -67,6 +68,7 @@ app.use("/api/clinet/bu/branch", clinetBranchRouter.router);
 app.use("/api/clinet/bu/chair", clinetChairhRouter.router);
 app.use("/api/client/bu/department", clientDepartment);
 app.use("/api/client/bu/services", clientservicesRouter);
+app.use("/api/client/bu/procedures", clientProcedureRouter);
 app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 
 // insert role

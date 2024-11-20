@@ -1,10 +1,14 @@
 
 const express = require('express')
-const { createSerices } = require('../controller/service.controller')
+const { createServices, editService, deleteService,readActiveServices } = require('../controller/service.controller')
+
 const serviceRouter = express.Router()
 
 
 
-serviceRouter.post('/createServices',createSerices)
+serviceRouter.post('/createServices',createServices)
+serviceRouter.put('/editService',editService )
+serviceRouter.delete('/deleteService',deleteService )
+serviceRouter.get('/getAllActiveServices',readActiveServices)
 
 module.exports = serviceRouter

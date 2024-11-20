@@ -101,9 +101,18 @@ module.exports = {
     //service 
     lblServiceExist:"Service alredy exist in the same name ",
     lblServiceCreated:"New service created ",
-    lblNotavalidSerialNumber:"Not a valid serial number "
+    lblNotavalidSerialNumber:"Not a valid serial number ",
+    lblServicenotFound:"No service found on this id ",
+    lblServiceDeleted:"Service has deleted",
+    lblSuccess:"request processed ",
+    lblFailed:"request processing failed ",
 
+    //procedures
 
-
-
+    lblProcedurealreadyExist:"Procedure alredy exist in the same name ",
+    lblProcedureCreated:"New Procedure created ",
+    lblProcedureNotFound:"No Procedure found on this id ",
+    lblProcedureNotModified:"No update found to update ",
+    lblProcedureDeleted:"Procedure has deleted",
+    lblProcedureModified:"Procedure modified"
   };

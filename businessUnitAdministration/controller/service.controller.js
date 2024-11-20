@@ -1,16 +1,43 @@
 const sanitizeBody = require("../../utils/sanitizeBody")
-const { createService } = require("../services/services.service")
+const { createService, deleteService, readActiveServices } = require("../services/services.service")
 
-exports.createSerices = async (req,res)=>{
+exports.createServices = async (req,res)=>{
     try {
         const data = await sanitizeBody(req.body)
         const result = await createService(data)
-        
-        console.log(result)
-        
-
+        res.json(result)
     } catch (error) {
-        
+        res.json( {status:false,message:error.message} )        
     }
-    res.json( req.body )
+}
+
+
+exports.editService = async (req,res)=>{
+    try {
+        const data = await sanitizeBody(req.body)
+        const result = await createService(data)
+        res.json(result)
+    } catch (error) {
+        res.json( {status:false,message:error.message} )        
+    }
+}
+
+exports.deleteService = async (req,res)=>{
+    try {
+        const data = await sanitizeBody(req.query)
+        const result = await deleteService(data)
+        res.json(result)
+    } catch (error) {
+        res.json( {status:false,message:error.message} )        
+    }
+}
+
+exports.readActiveServices = async (req,res)=>{
+    try {
+        const data = await sanitizeBody(req.query)
+        const result = await readActiveServices(data)
+        res.json(result)
+    } catch (error) {
+       res.json({status:false,message:error.message})     
+    } 
 }

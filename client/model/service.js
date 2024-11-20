@@ -7,7 +7,9 @@ const serviceSchema = new mongoose.Schema({
     serviceName: { type: String, unique: true, required: true },
     branchId :  { type: String },
     description: { type: String },
-    price:{ type: Number,default:0.00 }
+    price:{ type: Number,default:0.00 },
+    deleted:{type:Boolean,default:false},
+    isActive:{type:Boolean,default:true},
 });
  
 serviceSchema.index({ serviceId: 1, serviceName: 1 }, { unique: true });
