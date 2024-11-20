@@ -5,6 +5,7 @@ const serviceSchema = new mongoose.Schema({
     department: { type: String, required: true },
     procedures: { type: [String], default: [] },  
     serviceName: { type: String, unique: true, required: true },
+    branchId :  { type: String },
     description: { type: String },
     price:{ type: Number,default:0.00 }
 });

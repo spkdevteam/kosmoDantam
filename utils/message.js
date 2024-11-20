@@ -8,6 +8,7 @@ module.exports = {
     lblOtpNotMatched: 'OTP not matched!',
     lblRequiredFieldMissing: "Required fields are missing. Please check your input!",
     lblNoToken: "Token not provided!",
+    lblNotavalidAmount:"Not a valid integer",
 
 
 
@@ -88,14 +89,19 @@ module.exports = {
     lblChairNotFound : "Chair not found!",
     lblChairFoundSucessfully : "Chair found successfully!",
 
+    //department
     lblDepartmentalreadyExist:"department already exist in the same name",
     lblDpartmentCreationSuccess:"New department created",
     lblDpartmentModified:"Department modified",
     lblNoChanges:"No changes found ",
     lblCredentialMissing:"requiered information is missing ",
-    lblDepartmentDeleted:"Department deleted successfully "
+    lblDepartmentDeleted:"Department deleted successfully ",
+    lbldepartmentNotFound:"department not found ",
 
-
+    //service 
+    lblServiceExist:"Service alredy exist in the same name ",
+    lblServiceCreated:"New service created ",
+    lblNotavalidSerialNumber:"Not a valid serial number "
 
 
 
