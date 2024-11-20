@@ -10,6 +10,7 @@ const Roles = require("../../model/role");
 
 const clientRoleSchema = require("../../client/model/role");
 const clinetUserSchema = require("../../client/model/user");
+const clinetBusinessUnitSchema = require("../../client/model/businessUnit");
 const clinetBranchSchema = require("../../client/model/branch");
 
 
@@ -43,7 +44,7 @@ exports.createBusinessUnit = async (req, res) => {
     session.startTransaction(); // Start transaction
 
 
-    const superAdmin =  req.user
+    const superAdmin = req.user
 
     // Destructure fields from request body
     const { firstName, lastName, middleName, email, phone, password } = req.body;
@@ -92,7 +93,7 @@ exports.createBusinessUnit = async (req, res) => {
           isUserVerified: true,
           tc: true,
           isCreatedBySuperAdmin: true,
-          createdBy : superAdmin._id,
+          createdBy: superAdmin._id,
         },
       ],
       { session }
@@ -117,7 +118,7 @@ exports.createBusinessUnit = async (req, res) => {
     const clientUser = clientConnection.model('clientUsers', clinetUserSchema);
 
 
-    await clientUser.create({
+    const newClient = await clientUser.create({
 
       role: buRoleId?._id,
       roleId: 2,
@@ -130,6 +131,17 @@ exports.createBusinessUnit = async (req, res) => {
       isUserVerified: true,
       isActive: true,
 
+    });
+
+
+    const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
+
+    await BusinessUnit.create({
+      buHead: newClient._id,
+      name: newUser[0].firstName + " " + newUser[0].lastName + " " + "Businsenss Unit",
+      emailContact: newUser[0].email,
+      contactNumber: newUser[0].phone,
+      createdBy: newClient._id
     });
 
 

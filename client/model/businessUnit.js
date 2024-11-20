@@ -8,7 +8,7 @@ const clinetBusinessUnitSchema = new Schema(
     {
 
 
-        buHead: { type: ObjectId, ref: "user", default:null, index: true }, // Index for admin/user relationships
+        buHead: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
 
         name: { type: String, required: true },
 
@@ -30,6 +30,7 @@ const clinetBusinessUnitSchema = new Schema(
         contactNumber: {
             type: String,
             trim: true,
+            unique: true,
             validate: {
                 validator: function (v) {
                     return /^\+?[1-9]\d{1,14}$/.test(v);
@@ -61,7 +62,7 @@ const clinetBusinessUnitSchema = new Schema(
         isActive: { type: Boolean, default: true },
 
         // handlign created by
-        createdBy: { type: ObjectId, ref: "user", default:null, index: true }, // Index for admin/user relationships
+        createdBy: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
 
         deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality
     },

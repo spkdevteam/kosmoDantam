@@ -43,7 +43,7 @@ const connectionPool = new Map();
 
 const getClientDatabaseConnection = async (clientId) => {
 
-    console.log("connectionPool",connectionPool);
+    // console.log("connectionPool",connectionPool);
     
 
     if (connectionPool.has(clientId)) {

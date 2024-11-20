@@ -7,7 +7,7 @@ const message = require("../../utils/message");
 
 const { getClientDatabaseConnection } = require("../../db/connection");
 const clinetBranchSchema = require("../../client/model/branch");
-
+const clinetBusinessUnitSchema = require("../../client/model/businessUnit")
 
 
 
@@ -18,7 +18,7 @@ exports.createBranchByBusinessUnit = async (req, res) => {
     try {
 
         // Destructure fields from request body
-        const { clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber } = req.body;
+        const { clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnitId, branchHeadId  } = req.body;
 
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
@@ -51,7 +51,7 @@ exports.createBranchByBusinessUnit = async (req, res) => {
         const newBranch = await Branch.create(
             [
                 {
-                    clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber
+                    clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit : businessUnitId, branchHead : branchHeadId
                 },
             ],
         );
@@ -167,9 +167,17 @@ exports.getParticularBranchByBusinessUnit = async (req, res) => {
         // Get client database connection
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
+
 
         // Fetch the branch by ID
-        const branch = await Branch.findById(branchId);
+        const branch = await Branch.findById(branchId)
+        .populate({
+            path: 'businessUnit',
+            model: BusinessUnit,
+            select: 'name emailContact city state', // Specify fields to return from businessUnit
+        });
+
 
         if (!branch) {
             return res.status(404).send({
