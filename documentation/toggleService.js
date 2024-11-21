@@ -12,7 +12,7 @@
  *         application/json:
  *           example:
  *             clientId: "6735e64c5c58f271b1ce1678"
- *             serviceId: "UT-AB-2024-SV1001"
+ *             serviceId: "673f1a23c071b7a57c123a0e"
  
  *     responses:
  *       200:

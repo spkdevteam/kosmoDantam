@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 
 const serviceSchema = new mongoose.Schema({
     serviceId: { type: String, unique: true, required: true },
-    department: { type: String, required: true },
+    departmentId: {type: mongoose.Schema.ObjectId,ref:'department',  required: true  },
     procedures: { type: [String], default: [] },  
     serviceName: { type: String, unique: true, required: true },
-    branchId :  { type: String },
+    branchId :  { type: mongoose.Schema.ObjectId,ref:'branch',required:true },
     description: { type: String },
     price:{ type: Number,default:0.00 },
-    deleted:{type:Boolean,default:false},
+    deletedAt:{type:Date,default:null},
     isActive:{type:Boolean,default:true},
 });
  

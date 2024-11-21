@@ -12,7 +12,7 @@
  *         application/json:
  *           example:
  *             clientId: "6735e64c5c58f271b1ce1678"
- *             procedureId: "UT-AB-2024-PC100004"
+ *             procedureId: "673f052fc071b7a57c12393d"
  *             
  *     responses:
  *       200:

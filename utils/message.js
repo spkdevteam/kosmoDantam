@@ -106,10 +106,11 @@ module.exports = {
     lblCredentialMissing:"requiered information is missing ",
     lblDepartmentDeleted:"Department deleted successfully ",
     lbldepartmentNotFound:"department not found ",
-
+    lblDepartmentRestored:"Department restored",
     //service 
     lblServiceExist:"Service alredy exist in the same name ",
     lblServiceCreated:"New service created ",
+    lblServiceModified:"Service Modified",
     lblNotavalidSerialNumber:"Not a valid serial number ",
     lblServicenotFound:"No service found on this id ",
     lblServiceDeleted:"Service has deleted",
@@ -123,5 +124,7 @@ module.exports = {
     lblProcedureNotFound:"No Procedure found on this id ",
     lblProcedureNotModified:"No update found to update ",
     lblProcedureDeleted:"Procedure has deleted",
-    lblProcedureModified:"Procedure modified"
+    lblProcedureModified:"Procedure modified",
+    lblProcedurerestored:"Procedure restored ",
+    lblProcedureFetched:"Procedures fetched successfully"
   };

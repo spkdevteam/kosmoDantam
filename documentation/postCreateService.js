@@ -12,9 +12,9 @@
  *         application/json:
  *           example:
  *             clientId: "6735e64c5c58f271b1ce1678"
- *             branchId: "BR001"
+ *             branchId: "6736e43eecc4dfe280f90d03"
  *             serviceId: null
- *             deptId: "UT-AB-2024-DP100008"
+ *             deptId: "673efa60c071b7a57c1238b7"
  *             procedures: ["Procedure 1", "Procedure 2"]
  *             serviceName: "General Checkup"
  *             description: "A routine checkup for patients."

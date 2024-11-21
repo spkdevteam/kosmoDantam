@@ -12,11 +12,11 @@
  *         application/json:
  *           example:
  *             clientId: "6735e64c5c58f271b1ce1678"
- *             deptId: "UT-AB-2024-DP100008"
- *             branchId: "BR001"
+ *             deptId: "673c56bac071b7a57c121d2f"
+ *             branchId: "6736e43eecc4dfe280f90d03"
  *             deptName: "Human Resources"
  *             description: "Updated description for the department."
- *             isActive: true
+ *             
  *     responses:
  *       200:
  *         description: Department updated successfully or no changes made.
@@ -29,21 +29,21 @@
  *                   status: true
  *                   message: "Department created successfully."
  *                   clientId: "6735e64c5c58f271b1ce1678"
- *                   deptId: "UT-AB-2024-DP100008"
- *                   branchId: "BR001"
+ *                   deptId: "673c56bac071b7a57c121d2f"
+ *                   branchId: "6736e43eecc4dfe280f90d03"
  *                   deptName: "Human Resources"
  *                   description: "Updated description for the department."
- *                   isActive: true
+ *                  
  *               DepartmentModified:
  *                 summary: Department details updated.
  *                 value:
  *                   status: true
  *                   message: "Department modified successfully."
  *                   clientId: "6735e64c5c58f271b1ce1678"
- *                   deptId: "UT-AB-2024-DP100008"
- *                   branchId: "BR001"
+ *                   deptId: "673c56bac071b7a57c121d2f"
+ *                   branchId: "6736e43eecc4dfe280f90d03"
  *                   deptName: "Human Resources"
- *                   description: "Handles employee relations and administration."
+ *                   description: "Updated description for the department."
  *                   isActive: true
  *               NoChanges:
  *                 summary: No changes were made to the department.

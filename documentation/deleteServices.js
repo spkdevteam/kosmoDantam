@@ -20,7 +20,7 @@
  *         schema:
  *           type: string
  *         description: ID of the service to delete.
- *         example: "UT-AB-2024-SV1001"
+ *         example: "673d4b4ac071b7a57c12274a"
  *     responses:
  *       200:
  *         description: Service deleted successfully.
