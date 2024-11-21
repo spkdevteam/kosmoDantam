@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /api/client/bu/procedures/editProcedure:
+ * /api/client/bu/procedures/edit:
  *   put:
  *     summary: Edit an existing procedure
  *     description: Updates the details of an existing procedure, allowing modifications to department, services, procedure name, description, etc.

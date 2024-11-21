@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /api/client/bu/procedures/toggleProcedure:
+ * /api/client/bu/procedures/toggleActivestatus:
  *   patch:
  *     summary: Toggle procedure status (on/off)
  *     description: Toggles the status of a procedure (activates or deactivates) based on the provided `clientId` and `procedureId`.

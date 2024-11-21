@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /api/client/bu/procedures/createProcedure:
+ * /api/client/bu/procedures/create:
  *   post:
  *     summary: Create a new procedure
  *     description: Adds a new procedure to the system for specified services and department, with detailed information about the procedure.

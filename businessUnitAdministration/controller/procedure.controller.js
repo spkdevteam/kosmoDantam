@@ -5,9 +5,9 @@ exports.createProcedure = async (req, res) => {
     try {
         const data = await sanitizeBody(req.body)
         const result =await createProcedure(data)
-        res.json(result)
+        res.status(result?.statusCode || 200 ).json(result)
     } catch (error) {
-        res.json({ status: false, message: error.message })
+        res.json({ status: false, message: error.message,statusCode:500 })
     }
 }
 
@@ -16,9 +16,9 @@ exports.editProcedure = async (req, res) => {
     try {
         const data = await sanitizeBody(req.body)
         const result =await createProcedure(data)
-        res.json(result)
+        res.status(result?.statusCode || 200 ).json(result)
     } catch (error) {
-        res.json({ status: false, message: error.message })
+        res.json({ status: false, message: error.message,statusCode:500 })
     }
 }
 
@@ -26,9 +26,9 @@ exports.deleteProcedure = async (req, res) => {
     try {
         const data = await sanitizeBody(req.body)
         const result =await deleteProcedure(data)
-        res.json(result)
+        res.status(result?.statusCode || 200 ).json(result)
     } catch (error) {
-        res.json({ status: false, message: error.message })
+        res.json({ status: false, message: error.message,statusCode:500 })
     }
 }
 
@@ -36,9 +36,9 @@ exports.toggleProcedure = async (req,res)=>{
     try {
         const data = await sanitizeBody(req.body)
         const result =await toggleProcedure(data)
-        res.json(result)
+        res.status(result?.statusCode || 200 ).json(result)
     } catch (error) {
-        res.json({ status: false, message: error.message })
+        res.json({ status: false, message: error.message,statusCode:500 })
     }
 }
 

@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /api/client/bu/procedures/deleteProcedure:
+ * /api/client/bu/procedures/delete:
  *   delete:
  *     summary: Delete a procedure
  *     description: Deletes a procedure based on the provided `clientId` and `procedureId`.

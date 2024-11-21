@@ -1,60 +1,65 @@
 const message = require("../../utils/message")
 const sanitizeBody = require("../../utils/sanitizeBody")
-const { createDepartment, deleteDepartment,getallDepartments,toggleDepartment } = require("../services/department.service")
+const { 
+    createDepartment, 
+    deleteDepartment,
+    getallDepartments,
+    toggleDepartment, 
+    editDepartment 
+} = require("../services/department.service")
 
 
-exports.createDepartment =async (req, res) => {
+exports.createDepartment =async (req, res,next) => {
     try {
         const data =await sanitizeBody(req.body)
         const result = await createDepartment(data)
-        res.json(result)
+        res.status(result.statusCode || 200).json(result)
     } catch (error) {
-        res.json({ status: false, message: error.message })
+        next(error);
     }
 }
 
-exports.deleteDepartment = async (req,res)=>{
+exports.deleteDepartment = async (req,res,next)=>{
     try {
         const data = await sanitizeBody(req.query)
         console.log(req.query, data)
         const result = await deleteDepartment(data)
-        res.json(result)
+        res.status(result.statusCode || 200).json(result)
     } catch (error) {
-        res.json({status:false,message:error.message})
+        next(error);
     }
 }
 
 
 
-exports.editDepartment =async (req, res) => {
+exports.editDepartment =async (req, res,next) => {
     try {
         const data =await sanitizeBody(req.body)
         if(!data.deptId) res.json({status:false,message:message.lblCredentialMissing})
-            const result = await createDepartment(data)
-        console.log(data,result,'dataadfddfdfaaaa')
-        res.json(result)
+            const result = await editDepartment(data)
+        res.status(result.statusCode || 200).json(result)
     } catch (error) {
-        res.json({ status: false, message: error.message })
+        next(error);
     }
 }
 
-exports.getAllActiveDepartment = async (req,res)=>{
+exports.getAllActiveDepartment = async (req,res,next)=>{
     
     try {
         const data = await sanitizeBody(req.query)
         const  result  = await getallDepartments(data)
-        res.json(result)
+        res.status(result.statusCode || 200).json(result)
     } catch (error) {
-        res.json({status:false,message:error.message})
+        next(error);
     }
 } 
 
-exports.toggleDepartments = async (req,res)=>{
+exports.toggleDepartments = async (req,res,next)=>{
 try {
     const data = await sanitizeBody(req.query)
     const  result  = await toggleDepartment(data)
-    res.json(result)
+    res.status(result.statusCode || 200).json(result)
 } catch (error) {
-    res.json({status:false,message:error.message})
+    next(error);
 }
 }

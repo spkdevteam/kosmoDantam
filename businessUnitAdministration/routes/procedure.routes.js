@@ -1,12 +1,18 @@
+const express = require('express');
+const { 
+    createProcedure, 
+    editProcedure, 
+    deleteProcedure, 
+    toggleProcedure 
+} = require('../controller/procedure.controller');
 
-const express = require('express')  
-const { createProcedure,editProcedure,deleteProcedure,toggleProcedure } = require('../controller/procedure.controller')
-const procedureRouter = express.Router()
+const procedureRouter = express.Router();
 
-procedureRouter.post('/createProcedure',createProcedure) 
-procedureRouter.put('/editProcedure',editProcedure)  
-procedureRouter.delete('/deleteProcedure',deleteProcedure)
-procedureRouter.patch('/toggleProcedure',toggleProcedure)
+// Procedure Routes
+procedureRouter
+    .post('/create', createProcedure) // Create a new procedure
+    .put('/edit', editProcedure)     // Edit an existing procedure
+    .delete('/delete', deleteProcedure) // Delete a procedure
+    .patch('/toggleActivestatus', toggleProcedure); // Toggle a procedure's status
 
-
-module.exports = procedureRouter
+module.exports = procedureRouter;

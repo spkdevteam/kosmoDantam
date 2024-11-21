@@ -13,8 +13,8 @@
  *           example:
  *             clientId: "6735e64c5c58f271b1ce1678"
  *             deptName: "Human Resources"
- *             deptId: "DPT001"
- *             branchId: "BR001"
+ *             deptId: null
+ *             branchId: "6736e43eecc4dfe280f90d03"
  *             description: "Handles employee relations and administration."
  *     responses:
  *       201:
@@ -27,8 +27,8 @@
  *               data:
  *                 clientId: "6735e64c5c58f271b1ce1678"
  *                 deptName: "Human Resources"
- *                 deptId: "DPT001"
- *                 branchId: "BR001"
+ *                 deptId: "generatedDeptId"
+ *                 branchId: "6736e43eecc4dfe280f90d03"
  *                 description: "Handles employee relations and administration."
  *       400:
  *         description: Validation error or duplicate entry.
@@ -36,7 +36,7 @@
  *           application/json:
  *             example:
  *               status: false
- *               message: "Department name already exists."
+ *               message: "Validation error. Please check the input fields."
  *       500:
  *         description: Internal server error.
  *         content:

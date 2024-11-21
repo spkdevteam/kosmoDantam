@@ -1,53 +1,53 @@
 const sanitizeBody = require("../../utils/sanitizeBody")
 const { createService, deleteService, readActiveServices,toggleServiceStatus } = require("../services/services.service")
 
-exports.createServices = async (req,res)=>{
+exports.createServices = async (req,res,next)=>{
     try {
         const data = await sanitizeBody(req.body)
         const result = await createService(data)
-        res.json(result)
+        res.status(result?.statusCode).json(result)
     } catch (error) {
-        res.json( {status:false,message:error.message} )        
+        next(error)
     }
 }
 
 
-exports.editService = async (req,res)=>{
+exports.editService = async (req,res,next)=>{
     try {
         const data = await sanitizeBody(req.body)
         const result = await createService(data)
-        res.json(result)
+        res.status(result?.statusCode).json(result)
     } catch (error) {
-        res.json( {status:false,message:error.message} )        
+        next(error)
     }
 }
 
-exports.deleteService = async (req,res)=>{
+exports.deleteService = async (req,res,next)=>{
     try {
         const data = await sanitizeBody(req.query)
         const result = await deleteService(data)
-        res.json(result)
+        res.status(result?.statusCode).json(result)
     } catch (error) {
-        res.json( {status:false,message:error.message} )        
+        next(error)
     }
 }
 
-exports.readActiveServices = async (req,res)=>{
+exports.readActiveServices = async (req,res,next)=>{
     try {
         const data = await sanitizeBody(req.query)
         const result = await readActiveServices(data)
-        res.json(result)
+        res.status(result?.statusCode).json(result)
     } catch (error) {
-       res.json({status:false,message:error.message})     
+       next(error)
     } 
 }
 
-exports.toggleService = async (req,res)=>{
+exports.toggleService = async (req,res,next)=>{
     try {
         const data = await sanitizeBody(req.body)
         const result = await toggleServiceStatus(data)   
-        res.json(result)
+        res.status(result?.statusCode).json(result)
     } catch (error) {
-         res.json({status:false,message:error.message})
+         next(error)
     }
 }
