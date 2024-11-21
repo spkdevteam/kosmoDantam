@@ -13,6 +13,10 @@ const clientRoleSchema = new mongoose.Schema({
                 displayName: { type: String, default: null },
                 access: { type: Boolean, default: false },
                 subMenus: {
+                    list: {
+                        access: { type: Boolean, default: false },
+                        api: { type: String, default: null },
+                    },
                     create: {
                         access: { type: Boolean, default: false },
                         api: { type: String, default: null },
@@ -25,7 +29,15 @@ const clientRoleSchema = new mongoose.Schema({
                         access: { type: Boolean, default: false },
                         api: { type: String, default: null },
                     },
-                    delete: {
+                    softDelete: {
+                        access: { type: Boolean, default: false },
+                        api: { type: String, default: null },
+                    },
+                    hardDelete: {
+                        access: { type: Boolean, default: false },
+                        api: { type: String, default: null },
+                    },
+                    activeActive: {
                         access: { type: Boolean, default: false },
                         api: { type: String, default: null },
                     },

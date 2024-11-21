@@ -25,6 +25,9 @@ exports.createChairByBusinessUnit = async (req, res, next) => {
 
         // Destructure fields from request body
         const { clientId, chairLocation, chairNumber, createdBy, branchId } = req.body;
+
+        const mainUser = req.user;
+
         console.log(req.body)
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
@@ -56,7 +59,7 @@ exports.createChairByBusinessUnit = async (req, res, next) => {
             chairLocation,
             chairNumber,
             branch: branchId,
-            createdBy,
+            createdBy : mainUser._id,
         });
 
         return res.status(statusCode.OK).send({

@@ -3,29 +3,31 @@
 const express = require("express");
 let router = express.Router();
 
-
+const auth = require("../../middleware/authorization/chairAuthorization/chairAuthorization")
 
 const businessUnitChairContrller = require("../controller/chair.controller");
+
+const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization")
+
 
 
 
 // # create, update, view, list, activate/inactive, delete Chair by business unit routes starts here
 
 
-router.post('/createChair', businessUnitChairContrller.createChairByBusinessUnit);
+router.post('/createChair', entityAuth.authorizeEntity("Chair","create"), businessUnitChairContrller.createChairByBusinessUnit);
 
-router.put('/updateChair', businessUnitChairContrller.updateChairByBusinessUnit);
+router.put('/updateChair', entityAuth.authorizeEntity("Chair","update"), businessUnitChairContrller.updateChairByBusinessUnit);
 
-router.get('/Chair/:clientId/:chairId', businessUnitChairContrller.getParticularChairByBusinessUnit);
+router.get('/Chair/:clientId/:chairId',  entityAuth.authorizeEntity("Chair","view"), businessUnitChairContrller.getParticularChairByBusinessUnit);
 
-router.get('/listChair', businessUnitChairContrller.listChair);
+router.get('/listChair', entityAuth.authorizeEntity("Chair","list"), businessUnitChairContrller.listChair);
 
-router.post("/activeInactiveChair", businessUnitChairContrller.activeinactiveChairByBusinessUnit);
+router.post("/activeInactiveChair",  entityAuth.authorizeEntity("Chair","activeActive"), businessUnitChairContrller.activeinactiveChairByBusinessUnit);
 
-router.post("/softDeleteChair", businessUnitChairContrller.softDeleteChairByBusinesssUnit);
+router.post("/softDeleteChair", entityAuth.authorizeEntity("Chair","softDelete"), businessUnitChairContrller.softDeleteChairByBusinesssUnit);
 
-router.post("/restoreChair", businessUnitChairContrller.restoreChairByBusinessUnit);
-
+router.post("/restoreChair",entityAuth.authorizeEntity("Chair","update"), businessUnitChairContrller.restoreChairByBusinessUnit);
 
 
 // # create, update, view, list, activate/inactive, delete Chair by business unit routes ends here

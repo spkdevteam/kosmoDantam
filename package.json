@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "start:reset": "nodemon --exec \"node -r ./clear-cache.js ./app.js\""
+
   },
   "dependencies": {
     "aws-sdk": "^2.1581.0",
