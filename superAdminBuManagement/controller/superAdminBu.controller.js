@@ -106,6 +106,8 @@ exports.createBusinessUnit = async (req, res) => {
     const clientRole = clientConnection.model('clientRoles', clientRoleSchema);
     const roles = clientRoles;
 
+    
+
     // insert fixed
     const createdRole = await clientRole.insertMany(roles);
 
@@ -150,7 +152,7 @@ exports.createBusinessUnit = async (req, res) => {
     session.endSession();
     return res.status(statusCode.OK).send({
       message: message.lblBusinessUnitCreatedSuccess,
-      data: { userId: newUser[0]._id, email: newUser[0].email },
+      data: { userId: newUser[0]._id, email: newUser[0].email, roles, createdRole },
     });
 
   } catch (error) {

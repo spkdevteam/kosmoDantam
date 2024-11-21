@@ -6,7 +6,7 @@ const ObjectId = Schema.ObjectId;
 
 const clinetUserSchema = new Schema(
     {
-        role: { type: ObjectId, ref: "role", index: true }, // Index for role-based queries
+        role: { type: ObjectId, ref: "clientRoles", index: true }, // Index for role-based queries
         roleId: { type: Number },
 
         firstName: { type: String, required: true },
