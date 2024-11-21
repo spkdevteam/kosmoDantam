@@ -6,9 +6,10 @@
 //     "description": "Handles employee relations and administration."
 //   }
 
+const departmentSchema = require("../../client/model/department")
 const { getClientDatabaseConnection } = require("../../db/connection")
 const buSettingsSchema = require("../../model/buSettings")
-const departmentSchema = require("../../model/department")
+ 
 const getserialNumber = require("../../model/services/getserialNumber")
 const message = require("../../utils/message")
 const createDepartment = async (input) => {
@@ -64,4 +65,16 @@ const getallDepartments = async (input)=>{
     }
 }
 
-module.exports = { createDepartment ,deleteDepartment ,getallDepartments}
+const toggleDepartment = async (input)=>{
+try {
+    const db =await getClientDatabaseConnection(input.clientId)
+        const departments =await  db.model('department',departmentSchema)
+        const isExist =  await departments.find({deptId:input?.deptId})
+        if(!isExist || isExist.deleted) return {status:false,message:message.lbldepartmentNotFound}
+        const result = await departments.updateOne({deptId:input?.deptId},{$set:{isActive:!isExist?.isActive}})
+        if(result.modifiedCount) return {status:true,message:`Department ${isExist.deptName} has ${isExist.isActive ? 'disabled':'enabled'} `}
+} catch (error) {
+    
+}
+}
+module.exports = { createDepartment ,deleteDepartment ,getallDepartments,toggleDepartment}

@@ -1,5 +1,5 @@
 const sanitizeBody = require("../../utils/sanitizeBody")
-const { createProcedure,deleteProcedure } = require("../services/procedure.service")
+const { createProcedure,deleteProcedure,toggleProcedure } = require("../services/procedure.service")
 
 exports.createProcedure = async (req, res) => {
     try {
@@ -32,4 +32,13 @@ exports.deleteProcedure = async (req, res) => {
     }
 }
 
+exports.toggleProcedure = async (req,res)=>{
+    try {
+        const data = await sanitizeBody(req.body)
+        const result =await toggleProcedure(data)
+        res.json(result)
+    } catch (error) {
+        res.json({ status: false, message: error.message })
+    }
+}
 

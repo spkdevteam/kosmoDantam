@@ -57,7 +57,7 @@ exports.createBranchByBusinessUnit = async (req, res) => {
         console.error("Error in createBranch:", error);
         return res.status(statusCode.InternalServerError).send({
             message: message.lblInternalServerError,
-            error: error.message, // Optional: Include detailed error message for debugging
+            error: error.message,  
         });
     }
 };

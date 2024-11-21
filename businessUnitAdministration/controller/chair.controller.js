@@ -169,6 +169,7 @@ exports.getParticularChairByBusinessUnit = async (req, res) => {
         }
 
         // Get client database connection
+        
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Chair = clientConnection.model('chair', clinetChairSchema);
 

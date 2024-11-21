@@ -14,9 +14,10 @@
 //   }
 
 const clinetBranchSchema = require("../../client/model/branch")
+const departmentSchema = require("../../client/model/department")
 const serviceSchema = require("../../client/model/service")
 const { getClientDatabaseConnection } = require("../../db/connection")
-const departmentSchema = require("../../model/department")
+
 const getserialNumber = require("../../model/services/getserialNumber")
 const message = require("../../utils/message")
 const validateSerialnumber = require("../../utils/validateSerialNumber")
@@ -112,5 +113,22 @@ const readActiveServices = async (input)=>{
     }
 }
 
+const toggleServiceStatus =async (input)=>{
+    try {
+      
+        const db = await getClientDatabaseConnection(input.clientId);  
+        const services =await db.model('services', serviceSchema);
+        const isExist  = await services.findOne({serviceId:input?.serviceId}) 
+        console.log(isExist,'--------++++++++++++++++')
+        if(! await validateSerialnumber(input?.serviceId,input?.clientId)) return  {status:false,message:message.lblServicenotFound}
+        if(!isExist || isExist.deleted ) return {status:false,message:message.lblServicenotFound}
+        const result = await services.updateOne({serviceId:input?.serviceId},{$set:{isActive:!isExist.isActive}})
+        if(result.modifiedCount) return {status:true,message:`Service ${isExist?.serviceName} ${isExist.isActive?'enabled':'disabled'}`}
+        
+    } catch (error) {
+        return {status:true,message:error.message}
+    }
+}
 
-module.exports = {createService,deleteService,readActiveServices}
+
+module.exports = {createService,deleteService,readActiveServices,toggleServiceStatus}

@@ -1,6 +1,6 @@
 const message = require("../../utils/message")
 const sanitizeBody = require("../../utils/sanitizeBody")
-const { createDepartment, deleteDepartment,getallDepartments } = require("../services/department.service")
+const { createDepartment, deleteDepartment,getallDepartments,toggleDepartment } = require("../services/department.service")
 
 
 exports.createDepartment =async (req, res) => {
@@ -41,9 +41,20 @@ exports.editDepartment =async (req, res) => {
 exports.getAllActiveDepartment = async (req,res)=>{
     
     try {
-        const  result  = await getallDepartments
+        const data = await sanitizeBody(req.query)
+        const  result  = await getallDepartments(data)
         res.json(result)
     } catch (error) {
         res.json({status:false,message:error.message})
     }
 } 
+
+exports.toggleDepartments = async (req,res)=>{
+try {
+    const data = await sanitizeBody(req.query)
+    const  result  = await toggleDepartment(data)
+    res.json(result)
+} catch (error) {
+    res.json({status:false,message:error.message})
+}
+}

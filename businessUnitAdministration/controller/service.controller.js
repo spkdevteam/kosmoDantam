@@ -1,5 +1,5 @@
 const sanitizeBody = require("../../utils/sanitizeBody")
-const { createService, deleteService, readActiveServices } = require("../services/services.service")
+const { createService, deleteService, readActiveServices,toggleServiceStatus } = require("../services/services.service")
 
 exports.createServices = async (req,res)=>{
     try {
@@ -40,4 +40,14 @@ exports.readActiveServices = async (req,res)=>{
     } catch (error) {
        res.json({status:false,message:error.message})     
     } 
+}
+
+exports.toggleService = async (req,res)=>{
+    try {
+        const data = await sanitizeBody(req.body)
+        const result = await toggleServiceStatus(data)   
+        res.json(result)
+    } catch (error) {
+         res.json({status:false,message:error.message})
+    }
 }

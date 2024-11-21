@@ -8,4 +8,5 @@ deptRouter.post('/createDepartment',deptController.createDepartment)
 deptRouter.put('/editDepartment',deptController.editDepartment)
 deptRouter.delete('/deleteDepartment',deptController.deleteDepartment)
 deptRouter.get('/activeDepartments',deptController.getAllActiveDepartment)
+deptRouter.patch('/toggleDepartment',deptController.toggleDepartments)
 module.exports = deptRouter
