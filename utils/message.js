@@ -17,6 +17,14 @@ module.exports = {
     lblNotFoundRole: 'This role has not been set up on the platform!',
     lblRoleNotFound: "Role not found.",
 
+    // BusinessUnitRoleAndPermission
+    lblBusinessUnitRoleAlreadyExists : "Role already exists with this name!",
+    lblRoleIdIdAndClientIdRequired: "Role Id and Client Id are required!",
+    lblBusinessUnitRoleFoundSuccessfully : "Roles and permmission found successfully!",
+    lblBusinessUnitRoleCreatedSuccessfully : "Roles and permmission created successfully!",
+    lblBusinessUnitRoleUpdatedSuccessfully : "Roles and permmission updated successfully!",
+
+
 
 
     //Settings
@@ -83,8 +91,9 @@ module.exports = {
 
 
     // chair 
-    lblChairhAlreadyExists : "Chair already exists!",
+    lblChairhAlreadyExists : "Chair already exists with the location or chair number!",
     lblChairCreatedSuccess : "Chair created successfully!",
+    lblChairUpdatedSuccess : "Chair updated successfully!",
     lblChairIdIdAndClientIdRequired: "Chair Id and Client Id are required!",
     lblChairNotFound : "Chair not found!",
     lblChairFoundSucessfully : "Chair found successfully!",

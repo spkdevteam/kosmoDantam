@@ -11,10 +11,15 @@ const clinetChairSchema = require("../../client/model/chair");
 
 
 
+const chairService = require("../../client/service/chair.services")
+
+
+
+
 
 
 // create Chair by business unit
-exports.createChairByBusinessUnit = async (req, res) => {
+exports.createChairByBusinessUnit = async (req, res, next) => {
 
     try {
 
@@ -28,7 +33,7 @@ exports.createChairByBusinessUnit = async (req, res) => {
         }
 
         // Check if required fields are missing
-        if (!chairLocation || !chairNumber ) {
+        if (!chairLocation || !chairNumber) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
@@ -36,57 +41,40 @@ exports.createChairByBusinessUnit = async (req, res) => {
 
         const clientConnection = await getClientDatabaseConnection(clientId);
 
-        const Chair = clientConnection.model('chair', clinetChairSchema);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
 
         const branch = await Branch.findById(branchId);
 
-        if(!branch){
+        if (!branch) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblBranchNotFound,
             });
-
         }
 
-        const existingChair = await Chair.findOne({
-            $or: [ { chairNumber }],
+        // create new chair with service
+        const newChair = await chairService.createChair(clientId, {
+            chairLocation,
+            chairNumber,
+            branch: branchId,
+            createdBy,
         });
-
-        if (existingChair) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblChairhAlreadyExists,
-            });
-        }
-
-        // Create new chair 
-        const newChair = await Chair.create(
-            [
-                {
-                    chairLocation, chairNumber, branch : branchId, createdBy : createdBy
-                 },
-            ],
-        );
 
         return res.status(statusCode.OK).send({
             message: message.lblChairCreatedSuccess,
-            data: { chairId: newChair[0]._id, chairLocation: newChair[0].chairLocation },
+            data: { chairId: newChair._id, chairLocation: newChair.chairLocation },
         });
 
     } catch (error) {
-        console.error("Error in createChair:", error);
-        return res.status(statusCode.InternalServerError).send({
-            message: message.lblInternalServerError,
-            error: error.message, // Optional: Include detailed error message for debugging
-        });
+        next(error)
     }
 };
 
-// // update branch by business unit
-exports.updateChairByBusinessUnit = async (req, res) => {
+// update branch by business unit
+exports.updateChairByBusinessUnit = async (req, res, next) => {
 
     try {
         // Destructure fields from request body
-        const { chairId, clientId, chairLocation, chairNumber,} = req.body;
+        const { chairId, clientId, chairLocation, chairNumber, } = req.body;
 
         // Check if branchId and clientId are provided
         if (!chairId || !clientId) {
@@ -96,68 +84,32 @@ exports.updateChairByBusinessUnit = async (req, res) => {
         }
 
         // Check if required fields are missing
-        if (!chairLocation || !chairNumber ) {
+        if (!chairLocation || !chairNumber) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
 
-        // Get the client-specific database connection
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const Chair = clientConnection.model('chair', clinetChairSchema);
-
-        // Find the branch to be updated
-        const chair = await Chair.findById(chairId);
-        if (!chair) {
-            return res.status(statusCode.NotFound).send({
-                message: message.lblChairNotFound,
-            });
-        }
-
-        // Check if email or contact number is already used by another branch
-        const existingChair = await Chair.findOne({
-            $and: [
-                { _id: { $ne: chairId } },
-                {
-                    $or: [
-                        { chairLocation: chairLocation },
-                        { chairNumber: chairNumber },
-                    ],
-                },
-            ],
+        const updatedChair = await chairService.updateChair(clientId, chairId, {
+            chairLocation,
+            chairNumber,
         });
 
-        if (existingChair) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblChairhAlreadyExists,
-            });
-        }
 
-        
-
-        // Update branch details
-        branch.chairLocation = chairLocation;
-        branch.chairNumber = chairNumber;
-
-        // Save the updated branch
-        await chair.save();
 
         return res.status(statusCode.OK).send({
-            message: message.lblChairCreatedSuccess,
-            data: { chairId: chair._id, chairLocation: chair.chairLocation },
+            message: message.lblChairUpdatedSuccess,
+            data: { chairId: updatedChair._id, chairLocation: updatedChair.chairLocation },
         });
 
     } catch (error) {
-        console.error("Error in updateChair:", error);
-        return res.status(statusCode.InternalServerError).send({
-            message: message.lblInternalServerError,
-            error: error.message,
-        });
+
+        next(error);
     }
 };
 
-// // get particular chair by business unit
-exports.getParticularChairByBusinessUnit = async (req, res) => {
+// get particular chair by business unit
+exports.getParticularChairByBusinessUnit = async (req, res, next) => {
     try {
         const { clientId, chairId } = req.params; // Extract clientId and branchId from request params
 
@@ -168,108 +120,137 @@ exports.getParticularChairByBusinessUnit = async (req, res) => {
             });
         }
 
-        // Get client database connection
-        
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const Chair = clientConnection.model('chair', clinetChairSchema);
+        const chair = await chairService.getChairById(clientId, chairId);
 
-        // Fetch the chair by ID
-        const chair = await Chair.findById(chairId);
-
-        if (!chair) {
-            return res.status(404).send({
-                message: message.lblChairNotFound
-            });
-        }
-
-        // Respond with branch data
         return res.status(200).send({
             message: message.lblChairFoundSucessfully,
             data: chair,
         });
 
     } catch (error) {
-        console.error("Error in getChairById:", error);
-
-        // Handle errors
-        return res.status(500).send({
-            message: message.lblInternalServerError,
-            error: error.message,
-        });
+        next(error)
     }
 };
 
-// // list Chair for business unit
-exports.listChair = async (req, res) => {
+// list chair by business unit
+// exports.listChair = async (req, res, next) => {
+//     try {
+//         const { clientId, keyword = '', page = 1, perPage = 10 } = req.query;
+
+//         const searchText = keyword ? keyword.trim() : '';
+
+//         if (!clientId) {
+//             return res.status(statusCode.BadRequest).send({
+//                 message: message.lblClinetIdIsRequired,
+//             });
+//         }
+
+//         let filters = {
+//             deletedAt: null,
+//         };
+
+//         if (searchText) {
+//             filters.$or = [
+//                 { chairLocation: { $regex: searchText, $options: "i" } },
+//                 { chairNumber: { $regex: searchText, $options: "i" } },
+//             ];
+//         }
+
+//         const result = await chairService.listChairs(clientId, filters, { page, limit: perPage });
+
+//         return res.status(statusCode.OK).send({
+//             message: message.lblChairFoundSucessfully,
+//             data: result,
+//         });
+//     } catch (error) {
+//         next(error) 
+//     }
+// };
+exports.listChair = async (req, res, next) => {
     try {
+        const { clientId, keyword = '', page = 1, perPage = 10 } = req.query;
 
-        const clientId = req.query.clientId;
-        const searchText = req.query.keyword ? req.query.keyword.trim() : '';
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.perPage) || 10;
-        const skip = (page - 1) * limit;
-
-
-        let whereCondition = {
-            deletedAt: null,
-        };
-
-        if (searchText) {
-            whereCondition.$or = [
-                { chairLocation: { $regex: searchText, $options: "i" } },
-                { chairNumber: { $regex: searchText, $options: "i" } },
-            ];
-        }
-
-
-        // Validate inputs
         if (!clientId) {
-            return res.status(400).send({
+            return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
             });
         }
 
-        // Get client database connection
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const Chair = clientConnection.model('chair', clinetChairSchema);
+        const filters = {
+            deletedAt: null,
+            ...(keyword && {
+                $or: [
+                    { chairLocation: { $regex: keyword.trim(), $options: "i" } },
+                    { chairNumber: { $regex: keyword.trim(), $options: "i" } },
+                ],
+            }),
+        };
 
+        const result = await chairService.listChairs(clientId, filters, { page, limit: perPage });
 
-        const [chairs, count] = await Promise.all([
-            Chair.find(whereCondition)
-                .skip(skip)
-                .limit(limit)
-                .sort({ _id: 'desc' }),
-                Chair.countDocuments(whereCondition),
-        ]);
-
-        return res.json({
-            message: 'List of all Chairs!',
-            count: count,
-            listOfChair: chairs,
+        return res.status(statusCode.OK).send({
+            message: message.lblChairFoundSucessfully,
+            data: result,
         });
-
-
     } catch (error) {
-        console.error("Error in listChairs:", error);
-
-        return res.status(statusCode.InternalServerError).send({
-            message: message.lblInternalServerError,
-            error: error.message,
-        });
+        next(error);
     }
 };
 
-// // active inactive chair by Business unit
-exports.activeinactiveChairByBusinessUnit = async (req, res) => {
+
+// active inactive chair by Business unit
+// exports.activeinactiveChairByBusinessUnit = async (req, res, next) => {
 
 
+//     try {
+//         const { keyword, page, perPage, status, chairId, clientId } = req.body;
+//         req.query.keyword = keyword;
+//         req.query.page = page;
+//         req.query.perPage = perPage;
+//         req.query.clientId = clientId;
+
+
+//         // Validate inputs
+//         if (!clientId || !chairId) {
+//             return res.status(400).send({
+//                 message: message.lblChairIdIdAndClientIdRequired,
+//             });
+//         }
+
+//         const updatedChair = await chairService.updateChair(clientId, chairId, {
+//             isActive : status === "1"
+//         });
+
+//         // // Get client database connection
+//         // const clientConnection = await getClientDatabaseConnection(clientId);
+//         // const Chair = clientConnection.model('chair', clinetChairSchema);
+
+
+//         // // Find the business unit by ID
+//         // const chair = await Chair.findById(chairId)
+
+//         // if (!chair) {
+//         //     return res.status(statusCode.ExpectationFailed).send({
+//         //         message: message.lblChairNotFound,
+//         //     });
+//         // }
+
+//         // chair.isActive = status === "1";
+//         // await chair.save();
+
+//         this.listChair(req, res, next);
+
+//     } catch (error) {
+
+
+//        next(error)
+
+//     }
+// };
+
+exports.activeinactiveChairByBusinessUnit = async (req, res, next) => {
     try {
-        const { keyword, page, perPage, status, chairId, clientId } = req.body;
-        req.query.keyword = keyword;
-        req.query.page = page;
-        req.query.perPage = perPage;
-        req.query.clientId = clientId;
-
+        const { status, chairId, clientId } = req.body;
 
         // Validate inputs
         if (!clientId || !chairId) {
@@ -278,39 +259,22 @@ exports.activeinactiveChairByBusinessUnit = async (req, res) => {
             });
         }
 
-        // Get client database connection
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const Chair = clientConnection.model('chair', clinetChairSchema);
-
-
-        // Find the business unit by ID
-        const chair = await Chair.findById(chairId)
-
-        if (!chair) {
-            return res.status(statusCode.ExpectationFailed).send({
-                message: message.lblChairNotFound,
-            });
-        }
-
-        chair.isActive = status === "1";
-        await chair.save();
-
-        this.listChair(req, res);
-
-    } catch (error) {
-
-
-        console.error("Error in activeinactiveBusinessUnit:", error);
-        return res.status(statusCode.InternalServerError).send({
-            message: message.lblInternalServerError,
-            error: error.message,
+        const updatedChair = await chairService.activeInactiveChair(clientId, chairId, {
+            isActive: status === "1",
         });
 
+        // Optionally, you can return the updated chair details if needed
+        return res.status(statusCode.OK).send({
+            message: message.lblChairUpdatedSuccess,
+            data: updatedChair,
+        });
+    } catch (error) {
+        next(error);
     }
 };
 
 // // Soft delete chair by business unit
-exports.softDeleteChairByBusinesssUnit = async (req, res) => {
+exports.softDeleteChairByBusinesssUnit = async (req, res, next) => {
 
     try {
 
@@ -329,35 +293,18 @@ exports.softDeleteChairByBusinesssUnit = async (req, res) => {
             });
         }
 
-        // Get client database connection
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const Chair = clientConnection.model('chair', clinetChairSchema);
+        await chairService.deleteChair(clientId, chairId, softDelete = true)
 
-
-        const chair = await Chair.findById(chairId)
-
-        if (!chair) {
-            return res.status(statusCode.ExpectationFailed).send({
-                message: message.lblChairNotFound,
-            });
-        }
-
-        chair.deletedAt = new Date();
-        await chair.save()
-        this.listChair(req, res);
+        this.listChair(req, res, next);
 
 
     } catch (error) {
-        console.error("Error in softDeleteChair:", error);
-        return res.status(statusCode.InternalServerError).send({
-            message: message.lblInternalServerError,
-            error: error.message,
-        });
+        next(error);
     }
 };
 
-// // restore chair
-exports.restoreChairByBusinessUnit = async (req, res) => {
+// restore chair
+exports.restoreChairByBusinessUnit = async (req, res, next) => {
 
     try {
 
@@ -366,6 +313,7 @@ exports.restoreChairByBusinessUnit = async (req, res) => {
         req.query.keyword = keyword;
         req.query.page = page;
         req.query.perPage = perPage;
+        req.query.clientId = clientId;
 
         // Validate inputs
         if (!clientId || !chairId) {
@@ -374,31 +322,14 @@ exports.restoreChairByBusinessUnit = async (req, res) => {
             });
         }
 
-        // Get client database connection
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const Chair = clientConnection.model('chair', clinetChairSchema);
-
-
-        const chair = await Chair.findById(chairId)
-
-        if (!chair) {
-            return res.status(statusCode.ExpectationFailed).send({
-                message: message.lblChairNotFound,
-            });
-        }
-
-        chair.deletedAt = null;
-        await chair.save();
-        this.listChair(req, res);
+        await chairService.restoreChair(clientId, chairId)
+      
+        this.listChair(req, res, next);
 
 
     } catch (error) {
 
-        console.error("Error in restoreChair:", error);
-        return res.status(statusCode.InternalServerError).send({
-            message: message.lblInternalServerError,
-            error: error.message,
-        });
+        next(error)
     }
 };
 

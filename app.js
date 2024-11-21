@@ -5,6 +5,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
+
+const errorHandler = require("./middleware/errorHandler/errorHandler.js");
+
 const swaggerDocs = require("./documentation/swagger.js");  
 const swaggerUi = require('swagger-ui-express');
 
@@ -31,6 +34,7 @@ const superAdminRouter = require("./superAdminManagement/routes/superAdmin.route
 const superAdminBuRouter = require("./superAdminBuManagement/routes/superAdminBu.routes.js");
 const clinetBranchRouter = require("./businessUnitAdministration/routes/branch.routes.js");
 const clinetChairhRouter = require("./businessUnitAdministration/routes/chair.routes.js");
+const clinetRoleRouter = require("./businessUnitAdministration/routes/rolesAndPermission.routes.js");
 const clientDepartment = require("./businessUnitAdministration/routes/department.routes.js");
 const clientservicesRouter= require("./businessUnitAdministration/routes/service.routes.js");
 const clientProcedureRouter= require("./businessUnitAdministration/routes/procedure.routes.js");
@@ -66,6 +70,7 @@ app.use("/api/superAdmin", superAdminRouter.router);
 app.use("/api/superAdmin/bu/", superAdminBuRouter.router);
 app.use("/api/clinet/bu/branch", clinetBranchRouter.router);
 app.use("/api/clinet/bu/chair", clinetChairhRouter.router);
+app.use("/api/clinet/bu/role", clinetRoleRouter.router);
 app.use("/api/client/bu/department", clientDepartment);
 app.use("/api/client/bu/services", clientservicesRouter);
 app.use("/api/client/bu/procedures", clientProcedureRouter);
@@ -199,7 +204,8 @@ async function createDummyClient() {
 
 // createDummyClient()
 
-
+// Place errorHandler at the END after all routes
+app.use(errorHandler);
 
 
 // port setup

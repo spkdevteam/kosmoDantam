@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
-// const ObjectId = mongoose.Schema.ObjectId
-
+const ObjectId = mongoose.Schema.ObjectId
 
 const clientRoleSchema = new mongoose.Schema({
 
@@ -35,7 +34,12 @@ const clientRoleSchema = new mongoose.Schema({
         ],
         default: [], // Default to an empty array
     },
+    createdBy : { type: ObjectId, ref: "clientUsers", default:null, index: true },
     isActive: { type: Number, default: 1 },
+
+
+    deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality
+
 
 }, { timestamps: true });
 

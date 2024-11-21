@@ -8,7 +8,8 @@ const clinetBranchSchema = new Schema(
     {
 
 
-        branchHead: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
+        businessUnit: { type: ObjectId, ref: "businessUnit", default:null, index: true }, 
+        branchHead: { type: ObjectId, ref: "clientUsers", default:null, index: true }, 
 
         name: { type: String, required: true },
         incorporationName: { type: String, required: true },
@@ -71,7 +72,7 @@ const clinetBranchSchema = new Schema(
         isActive: { type: Boolean, default: false },
 
         // handlign created by
-        createdBy: { type: ObjectId, ref: "user", default:null, index: true }, // Index for admin/user relationships
+        createdBy: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
 
         deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality
     },

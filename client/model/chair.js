@@ -9,9 +9,10 @@ const clinetChairSchema = new Schema(
 
 
         branch: { type: ObjectId, ref: "branch", default:null, index: true }, // Index for admin/user relationships
+        businessUnit: { type: ObjectId, ref: "businessUnit", default:null, index: true }, 
 
-        chairLocation: { type: String, required: true },
-        chairNumber:  { type: String },
+        chairLocation: { type: String, required: true, index: true },
+        chairNumber:  { type: String, index: true },
 
         isActive: { type: Boolean, default: false },
 
