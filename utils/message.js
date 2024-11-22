@@ -126,5 +126,9 @@ module.exports = {
     lblProcedureDeleted:"Procedure has deleted",
     lblProcedureModified:"Procedure modified",
     lblProcedurerestored:"Procedure restored ",
-    lblProcedureFetched:"Procedures fetched successfully"
+    lblProcedureFetched:"Procedures fetched successfully",
+
+
+    //Medical case 
+    lblcaseAlreadyExist:'These medical case already exist '
   };

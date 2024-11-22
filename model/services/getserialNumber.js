@@ -12,11 +12,12 @@ const getserialNumber = async (collection,clientId,branchId) => {
         const buModel =await db.model('BUSetting',buSettingsSchema)
         const branchModel = await db.model('branch', clinetBranchSchema)
         const BUnit= await buModel.findOne({})
-        const branchDetails =await branchModel.findOne({_id:branchId})
+        const branchDetails =branchId.length ? await branchModel.findOne({_id:branchId||''}):{branchPrefix:'BU'}
         const result = await serialNumber.findOneAndUpdate({ collectionName: collection }, { $inc: { nextNum: 1 } })
-        console.log(BUnit.BUPrefix , branchDetails.branchPrefix , BUnit.activeYear ,result.prefix + result.nextNum,    'serial Number')
+        
         if (result) {
-            return BUnit.BUPrefix +'-'+branchDetails.branchPrefix+'-'+BUnit.activeYear + '-' +  result.prefix + result.nextNum
+            console.log('xxx',BUnit.BUPrefix +'-'+branchDetails?.branchPrefix+'-'+BUnit.activeYear + '-' +  result.prefix + result.nextNum)
+            return BUnit.BUPrefix +'-'+branchDetails?.branchPrefix+'-'+BUnit.activeYear + '-' +  result.prefix + result.nextNum
         }
         else {
             return null
@@ -25,5 +26,6 @@ const getserialNumber = async (collection,clientId,branchId) => {
         return null
     }
 }
+
 
 module.exports = getserialNumber
