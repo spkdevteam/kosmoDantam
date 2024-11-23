@@ -35,7 +35,7 @@ const createDepartment = async (input) => {
             branchId: input.branchId,
             description: input.description,
             deptId: input.deptId,
-            deletedAt: null,
+         
             isActive: true,
         }
 
