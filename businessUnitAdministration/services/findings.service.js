@@ -21,22 +21,22 @@ const createFindings = async (input) => {
             }
             input.findingsId = await getserialNumber('findings', input?.clientId, '');
         }
- 
+
         const newData = {
             findingsId: input?.findingsId,
             findingsName: input?.findingsName,
-            discription: input?.discription, 
-            clientId: input?.clientId,  
+            discription: input?.discription,
+            clientId: input?.clientId,
         };
 
-        
+
         const result = await findings.findOneAndUpdate(
             { findingsId: input?.findingsId },
             { $set: newData },
             {
                 new: true,
                 returnDocument: 'after',
-                upsert: true,  
+                upsert: true,
             }
         );
 
@@ -49,10 +49,10 @@ const createFindings = async (input) => {
         };
     } catch (error) {
         // Log and handle unexpected errors
-        
+
         return {
             status: false,
-            statusCode: httpStatusCode.InternalServerError ,
+            statusCode: httpStatusCode.InternalServerError,
             message: 'Internal server error.',
         };
     }
@@ -61,14 +61,14 @@ const createFindings = async (input) => {
 
 const editFindings = async (input) => {
     try {
-        console.log(input,'input')
+        console.log(input, 'input')
         const db = await getClientDatabaseConnection(input?.clientId);
         const findings = db.model('finding', findingsSchema);
-        if (!input._Id)   return {  status: false,  statusCode: httpStatusCode.Conflict,  message: message.lblFindingsDoesNotExist };
-            const newData = {
+        if (!input._Id) return { status: false, statusCode: httpStatusCode.Conflict, message: message.lblFindingsDoesNotExist };
+        const newData = {
             findingsName: input?.findingsName,
-            discription: input?.discription, 
-            clientId: input?.clientId,  
+            discription: input?.discription,
+            clientId: input?.clientId,
         };
         const result = await findings.findOneAndUpdate(
             { _id: input?._Id },
@@ -79,7 +79,7 @@ const editFindings = async (input) => {
             }
         );
 
-       
+
         return {
             status: true,
             statusCode: httpStatusCode.OK,
@@ -87,55 +87,66 @@ const editFindings = async (input) => {
             data: result._doc,
         };
     } catch (error) {
-        
+
         return {
             status: false,
-            statusCode: httpStatusCode.InternalServerError ,
+            statusCode: httpStatusCode.InternalServerError,
             message: error.message,
         };
     }
 };
 
-const ToggleFindings = async(input)=>{
+const ToggleFindings = async (input) => {
     const db = await getClientDatabaseConnection(input?.clientId)
-    const findings =await db.model('finding',findingsSchema)
-    const isExist =await findings.findOne({_Id:input?._id})
-    if(!isExist ||isExist.deletedAt ) return {status:false,statusCode:httpStatusCode.NotFound,message:message.lblFindingsDoesNotExist}
-    const result = await findings.updateOne({_Id:input?.Id},{$set:{isActive:!isExist?.isActive}})
-    if(result.modifiedCount) return {status:true,statusCode:httpStatusCode.OK,message:`${isExist.findingsName} ${isExist.isActive ?'disabled' : 'enabled'} `}
-    else  return {status:true,statusCode:httpStatusCode.OK,message:message.lblFindingsNoChanges}
+    const findings = await db.model('finding', findingsSchema)
+    const isExist = await findings.findOne({ _Id: input?._id })
+    if (!isExist || isExist.deletedAt) return { status: false, statusCode: httpStatusCode.NotFound, message: message.lblFindingsDoesNotExist }
+    const result = await findings.updateOne({ _Id: input?.Id }, { $set: { isActive: !isExist?.isActive } })
+    if (result.modifiedCount) return { status: true, statusCode: httpStatusCode.OK, message: `${isExist.findingsName} ${isExist.isActive ? 'disabled' : 'enabled'} ` }
+    else return { status: true, statusCode: httpStatusCode.OK, message: message.lblFindingsNoChanges }
 }
 
-const deleteFindings = async (input)=>{
-try {
-    console.log(input)
-    const db = await getClientDatabaseConnection(input?.clientId)
-    const findings =await db.model('finding',findingsSchema)
-    const isExist =await findings.findOne({_id:input?._Id})
-    if(!isExist ||isExist.deletedAt ) return {status:false,statusCode:httpStatusCode.NotFound,message:message.lblFindingsDoesNotExist}
-    console.log(isExist)
-    const result = await findings.updateOne({ _id: input?._Id },{ $set: { deletedAt: new Date(),isActive:false } });
-    console.log(result,'result')
-    if(result.modifiedCount) return {status:true,statusCode:httpStatusCode.OK,message:`${isExist.findingsName} ${isExist.isActive ?'disabled' : 'enabled'} `}
-    else  return {status:true,statusCode:httpStatusCode.OK,message:message.lblFindingsNoChanges}
-} catch (error) {
-    
-}
-}
-const revokeFindings = async (input)=>{
+const deleteFindings = async (input) => {
     try {
         console.log(input)
         const db = await getClientDatabaseConnection(input?.clientId)
-        const findings =await db.model('finding',findingsSchema)
-        const isExist =await findings.findOne({_id:input?._Id})
-        if(!isExist ||!isExist.deletedAt ) return {status:false,statusCode:httpStatusCode.Conflict,message:message.lblFindingsRetrievalFailed}
+        const findings = await db.model('finding', findingsSchema)
+        const isExist = await findings.findOne({ _id: input?._Id })
+        if (!isExist || isExist.deletedAt) return { status: false, statusCode: httpStatusCode.NotFound, message: message.lblFindingsDoesNotExist }
         console.log(isExist)
-        const result = await findings.updateOne({ _id: input?._Id },{ $set: { deletedAt:null ,isActive:false } });
-        console.log(result,'result')
-        if(result.modifiedCount) return {status:true,statusCode:httpStatusCode.OK,message:`${isExist.findingsName} restored `}
-        else  return {status:true,statusCode:httpStatusCode.OK,message:message.lblFindingsNoChanges}
+        const result = await findings.updateOne({ _id: input?._Id }, { $set: { deletedAt: new Date(), isActive: false } });
+        console.log(result, 'result')
+        if (result.modifiedCount) return { status: true, statusCode: httpStatusCode.OK, message: `${isExist.findingsName} ${isExist.isActive ? 'disabled' : 'enabled'} ` }
+        else return { status: true, statusCode: httpStatusCode.OK, message: message.lblFindingsNoChanges }
     } catch (error) {
-        
+
+    }
+}
+const revokeFindings = async (input) => {
+    try {
+        console.log(input)
+        const db = await getClientDatabaseConnection(input?.clientId)
+        const findings = await db.model('finding', findingsSchema)
+        const isExist = await findings.findOne({ _id: input?._Id })
+        if (!isExist || !isExist.deletedAt) return { status: false, statusCode: httpStatusCode.Conflict, message: message.lblFindingsRetrievalFailed }
+        console.log(isExist)
+        const result = await findings.updateOne({ _id: input?._Id }, { $set: { deletedAt: null, isActive: false } });
+        console.log(result, 'result')
+        if (result.modifiedCount) return { status: true, statusCode: httpStatusCode.OK, message: `${isExist.findingsName} restored ` }
+        else return { status: true, statusCode: httpStatusCode.OK, message: message.lblFindingsNoChanges }
+    } catch (error) {
+
+    }
+}
+const readAllFindings = async (input) => {
+    try {
+        const db = await getClientDatabaseConnection(input?.clientId)
+        const findings = await db.model('finding', findingsSchema)
+        const isExist = await findings.find({ deletedAt: null})
+        if (isExist.length) return { status: true, statusCode: httpStatusCode.OK, message: message.lblFindingsFetched, data: isExist }
+        else return { status: true, statusCode: httpStatusCode.OK, message: message.lblFindingsDoesNotExist }
+    } catch (error) {
+
     }
 }
 
@@ -143,5 +154,4 @@ const revokeFindings = async (input)=>{
 
 
 
-
-module.exports = { createFindings ,editFindings,ToggleFindings ,deleteFindings,revokeFindings};
+module.exports = { createFindings, editFindings, ToggleFindings, deleteFindings, revokeFindings, readAllFindings };

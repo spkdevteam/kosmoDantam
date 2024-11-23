@@ -3,6 +3,8 @@ const express = require('express')
 const deptRouter = express.Router()
 const deptController = require('../controller/department.controller')
 
+const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization")
+
  
 deptRouter
 .post('/createDepartment',deptController.createDepartment)

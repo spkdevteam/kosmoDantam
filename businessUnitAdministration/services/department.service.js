@@ -16,10 +16,9 @@ const createDepartment = async (input) => {
     try {
         const db = await getClientDatabaseConnection(input?.clientId)
         const department = await db.model('department', departmentSchema)
-
         // If deptId doesn't exist, generate a new one or check if the department already exists
         if (!input?.deptId) {
-            const result = await department.findOne({ deptName: input.deptName, deletedAt: false })
+            const result = await department.findOne({ deptName: input.deptName, deletedAt: null })
             if (result) {
                 return {
                     status: false,
@@ -29,15 +28,15 @@ const createDepartment = async (input) => {
             }
             input.deptId = await getserialNumber('department', input?.clientId, input?.branchId)
         }
-
+        
         const newData = {
             deptName: input.deptName,
             branchId: input.branchId,
             description: input.description,
             deptId: input.deptId,
-         
             isActive: true,
         }
+        console.log(newData,'iput')
 
 
         const result = await department.findOneAndUpdate(

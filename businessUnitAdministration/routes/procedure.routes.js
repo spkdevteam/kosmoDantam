@@ -13,10 +13,10 @@ const procedureRouter = express.Router();
 
 // Procedure Routes
 procedureRouter
-    .post('/create', createProcedure) // Create a new procedure
-    .put('/edit', editProcedure)     // Edit an existing procedure
-    .delete('/delete', deleteProcedure) // Delete a procedure
-    .patch('/toggleActivestatus', toggleProcedure) // Toggle a procedure's status
+    .post('/create', createProcedure) 
+    .put('/edit', editProcedure)     
+    .delete('/delete', deleteProcedure) 
+    .patch('/toggleActivestatus', toggleProcedure) 
     .put('/revoke',revokeProcedure)
     .get('/getAllProcedures',getAllProcedures)
 

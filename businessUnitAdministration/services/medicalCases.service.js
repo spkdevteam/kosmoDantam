@@ -5,7 +5,6 @@ const httpStatusCode = require("../../utils/http-status-code")
 const message = require("../../utils/message")
 
 
-
 const createMedicalCases = async (input) => {
     try {
         const db = await getClientDatabaseConnection(input?.clientId)
@@ -67,7 +66,6 @@ const updateMedicalCases = async (input) => {
 
     } 
 }
-
 const readAllMedicalCases = async (input)=>{
     try {
         console.log(input)
@@ -136,8 +134,6 @@ const toggleMedicalCases = async (input) => {
 
     } 
 }
-
-
 module.exports = { 
     createMedicalCases,
     updateMedicalCases ,

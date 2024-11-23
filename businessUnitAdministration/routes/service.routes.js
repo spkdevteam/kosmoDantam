@@ -6,10 +6,11 @@ const serviceRouter = express.Router()
 
 
 
-serviceRouter.post('/createServices',createServices)
-serviceRouter.put('/editService',editService )
-serviceRouter.delete('/deleteService',deleteService )
-serviceRouter.get('/getAllActiveServices',readActiveServices)
-serviceRouter.patch('/toggleService',toggleService)
+serviceRouter
+    .post('/createServices',createServices)
+    .put('/editService',editService )
+    .delete('/deleteService',deleteService )
+    .get('/getAllActiveServices',readActiveServices)
+    .patch('/toggleService',toggleService)
 
 module.exports = serviceRouter

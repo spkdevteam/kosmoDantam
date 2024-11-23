@@ -1,5 +1,5 @@
 const express = require('express')
-const { createFindings, editFindings,toggleFindings,deleteFindings,revokeFindings } = require('../controller/findings.controller')
+const { createFindings, editFindings,toggleFindings,deleteFindings,revokeFindings,readAllFindings } = require('../controller/findings.controller')
 const findingsRouter = express.Router()
 
 findingsRouter
@@ -8,6 +8,7 @@ findingsRouter
     .post('/toggleFindings',toggleFindings)
     .delete('/delete',deleteFindings)
     .put('/revokeDeletedFindings',revokeFindings)
+    .get('/',readAllFindings)
 
 
 module.exports = findingsRouter

@@ -15,7 +15,22 @@ const swaggerOptions = {
         },
          
       ],
+       components: {
+          securitySchemes: {
+              bearerAuth: {
+                  type: 'http',
+                  scheme: 'bearer',
+                  bearerFormat: 'JWT', // Optional: indicates token format
+              },
+          },
+      },
+      security: [
+          {
+              bearerAuth: [], // Applies Bearer authentication globally
+          },
+      ],
     },
+    
     apis: ['./documentation/*.js'],  
   };
    

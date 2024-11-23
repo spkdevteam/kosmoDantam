@@ -12,6 +12,4 @@ medHistoryRoutes
     .delete('/delete',deleteMedicalCases) 
     .patch('/revokeDelete',revokeDeleteMedicalCases)
     .patch('/toggle',toggleMedicalCases )
-
-
 module.exports = medHistoryRoutes
