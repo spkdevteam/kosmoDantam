@@ -70,6 +70,7 @@ app.use("/api/clinet/auth/", clientAuthRouter.router);
 
 app.use("/api/clinet/bu/branch", clinetBranchRouter.router);
 app.use("/api/clinet/bu/chair", clinetChairhRouter.router);
+app.use("/api/clinet/branch/chair", clinetChairhRouter.router);
 app.use("/api/clinet/bu/role", clinetRoleRouter.router);
 
 

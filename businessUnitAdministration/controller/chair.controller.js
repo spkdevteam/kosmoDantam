@@ -8,6 +8,7 @@ const message = require("../../utils/message");
 const { getClientDatabaseConnection } = require("../../db/connection");
 const clinetBranchSchema = require("../../client/model/branch");
 const clinetChairSchema = require("../../client/model/chair");
+const clinetBusinessUnitSchema = require("../../client/model/businessUnit")
 
 
 
@@ -24,7 +25,7 @@ exports.createChairByBusinessUnit = async (req, res, next) => {
     try {
 
         // Destructure fields from request body
-        const { clientId, chairLocation, chairNumber, createdBy, branchId } = req.body;
+        const { clientId, chairLocation, chairNumber, branchId, businessUnit } = req.body;
 
         const mainUser = req.user;
 
@@ -44,6 +45,8 @@ exports.createChairByBusinessUnit = async (req, res, next) => {
         const clientConnection = await getClientDatabaseConnection(clientId);
 
         const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
+
 
         const branch = await Branch.findById(branchId);
 
@@ -53,12 +56,21 @@ exports.createChairByBusinessUnit = async (req, res, next) => {
             });
         }
 
+        const bu = await BusinessUnit.findById(businessUnit)
+
+        if (!bu) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblBusinessUnitNotFound,
+            });
+        }
+
         // create new chair with service
         const newChair = await chairService.createChair(clientId, {
             chairLocation,
             chairNumber,
             branch: branchId,
-            createdBy : mainUser._id,
+            createdBy: mainUser._id,
+            businessUnit: businessUnit,
         });
 
         return res.status(statusCode.OK).send({
@@ -325,7 +337,7 @@ exports.restoreChairByBusinessUnit = async (req, res, next) => {
         }
 
         await chairService.restoreChair(clientId, chairId)
-      
+
         this.listChair(req, res, next);
 
 
