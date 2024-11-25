@@ -497,7 +497,7 @@ exports.updateProfile = async (req, res) => {
         const user = req.user;
         const {
             firstName, middleName, lastName, password, gender, dateOfBirth,
-            optionalEmail, emergencyPhone, phone, city, state, ZipCode, address,
+            optionalEmail, emergencyPhone, phone, city, state,country, ZipCode, address,
             removeProfileImage
         } = req.body;
 
@@ -537,6 +537,7 @@ exports.updateProfile = async (req, res) => {
             phone,
             city,
             state,
+            country,
             ZipCode,
             address,
             profileCreated: true,
@@ -581,6 +582,7 @@ exports.updateProfile = async (req, res) => {
             phone: updatedUser.phone,
             city: updatedUser.city,
             state: updatedUser.state,
+            country : updatedUser.country,
             ZipCode: updatedUser.ZipCode,
             address: updatedUser.address,
             profileImage: updatedUser.profileImage
@@ -618,7 +620,7 @@ exports.getProfile = async (req, res) => {
 
         // Fetch user by ID and select only required fields
         const user = await User.findById(id).select(
-            'profileImage firstName middleName lastName  gender dateOfBirth  optionalEmail emergencyPhone phone city state ZipCode address  email profileCreated '
+            'profileImage firstName middleName lastName  gender dateOfBirth  optionalEmail emergencyPhone phone city state country ZipCode address  email profileCreated '
         );
 
         // Check if user exists and profile is created

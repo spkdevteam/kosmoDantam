@@ -79,6 +79,11 @@ const userSchema = new Schema(
       trim: true, 
     },
 
+    country : {
+      type: String,
+      trim: true, 
+    },
+
     ZipCode: {
       type: String,
       trim: true,
