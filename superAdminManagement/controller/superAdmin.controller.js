@@ -509,21 +509,21 @@ exports.updateProfile = async (req, res) => {
         }
 
         let parsedDateOfBirth = dateOfBirth;
-        if (typeof dateOfBirth === 'string') {
-            parsedDateOfBirth = parseDate(dateOfBirth); 
-            if (!parsedDateOfBirth) {
-                return res.status(statusCode.BadRequest).send({
-                    message: "Invalid date format. Please use dd/mm/yyyy format or a valid ISO date."
-                });
-            }
-        }
-        else if (dateOfBirth instanceof Date && !isNaN(dateOfBirth)) {
-            parsedDateOfBirth = dateOfBirth;
-        } else {
-            return res.status(statusCode.BadRequest).send({
-                message: "Invalid date format. Please provide a valid date."
-            });
-        }
+        // if (typeof dateOfBirth === 'string') {
+        //     parsedDateOfBirth = parseDate(dateOfBirth); 
+        //     if (!parsedDateOfBirth) {
+        //         return res.status(statusCode.BadRequest).send({
+        //             message: "Invalid date format. Please use dd/mm/yyyy format or a valid ISO date."
+        //         });
+        //     }
+        // }
+        // else if (dateOfBirth instanceof Date && !isNaN(dateOfBirth)) {
+        //     parsedDateOfBirth = dateOfBirth;
+        // } else {
+        //     return res.status(statusCode.BadRequest).send({
+        //         message: "Invalid date format. Please provide a valid date."
+        //     });
+        // }
 
         // Build the update profile object
         const profileUpdates = {
