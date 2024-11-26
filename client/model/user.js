@@ -7,6 +7,9 @@ const ObjectId = Schema.ObjectId;
 const clinetUserSchema = new Schema(
     {
         role: { type: ObjectId, ref: "clientRoles", index: true }, // Index for role-based queries
+        branch: { type: ObjectId, ref: "branch", default:null, index: true },
+        businessUnit: { type: ObjectId, ref: "businessUnit", default:null, index: true }, 
+
         roleId: { type: Number },
 
         firstName: { type: String, required: true },
@@ -78,6 +81,11 @@ const clinetUserSchema = new Schema(
             trim: true,
         },
 
+        country: {
+            type: String,
+            trim: true,
+        },
+
         ZipCode: {
             type: String,
             trim: true,
@@ -97,11 +105,11 @@ const clinetUserSchema = new Schema(
 
 
         // handlign created by
-        createdBy: { type: ObjectId, ref: "user",  index: true }, // Index for admin/user relationships
+        createdBy: { type: ObjectId, ref: "user", index: true }, // Index for admin/user relationships
 
         deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality
     },
-    
+
     { timestamps: true }
 );
 

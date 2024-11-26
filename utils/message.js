@@ -157,6 +157,20 @@ module.exports = {
     lblMedCaseDependencies: "Please resolve linked issues before proceeding with this action.",
     lblMedCaseDoesNotExist: "The specified medical case does not exist in the system." ,
 
+    // employee
+    lblEmployeeAlreadyExists : "Employee already exists with email or phone!",
+    lblEmployeeCreatedSuccess : "Employee created successfully!",
+    lblEmployeeUpdatedSuccess : "Employee updated successfully!",
+    lblEmployeeIdIdAndClientIdRequired: "Employee Id and Client Id are required!",
+    lblEmployeeNotFound : "Employee not found!",
+    lblEmployeeFoundSucessfully : "Employee found successfully!",
+
+
+
+
+
+
+
 
 
     lblFindingsCreated: "New finding added to the system.",

@@ -294,11 +294,13 @@ const welcomeRouter = require("./routes/welcome");
 const superAdminRouter = require("./superAdminManagement/routes/superAdmin.routes.js");
 const superAdminBuRouter = require("./superAdminBuManagement/routes/superAdminBu.routes.js");
 
-const clientAuthRouter = require("./commonClinetAuthentication/routes/clientAuth.js")
+const clientAuthRouter = require("./commonClinetAuthentication/routes/clientAuth.routes.js");
+const staffAuthRouter = require("./comonStaffAuthentication/routes/staffAuth.routes.js");
 
 
 const clinetBranchRouter = require("./businessUnitAdministration/routes/branch.routes.js");
 const clinetChairhRouter = require("./businessUnitAdministration/routes/chair.routes.js");
+const clientEmployeeRouter = require("./businessUnitAdministration/routes/employee.routes.js")
 const clinetRoleRouter = require("./businessUnitAdministration/routes/rolesAndPermission.routes.js");
 const clientDepartment = require("./businessUnitAdministration/routes/department.routes.js");
 const clientservicesRouter= require("./businessUnitAdministration/routes/service.routes.js");
@@ -341,9 +343,12 @@ app.use("/api/superAdmin/tooth", toothRouter);
 app.use("/api/superAdmin/bu/", superAdminBuRouter.router);
 
 app.use("/api/clinet/auth/", clientAuthRouter.router);
+app.use("/api/clinet/staff/auth/", staffAuthRouter.router);
 
 app.use("/api/clinet/bu/branch", clinetBranchRouter.router);
 app.use("/api/clinet/bu/chair", clinetChairhRouter.router);
+app.use("/api/client/bu/employee", clientEmployeeRouter.router);
+app.use("/api/clinet/branch/chair", clinetChairhRouter.router);
 app.use("/api/clinet/bu/role", clinetRoleRouter.router);
 app.use("/api/client/bu/department", clientDepartment);
 app.use("/api/client/bu/services", clientservicesRouter);
@@ -479,6 +484,41 @@ async function createDummyClient() {
         console.error("Error creating dummy client:", error);
     }
 }
+
+
+async function createNewRole(params) {
+
+    try {
+
+        const roleData = {
+            name: "clientStaff",
+            id: 5,
+        }
+
+        const role = await Roles.findOne({ name: roleData.name });
+
+        if (role) {
+            
+            console.log("ROle already Exisits", role);
+
+            return
+        }
+
+        const create = await Roles.create(roleData);
+
+        console.log("role created successfully", create);
+
+    } catch (error) {
+        console.error("Error creating new role:", error);
+    }
+
+}
+
+
+// createNewRole()
+
+
+
 
 
 // createDummyClient()

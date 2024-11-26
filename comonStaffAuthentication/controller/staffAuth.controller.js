@@ -13,19 +13,17 @@ const { mailSender } = require("../../email/emailSend");
 const statusCode = require("../../utils/http-status-code");
 const message = require("../../utils/message");
 
+const {commonCheckForClient} = require("../util/commonCheck"); 
+const {staffInfo} = require("../util/staffInfo")
 
 // env 
 dotnev.config();
 const PRIVATEKEY = process.env.PRIVATEKEY;
 
-
-
-
-
-
 // Sign in
-exports.signIn = async (req, res) => {
+exports.signIn = async (req, res, next) => {
     try {
+
         const { identifier, password } = req.body;
 
         // Validate input data
@@ -41,10 +39,6 @@ exports.signIn = async (req, res) => {
         // Check if the identifier is a valid 10-digit phone number
         const isPhone = /^\d{10}$/.test(identifier);
 
-        // Debugging logs
-        console.log("isEmail:", isEmail);
-        console.log("isPhone:", isPhone);
-
         // If neither a valid email nor a 10-digit phone number, return error
         if (!isEmail && !isPhone) {
             return res.status(statusCode.BadRequest).send({
@@ -57,32 +51,8 @@ exports.signIn = async (req, res) => {
 
         // Check if user exists
         const user = await User.findOne(query).populate('role');
-        if (!user) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblNotFoundUser
-            });
-        }
 
-        // Check if user is active
-        if (!user.isActive) {
-            return res.status(statusCode.Unauthorized).send({
-                message: message.lblAccountDeactivate
-            });
-        }
-
-        // Check if user is verified
-        if (!user.isUserVerified) {
-            return res.status(statusCode.Unauthorized).send({
-                message: message.lblUnVerified
-            });
-        }
-
-        // Check role authorization
-        if (user.roleId > 2) {
-            return res.status(statusCode.Unauthorized).send({
-                message: message.lblUnauthorize
-            });
-        }
+        await  commonCheckForClient(user);
 
         // Validate password
         const isPasswordValid = await user.isPasswordCorrect(password);
@@ -124,15 +94,13 @@ exports.signIn = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("SignIn Error:", error);
-        return res.status(statusCode.InternalServerError).send({
-            message: message.lblInternalServerError
-        });
+        next(error)
     }
 };
 
 // sign in with otp
-exports.signInByOtp = async (req, res) => {
+exports.signInByOtp = async (req, res, next) => {
+
     try {
         const { identifier, otp, rememberMe } = req.body;  // Can be email or phone number
 
@@ -158,33 +126,9 @@ exports.signInByOtp = async (req, res) => {
         const query = isEmail ? { email: identifier } : { phone: identifier };
 
         // Find user and check if exists
-        const user = await User.findOne(query).populate('role');
-        if (!user) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblNotFoundUser
-            });
-        }
+        const user = await User.findOne(query).select('-password  -createdBy -isCreatedBySuperAdmin -deletedAt -createdAt -updatedAt -otpGeneratedAt ').populate('role','-isActive -createdAt -updatedAt');
 
-        // Check if account is active
-        if (!user.isActive) {
-            return res.status(statusCode.Unauthorized).send({
-                message: message.lblAccountDeactivate
-            });
-        }
-
-        // Check if account is verified
-        if (!user.isUserVerified) {
-            return res.status(statusCode.Unauthorized).send({
-                message: message.lblUnVerified
-            });
-        }
-
-        // Check if user has the appropriate role
-        if (user.roleId > 2) {
-            return res.status(statusCode.Unauthorized).send({
-                message: message.lblUnauthorize
-            });
-        }
+        await  commonCheckForClient(user);
 
         // Validate OTP
         if (otp !== user.verificationOtp) {
@@ -194,30 +138,28 @@ exports.signInByOtp = async (req, res) => {
         }
 
         // Set token expiration time
-        const expiresIn = rememberMe ? '7d' : '1d';
-        const token = jwt.sign({ id: user._id }, process.env.PRIVATEKEY, { expiresIn });
+        // const expiresIn = rememberMe ? '7d' : '1d';
+        // const token = jwt.sign({ id: user._id, email :  user.email }, process.env.PRIVATEKEY, { expiresIn });
 
         // Calculate expiry timestamp for frontend use
         const expiryTime = new Date().getTime() + (rememberMe ? 7 : 1) * 24 * 60 * 60 * 1000;
 
+        const client = await staffInfo(user?._id, user?.email);
+
         return res.status(statusCode.OK).send({
             token,
             expiryTime,
-            adminInfo: user,
+            adminInfo: client,
             message: message.lblLoginSuccess
         });
 
     } catch (error) {
-        console.error("SignInByOtp Error:", error);
-        return res.status(statusCode.InternalServerError).send({
-            message: message.lblInternalServerError
-        });
+       next(error)
     }
 };
 
-
 // resend signIn Otp
-exports.resendSignInOtp = async (req, res) => {
+exports.resendSignInOtp = async (req, res, next) => {
     try {
         const { identifier } = req.body;  // Can be email or phone
 
@@ -243,33 +185,9 @@ exports.resendSignInOtp = async (req, res) => {
         const query = isEmail ? { email: identifier } : { phone: identifier };
 
         // Check if user exists
-        const user = await User.findOne(query).populate('role');
-        if (!user) {
-            return res.status(statusCode.BadRequest).send({
-                message: "User not found."
-            });
-        }
+        const user = await User.findOne(query);
 
-        // Check if account is active
-        if (!user.isActive) {
-            return res.status(statusCode.Unauthorized).send({
-                message: "Your account has been deactivated, please contact support."
-            });
-        }
-
-        // Check if account is verified
-        if (!user.isVerified) {
-            return res.status(statusCode.Unauthorized).send({
-                message: "Unverified user, please verify your email."
-            });
-        }
-
-        // Check if user has appropriate role
-        if (user.roleId > 2) {
-            return res.status(statusCode.Unauthorized).send({
-                message: "Unauthorized access."
-            });
-        }
+        await  commonCheckForClient(user);
 
         // Generate OTP
         const otp = generateOtp();
@@ -306,16 +224,13 @@ exports.resendSignInOtp = async (req, res) => {
 
 
     } catch (error) {
-        console.error("ResendSignInOtp Error:", error);
-        return res.status(statusCode.InternalServerError).send({
-            message: "Internal Server Error"
-        });
+       next(error)
     }
 };
 
 
 // forget passwoed 
-exports.forgetPassword = async (req, res) => {
+exports.forgetPassword = async (req, res, next) => {
     try {
         const { identifier } = req.body;
 
@@ -342,25 +257,8 @@ exports.forgetPassword = async (req, res) => {
 
         // Check if user exists
         const user = await User.findOne(query);
-        if (!user) {
-            return res.status(statusCode.BadRequest).send({
-                message: "User not found."
-            });
-        }
 
-        // Check if account is active
-        if (!user.isActive) {
-            return res.status(statusCode.Unauthorized).send({
-                message: "Your account has been deactivated, please contact support."
-            });
-        }
-
-        // Check if account is verified
-        if (!user.isUserVerified) {
-            return res.status(statusCode.Unauthorized).send({
-                message: "Unverified user, please verify your account."
-            });
-        }
+        await  commonCheckForClient(user);
 
         // Generate OTP
         const otp = generateOtp();
@@ -396,15 +294,13 @@ exports.forgetPassword = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("ForgetPassword Error:", error);
-        return res.status(statusCode.InternalServerError).send({
-            message: "Internal Server Error"
-        });
+       next(error)
     }
 };
 
-// reset password 
-exports.resetPassword = async (req, res) => {
+// reset password
+exports.resetPassword = async (req, res, next) => {
+
     try {
         const { identifier, password, otp } = req.body;  // Can be email or phone
 
@@ -431,25 +327,8 @@ exports.resetPassword = async (req, res) => {
 
         // Check if user exists
         const user = await User.findOne(query);
-        if (!user) {
-            return res.status(statusCode.BadRequest).send({
-                message: "User not found."
-            });
-        }
 
-        // Check if account is active
-        if (!user.isActive) {
-            return res.status(statusCode.Unauthorized).send({
-                message: "Your account has been deactivated, please contact support."
-            });
-        }
-
-        // Check if account is verified
-        if (!user.isUserVerified) {
-            return res.status(statusCode.Unauthorized).send({
-                message: "Unverified user, please verify your email."
-            });
-        }
+        await  commonCheckForClient(user);
 
         // Check if OTP exists (user must have requested a password reset)
         if (!user.OTP) {
@@ -483,13 +362,9 @@ exports.resetPassword = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("ResetPassword Error:", error);
-        return res.status(statusCode.InternalServerError).send({
-            message: "Internal Server Error"
-        });
+        next(error)
     }
 };
-
 
 // update profile
 exports.updateProfile = async (req, res) => {
@@ -497,7 +372,7 @@ exports.updateProfile = async (req, res) => {
         const user = req.user;
         const {
             firstName, middleName, lastName, password, gender, dateOfBirth,
-            optionalEmail, emergencyPhone, phone, city, state,country, ZipCode, address,
+            optionalEmail, emergencyPhone, phone, city, state, ZipCode, address,
             removeProfileImage
         } = req.body;
 
@@ -509,21 +384,21 @@ exports.updateProfile = async (req, res) => {
         }
 
         let parsedDateOfBirth = dateOfBirth;
-        // if (typeof dateOfBirth === 'string') {
-        //     parsedDateOfBirth = parseDate(dateOfBirth); 
-        //     if (!parsedDateOfBirth) {
-        //         return res.status(statusCode.BadRequest).send({
-        //             message: "Invalid date format. Please use dd/mm/yyyy format or a valid ISO date."
-        //         });
-        //     }
-        // }
-        // else if (dateOfBirth instanceof Date && !isNaN(dateOfBirth)) {
-        //     parsedDateOfBirth = dateOfBirth;
-        // } else {
-        //     return res.status(statusCode.BadRequest).send({
-        //         message: "Invalid date format. Please provide a valid date."
-        //     });
-        // }
+        if (typeof dateOfBirth === 'string') {
+            parsedDateOfBirth = parseDate(dateOfBirth);
+            if (!parsedDateOfBirth) {
+                return res.status(statusCode.BadRequest).send({
+                    message: "Invalid date format. Please use dd/mm/yyyy format or a valid ISO date."
+                });
+            }
+        }
+        else if (dateOfBirth instanceof Date && !isNaN(dateOfBirth)) {
+            parsedDateOfBirth = dateOfBirth;
+        } else {
+            return res.status(statusCode.BadRequest).send({
+                message: "Invalid date format. Please provide a valid date."
+            });
+        }
 
         // Build the update profile object
         const profileUpdates = {
@@ -531,13 +406,12 @@ exports.updateProfile = async (req, res) => {
             middleName,
             lastName,
             gender,
-            dateOfBirth: parsedDateOfBirth, 
+            dateOfBirth: parsedDateOfBirth,
             optionalEmail,
             emergencyPhone,
             phone,
             city,
             state,
-            country,
             ZipCode,
             address,
             profileCreated: true,
@@ -582,7 +456,6 @@ exports.updateProfile = async (req, res) => {
             phone: updatedUser.phone,
             city: updatedUser.city,
             state: updatedUser.state,
-            country : updatedUser.country,
             ZipCode: updatedUser.ZipCode,
             address: updatedUser.address,
             profileImage: updatedUser.profileImage
@@ -620,7 +493,7 @@ exports.getProfile = async (req, res) => {
 
         // Fetch user by ID and select only required fields
         const user = await User.findById(id).select(
-            'profileImage firstName middleName lastName  gender dateOfBirth  optionalEmail emergencyPhone phone city state country ZipCode address  email profileCreated '
+            'profileImage firstName middleName lastName  gender dateOfBirth  optionalEmail emergencyPhone phone city state ZipCode address  email profileCreated '
         );
 
         // Check if user exists and profile is created
