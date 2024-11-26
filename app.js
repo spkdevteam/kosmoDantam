@@ -315,6 +315,8 @@ const appointmentSchema = require("./model/patient.js"); // Import the Appointme
 const toothRouter = require("./superAdminBuManagement/routes/tooth.routes.js");
 const medHistoryRoutes = require("./businessUnitAdministration/routes/medicalCases.routes.js");
 const findingsRouter = require("./businessUnitAdministration/routes/findings.routes.js");
+const ccRouter = require("./businessUnitAdministration/routes/cheifComplaint..routes.js");
+const investigationRouter = require("./businessUnitAdministration/routes/investigation.routes.js");
 
 
 // middleware setup
@@ -348,6 +350,8 @@ app.use("/api/client/bu/services", clientservicesRouter);
 app.use("/api/client/bu/procedures", clientProcedureRouter);
 app.use("/api/client/bu/MediCases", medHistoryRoutes);
 app.use("/api/client/bu/findings", findingsRouter);
+app.use("/api/client/bu/chiefComplaint/",ccRouter )
+app.use("/api/client/bu/investigation",investigationRouter)
 
 app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 
