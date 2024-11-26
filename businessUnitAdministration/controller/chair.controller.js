@@ -29,6 +29,7 @@ exports.createChairByBusinessUnit = async (req, res, next) => {
 
         const mainUser = req.user;
 
+        console.log(req.body)
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,

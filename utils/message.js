@@ -8,6 +8,7 @@ module.exports = {
     lblOtpNotMatched: 'OTP not matched!',
     lblRequiredFieldMissing: "Required fields are missing. Please check your input!",
     lblNoToken: "Token not provided!",
+    lblNotavalidAmount:"Not a valid integer",
 
 
 
@@ -97,6 +98,64 @@ module.exports = {
     lblChairNotFound : "Chair not found!",
     lblChairFoundSucessfully : "Chair found successfully!",
 
+    //department
+    lblDepartmentalreadyExist:"department already exist in the same name",
+    lblDpartmentCreationSuccess:"New department created",
+    lblDpartmentModified:"Department modified",
+    lblNoChanges:"No changes found ",
+    lblCredentialMissing:"requiered information is missing ",
+    lblDepartmentDeleted:"Department deleted successfully ",
+    lbldepartmentNotFound:"department not found ",
+    lblDepartmentRestored:"Department restored",
+    //service 
+    lblServiceExist:"Service alredy exist in the same name ",
+    lblServiceCreated:"New service created ",
+    lblServiceModified:"Service Modified",
+    lblNotavalidSerialNumber:"Not a valid serial number ",
+    lblServicenotFound:"No service found on this id ",
+    lblServiceDeleted:"Service has deleted",
+    lblSuccess:"request processed ",
+    lblFailed:"request processing failed ",
+
+    //procedures
+
+    lblProcedureAlreadyExists: "A procedure with the same name already exists.",
+    lblProcedureCreated: "The procedure has been successfully created.",
+    lblProcedureCreationFailed: "Failed to create the procedure. Please ensure all required fields are provided.",
+    lblProcedureNotFound: "The procedure was not found or does not exist.",
+    lblProcedureNotModified: "No changes detected to update the procedure.",
+    lblProcedureDeleted: "The procedure has been successfully deleted.",
+    lblProcedureDeletionFailed: "Failed to delete the procedure. Please try again later.",
+    lblProcedureModified: "The procedure has been successfully updated.",
+    lblProcedureModificationFailed: "Failed to update the procedure. Please check the provided data.",
+    lblProcedureRestored: "The procedure has been successfully restored.",
+    lblProcedureRestoreFailed: "Failed to restore the procedure. Please try again later.",
+    lblProcedureFetched: "Procedures have been successfully retrieved.",
+    lblProcedureFetchFailed: "Failed to retrieve procedures. Please try again later.",
+    lblProcedureBulkOperations: "Procedures have been successfully imported/exported.",
+    lblProcedureBulkOperationFailed: "Failed to process bulk operations on procedures.",
+    lblProcedurePendingAction: "The procedure is pending approval and cannot be modified.",
+    lblProcedureDependencies: "The procedure cannot be deleted as it is linked to other records.",
+    lblProcedureUnauthorized: "You are not authorized to perform this operation on the procedure.",
+    lblProcedureNoChanges: "The procedure details are already up to date.",
+    lblProcedureDoesNotExist: "The specified procedure does not exist in the system.",
+
+
+    //Medical case 
+    lblMedCaseCreated: "New medical case added to the system.",
+    lblMedCaseEdited: "Changes to the medical case have been saved.",
+    lblMedCaseDeleted: "The medical case has been removed from the system.",
+    lblMedCaseFetched: "Medical case data loaded.",
+    lblMedCaseBulkOperations: "Medical cases imported/exported successfully.",
+    lblMedCaseCreationFailed: "Unable to add a new medical case. Ensure all required fields are provided.",
+    lblMedCaseEditingFailed: "Medical case update unsuccessful. Ensure the case exists.",
+    lblMedCaseDeletionFailed: "Medical case deletion unsuccessful. Please try again later.",
+    lblMedCaseRetrievalFailed: "No medical case found with the given ID.",
+    lblMedCaseAuthorizationFailed: "Invalid input data for the medical case operation.",
+    lblMedCasePendingAction: "Medical case updates are pending approval.",
+    lblMedCaseNoChanges: "The medical case details are already up to date.",
+    lblMedCaseDependencies: "Please resolve linked issues before proceeding with this action.",
+    lblMedCaseDoesNotExist: "The specified medical case does not exist in the system." ,
 
     // employee
     lblEmployeeAlreadyExists : "Employee already exists with email or phone!",
@@ -114,7 +173,20 @@ module.exports = {
 
 
 
-
+    lblFindingsCreated: "New finding added to the system.",
+    lblFindingsEdited: "Changes to the finding have been saved.",
+    lblFindingsDeleted: "The finding has been removed from the system.",
+    lblFindingsFetched: "Finding data loaded.",
+    lblFindingsBulkOperations: "Findings imported/exported successfully.",
+    lblFindingsCreationFailed: "Unable to add a new finding. Ensure all required fields are provided.",
+    lblFindingsEditingFailed: "Finding update unsuccessful. Ensure the finding exists.",
+    lblFindingsDeletionFailed: "Finding deletion unsuccessful. Please try again later.",
+    lblFindingsRetrievalFailed: "No finding found with the given ID.",
+    lblFindingsAuthorizationFailed: "Invalid input data for the finding operation.",
+    lblFindingsPendingAction: "Finding updates are pending approval.",
+    lblFindingsNoChanges: "The finding details are already up to date.",
+    lblFindingsDependencies: "Please resolve linked issues before proceeding with this action.",
+    lblFindingsDoesNotExist: "The specified finding does not exist in the system."  // Added missing case
 
 
   };

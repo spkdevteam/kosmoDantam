@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:reset": "nodemon --exec \"node -r ./clear-cache.js ./app.js\""
-
+    "start:reset": "nodemon --exec \"node -r ./clear-cache.js ./app.js\"",
+    "start": "nodemon app.js"
   },
   "dependencies": {
     "aws-sdk": "^2.1581.0",
@@ -24,7 +24,9 @@
     "nodemailer": "^6.9.7",
     "nodemailer-express-handlebars": "^6.1.0",
     "nodemon": "^3.0.2",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "keywords": [],
   "author": "",

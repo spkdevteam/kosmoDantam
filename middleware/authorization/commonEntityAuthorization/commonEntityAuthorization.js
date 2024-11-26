@@ -15,11 +15,9 @@ const clientRoleSchema = require("../../../client/model/role")
 exports.authorizeEntity = (entityName, subMenuAction = 'create') => async (req, res, next) => {
     try {
         const { capability, user } = await commonCheckOfEntity(req.headers, entityName);
-        
         if (!capability?.subMenus?.[subMenuAction]?.access) {
             return res.status(statusCode.Forbidden).send({ message: message.lblUnauthorize });
         }
-
         req.user = user;
         next();
     } catch (error) {

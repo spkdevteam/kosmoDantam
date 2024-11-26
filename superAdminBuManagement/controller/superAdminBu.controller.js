@@ -39,7 +39,6 @@ const PRIVATEKEY = process.env.PRIVATEKEY;
 // create Business unit
 exports.createBusinessUnit = async (req, res) => {
   const session = await mongoose.startSession(); // Start Mongoose session for transaction-like behavior
-
   try {
     session.startTransaction(); // Start transaction
 
@@ -100,6 +99,7 @@ exports.createBusinessUnit = async (req, res) => {
     );
 
     // const clientConnection = await getClientDatabaseConnection(newUser._id);
+    console.log(newUser)
     const clientConnection = await createClientDatabase(newUser[0]._id);
 
     // Use the imported schema to create the roles model in the client database
