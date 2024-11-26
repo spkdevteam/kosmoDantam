@@ -98,6 +98,20 @@ module.exports = {
     lblChairFoundSucessfully : "Chair found successfully!",
 
 
+    // employee
+    lblEmployeeAlreadyExists : "Employee already exists with email or phone!",
+    lblEmployeeCreatedSuccess : "Employee created successfully!",
+    lblEmployeeUpdatedSuccess : "Employee updated successfully!",
+    lblEmployeeIdIdAndClientIdRequired: "Employee Id and Client Id are required!",
+    lblEmployeeNotFound : "Employee not found!",
+    lblEmployeeFoundSucessfully : "Employee found successfully!",
+
+
+
+
+
+
+
 
 
 

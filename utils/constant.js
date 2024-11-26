@@ -304,7 +304,7 @@ const businessUnitPersmissionsList = [
     },
     {
         name: "Employee",
-        displayName: "Emoloyee",
+        displayName: "All Emoloyee",
         access: true,
         subMenus: {
             list: {

@@ -108,7 +108,8 @@ const userSchema = new Schema(
     createdBy: { type: ObjectId, ref: "user", index: true }, // Index for admin/user relationships
     isCreatedBySuperAdmin: { type: Boolean, default: false ,  index: true},
 
-
+    // clinet staff handling
+    accessUnit :  [{ id : {type : String} }],
 
     deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality
   },

@@ -1,6 +1,8 @@
 
 
 
+const bcrypt = require("bcrypt");
+
 
 const statusCode = require("../../utils/http-status-code");
 const message = require("../../utils/message");
@@ -8,24 +10,21 @@ const message = require("../../utils/message");
 const { getClientDatabaseConnection } = require("../../db/connection");
 const clinetBranchSchema = require("../../client/model/branch");
 const clinetChairSchema = require("../../client/model/chair");
-const clinetBusinessUnitSchema = require("../../client/model/businessUnit")
+const clinetBusinessUnitSchema = require("../../client/model/businessUnit");
+const clientRoleSchema = require("../../client/model/role");
 
+const RoleModel = require("../../model/role");
+const MasterUser = require("../../model/user")
 
+const employeeService = require("../../client/service/employee.service")
 
-const chairService = require("../../client/service/chair.services")
-
-
-
-
-
-
-// create Chair by business unit
-exports.createChairByBusinessUnit = async (req, res, next) => {
+// create Employee by business unit
+exports.createEmployeeByBusinessUnit = async (req, res, next) => {
 
     try {
 
         // Destructure fields from request body
-        const { clientId, chairLocation, chairNumber, branchId, businessUnit } = req.body;
+        const { clientId, branchId, roleId, businessUnit, firstName, lastName, email, phone, password } = req.body;
 
         const mainUser = req.user;
 
@@ -36,7 +35,7 @@ exports.createChairByBusinessUnit = async (req, res, next) => {
         }
 
         // Check if required fields are missing
-        if (!chairLocation || !chairNumber) {
+        if (!firstName || !lastName || !email || !phone || !password || !roleId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
@@ -46,7 +45,7 @@ exports.createChairByBusinessUnit = async (req, res, next) => {
 
         const Branch = clientConnection.model('branch', clinetBranchSchema);
         const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
-
+        const Role = clientConnection.model('clientRoles', clientRoleSchema);
 
         const branch = await Branch.findById(branchId);
 
@@ -57,63 +56,180 @@ exports.createChairByBusinessUnit = async (req, res, next) => {
         }
 
         const bu = await BusinessUnit.findById(businessUnit)
-
         if (!bu) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblBusinessUnitNotFound,
             });
         }
 
-        // create new chair with service
-        const newChair = await chairService.createChair(clientId, {
-            chairLocation,
-            chairNumber,
+        const role = await Role.findById(roleId);
+
+        if (!role) {
+            throw new CustomError(statusCode.Conflict, message.lblRoleNotFound);
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // create new employee with service
+        const newEmployee = await employeeService.createEmployee(clientId, {
+            firstName,
+            lastName,
+            email,
+            phone,
+            password: hashedPassword,
             branch: branchId,
-            createdBy: mainUser._id,
+            role: roleId,
+            roleId: role.id,
             businessUnit: businessUnit,
+            tc: true,
+            isUserVerified: true,
+            createdBy: mainUser._id,
+
         });
 
-        return res.status(statusCode.OK).send({
-            message: message.lblChairCreatedSuccess,
-            data: { chairId: newChair._id, chairLocation: newChair.chairLocation },
+
+        // create employee in main database 
+
+        const masterRole = await RoleModel.findOne({ id: 5 });
+
+
+        const existingStaff = await MasterUser.findOne({
+            $or: [{ email: email.toLowerCase() }, { phone }],
         });
+
+        if (existingStaff) {
+
+            const isAccessUnitAlreadyExists = existingStaff.accessUnit.find((item) => item.id == clientId);
+
+            if (isAccessUnitAlreadyExists) {
+
+                return res.status(statusCode.OK).send({
+                    message: message.lblEmployeeCreatedSuccess,
+                    data: { empId: newEmployee._id },
+                });
+
+            } else {
+
+                existingStaff.accessUnit = [...existingStaff.accessUnit, { id: clientId }];
+
+                await existingStaff.save()
+
+                return res.status(statusCode.OK).send({
+                    message: message.lblEmployeeCreatedSuccess,
+                    data: { empId: newEmployee._id },
+                });
+
+            }
+        } else {
+
+            const newStaff = await MasterUser.create(
+                [
+                    {
+                        firstName,
+                        lastName,
+                        email: email.toLowerCase(),
+                        phone,
+                        password: hashedPassword,
+                        role: masterRole._id,
+                        roleId: masterRole.id,
+                        isActive: true,
+                        isUserVerified: true,
+                        tc: true,
+                        accessUnit: [{ id: clientId }]
+                    },
+                ],
+            );
+
+
+            return res.status(statusCode.OK).send({
+                message: message.lblEmployeeCreatedSuccess,
+                data: { empId: newEmployee._id },
+            });
+
+        }
 
     } catch (error) {
         next(error)
     }
 };
 
-// update branch by business unit
-exports.updateChairByBusinessUnit = async (req, res, next) => {
+// update employee by business unit
+exports.updateEmployeeByBusinessUnit = async (req, res, next) => {
 
     try {
         // Destructure fields from request body
-        const { chairId, clientId, chairLocation, chairNumber, } = req.body;
+        const { clientId, branchId, roleId, businessUnit, employeeId, firstName, lastName, email, phone, password } = req.body;
 
-        // Check if branchId and clientId are provided
-        if (!chairId || !clientId) {
+        if (!clientId) {
             return res.status(statusCode.BadRequest).send({
-                message: message.lblChairIdIdAndClientIdRequired,
+                message: message.lblClinetIdIsRequired,
             });
         }
 
         // Check if required fields are missing
-        if (!chairLocation || !chairNumber) {
+        if (!employeeId || !branchId || !roleId || !businessUnit) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
 
-        const updatedChair = await chairService.updateChair(clientId, chairId, {
-            chairLocation,
-            chairNumber,
+        const clientConnection = await getClientDatabaseConnection(clientId);
+
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
+        const Role = clientConnection.model('clientRoles', clientRoleSchema);
+
+        const branch = await Branch.findById(branchId);
+
+        if (!branch) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblBranchNotFound,
+            });
+        }
+
+        const bu = await BusinessUnit.findById(businessUnit)
+        if (!bu) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblBusinessUnitNotFound,
+            });
+        }
+
+        const role = await Role.findById(roleId);
+
+        if (!role) {
+            throw new CustomError(statusCode.Conflict, message.lblRoleNotFound);
+        }
+
+        let dataObject = {
+            firstName,
+            lastName,
+            email,
+            phone,
+            branch: branchId,
+            role: roleId,
+            businessUnit: businessUnit,
+        }
+
+        if (password) {
+            dataObject = {
+                ...dataObject,
+                password: await bcrypt.hash(password, 10)
+            }
+        }
+
+        const updated = await employeeService.updateEmployee(clientId, employeeId, dataObject);
+
+        const existingStaff = await MasterUser.findOne({
+            $or: [{ email: updated?.email.toLowerCase() }, { phone: updated?.phone }],
         });
 
+        existingStaff.email = email;
+        existingStaff.phone = phone;
 
+        await existingStaff.save();
 
         return res.status(statusCode.OK).send({
-            message: message.lblChairUpdatedSuccess,
-            data: { chairId: updatedChair._id, chairLocation: updatedChair.chairLocation },
+            message: message.lblEmployeeUpdatedSuccess,
         });
 
     } catch (error) {
@@ -122,22 +238,22 @@ exports.updateChairByBusinessUnit = async (req, res, next) => {
     }
 };
 
-// get particular chair by business unit
-exports.getParticularChairByBusinessUnit = async (req, res, next) => {
+// get particular employee by business unit
+exports.getParticularEmployeeByBusinessUnit = async (req, res, next) => {
     try {
-        const { clientId, chairId } = req.params; // Extract clientId and branchId from request params
+        const { clientId, employeeId } = req.params; // Extract clientId and branchId from request params
 
         // Validate inputs
-        if (!clientId || !chairId) {
+        if (!clientId || !employeeId) {
             return res.status(400).send({
-                message: message.lblChairIdIdAndClientIdRequired,
+                message: message.lblEmployeeIdIdAndClientIdRequired,
             });
         }
 
-        const chair = await chairService.getChairById(clientId, chairId);
+        const chair = await employeeService.getEmployeeById(clientId, employeeId);
 
         return res.status(200).send({
-            message: message.lblChairFoundSucessfully,
+            message: message.lblEmployeeFoundSucessfully,
             data: chair,
         });
 
@@ -146,43 +262,10 @@ exports.getParticularChairByBusinessUnit = async (req, res, next) => {
     }
 };
 
-// list chair by business unit
-// exports.listChair = async (req, res, next) => {
-//     try {
-//         const { clientId, keyword = '', page = 1, perPage = 10 } = req.query;
-
-//         const searchText = keyword ? keyword.trim() : '';
-
-//         if (!clientId) {
-//             return res.status(statusCode.BadRequest).send({
-//                 message: message.lblClinetIdIsRequired,
-//             });
-//         }
-
-//         let filters = {
-//             deletedAt: null,
-//         };
-
-//         if (searchText) {
-//             filters.$or = [
-//                 { chairLocation: { $regex: searchText, $options: "i" } },
-//                 { chairNumber: { $regex: searchText, $options: "i" } },
-//             ];
-//         }
-
-//         const result = await chairService.listChairs(clientId, filters, { page, limit: perPage });
-
-//         return res.status(statusCode.OK).send({
-//             message: message.lblChairFoundSucessfully,
-//             data: result,
-//         });
-//     } catch (error) {
-//         next(error) 
-//     }
-// };
-exports.listChair = async (req, res, next) => {
+// list employee by business unit
+exports.listEmployee = async (req, res, next) => {
     try {
-        const { clientId, keyword = '', page = 1, perPage = 10 } = req.query;
+        const { clientId, keyword = '', page = 1, perPage = 10, roleId = 3 } = req.query;
 
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
@@ -192,158 +275,55 @@ exports.listChair = async (req, res, next) => {
 
         const filters = {
             deletedAt: null,
+            roleId: roleId,
             ...(keyword && {
                 $or: [
-                    { chairLocation: { $regex: keyword.trim(), $options: "i" } },
-                    { chairNumber: { $regex: keyword.trim(), $options: "i" } },
+                    { firstName: { $regex: keyword.trim(), $options: "i" } },
+                    { lastName: { $regex: keyword.trim(), $options: "i" } },
+                    { email: { $regex: keyword.trim(), $options: "i" } },
+                    { phone: { $regex: keyword.trim(), $options: "i" } },
                 ],
             }),
         };
 
-        const result = await chairService.listChairs(clientId, filters, { page, limit: perPage });
+        const result = await employeeService.listEmployee(clientId, filters, { page, limit: perPage });
 
         return res.status(statusCode.OK).send({
-            message: message.lblChairFoundSucessfully,
+            message: message.lblEmployeeFoundSucessfully,
             data: result,
         });
+
     } catch (error) {
         next(error);
     }
 };
 
-
-// active inactive chair by Business unit
-// exports.activeinactiveChairByBusinessUnit = async (req, res, next) => {
-
-
-//     try {
-//         const { keyword, page, perPage, status, chairId, clientId } = req.body;
-//         req.query.keyword = keyword;
-//         req.query.page = page;
-//         req.query.perPage = perPage;
-//         req.query.clientId = clientId;
-
-
-//         // Validate inputs
-//         if (!clientId || !chairId) {
-//             return res.status(400).send({
-//                 message: message.lblChairIdIdAndClientIdRequired,
-//             });
-//         }
-
-//         const updatedChair = await chairService.updateChair(clientId, chairId, {
-//             isActive : status === "1"
-//         });
-
-//         // // Get client database connection
-//         // const clientConnection = await getClientDatabaseConnection(clientId);
-//         // const Chair = clientConnection.model('chair', clinetChairSchema);
-
-
-//         // // Find the business unit by ID
-//         // const chair = await Chair.findById(chairId)
-
-//         // if (!chair) {
-//         //     return res.status(statusCode.ExpectationFailed).send({
-//         //         message: message.lblChairNotFound,
-//         //     });
-//         // }
-
-//         // chair.isActive = status === "1";
-//         // await chair.save();
-
-//         this.listChair(req, res, next);
-
-//     } catch (error) {
-
-
-//        next(error)
-
-//     }
-// };
-
-exports.activeinactiveChairByBusinessUnit = async (req, res, next) => {
+// active inactive employee by business unit
+exports.activeinactiveEmployeeByBusinessUnit = async (req, res, next) => {
     try {
-        const { status, chairId, clientId } = req.body;
+        const { status, employeeId, clientId, roleId, keyword, page, perPage } = req.body;
+
+        req.query.clientId = clientId;
+        req.query.roleId = roleId;
+        req.query.keyword = keyword;
+        req.query.page = page;
+        req.query.perPage = perPage;
 
         // Validate inputs
-        if (!clientId || !chairId) {
+        if (!clientId || !employeeId) {
             return res.status(400).send({
-                message: message.lblChairIdIdAndClientIdRequired,
+                message: message.lblEmployeeIdIdAndClientIdRequired,
             });
         }
 
-        const updatedChair = await chairService.activeInactiveChair(clientId, chairId, {
+        const updatedEmployee = await employeeService.activeInactiveEmployee(clientId, employeeId, {
             isActive: status === "1",
         });
 
-        // Optionally, you can return the updated chair details if needed
-        return res.status(statusCode.OK).send({
-            message: message.lblChairUpdatedSuccess,
-            data: updatedChair,
-        });
-    } catch (error) {
-        next(error);
-    }
-};
-
-// // Soft delete chair by business unit
-exports.softDeleteChairByBusinesssUnit = async (req, res, next) => {
-
-    try {
-
-        const { keyword, page, perPage, chairId, clientId } = req.body;
-
-        req.query.keyword = keyword;
-        req.query.page = page;
-        req.query.perPage = perPage;
-        req.query.clientId = clientId;
-
-
-        // Validate inputs
-        if (!clientId || !chairId) {
-            return res.status(400).send({
-                message: message.lblChairIdIdAndClientIdRequired,
-            });
-        }
-
-        await chairService.deleteChair(clientId, chairId, softDelete = true)
-
-        this.listChair(req, res, next);
-
+        this.listEmployee(req, res)
 
     } catch (error) {
         next(error);
-    }
-};
-
-// restore chair
-exports.restoreChairByBusinessUnit = async (req, res, next) => {
-
-    try {
-
-        const { keyword, page, perPage, chairId, clientId } = req.body;
-
-        req.query.keyword = keyword;
-        req.query.page = page;
-        req.query.perPage = perPage;
-        req.query.clientId = clientId;
-
-        // Validate inputs
-        if (!clientId || !chairId) {
-            return res.status(400).send({
-                message: message.lblChairIdIdAndClientIdRequired,
-            });
-        }
-
-        await chairService.restoreChair(clientId, chairId)
-
-        this.listChair(req, res, next);
-
-
-    } catch (error) {
-
-        next(error)
     }
 };
 
