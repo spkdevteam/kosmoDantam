@@ -30,6 +30,10 @@
  *                 type: string
  *                 description: Unique identifier for the client associated with the Chief Complaint.
  *                 example: "6735e64c5c58f271b1ce1678"
+ *               buId:
+ *                 type: string
+ *                 description: Unique identifier for the business unit associated with the Chief Complaint.
+ *                 example: "673ef64bdc1355e6ca2e61eb"
  *     responses:
  *       201:
  *         description: Chief Complaint created successfully.
@@ -44,6 +48,7 @@
  *                 complaintName: "Severe Headache"
  *                 discription: "Complaint of frequent and severe headaches lasting more than a week."
  *                 clientId: "6735e64c5c58f271b1ce1678"
+ *                 buId: "BU-2024-001"
  *       400:
  *         description: Invalid input data.
  *         content:

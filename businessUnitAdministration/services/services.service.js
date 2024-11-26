@@ -17,7 +17,7 @@ const createService = async (input) => {
         if (!input.serviceId) {
             const isNameExist = await services.findOne({ serviceName: input?.serviceName })
             if (isNameExist) return { status: false, statusCode: 409, messsage: message.lblServiceExist }
-            input.serviceId = await getserialNumber('service', input?.clientId, input?.branchId)
+            input.serviceId = await getserialNumber('service', input?.clientId, input?.branchId,input?.buId)
         }
         const isDepartmentValid = await department.findOne({ _id: input?.deptId })
         const isBranchValid = await branch.findOne({ _id: input?.branchId })
@@ -32,6 +32,7 @@ const createService = async (input) => {
             serviceName: input?.serviceName,
             description: input?.description,
             price: input?.price,
+            buId: input?.buId,
             isActive: true,
             deletedAt: null
         }
@@ -150,4 +151,34 @@ const editService = async (input) => {
         return { status: false, statusCode: 500, message: error.message }
     }
 }
-module.exports = { createService, deleteService, readActiveServices, toggleServiceStatus,editService }
+
+const serviceUnderDepartment  = async (input) => {
+    try {
+        const db = await getClientDatabaseConnection(input.clientId);
+        const services = await db.model('services', serviceSchema);
+        const data = await services.find({ deletedAt:null,departmentId:input?.departmentId ,isActive:true })
+        
+        if (data) {
+            return {
+                status: true,
+                statusCode: 200,
+                message: message.lblSuccess,
+                services: data
+            }
+        } else {
+            return {
+                status: false,
+                statusCode: 404,
+                message: message.lblFailed,
+            }
+        }
+    } catch (error) {
+        return {
+            status: false,
+            statusCode: 500,
+            message: error.message,
+        }
+    }
+}
+
+module.exports = { createService, deleteService, readActiveServices, toggleServiceStatus,editService,serviceUnderDepartment  }

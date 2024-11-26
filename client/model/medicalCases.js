@@ -6,6 +6,7 @@ const medicalCasesSchema =  mongoose.Schema({
     caseName:{type:String,unique:true,required:true},
     remark:{type:String},
     deletedAt:{type:Date },
+    buId:{ type: mongoose.Schema.ObjectId, ref: "businessUnit", default:null, index: true  },
     isActive:{type:Boolean,default:true},
     createdBy:{type:mongoose.Schema.ObjectId,ref:'clientusers',index:true,default:null}
 })

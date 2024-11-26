@@ -5,7 +5,8 @@ const {
     deleteProcedure, 
     toggleProcedure,
     revokeProcedure ,
-    getAllProcedures
+    getAllProcedures,
+    getProcedureUnderService
 } = require('../controller/procedure.controller');
 
 
@@ -19,5 +20,5 @@ procedureRouter
     .patch('/toggleActivestatus', toggleProcedure) 
     .put('/revoke',revokeProcedure)
     .get('/getAllProcedures',getAllProcedures)
-
+    .get('/procedureUnderService',getProcedureUnderService)
 module.exports = procedureRouter;

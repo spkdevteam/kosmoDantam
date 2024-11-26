@@ -17,6 +17,10 @@
  *                 type: string
  *                 description: Unique identifier for the client associated with the investigation.
  *                 example: "6735e64c5c58f271b1ce1678"
+ *               buId:
+ *                 type: string
+ *                 description: Unique identifier for the business unit.
+ *                 example: "673ef64bdc1355e6ca2e61eb"
  *               investigationName:
  *                 type: string
  *                 description: Name of the investigation.
@@ -36,6 +40,7 @@
  *               message: "Investigation created successfully."
  *               data:
  *                 clientId: "6735e64c5c58f271b1ce1678"
+ *                 buId: "673ef64bdc1355e6ca2e61eb"
  *                 investigationName: "ECG"
  *                 discription: "A test to analyze heart activity."
  *       400:

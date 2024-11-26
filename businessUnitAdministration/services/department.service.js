@@ -26,7 +26,7 @@ const createDepartment = async (input) => {
                     statusCode: 400 // Bad Request (department already exists)
                 }
             }
-            input.deptId = await getserialNumber('department', input?.clientId, input?.branchId)
+            input.deptId = await getserialNumber('department', input?.clientId, input?.branchId,input?.buId)
         }
         
         const newData = {
@@ -34,6 +34,7 @@ const createDepartment = async (input) => {
             branchId: input.branchId,
             description: input.description,
             deptId: input.deptId,
+            buId: input?.buId,
             isActive: true,
         }
         console.log(newData,'iput')

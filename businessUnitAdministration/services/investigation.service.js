@@ -20,14 +20,15 @@ const createInvestigation = async (input) => {
             const isExist = await investigation.findOne({ investigationName: input?.investigationName, deletedAt: null })
             console.log(isExist,'ssssss')
             if (isExist) return { status: false, message: message.lblChiefComplaintAlreadyExist, statusCode: httpStatusCode.Conflict }
-            input.investigationId = await getserialNumber('investigation', input?.clientId, '')
+            input.investigationId = await getserialNumber('investigation', input?.clientId, '',input?.buId)
             
             const newData = {
                 investigationId: input?.investigationId,
                 investigationName: input?.investigationName,
                 discription: input?.discription,
                 deletedAt: null,
-                isActive: true
+                isActive: true,
+                buId: input?.buId,
             }
             
             const result = await investigation.findOneAndUpdate({

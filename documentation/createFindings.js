@@ -17,11 +17,10 @@
  *                 type: string
  *                 description: Unique identifier for the client associated with the finding.
  *                 example: "6735e64c5c58f271b1ce1678"
- *               findingsId:
+ *               buId:
  *                 type: string
- *                 unique: true
- *                 description: Unique identifier for the finding.
- *                 example: "FND001"
+ *                 description: Unique identifier for the business unit.
+ *                 example: "673ef64bdc1355e6ca2e61eb"
  *               findingsName:
  *                 type: string
  *                 unique: true
@@ -32,10 +31,7 @@
  *                 unique: true
  *                 description: Detailed description of the finding.
  *                 example: "Detailed analysis of blood test results."
- *               isActive:
- *                 type: boolean
- *                 description: Status of the finding's availability.
- *                 example: true
+ *                
  *     responses:
  *       201:
  *         description: Finding created successfully.
@@ -46,7 +42,7 @@
  *               message: "Finding created successfully."
  *               data:
  *                 clientId: "6735e64c5c58f271b1ce1678"
- *                 findingsId: "FND001"
+ *                 buId: "673ef64bdc1355e6ca2e61eb"
  *                 findingsName: "Blood Test Results"
  *                 description: "Detailed analysis of blood test results."
  *                 isActive: true

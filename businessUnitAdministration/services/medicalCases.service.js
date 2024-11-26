@@ -11,8 +11,8 @@ const createMedicalCases = async (input) => {
         const medicalCases = db.model('medicalCase', medicalCasesSchema)
         if (!input.caseId) {
             const isExist = await medicalCases.findOne({ caseName: input?.caseName, deletedAt: null })
-            if (isExist) return { status: false, statusCode: httpStatusCode.Conflict, message: message.lblcaseAlreadyExist }
-            input.caseId = await getserialNumber('mediCases', input?.clientId, '')
+            if (isExist) return { status: false, statusCode: httpStatusCode.Conflict, message: message.lblChairhAlreadyExists }
+            input.caseId = await getserialNumber('mediCases', input?.clientId, '',input?.buId)
              
         }
  
@@ -21,7 +21,9 @@ const createMedicalCases = async (input) => {
             caseName: input?.caseName,
             remark: input?.remark,
             isActive: input?.isActive,
-            createdBy: input?.createdBy
+            createdBy: input?.createdBy,
+            buId:input?.buId,
+
         }
         
         const result =await medicalCases.findOneAndUpdate(

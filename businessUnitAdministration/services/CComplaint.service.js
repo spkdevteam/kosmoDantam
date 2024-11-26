@@ -18,12 +18,13 @@ const createCheifComplaint = async (input) => {
         if (!input?.complaintId) {
             const isExist = await cheifComplaint.findOne({ complaintName: input?.complaintName, deletedAt: null })
             if (isExist) return { status: false, message: message.lblChiefComplaintAlreadyExist, statusCode: httpStatusCode.Conflict }
-            input.complaintId = await getserialNumber('cheifComplaint', input?.clientId, '')
-
+            input.complaintId = await getserialNumber('cheifComplaint', input?.clientId, '',input?.buId)
+            console.log(input,'inputinput')
             const newData = {
-                "complaintId": input?.complaintId,
-                "complaintName": input?.complaintName,
-                "discription": input?.discription,
+                complaintId: input?.complaintId,
+                complaintName: input?.complaintName,
+                discription: input?.discription,
+                buId: input?.buId,
                 deletedAt: null,
                 isActive: true
             }
@@ -54,12 +55,12 @@ const editCheifComplaint = async (input) => {
         const cheifComplaint = await db.model('CheifComplaint', cheifComplaintSchema)
         if (input?.complaintId) {
             const isExist = await cheifComplaint.findOne({ _id: input?.complaintId, deletedAt: null })
-            console.log(isExist, 'sasasas')
             if (!isExist) return { statusCode: httpStatusCode.NotFound, status: true, message: message.lblChiefComplaintDoesNotExist }
             const newData = {
-                "complaintId": input?.complaintId,
-                "complaintName": input?.complaintName,
-                "discription": input?.discription,
+                complaintId: input?.complaintId,
+                complaintName: input?.complaintName,
+                discription: input?.discription,
+                buId: input?.buid,
                 deletedAt: null,
                 isActive: true
             }

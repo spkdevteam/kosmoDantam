@@ -19,7 +19,7 @@ const createFindings = async (input) => {
                     message: 'Findings already exist.',
                 };
             }
-            input.findingsId = await getserialNumber('findings', input?.clientId, '');
+            input.findingsId = await getserialNumber('findings', input?.clientId, '',input?.buId);
         }
 
         const newData = {
@@ -27,6 +27,7 @@ const createFindings = async (input) => {
             findingsName: input?.findingsName,
             discription: input?.discription,
             clientId: input?.clientId,
+            buId: input?.buId,
         };
 
 

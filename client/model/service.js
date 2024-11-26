@@ -7,6 +7,7 @@ const serviceSchema = new mongoose.Schema({
     serviceName: { type: String, unique: true, required: true },
     branchId :  { type: mongoose.Schema.ObjectId,ref:'branch',required:true },
     description: { type: String },
+    buId:{ type: mongoose.Schema.ObjectId, ref: "businessUnit", default:null, index: true  },
     price:{ type: Number,default:0.00 },
     deletedAt:{type:Date,default:null},
     isActive:{type:Boolean,default:true},

@@ -1,5 +1,5 @@
 const sanitizeBody = require("../../utils/sanitizeBody")
-const { createProcedure,deleteProcedure,toggleProcedure, revokeDeletedProcedure, editProcedure,getAllProcedures } = require("../services/procedure.service")
+const { createProcedure,deleteProcedure,toggleProcedure, revokeDeletedProcedure, editProcedure,getAllProcedures, procedureUnderService } = require("../services/procedure.service")
 
 exports.createProcedure = async (req, res) => {
     try {
@@ -61,4 +61,16 @@ exports.getAllProcedures = async (req,res)=>{
         res.json({ status: false, message: error.message,statusCode:500 })
     }
 }
+
+exports.getProcedureUnderService = async (req,res)=>{
+    try {
+        const data = await sanitizeBody(req.query)
+      
+        const result =await procedureUnderService(data)
+        res.status(result?.statusCode || 200 ).json(result)
+    } catch (error) {
+        res.json({ status: false, message: error.message,statusCode:500 })
+    }
+}
+
 

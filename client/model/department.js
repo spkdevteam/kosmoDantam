@@ -4,6 +4,7 @@ const departmentSchema = mongoose.Schema({
     deptName : {type:String,unique:true},
     deptId : {type:String,unique:true},
     branchId : { type: mongoose.Schema.ObjectId, ref: "branch", index: true }, 
+    buId:{ type: mongoose.Schema.ObjectId, ref: "businessUnit", default:null, index: true  },
     description:{type:String} ,
     deletedAt:{type:Date,default:null},
     isActive:{type:Boolean,default:true},

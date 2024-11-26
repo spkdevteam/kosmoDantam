@@ -10,13 +10,10 @@ const createProcedure = async (input) => {
         const procedures = await db.model('procedure', procedureSchema)
         if (!input.procedureId) {
             const isExist = await procedures.findOne({ procedureName: input?.procedureName })
-            if (isExist) return { status: false, message: message.lblProcedurealreadyExist, statusCode: 400 }
-            input.procedureId = await getserialNumber('procedure', input?.clientId, input?.branchId)
+            if (isExist) return { status: false, message: message.lblProcedureAlreadyExists, statusCode: 400 }
+            input.procedureId = await getserialNumber('procedure', input?.clientId, input?.branchId,input?.buId)
         }
-        console.log(input,'sasasa')
-        if (!await validateSerialnumber(input?.procedureId, input.clientId))
-            return { status: false, message: message.lblNotavalidSerialNumber, statusCode: 400 }
-
+       
         const newRecord = {
             deptId: input?.deptId,
             services: input?.services || [],
@@ -26,6 +23,7 @@ const createProcedure = async (input) => {
             branchId: input?.branchId,
             deletedAt: null,
             isActive: true,
+            buId: input?.buId,
         }
         const result = await procedures.updateOne({ procedureId: input?.procedureId }, { $set: newRecord }, { upsert: true })
         if (result.modifiedCount) return { status: true, message: message.lblProcedureModified, statusCode: 200, ...newRecord }
@@ -93,7 +91,7 @@ const editProcedure = async (input) => {
         if (!input.procedureId) {
             const isExist = await procedures.findOne({ _id: input?.procedureName })
             if (isExist) return { status: false, message: message.lblProcedurealreadyExist, statusCode: 400 }
-            input.procedureId = await getserialNumber('procedure', input?.clientId, input?.branchId)
+            
         }
         const newRecord = {
             deptId: input?.deptId,
@@ -101,6 +99,7 @@ const editProcedure = async (input) => {
             procedureName: input?.procedureName,
             description: input?.description,
             branchId: input?.branchId,
+            
             deletedAt: null,
             isActive: true,
         }
@@ -122,4 +121,17 @@ const getAllProcedures = async (input)=>{
         return { status: false, message: error.message, statusCode: 500 }
     }
 }
-module.exports = { createProcedure, deleteProcedure, toggleProcedure ,revokeDeletedProcedure,editProcedure,getAllProcedures }
+
+const procedureUnderService = async (input)=>{
+    try {
+        const db = await getClientDatabaseConnection(input.clientId)
+        const procedures = await db.model('procedure', procedureSchema)
+        const result =await procedures.find({deletedAt:null,services:input?.serviceId})
+        return {status:true,statusCode:200,result:result,message:message.lblProcedureFetched}
+    } catch (error) {
+        return { status: false, message: error.message, statusCode: 500 }
+    }
+}
+
+
+module.exports = { createProcedure, deleteProcedure, toggleProcedure ,revokeDeletedProcedure,editProcedure,getAllProcedures,procedureUnderService }
