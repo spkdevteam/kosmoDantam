@@ -17,7 +17,7 @@ const createMedicalCases = async (input) => {
         }
  
         const newData = {
-            caseId: input?.caseId,
+            displayId: input?.caseId,
             caseName: input?.caseName,
             remark: input?.remark,
             isActive: input?.isActive,
@@ -27,7 +27,7 @@ const createMedicalCases = async (input) => {
         }
         
         const result =await medicalCases.findOneAndUpdate(
-            { caseId: input?.caseId, deletedAt: null },
+            { displayId: input?.caseId, deletedAt: null },
             { $set: newData },
             {
                 upsert: true,

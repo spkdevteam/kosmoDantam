@@ -23,7 +23,7 @@ const createFindings = async (input) => {
         }
 
         const newData = {
-            findingsId: input?.findingsId,
+            displayId: input?.findingsId,
             findingsName: input?.findingsName,
             discription: input?.discription,
             clientId: input?.clientId,
@@ -32,7 +32,7 @@ const createFindings = async (input) => {
 
 
         const result = await findings.findOneAndUpdate(
-            { findingsId: input?.findingsId },
+            { displayId: input?.findingsId },
             { $set: newData },
             {
                 new: true,

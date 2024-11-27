@@ -12,7 +12,7 @@
  *         application/json:
  *           example:
  *             clientId: "6735e64c5c58f271b1ce1678"
- *             deptId: "673c56bac071b7a57c121d2f"
+ *             deptId: "6746af38b193ebcde50803fd"
  *             branchId: "6736e43eecc4dfe280f90d03"
  *             deptName: "Human Resources"
  *             description: "Updated description for the department."

@@ -2,7 +2,7 @@ const { default: mongoose } = require("mongoose");
 
 const departmentSchema = mongoose.Schema({
     deptName : {type:String,unique:true},
-    deptId : {type:String,unique:true},
+    displayId : {type:String,unique:true},
     branchId : { type: mongoose.Schema.ObjectId, ref: "branch", index: true }, 
     buId:{ type: mongoose.Schema.ObjectId, ref: "businessUnit", default:null, index: true  },
     description:{type:String} ,

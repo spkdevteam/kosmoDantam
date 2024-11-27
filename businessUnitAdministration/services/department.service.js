@@ -33,7 +33,7 @@ const createDepartment = async (input) => {
             deptName: input.deptName,
             branchId: input.branchId,
             description: input.description,
-            deptId: input.deptId,
+            displayId: input.deptId,
             buId: input?.buId,
             isActive: true,
         }
@@ -41,7 +41,7 @@ const createDepartment = async (input) => {
 
 
         const result = await department.findOneAndUpdate(
-            { deptId: input.deptId },
+            { displayId: input.deptId },
             { $set: newData },
             {
                 upsert: true,
@@ -100,7 +100,7 @@ const getallDepartments = async (input) => {
     try {
         const db = await getClientDatabaseConnection(input.clientId)
         const departments = await db.model('department', departmentSchema)
-        const result = await departments.find({ deletedAt: null })
+        const result = await departments.find({ deletedAt: null,isActive:true })
         if (result) return { status: true, message: 'success', result: result, statusCode: 200 }
         else return { status: false, message: 'unKnown error ', statusCode: 500 }
     } catch (error) {

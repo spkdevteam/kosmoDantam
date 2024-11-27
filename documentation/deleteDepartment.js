@@ -22,7 +22,7 @@
  *         required: true
  *         description: Unique identifier for the department to be deleted. 
  *                      This can be either an ObjectId or a custom string identifier.
- *         example: "673efa60c071b7a57c1238b7"
+ *         example: "6746af38b193ebcde50803fd"
  *     responses:
  *       200:
  *         description: Department deleted successfully.

@@ -1,7 +1,7 @@
 
 const mongoose = require('mongoose')
 const cheifComplaintSchema = mongoose.Schema({
-    complaintId:{type:String,unique:true},
+    displayId:{type:String,unique:true},
     complaintName:{type:String},
     discription:{type:String},
     buId:{ type: mongoose.Schema.ObjectId, ref: "businessUnit", default:null, index: true  },

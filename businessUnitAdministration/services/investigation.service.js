@@ -23,7 +23,7 @@ const createInvestigation = async (input) => {
             input.investigationId = await getserialNumber('investigation', input?.clientId, '',input?.buId)
             
             const newData = {
-                investigationId: input?.investigationId,
+                displayId: input?.investigationId,
                 investigationName: input?.investigationName,
                 discription: input?.discription,
                 deletedAt: null,
@@ -32,7 +32,7 @@ const createInvestigation = async (input) => {
             }
             
             const result = await investigation.findOneAndUpdate({
-                investigationId: input?.investigationId
+                displayId: input?.investigationId
             },
             {
                 $set: newData
@@ -61,7 +61,6 @@ const editinvestigation = async (input) => {
             const isExist = await investigation.findOne({ _id: input?.investigationId, deletedAt: null })
             if (!isExist) return { statusCode: httpStatusCode.NotFound, status: true, message: message.lblInvestigationDoesNotExist }
             const newData = {
-                investigationId: input?.investigationId,
                 investigationName: input?.investigationIdName,
                 discription: input?.discription,
                 deletedAt: null,

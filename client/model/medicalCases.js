@@ -2,7 +2,7 @@
 const mongoose = require('mongoose')
 const { index } = require('./branch')
 const medicalCasesSchema =  mongoose.Schema({
-    caseId:{type:String,unique:true,required:true},
+    displayId:{type:String,unique:true,required:true},
     caseName:{type:String,unique:true,required:true},
     remark:{type:String},
     deletedAt:{type:Date },

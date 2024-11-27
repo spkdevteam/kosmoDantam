@@ -111,6 +111,7 @@ module.exports = {
     lblServiceExist:"Service alredy exist in the same name ",
     lblServiceCreated:"New service created ",
     lblServiceModified:"Service Modified",
+    lblServicenotModified:"no changes found to Modify",
     lblNotavalidSerialNumber:"Not a valid serial number ",
     lblServicenotFound:"No service found on this id ",
     lblServiceDeleted:"Service has deleted",

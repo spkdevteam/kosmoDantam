@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const serviceSchema = new mongoose.Schema({
-    serviceId: { type: String, unique: true, required: true },
+    displayId: { type: String, unique: true, required: true },
     departmentId: {type: mongoose.Schema.ObjectId,ref:'department',  required: true  },
     procedures: { type: [String], default: [] },  
     serviceName: { type: String, unique: true, required: true },

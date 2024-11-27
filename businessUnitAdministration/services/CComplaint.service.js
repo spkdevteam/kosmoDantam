@@ -21,7 +21,7 @@ const createCheifComplaint = async (input) => {
             input.complaintId = await getserialNumber('cheifComplaint', input?.clientId, '',input?.buId)
             console.log(input,'inputinput')
             const newData = {
-                complaintId: input?.complaintId,
+                displayId: input?.complaintId,
                 complaintName: input?.complaintName,
                 discription: input?.discription,
                 buId: input?.buId,
@@ -30,7 +30,7 @@ const createCheifComplaint = async (input) => {
             }
 
             const result = await cheifComplaint.findOneAndUpdate({
-                complaintId: input?.complaintId
+                displayId: input?.complaintId
             },
                 {
                     $set: newData
@@ -57,7 +57,7 @@ const editCheifComplaint = async (input) => {
             const isExist = await cheifComplaint.findOne({ _id: input?.complaintId, deletedAt: null })
             if (!isExist) return { statusCode: httpStatusCode.NotFound, status: true, message: message.lblChiefComplaintDoesNotExist }
             const newData = {
-                complaintId: input?.complaintId,
+                
                 complaintName: input?.complaintName,
                 discription: input?.discription,
                 buId: input?.buid,
