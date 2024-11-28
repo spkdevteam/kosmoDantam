@@ -6,12 +6,10 @@ const ObjectId = Schema.ObjectId;
 
 const clinetBusinessUnitSchema = new Schema(
     {
-
-
         buHead: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
-
+        BUPrefix:{type:String,default:'KC'}, 
+        activeYear:{type:String,default:'2024'},
         name: { type: String, required: true },
-
         emailContact: {
             type: String,
             unique: true,
@@ -26,7 +24,6 @@ const clinetBusinessUnitSchema = new Schema(
                 message: 'Invalid email format.',
             },
         },
-
         contactNumber: {
             type: String,
             trim: true,

@@ -13,9 +13,9 @@
  *           example:
  *             clientId: "6735e64c5c58f271b1ce1678"
  *             branchId: "6736e43eecc4dfe280f90d03"
- *             serviceId: null
- *             deptId: "673efa60c071b7a57c1238b7"
- *             procedures: ["Procedure 1", "Procedure 2"]
+ *             buId: "673ef64bdc1355e6ca2e61eb"
+ *             deptId: "6746af38b193ebcde50803fd"
+ *              
  *             serviceName: "General Checkup"
  *             description: "A routine checkup for patients."
  *             price: 100
@@ -30,9 +30,9 @@
  *               service:
  *                 clientId: "6735e64c5c58f271b1ce1678"
  *                 branchId: "BR001"
- *                 serviceId: "SVC001"
+ *                 buId: "673ef64bdc1355e6ca2e61eb"
  *                 deptId: "UT-AB-2024-DP100008"
- *                 procedures: ["Procedure 1", "Procedure 2"]
+ *                 
  *                 serviceName: "General Checkup"
  *                 description: "A routine checkup for patients."
  *                 price: 100
@@ -42,7 +42,7 @@
  *           application/json:
  *             example:
  *               status: false
- *               message: "Duplicate entry. serviceId or serviceName already exists."
+ *               message: "Duplicate entry. serviceName already exists."
  *       500:
  *         description: Internal server error.
  *         content:

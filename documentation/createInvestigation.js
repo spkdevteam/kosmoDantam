@@ -1,11 +1,11 @@
 /**
  * @swagger
- * /api/client/bu/findings/create:
+ * /api/client/bu/investigation/create:
  *   post:
- *     summary: Create a new finding
- *     description: Adds a new finding to the system with unique identifiers and other details.
+ *     summary: Create a new investigation
+ *     description: Adds a new investigation with the provided details such as `investigationName`, `description`, and associates it with a client using `clientId`.
  *     tags:
- *       - Findings
+ *       - Investigation
  *     requestBody:
  *       required: true
  *       content:
@@ -15,49 +15,48 @@
  *             properties:
  *               clientId:
  *                 type: string
- *                 description: Unique identifier for the client associated with the finding.
+ *                 description: Unique identifier for the client associated with the investigation.
  *                 example: "6735e64c5c58f271b1ce1678"
  *               buId:
  *                 type: string
  *                 description: Unique identifier for the business unit.
  *                 example: "673ef64bdc1355e6ca2e61eb"
- *               findingsName:
+ *               investigationName:
  *                 type: string
- *                 unique: true
- *                 description: Name of the finding.
- *                 example: "Blood Test Results"
- *               description:
+ *                 description: Name of the investigation.
+ *                 example: "ECG"
+ *               discription:
  *                 type: string
- *                 unique: true
- *                 description: Detailed description of the finding.
- *                 example: "Detailed analysis of blood test results."
- *                
+ *                 description: Detailed description of the investigation.
+ *                 example: "A test to analyze heart activity."
  *     responses:
  *       201:
- *         description: Finding created successfully.
+ *         description: Investigation created successfully.
  *         content:
  *           application/json:
  *             example:
  *               status: true
- *               message: "Finding created successfully."
+ *               statusCode: 201
+ *               message: "Investigation created successfully."
  *               data:
  *                 clientId: "6735e64c5c58f271b1ce1678"
  *                 buId: "673ef64bdc1355e6ca2e61eb"
- *                 findingsName: "Blood Test Results"
- *                 description: "Detailed analysis of blood test results."
- *                 isActive: true
+ *                 investigationName: "ECG"
+ *                 discription: "A test to analyze heart activity."
  *       400:
- *         description: Invalid input or duplicate data.
+ *         description: Bad request due to missing or invalid input.
  *         content:
  *           application/json:
  *             example:
  *               status: false
- *               message: "Invalid input data or duplicate entry for findings."
+ *               statusCode: 400
+ *               message: "Invalid input data. Please provide all required fields."
  *       500:
  *         description: Internal server error.
  *         content:
  *           application/json:
  *             example:
  *               status: false
+ *               statusCode: 500
  *               message: "Internal server error."
  */

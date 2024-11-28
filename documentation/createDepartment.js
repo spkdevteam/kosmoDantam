@@ -13,7 +13,7 @@
  *           example:
  *             clientId: "6735e64c5c58f271b1ce1678"
  *             deptName: "Human Resources"
- *             deptId: null
+ *             buId: "673ef64bdc1355e6ca2e61eb"
  *             branchId: "6736e43eecc4dfe280f90d03"
  *             description: "Handles employee relations and administration."
  *     responses:
@@ -27,7 +27,7 @@
  *               data:
  *                 clientId: "6735e64c5c58f271b1ce1678"
  *                 deptName: "Human Resources"
- *                 deptId: "generatedDeptId"
+ *                 buId: "673ef64bdc1355e6ca2e61eb"
  *                 branchId: "6736e43eecc4dfe280f90d03"
  *                 description: "Handles employee relations and administration."
  *       400:

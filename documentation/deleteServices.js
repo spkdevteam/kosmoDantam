@@ -20,7 +20,7 @@
  *         schema:
  *           type: string
  *         description: ID of the service to delete.
- *         example: "673d4b4ac071b7a57c12274a"
+ *         example: "6746b373b193ebcde5080449"
  *     responses:
  *       200:
  *         description: Service deleted successfully.

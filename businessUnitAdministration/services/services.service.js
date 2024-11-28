@@ -17,7 +17,7 @@ const createService = async (input) => {
         if (!input.serviceId) {
             const isNameExist = await services.findOne({ serviceName: input?.serviceName })
             if (isNameExist) return { status: false, statusCode: 409, messsage: message.lblServiceExist }
-            input.serviceId = await getserialNumber('service', input?.clientId, input?.branchId)
+            input.serviceId = await getserialNumber('service', input?.clientId, input?.branchId,input?.buId)
         }
         const isDepartmentValid = await department.findOne({ _id: input?.deptId })
         const isBranchValid = await branch.findOne({ _id: input?.branchId })
@@ -25,17 +25,17 @@ const createService = async (input) => {
         if (!isBranchValid) return { status: false, statusCode: 404, messsage: message.lblBranchNotFound }
         if (typeof (input.price) != 'number' || input.price < 0) return { status: false, statusCode: 400, messsage: message.lblNotavalidAmount }
         const newData = {
-            serviceId: input?.serviceId,
+            displayId: input?.serviceId,
             departmentId: isDepartmentValid._id,
             branchId:isBranchValid._id,
-            procedures: input?.procedures || [],
             serviceName: input?.serviceName,
             description: input?.description,
             price: input?.price,
+            buId: input?.buId,
             isActive: true,
             deletedAt: null
         }
-        const result = await services.findOneAndUpdate({ serviceId: newData.serviceId }, { $set: newData }, { upsert: true,new:true,returnDocument:'after'})
+        const result = await services.findOneAndUpdate({ displayId: newData.serviceId }, { $set: newData }, { upsert: true,new:true,returnDocument:'after'})
         if (result) return { status: true, statusCode: 201, messsage: message.lblServiceCreated, ...result._doc }
 
     } catch (error) {
@@ -70,7 +70,7 @@ const readActiveServices = async (input) => {
     try {
         const db = await getClientDatabaseConnection(input.clientId);
         const services = await db.model('services', serviceSchema);
-        const data = await services.find({ deletedAt:null})
+        const data = await services.find({ deletedAt:null,isActive:true})
         console.log(data, 'dey data fetched ')
 
         if (data) {
@@ -145,9 +145,40 @@ const editService = async (input) => {
         const result = await services.updateOne({ _id: input.serviceId }, { $set: newData })
         console.log(newData,result)
         if (result.modifiedCount) return { status: true, statusCode: 201, messsage: message.lblServiceModified, ...newData }
+        else  return { status: false, statusCode: 404, messsage: message.lblServicenotModified }
 
     } catch (error) {
         return { status: false, statusCode: 500, message: error.message }
     }
 }
-module.exports = { createService, deleteService, readActiveServices, toggleServiceStatus,editService }
+
+const serviceUnderDepartment  = async (input) => {
+    try {
+        const db = await getClientDatabaseConnection(input.clientId);
+        const services = await db.model('services', serviceSchema);
+        const data = await services.find({ deletedAt:null,departmentId:input?.departmentId ,isActive:true })
+        
+        if (data) {
+            return {
+                status: true,
+                statusCode: 200,
+                message: message.lblSuccess,
+                services: data
+            }
+        } else {
+            return {
+                status: false,
+                statusCode: 404,
+                message: message.lblFailed,
+            }
+        }
+    } catch (error) {
+        return {
+            status: false,
+            statusCode: 500,
+            message: error.message,
+        }
+    }
+}
+
+module.exports = { createService, deleteService, readActiveServices, toggleServiceStatus,editService,serviceUnderDepartment  }

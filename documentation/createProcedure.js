@@ -12,13 +12,12 @@
  *         application/json:
  *           example:
  *             clientId: "6735e64c5c58f271b1ce1678"
- *             deptId: "673efa60c071b7a57c1238b7"
- *             branchId: "6736e43eecc4dfe280f90d03"   
- *             services: ["UT-AB-2024-SV1001", "UT-AB-2024-SV1014"]
+ *             deptId: "6746af38b193ebcde50803fd"
+ *             branchId: "6736e43eecc4dfe280f90d03"
+ *             services: ["6746b2deb193ebcde5080439", "6746b373b193ebcde5080449"]
  *             procedureName: "Fillings (Amalgam or Composite)"
- *             procedureId: null
+ *             buId: "673ef64bdc1355e6ca2e61eb"
  *             description: "General Dental Care is designed to maintain optimal oral health. This service includes essential procedures such as Teeth Cleaning (Prophylaxis) to remove plaque, tartar, and stains, and Fillings to restore cavities or tooth damage using high-quality materials like amalgam or composite resin. Regular visits to maintain general dental care can help prevent cavities, gum disease, and ensure a bright, healthy smile."
- *             
  *     responses:
  *       201:
  *         description: Procedure created successfully.
@@ -29,12 +28,12 @@
  *               message: "Procedure created successfully."
  *               procedure:
  *                 clientId: "6735e64c5c58f271b1ce1678"
- *                 deptId: "UT-AB-2024-DP100008"
- *                 services: ["UT-AB-2024-SV1001", "UT-AB-2024-SV1014"]
+ *                 deptId: "6746af38b193ebcde50803fd"
+ *                 services: ["6746b2deb193ebcde5080439", "6746b373b193ebcde5080449"]
  *                 procedureName: "Fillings (Amalgam or Composite)"
- *                 procedureId: "generatedProcedureId"
+ *                 buId: "673ef64bdc1355e6ca2e61eb"
  *                 description: "General Dental Care is designed to maintain optimal oral health. This service includes essential procedures such as Teeth Cleaning (Prophylaxis) to remove plaque, tartar, and stains, and Fillings to restore cavities or tooth damage using high-quality materials like amalgam or composite resin. Regular visits to maintain general dental care can help prevent cavities, gum disease, and ensure a bright, healthy smile."
- *                 branchId: "BR001"
+ *                 branchId: "6736e43eecc4dfe280f90d03"
  *       400:
  *         description: Validation error or missing data.
  *         content:

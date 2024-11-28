@@ -20,10 +20,10 @@
  *               deptId:
  *                 type: string
  *                 description: Unique identifier for the department to be restored.
- *                 example: "673efa60c071b7a57c1238b7"
+ *                 example: "6746af38b193ebcde50803fd"
  *           example:
  *             clientId: "6735e64c5c58f271b1ce1678"
- *             deptId: "673efa60c071b7a57c1238b7"
+ *             deptId: "6746af38b193ebcde50803fd"
  *     responses:
  *       200:
  *         description: Department restored successfully.

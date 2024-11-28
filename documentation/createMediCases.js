@@ -17,10 +17,10 @@
  *                 type: string
  *                 description: Database reference to the client.
  *                 example: "6735e64c5c58f271b1ce1678"
- *               caseId:
+ *               buId:
  *                 type: string
- *                 description: Unique identifier for the medical case.
- *                 example: null
+ *                 description: Unique identifier for the business unit.
+ *                 example: "673ef64bdc1355e6ca2e61eb"
  *               caseName:
  *                 type: string
  *                 description: Name of the medical case.
@@ -38,7 +38,7 @@
  *               status: true
  *               message: "Medical case created successfully."
  *               data:
- *                 caseId: "CASE123"
+ *                 buId: "673ef64bdc1355e6ca2e61eb"
  *                 caseName: "Diabetes"
  *                 remark: "Fasting Blood Sugar (FBS): 70-100 mg/dL (Normal), Postprandial Blood Sugar (PPBS): 90-140 mg/dL (Normal)"
  *       400:
@@ -49,12 +49,12 @@
  *               status: false
  *               message: "Invalid input data. Please provide valid fields."
  *       409:
- *         description: Medical case with the given caseId or caseName already exists.
+ *         description: Medical case with the given caseName already exists.
  *         content:
  *           application/json:
  *             example:
  *               status: false
- *               message: "A medical case with the given caseId or caseName already exists."
+ *               message: "A medical case with the given caseName already exists."
  *       500:
  *         description: Internal server error.
  *         content:
