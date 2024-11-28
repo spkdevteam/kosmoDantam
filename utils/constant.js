@@ -551,6 +551,43 @@ const businessUnitPersmissionsList = [
         }
     },
 
+    {
+        name: "Patient",
+        displayName: "All Patient",
+        access: true,
+        subMenus: {
+            list: {
+                access: true,
+                api: "/demo/path",
+            },
+            create: {
+                access: true,
+                api: "/demo/path",
+            },
+            view: {
+                access: true,
+                api: "/demo/path",
+            },
+            update: {
+                access: true,
+                api: "/demo/path",
+            },
+            softDelete: {
+                access: true,
+                api: "/demo/path",
+            },
+            hardDelete: {
+                access: true,
+                api: "/demo/path",
+            },
+            activeActive: {
+                access: true,
+                api: "/demo/path",
+            },
+        }
+    },
+
+
 ]
 
 // clients role
@@ -571,6 +608,7 @@ const clientRoles = [
     { id: 14, name: "Finance Manager ", capability: defaultPersmissionsList },
     { id: 15, name: "Specialist", capability: defaultPersmissionsList },
     { id: 16, name: "Consultant", capability: defaultPersmissionsList },
+    { id: 17, name: "patienit", capability: defaultPersmissionsList },
 ];
 
 

@@ -28,12 +28,34 @@ const clinetUserSchema = new Schema(
 
         isActive: { type: Boolean, default: true },
 
-        // fields for profile
         gender: {
             type: String,
             enum: ['Male', 'Female', 'Other', 'Prefer not to say'],
             default: 'Prefer not to say',
             trim: true,
+        },
+
+        age: {
+            type: Number,
+            default: null
+        },
+
+        bloodGroup: {
+            type: String,
+            trim: true,
+            default: null
+        },
+
+        patientGroup: {
+            type: String,
+            trim: true,
+            default: null
+        },
+
+        referedBy: {
+            type: String,
+            trim: true,
+            default: null
         },
 
 
@@ -71,6 +93,8 @@ const clinetUserSchema = new Schema(
             },
         },
 
+
+
         city: {
             type: String,
             trim: true,
@@ -105,7 +129,7 @@ const clinetUserSchema = new Schema(
 
 
         // handlign created by
-        createdBy: { type: ObjectId, ref: "user", index: true }, // Index for admin/user relationships
+        createdBy: { type: ObjectId, ref: "clientUsers", index: true }, // Index for admin/user relationships
 
         deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality
     },
