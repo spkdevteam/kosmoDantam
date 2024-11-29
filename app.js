@@ -308,6 +308,7 @@ const clinetChairhRouter = require("./businessUnitAdministration/routes/chair.ro
 const clientEmployeeRouter = require("./businessUnitAdministration/routes/employee.routes.js")
 const clinetRoleRouter = require("./businessUnitAdministration/routes/rolesAndPermission.routes.js");
 const clientPatientRouter = require("./businessUnitPatientCare/routes/patient.routes.js");
+const clientCaseSheetRouter = require("./businessUnitPatientCare/routes/caseSheet.routes.js")
 
 
 const clientDepartment = require("./businessUnitAdministration/routes/department.routes.js");
@@ -359,6 +360,7 @@ app.use("/api/client/bu/employee", clientEmployeeRouter.router);
 app.use("/api/clinet/branch/chair", clinetChairhRouter.router);
 app.use("/api/clinet/bu/role", clinetRoleRouter.router);
 app.use("/api/clinet/bu/patient", clientPatientRouter.router);
+app.use("/api/clinet/bu/caseSheet", clientCaseSheetRouter.router);
 
 app.use("/api/client/bu/department", clientDepartment);
 app.use("/api/client/bu/services", clientservicesRouter);

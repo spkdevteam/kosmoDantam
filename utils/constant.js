@@ -239,36 +239,71 @@ const defaultPersmissionsList = [
     },
 
     {
-        name: "Procedure",
-        displayName: "All Procedure",
-        access: false,
+        name: "CaseSheet",
+        displayName: "All Case Sheet",
+        access: true,
         subMenus: {
             list: {
-                access: false,
+                access: true,
                 api: "/demo/path",
             },
             create: {
-                access: false,
+                access: true,
                 api: "/demo/path",
             },
             view: {
-                access: false,
+                access: true,
                 api: "/demo/path",
             },
             update: {
-                access: false,
+                access: true,
                 api: "/demo/path",
             },
             softDelete: {
-                access: false,
+                access: true,
                 api: "/demo/path",
             },
             hardDelete: {
-                access: false,
+                access: true,
                 api: "/demo/path",
             },
             activeActive: {
-                access: false,
+                access: true,
+                api: "/demo/path",
+            },
+        }
+    },
+    {
+        name: "Patient",
+        displayName: "All Patient",
+        access: true,
+        subMenus: {
+            list: {
+                access: true,
+                api: "/demo/path",
+            },
+            create: {
+                access: true,
+                api: "/demo/path",
+            },
+            view: {
+                access: true,
+                api: "/demo/path",
+            },
+            update: {
+                access: true,
+                api: "/demo/path",
+            },
+            softDelete: {
+                access: true,
+                api: "/demo/path",
+            },
+            hardDelete: {
+                access: true,
+                api: "/demo/path",
+            },
+            activeActive: {
+                access: true,
                 api: "/demo/path",
             },
         }
@@ -372,7 +407,6 @@ const businessUnitPersmissionsList = [
             },
         }
     },
-
     {
         name: "Chair",
         displayName: "All Chairs",
@@ -408,7 +442,6 @@ const businessUnitPersmissionsList = [
             },
         }
     },
-
     {
         name: "Department",
         displayName: "All Department",
@@ -514,10 +547,9 @@ const businessUnitPersmissionsList = [
             },
         }
     },
-
     {
-        name: "Procedure",
-        displayName: "All Procedure",
+        name: "CaseSheet",
+        displayName: "All Case Sheet",
         access: true,
         subMenus: {
             list: {
@@ -550,7 +582,6 @@ const businessUnitPersmissionsList = [
             },
         }
     },
-
     {
         name: "Patient",
         displayName: "All Patient",

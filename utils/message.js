@@ -77,6 +77,7 @@ module.exports = {
   lblBusinessUnitSoftDeletedSuccess: "Business unit soft deleted successfully!",
   lblBusinessUnitRestoredSuccess: "Business unit restored succesfully!",
   lblClinetIdIsRequired: "Client Id is required!",
+  lblBusinessUnitIdIsRequired: "Business Unit Id is required!",
 
 
 
@@ -85,6 +86,7 @@ module.exports = {
   lblBranchCreatedSuccess: "Branch created successfully!",
   lblBranchUpdatedSuccess: "Business unit updated successfully!",
   lblBranchIdAndClientIdRequired: " Brach Id and Client Id are required!",
+  lblBranchIRequired: " Brach Id is required!",
   lblBranchNotFound: "Branch not found!",
   lblBranchFoundSucessfully: "Branch found successfully!",
 
@@ -175,6 +177,25 @@ module.exports = {
   lblPatientNotFound: "Patient not found!",
   lblPatientFoundSucessfully: "Patient found successfully!",
   lblPatientIdRequired: "Patient Id is required!",
+
+  
+  // cheif complaints 
+  lblCheifComplaintshAlreadyExists: "CheifComplaints already exists with the location or CheifComplaints number!",
+  lblCheifComplaintsCreatedSuccess: "CheifComplaints created successfully!",
+  lblCheifComplaintsUpdatedSuccess: "CheifComplaints updated successfully!",
+  lblCheifComplaintsIdIdAndClientIdRequired: "CheifComplaints Id and Client Id are required!",
+  lblCheifComplaintsNotFound: "CheifComplaints not found!",
+  lblCheifComplaintsFoundSucessfully: "CheifComplaints found successfully!",
+
+  
+  // case sheet 
+  lblCaseSheethAlreadyExists: "CaseSheet already exists with the location or CaseSheet number!",
+  lblCaseSheetCreatedSuccess: "CaseSheet created successfully!",
+  lblCaseSheetUpdatedSuccess: "CaseSheet updated successfully!",
+  lblCaseSheetIdIdAndClientIdRequired: "CaseSheet Id and Client Id are required!",
+  lblCaseSheetNotFound: "CaseSheet not found!",
+  lblCaseSheetFoundSucessfully: "CaseSheet found successfully!",
+
 
 
   lblFindingsCreated: "New finding added to the system.",

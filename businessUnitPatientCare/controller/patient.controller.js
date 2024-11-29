@@ -24,11 +24,7 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
     try {
         const { clientId, branchId, roleId, businessUnit, firstName, lastName, email, phone, gender, age, bloodGroup, patientGroup, referedBy, city, state, country, password } = req.body;
         const mainUser = req.user;
-        if (!clientId) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblClinetIdIsRequired,
-            });
-        }
+        await commonIdCheck({ clientId, branchId, businessUnit });
         if (!firstName || !lastName || !email || !phone || !roleId || !city || !state || !country) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
@@ -98,11 +94,7 @@ exports.createSubPatientByBusinessUnit = async (req, res, next) => {
     try {
         const { clientId, branchId, businessUnit, mainPatientLinkedId, firstName, lastName, email, phone, gender, age, bloodGroup, patientGroup, referedBy, city, state, country, relation } = req.body;
         const mainUser = req.user;
-        if (!clientId) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblClinetIdIsRequired,
-            });
-        }
+        await commonIdCheck({ clientId, branchId, businessUnit });
         if (!firstName || !lastName || !email || !phone || !city || !state || !country || !relation) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
@@ -159,14 +151,10 @@ exports.createSubPatientByBusinessUnit = async (req, res, next) => {
 exports.updatePatientByBusinessUnit = async (req, res, next) => {
     try {
         const { clientId, branchId, businessUnit, patientId, firstName, lastName, email, phone, gender, age, bloodGroup, patientGroup, referedBy, city, state, country } = req.body;
-        if (!clientId) {
+        await commonIdCheck({ clientId, branchId, businessUnit });
+        if (!patientId) {
             return res.status(statusCode.BadRequest).send({
-                message: message.lblClinetIdIsRequired,
-            });
-        }
-        if (!patientId || !branchId || !businessUnit) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblRequiredFieldMissing,
+                message: message.lblPatientIdRequired,
             });
         }
         const clientConnection = await getClientDatabaseConnection(clientId);
@@ -298,6 +286,25 @@ exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
     }
 };
 
+
+const CustomError = require("../../utils/customeError")
+
+
+const commonIdCheck = async (data) => {
+    try {
+        if (!data.clientId) {
+            throw new CustomError(statusCode.BadRequest, message.lblClinetIdIsRequired);
+        }
+        if (!data.branchId) {
+            throw new CustomError(statusCode.BadRequest, message.lblBranchIRequired);
+        }
+        if (!data.businessUnit) {
+            throw new CustomError(statusCode.BadRequest, message.lblBusinessUnitIdIsRequired);
+        }
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating patient: ${error.message}`);
+    }
+}
 
 
 
