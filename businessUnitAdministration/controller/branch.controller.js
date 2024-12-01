@@ -69,7 +69,7 @@ exports.updateBranchByBusinessUnit = async (req, res) => {
     try {
         // Destructure fields from request body
         const { branchId, clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber } = req.body;
-
+camera
         // Check if branchId and clientId are provided
         if (!branchId || !clientId) {
             return res.status(statusCode.BadRequest).send({

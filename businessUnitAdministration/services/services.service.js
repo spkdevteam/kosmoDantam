@@ -4,12 +4,15 @@ const serviceSchema = require("../../client/model/service")
 const { getClientDatabaseConnection } = require("../../db/connection")
 
 const getserialNumber = require("../../model/services/getserialNumber")
+const httpStatusCode = require("../../utils/http-status-code")
 const message = require("../../utils/message")
 const validateSerialnumber = require("../../utils/validateSerialNumber")
+const { validateObjectId } = require("./validate.serialNumber")
 
 const createService = async (input) => {
     try {
-        console.log(input)
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId)
         const services = db.model('services', serviceSchema)
         const department = db.model('department', departmentSchema)
@@ -44,6 +47,8 @@ const createService = async (input) => {
 }
 const deleteService = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId);
         const services = db.model('services', serviceSchema);
         const result = await services.findOne({ _id: input?.serviceId });
@@ -68,6 +73,8 @@ const deleteService = async (input) => {
 };
 const readActiveServices = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId);
         const services = await db.model('services', serviceSchema);
         const data = await services.find({ deletedAt:null,isActive:true})
@@ -98,7 +105,8 @@ const readActiveServices = async (input) => {
 
 const toggleServiceStatus = async (input) => {
     try {
-
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId);
         const services = await db.model('services', serviceSchema);
         const isExist = await services.findOne({ _id: input?.serviceId })
@@ -116,6 +124,8 @@ const toggleServiceStatus = async (input) => {
 }
 const editService = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId)
         const services = db.model('services', serviceSchema)
         const department = db.model('department', departmentSchema)
@@ -154,6 +164,8 @@ const editService = async (input) => {
 
 const serviceUnderDepartment  = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId);
         const services = await db.model('services', serviceSchema);
         const data = await services.find({ deletedAt:null,departmentId:input?.departmentId ,isActive:true })

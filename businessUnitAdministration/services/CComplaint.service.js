@@ -2,7 +2,8 @@ const cheifComplaintSchema = require("../../client/model/cheifcomplaint");
 const { getClientDatabaseConnection } = require("../../db/connection");
 const getserialNumber = require("../../model/services/getserialNumber");
 const httpStatusCode = require("../../utils/http-status-code");
-const message = require("../../utils/message")
+const message = require("../../utils/message");
+const { validateObjectId } = require("./validate.serialNumber");
 // input =  {
 //     "complaintId": "67444ddab193ebcde507e2a4",
 //     "complaintName": "Severe Headache",
@@ -12,14 +13,18 @@ const message = require("../../utils/message")
 
 const createCheifComplaint = async (input) => {
     try {
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId);
         const cheifComplaint = await db.model('CheifComplaint', cheifComplaintSchema)
         console.log(input, 'sasasa')
         if (!input?.complaintId) {
             const isExist = await cheifComplaint.findOne({ complaintName: input?.complaintName, deletedAt: null })
             if (isExist) return { status: false, message: message.lblChiefComplaintAlreadyExist, statusCode: httpStatusCode.Conflict }
-            input.complaintId = await getserialNumber('cheifComplaint', input?.clientId, '',input?.buId)
-            console.log(input,'inputinput')
+            input.complaintId = await getserialNumber('cheifComplaint', input?.clientId, '', input?.buId)
+            console.log(input, 'inputinput')
+            if(! await validateObjectId({clientid:input?.clientId,objectId: input?.buId,collectionName:'businessunit'})) return {status:false,message:message.lblBusinessUnitNotFound, statusCode:httpStatusCode.Unauthorized}
+        
             const newData = {
                 displayId: input?.complaintId,
                 complaintName: input?.complaintName,
@@ -29,9 +34,10 @@ const createCheifComplaint = async (input) => {
                 isActive: true
             }
 
-            const result = await cheifComplaint.findOneAndUpdate({
+            const result = await cheifComplaint.findOneAndUpdate(
+                {
                 displayId: input?.complaintId
-            },
+                },
                 {
                     $set: newData
                 },
@@ -51,13 +57,15 @@ const createCheifComplaint = async (input) => {
 
 const editCheifComplaint = async (input) => {
     try {
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId);
         const cheifComplaint = await db.model('CheifComplaint', cheifComplaintSchema)
         if (input?.complaintId) {
             const isExist = await cheifComplaint.findOne({ _id: input?.complaintId, deletedAt: null })
             if (!isExist) return { statusCode: httpStatusCode.NotFound, status: true, message: message.lblChiefComplaintDoesNotExist }
             const newData = {
-                
+
                 complaintName: input?.complaintName,
                 discription: input?.discription,
                 buId: input?.buid,
@@ -88,6 +96,8 @@ const editCheifComplaint = async (input) => {
 
 const toggleCheifComplain = async (input) => {
     try {
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId);
         const cheifComplaint = await db.model('CheifComplaint', cheifComplaintSchema)
         if (input?.complaintId) {
@@ -105,12 +115,14 @@ const toggleCheifComplain = async (input) => {
 
 const deleteCheifComplaint = async (input) => {
     try {
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId);
         const cheifComplaint = await db.model('CheifComplaint', cheifComplaintSchema)
         if (input?.complaintId) {
             const isExist = await cheifComplaint.findOne({ _id: input?.complaintId, deletedAt: null })
             if (!isExist) return { statusCode: httpStatusCode.NotFound, status: true, message: message.lblChiefComplaintDoesNotExist }
-            const result = await cheifComplaint.updateOne({ _id: input?.complaintId, deletedAt: null }, { $set: { deletedAt:new Date() } })
+            const result = await cheifComplaint.updateOne({ _id: input?.complaintId, deletedAt: null }, { $set: { deletedAt: new Date() } })
             if (result.modifiedCount) return { statusCode: httpStatusCode.OK, status: true, message: `${isExist.complaintName} ${isExist.deletedAt ? 'revoked' : 'deleted'}` }
             return { statusCode: httpStatusCode.OK, status: true, message: message.lblChiefComplaintEditingFailed }
         }
@@ -122,12 +134,14 @@ const deleteCheifComplaint = async (input) => {
 
 const revokeCheifComplaint = async (input) => {
     try {
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId);
         const cheifComplaint = await db.model('CheifComplaint', cheifComplaintSchema)
         if (input?.complaintId) {
-            const isExist = await cheifComplaint.findOne({ _id: input?.complaintId, deletedAt: {$ne:null} })
+            const isExist = await cheifComplaint.findOne({ _id: input?.complaintId, deletedAt: { $ne: null } })
             if (!isExist) return { statusCode: httpStatusCode.NotFound, status: true, message: message.lblChiefComplaintDoesNotExist }
-            const result = await cheifComplaint.updateOne({ _id: input?.complaintId, deletedAt: {$ne:null} }, { $set: { deletedAt:null } })
+            const result = await cheifComplaint.updateOne({ _id: input?.complaintId, deletedAt: { $ne: null } }, { $set: { deletedAt: null } })
             if (result.modifiedCount) return { statusCode: httpStatusCode.OK, status: true, message: `${isExist.complaintName} ${isExist.deletedAt ? 'revoked' : 'deleted'}` }
             return { statusCode: httpStatusCode.OK, status: true, message: message.lblChiefComplaintEditingFailed }
         }
@@ -139,24 +153,28 @@ const revokeCheifComplaint = async (input) => {
 
 const readActiveCheifComplaint = async (input) => {
     try {
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId);
         const cheifComplaint = await db.model('CheifComplaint', cheifComplaintSchema)
-        const isExist = await cheifComplaint.find({deletedAt: null,isActive:true })
-        return { statusCode: httpStatusCode.OK, status: true, message: message.lblChiefComplaintFetched,data:isExist }
-         } catch (error) {
+        const isExist = await cheifComplaint.find({ deletedAt: null, isActive: true })
+        return { statusCode: httpStatusCode.OK, status: true, message: message.lblChiefComplaintFetched, data: isExist }
+    } catch (error) {
         return { status: false, message: 'invalid credential', statusCode: httpStatusCode.NotFound }
     }
 }
 const readAllCheifComplaint = async (input) => {
     try {
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId);
         const cheifComplaint = await db.model('CheifComplaint', cheifComplaintSchema)
-        const isExist = await cheifComplaint.find({deletedAt: null, })
-        return { statusCode: httpStatusCode.OK, status: true, message: message.lblChiefComplaintFetched,data:isExist }
-         } catch (error) {
+        const isExist = await cheifComplaint.find({ deletedAt: null, })
+        return { statusCode: httpStatusCode.OK, status: true, message: message.lblChiefComplaintFetched, data: isExist }
+    } catch (error) {
         return { status: false, message: 'invalid credential', statusCode: httpStatusCode.NotFound }
     }
 }
 
 
-module.exports = { createCheifComplaint, editCheifComplaint,readAllCheifComplaint, toggleCheifComplain,deleteCheifComplaint,revokeCheifComplaint,readActiveCheifComplaint }
+module.exports = { createCheifComplaint, editCheifComplaint, readAllCheifComplaint, toggleCheifComplain, deleteCheifComplaint, revokeCheifComplaint, readActiveCheifComplaint }

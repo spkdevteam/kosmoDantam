@@ -319,6 +319,7 @@ const medHistoryRoutes = require("./businessUnitAdministration/routes/medicalCas
 const findingsRouter = require("./businessUnitAdministration/routes/findings.routes.js");
 const ccRouter = require("./businessUnitAdministration/routes/cheifComplaint..routes.js");
 const investigationRouter = require("./businessUnitAdministration/routes/investigation.routes.js");
+const bookingRoutes = require("./businessUnitAdministration/routes/appointment.routes.js");
 
 
 // middleware setup
@@ -357,6 +358,7 @@ app.use("/api/client/bu/MediCases", medHistoryRoutes);
 app.use("/api/client/bu/findings", findingsRouter);
 app.use("/api/client/bu/chiefComplaint/",ccRouter )
 app.use("/api/client/bu/investigation",investigationRouter)
+app.use("/api/client/bu/booking",bookingRoutes)
 
 app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 
@@ -532,6 +534,7 @@ const port = process.env.PORT;
 
 // listening server
 server.listen(port, () => {
+    console.clear()
     console.log(`APP STARTED SUCCESSFULLY on port ${port}....`)
 });
 

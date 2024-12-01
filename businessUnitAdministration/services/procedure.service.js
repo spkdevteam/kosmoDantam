@@ -2,8 +2,12 @@ const message = require("../../utils/message")
 const procedureSchema = require("../../client/model/procedure")
 const { getClientDatabaseConnection } = require("../../db/connection")
 const getserialNumber = require("../../model/services/getserialNumber")
+const httpStatusCode = require("../../utils/http-status-code")
+const { validateObjectId } = require("./validate.serialNumber")
 const createProcedure = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId)
         const procedures = await db.model('procedure', procedureSchema)
         if (!input.procedureId) {
@@ -35,7 +39,8 @@ const createProcedure = async (input) => {
 
 const deleteProcedure = async (input) => {
     try {
-        //aquiering connection with client database 
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId)
         const procedures = await db.model('procedure', procedureSchema)
         const isExit = await procedures.findOne({ _id: input?.procedureId, deletedAt: null })
@@ -50,6 +55,8 @@ const deleteProcedure = async (input) => {
 }
 const revokeDeletedProcedure = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId)
         const procedures = await db.model('procedure', procedureSchema)
         const result = await procedures.updateOne({ _id: input?.procedureId }, { $set: { deletedAt:null } })
@@ -61,6 +68,8 @@ const revokeDeletedProcedure = async (input) => {
 }
 const toggleProcedure = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId)
         const procedures = await db.model('procedure', procedureSchema)
         const isExit = await procedures.findOne({ _id: input?.procedureId,   })
@@ -83,6 +92,8 @@ const toggleProcedure = async (input) => {
 }
 const editProcedure = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId)
         const procedures = await db.model('procedure', procedureSchema)
         if (!input.procedureId) {
@@ -109,6 +120,8 @@ const editProcedure = async (input) => {
 }
 const getAllProcedures = async (input)=>{
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId)
         const procedures = await db.model('procedure', procedureSchema)
         const result =await procedures.find({deletedAt:null})
@@ -119,6 +132,8 @@ const getAllProcedures = async (input)=>{
 }
 const procedureUnderService = async (input)=>{
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId)
         const procedures = await db.model('procedure', procedureSchema)
         const result =await procedures.find({deletedAt:null,services:input?.serviceId})

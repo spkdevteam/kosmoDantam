@@ -6,6 +6,9 @@ const message = require("../../utils/message")
 const createFindings = async (input) => {
     try {
         // Connect to the client database
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        
         const db = await getClientDatabaseConnection(input?.clientId);
         const findings = db.model('finding', findingsSchema);
 
@@ -62,7 +65,9 @@ const createFindings = async (input) => {
 
 const editFindings = async (input) => {
     try {
-        console.log(input, 'input')
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        
         const db = await getClientDatabaseConnection(input?.clientId);
         const findings = db.model('finding', findingsSchema);
         if (!input._Id) return { status: false, statusCode: httpStatusCode.Conflict, message: message.lblFindingsDoesNotExist };
@@ -98,6 +103,8 @@ const editFindings = async (input) => {
 };
 
 const ToggleFindings = async (input) => {
+    if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+    if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
     const db = await getClientDatabaseConnection(input?.clientId)
     const findings = await db.model('finding', findingsSchema)
     const isExist = await findings.findOne({ _Id: input?._id })
@@ -109,7 +116,8 @@ const ToggleFindings = async (input) => {
 
 const deleteFindings = async (input) => {
     try {
-        console.log(input)
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId)
         const findings = await db.model('finding', findingsSchema)
         const isExist = await findings.findOne({ _id: input?._Id })
@@ -125,7 +133,9 @@ const deleteFindings = async (input) => {
 }
 const revokeFindings = async (input) => {
     try {
-        console.log(input)
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        
         const db = await getClientDatabaseConnection(input?.clientId)
         const findings = await db.model('finding', findingsSchema)
         const isExist = await findings.findOne({ _id: input?._Id })
@@ -141,6 +151,8 @@ const revokeFindings = async (input) => {
 }
 const readAllFindings = async (input) => {
     try {
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId)
         const findings = await db.model('finding', findingsSchema)
         const isExist = await findings.find({ deletedAt: null})

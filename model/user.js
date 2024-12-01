@@ -33,7 +33,6 @@ const userSchema = new Schema(
       default: 'Prefer not to say',
       trim: true, 
     },
-
     
     dateOfBirth: {
       type: Date,

@@ -14,6 +14,7 @@ const message = require("../../utils/message")
 const createInvestigation = async (input) => {
     try {
         if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId);
         const investigation = await db.model('investigation', investigationSchema)
         if (!input?.investigationId) {
@@ -55,6 +56,9 @@ const createInvestigation = async (input) => {
 
 const editinvestigation = async (input) => {
     try {
+         
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId);
         const investigation = await db.model('investigation', investigationSchema)
         if (input?.investigationId) {
@@ -89,6 +93,8 @@ const editinvestigation = async (input) => {
 
 const toggleInvestigation = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId);
         const investigation = await db.model('investigation', investigationSchema)
         if (input?.investigationId) {
@@ -106,6 +112,8 @@ const toggleInvestigation = async (input) => {
 
 const deleteInvestigation = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId);
         const investigation = await db.model('investigation', investigationSchema)
         if (input?.investigationId) {
@@ -124,6 +132,8 @@ const deleteInvestigation = async (input) => {
  
 const revokeinvestigation = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId);
         const investigation = await db.model('investigation', investigationSchema)
         if (input?.investigationId) {
@@ -141,6 +151,9 @@ const revokeinvestigation = async (input) => {
 
 const readActiveinvestigation = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        
         const db = await getClientDatabaseConnection(input?.clientId);
         const investigation = await db.model('investigation', investigationSchema)
         const isExist = await investigation.find({deletedAt: null,isActive:true })
@@ -151,6 +164,8 @@ const readActiveinvestigation = async (input) => {
 }
 const readAllinvestigation = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId);
         const investigation = await db.model('investigation', investigationSchema)
         const isExist = await investigation.find({deletedAt: null, })

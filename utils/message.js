@@ -76,7 +76,9 @@ module.exports = {
     lblBusinessUnitFoundSuccessfully : "Business unit found successfully!",
     lblBusinessUnitSoftDeletedSuccess : "Business unit soft deleted successfully!",
     lblBusinessUnitRestoredSuccess : "Business unit restored succesfully!",
+    lblBusinessUnitinValid : "Invalid business id !",
     lblClinetIdIsRequired: "Client Id is required!",
+    
 
 
 
@@ -87,6 +89,7 @@ module.exports = {
     lblBranchIdAndClientIdRequired: " Brach Id and Client Id are required!",
     lblBranchNotFound : "Branch not found!",
     lblBranchFoundSucessfully : "Branch found successfully!",
+    lblBranchIdInvalid:"not a valid branch id ",
 
 
 
@@ -222,6 +225,26 @@ module.exports = {
     lblInvestigationNoChanges: "The Investigation details are already up to date.",
     lblInvestigationDependencies: "Please resolve linked issues before proceeding with this action.",
     lblInvestigationDoesNotExist: "The specified Investigation does not exist in the system.",
-    lblInvestigationAlreadyExist: "An Investigation with the same name already exists."
+    lblInvestigationAlreadyExist: "An Investigation with the same name already exists.",
     
+    lblAppointmentCreated: "New Appointment added to the system.",
+    lblAppointmentEdited: "Changes to the Appointment have been saved.",
+    lblAppointmentDeleted: "The Appointment has been removed from the system.",
+    lblAppointmentFetched: "Appointment data loaded.",
+    lblAppointmentBulkOperations: "Appointments imported/exported successfully.",
+    lblAppointmentCreationFailed: "Unable to add a new Appointment. Ensure all required fields are provided.",
+    lblAppointmentEditingFailed: "Appointment update unsuccessful. Ensure the Appointment exists.",
+    lblAppointmentEditingNotDone: "No changes found in the Appointment.",
+    lblAppointmentDeletionFailed: "Appointment deletion unsuccessful. Please try again later.",
+    lblAppointmentRetrievalFailed: "No Appointment found with the given ID.",
+    lblAppointmentAuthorizationFailed: "Invalid input data for the Appointment operation.",
+    lblAppointmentPendingAction: "Appointment updates are pending approval.",
+    lblAppointmentNoChanges: "The Appointment details are already up to date.",
+    lblAppointmentDependencies: "Please resolve linked issues before proceeding with this action.",
+    lblAppointmentDoesNotExist: "The specified Appointment does not exist in the system.",
+    lblAppointmentAlreadyExist: "An Appointment with the same details already exists.",
+
+    lblClinetIdInvalid:"invalid Client id",
+    
+
   };

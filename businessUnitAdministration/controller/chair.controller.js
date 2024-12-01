@@ -12,7 +12,7 @@ const clinetBusinessUnitSchema = require("../../client/model/businessUnit")
 
 
 
-const chairService = require("../../client/service/chair.services")
+const chairService = require("../../client/service/CHAIR.services")
 
 
 

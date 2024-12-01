@@ -11,9 +11,13 @@ const { getClientDatabaseConnection } = require("../../db/connection")
 const buSettingsSchema = require("../../model/buSettings")
 
 const getserialNumber = require("../../model/services/getserialNumber")
+const httpStatusCode = require("../../utils/http-status-code")
 const message = require("../../utils/message")
+const { validateObjectId } = require("./validate.serialNumber")
 const createDepartment = async (input) => {
     try {
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId)
         const department = await db.model('department', departmentSchema)
         // If deptId doesn't exist, generate a new one or check if the department already exists
@@ -72,6 +76,8 @@ const createDepartment = async (input) => {
 
 const deleteDepartment = async (input) => {
     try {
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId)
         const department = await db.model('department', departmentSchema)
 
@@ -85,7 +91,8 @@ const deleteDepartment = async (input) => {
 
 const revokeDeleteDepartment = async (input) => {
     try {
-        console.log(input, 'kkksksksks')
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId)
         const department = await db.model('department', departmentSchema)
         const result = await department.updateOne({ _id: input.deptId }, { $set: { deletedAt: null } })
@@ -98,6 +105,8 @@ const revokeDeleteDepartment = async (input) => {
 
 const getallDepartments = async (input) => {
     try {
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId)
         const departments = await db.model('department', departmentSchema)
         const result = await departments.find({ deletedAt: null,isActive:true })
@@ -110,6 +119,8 @@ const getallDepartments = async (input) => {
 
 const editDepartment = async (input) => {
     try {
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId)
         const department = await db.model('department', departmentSchema)
         // const buSettings =await db.model('BUSetting',buSettingsSchema)
@@ -135,6 +146,8 @@ const editDepartment = async (input) => {
 
 const toggleDepartment = async (input) => {
     try {
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId)
         const departments = await db.model('department', departmentSchema)
         const isExist = await departments.findOne({ _id: input?.deptId })
