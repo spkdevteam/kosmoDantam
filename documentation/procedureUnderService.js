@@ -20,7 +20,7 @@
  *           type: string
  *         required: true
  *         description: Unique identifier for the service.
- *         example: "673d6103c071b7a57c1227dc"
+ *         example: "6746b2deb193ebcde5080439"
  *     responses:
  *       200:
  *         description: List of procedures under the specified service.

@@ -43,11 +43,11 @@ exports.validateObjectId = async ({clientid='',objectId='',collectionName=''})=>
             case 'medicalCase':
                 return await medicalCases.findOne({ _id: objectId, deletedAt: null }) ? true : false;
             case 'procedure':
-                return await procedures.findOne({ _id: objectId, deletedAt: null }) ? true : false;
+                return await procedures.findOne({ _id: objectId}) ? true : false;
             case 'services':
                 return await services.findOne({ _id: objectId, deletedAt: null }) ? true : false;
             case 'branch':
-                return await branch.findOne({ _id: objectId, deletedAt: null }) ? true : false;
+                return  await branch.findOne({ _id: objectId, deletedAt: null }) ? true : false;
             case 'clientuser':
                 return await User.findOne({ _id: objectId, deletedAt: null }) ? true : false;
             case 'businessunit':
@@ -55,6 +55,7 @@ exports.validateObjectId = async ({clientid='',objectId='',collectionName=''})=>
             case 'chair':
                 return await chair.findOne({ _id: objectId, deletedAt: null }) ? true : false;
             case 'clientId':
+                console.log(await userModel.findOne({ _id: objectId, deletedAt: null }) ? true : false,'aaaaa')
                 return await userModel.findOne({ _id: objectId, deletedAt: null }) ? true : false;
             default:
                 return false;
