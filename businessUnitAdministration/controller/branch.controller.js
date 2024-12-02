@@ -16,7 +16,7 @@ const clinetBusinessUnitSchema = require("../../client/model/businessUnit")
 exports.createBranchByBusinessUnit = async (req, res) => {
     try {
         // Destructure fields from request body
-        const { clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnitId, branchHeadId  } = req.body;
+        const { clientId,branchPrefix, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnitId, branchHeadId  } = req.body;
 
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
@@ -24,7 +24,7 @@ exports.createBranchByBusinessUnit = async (req, res) => {
             });
         }
         // Check if required fields are missing
-        if (!name || !incorporationName || !emailContact || !contactNumber) {
+        if (!name || !incorporationName || !emailContact || !contactNumber || branchPrefix) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
@@ -40,11 +40,17 @@ exports.createBranchByBusinessUnit = async (req, res) => {
                 message: message.lblBranchAlreadyExists,
             });
         }
+        const prefixExist = await Branch.findOne({branchPrefix});
+        if (prefixExist) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblBranchprefixConflict,
+            });
+        }
         // Create new brnanch 
         const newBranch = await Branch.create(
             [
                 {
-                    clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit : businessUnitId, branchHead : branchHeadId
+                    branchPrefix,clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit : businessUnitId, branchHead : branchHeadId
                 },
             ],
         );
@@ -68,7 +74,7 @@ exports.updateBranchByBusinessUnit = async (req, res) => {
 
     try {
         // Destructure fields from request body
-        const { branchId, clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber } = req.body;
+        const { branchId,branchPrefix, clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber } = req.body;
 camera
         // Check if branchId and clientId are provided
         if (!branchId || !clientId) {
@@ -108,6 +114,13 @@ camera
                 },
             ],
         });
+        const prefixExist = await Branch.findOne({branchPrefix:branchPrefix,_id: { $ne: branchId }});
+        if (prefixExist) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblBranchprefixConflict,
+            });
+        }
+
 
         if (existingBranch) {
             return res.status(statusCode.BadRequest).send({
@@ -127,6 +140,7 @@ camera
         branch.incorporationName = incorporationName;
         branch.cinNumber = cinNumber;
         branch.gstNumber = gstNumber;
+        branchPrefix ? branch.branchPrefix = branchPrefix:'';
 
         // Save the updated branch
         await branch.save();

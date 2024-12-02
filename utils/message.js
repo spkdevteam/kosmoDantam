@@ -90,6 +90,8 @@ module.exports = {
     lblBranchNotFound : "Branch not found!",
     lblBranchFoundSucessfully : "Branch found successfully!",
     lblBranchIdInvalid:"not a valid branch id ",
+    lblBranchprefixConflict:"Prefix not available , already in use  ",
+    
 
 
 
