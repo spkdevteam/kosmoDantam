@@ -119,7 +119,7 @@ exports.createBusinessUnit = async (req, res) => {
 
     const clientUser = clientConnection.model('clientUsers', clinetUserSchema);
 
-    
+
     const newClient = await clientUser.create({
 
       role: buRoleId?._id,
@@ -300,6 +300,7 @@ exports.listBusinessUnit = async (req, res) => {
 
     let whereCondition = {
       deletedAt: null,
+      roleId : 4,
     };
 
     if (searchText) {
@@ -313,7 +314,7 @@ exports.listBusinessUnit = async (req, res) => {
 
     const [businessUnit, count] = await Promise.all([
       User.find(whereCondition)
-        .select('firstName lastName email phone')
+        .select('firstName lastName email phone isActive middleName')
         .skip(skip)
         .limit(limit)
         .sort({ _id: 'desc' }),
