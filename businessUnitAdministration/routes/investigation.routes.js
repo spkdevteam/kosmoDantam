@@ -1,6 +1,6 @@
 
 const express = require('express')
-const { createInvestigation, editInvestigation, toggleInvestigation, deleteInvestigation, revokeInvestigation, getActiveInvestigation, getAllInvestigation } = require('../controller/investigation.controller')
+const { getallInvestigationByPage,createInvestigation, editInvestigation, toggleInvestigation, deleteInvestigation, revokeInvestigation, getActiveInvestigation, getAllInvestigation } = require('../controller/investigation.controller')
 const investigationRouter = express.Router()
 
 investigationRouter
@@ -11,6 +11,7 @@ investigationRouter
 .post('/revoke',revokeInvestigation)
 .get('/getActiveInvestigation',getActiveInvestigation)
 .get('/getAllInvestigation',getAllInvestigation)
+.get('/allInvestigationByPage',getallInvestigationByPage)
 
 
 module.exports = investigationRouter

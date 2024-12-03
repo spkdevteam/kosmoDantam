@@ -245,7 +245,6 @@ exports.listBranch = async (req, res) => {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
 
-
         const [branches, count] = await Promise.all([
             Branch.find(whereCondition)
                 .skip(skip)

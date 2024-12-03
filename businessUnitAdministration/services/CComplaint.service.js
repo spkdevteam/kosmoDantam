@@ -92,6 +92,7 @@ const editCheifComplaint = async (input) => {
 }
 const toggleCheifComplain = async (input) => {
     try {
+        console.log(input,'toggleCheifComplain')
         if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
         if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         if(! await validateObjectId({clientid:input?.clientId,objectId:input?.complaintId,collectionName:'CheifComplaint'})) return {status:false,message:message.lblChiefComplaintDoesNotExist, statusCode:httpStatusCode.Unauthorized}
@@ -158,6 +159,34 @@ const readActiveCheifComplaint = async (input) => {
         return { status: false, message: 'invalid credential', statusCode: httpStatusCode.NotFound }
     }
 }
+const listComplaintByPage = async (input)=>{
+    try {
+        !input?.keyWord ? input.keyWord = "" :''
+        !input?.page ? input.page = 0 :input.page = parseInt(input.page)
+        !input?.perPage ? input.perPage = 10 : input.perPage  = parseInt(input.perPage)
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        const db = await getClientDatabaseConnection(input?.clientId);
+        const cheifComplaint = await db.model('CheifComplaint', cheifComplaintSchema)
+        const isExist = await cheifComplaint.find({
+            deletedAt: null,
+            isActive: true,
+            $or: [
+              { complaintName: { $regex: `${input?.keyWord || ''}`, $options: 'i' } },
+              { discription: { $regex: `${input?.keyWord || ''}`, $options: 'i' } }
+            ]
+          })
+          .skip((input?.page - 1) * input?.perPage)
+          .limit(input?.page * input?.perPage);
+
+          
+        console.log(input)
+        return { statusCode: httpStatusCode.OK,page:input?.page,perPage:input?.perPage,keyWord:input?.keyWord, status: true, message: message.lblChiefComplaintFetched, data: isExist }
+    } catch (error) {
+        return { status: false, message: 'invalid credential', statusCode: httpStatusCode.NotFound }
+    }
+}
+
 const readAllCheifComplaint = async (input) => {
     try {
         if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
@@ -170,6 +199,34 @@ const readAllCheifComplaint = async (input) => {
         return { status: false, message: 'invalid credential', statusCode: httpStatusCode.NotFound }
     }
 }
+const toggleComplaintWithPage = async (input) => {
+    try {
+        // const { keyword, page, perPage, status, complaintId, clientId } = input ;
+        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.complaintId,collectionName:'CheifComplaint'})) return {status:false,message:message.lblChiefComplaintDoesNotExist, statusCode:httpStatusCode.Unauthorized}
+        const db = await getClientDatabaseConnection(input?.clientId);
+        const cheifComplaint = await db.model('CheifComplaint', cheifComplaintSchema)
+        if (input?.complaintId) {
+            const isExist = await cheifComplaint.findOne({ _id: input?.complaintId, deletedAt: null })
+            if (!isExist) return { statusCode: httpStatusCode.NotFound, status: true, message: message.lblChiefComplaintDoesNotExist }
+            const result = await cheifComplaint.updateOne({ _id: input?.complaintId, deletedAt: null }, { $set: { isActive: !isExist.isActive } })
+            if (result.modifiedCount) return { statusCode: httpStatusCode.OK, status: true, message: `${isExist.complaintName} ${isExist.isActive ? 'disabled' : 'enabled'}` }
+            return { statusCode: httpStatusCode.OK, status: true, message: message.lblChiefComplaintEditingFailed }
+        }
+        return { statusCode: httpStatusCode.Forbidden, status: true, message: message.lblChiefComplaintDoesNotExist }
+    } catch (error) {
+        return { status: false, message: 'invalid credential', statusCode: httpStatusCode.NotFound }
+    }
+}
 
-
-module.exports = { createCheifComplaint, editCheifComplaint, readAllCheifComplaint, toggleCheifComplain, deleteCheifComplaint, revokeCheifComplaint, readActiveCheifComplaint }
+module.exports = {
+    listComplaintByPage,
+    toggleComplaintWithPage, 
+    createCheifComplaint, 
+    editCheifComplaint, 
+    readAllCheifComplaint, 
+    toggleCheifComplain, 
+    deleteCheifComplaint, 
+    revokeCheifComplaint, 
+    readActiveCheifComplaint }

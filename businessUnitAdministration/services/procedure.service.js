@@ -19,7 +19,6 @@ const createProcedure = async (input) => {
             const index = serviceValidations.findIndex(value => value == false)
             return { status: false, message: message.lblServicenotFound + input?.services[index], statusCode: httpStatusCode.Unauthorized };
         }
-
         const db = await getClientDatabaseConnection(input.clientId)
         const procedures = await db.model('procedure', procedureSchema)
         if (!input.procedureId) {
@@ -46,8 +45,6 @@ const createProcedure = async (input) => {
         return { status: false, message: error.message, statusCode: 500 }
     }
 }
-
-
 
 const deleteProcedure = async (input) => {
     try {
@@ -174,5 +171,38 @@ const procedureUnderService = async (input) => {
         return { status: false, message: error.message, statusCode: 500 }
     }
 }
+const getAllProceduresByPage = async (input) => {
+    try {
+        !input?.keyWord ? input.keyWord = "" : ''
+        !input?.page ? input.page = 0 : input.page = parseInt(input.page)
+        !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
+        
+        if (!input?.clientId) return { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        const db = await getClientDatabaseConnection(input.clientId)
+        const procedures = await db.model('procedure', procedureSchema)
+        const result = await procedures.find({ deletedAt: null,
+            $or:[
+                {procedureName:{$regex:input?.keyWord,$options:'i'}},
+                {description:{$regex:input?.keyWord,$options:'i'}},
+                {displayId:{$regex:input?.keyWord,$options:'i'}}
+            ]
+        })
+        .skip((input.page-1) *  input.perPage )
+        .limit(input.page * input.perPage)
+        return { status: true, statusCode: 200, result: result, message: message.lblProcedureFetched }
+    } catch (error) {
+        return { status: false, message: error.message, statusCode: 500 }
+    }
+}
 
-module.exports = { createProcedure, deleteProcedure, toggleProcedure, revokeDeletedProcedure, editProcedure, getAllProcedures, procedureUnderService }
+module.exports = { 
+    createProcedure, 
+    getAllProceduresByPage,
+    deleteProcedure, 
+    toggleProcedure, 
+    revokeDeletedProcedure, 
+    editProcedure, 
+    getAllProcedures, 
+    procedureUnderService 
+}

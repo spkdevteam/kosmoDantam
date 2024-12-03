@@ -356,7 +356,7 @@ app.use("/api/client/bu/services", clientservicesRouter);
 app.use("/api/client/bu/procedures", clientProcedureRouter);
 app.use("/api/client/bu/MediCases", medHistoryRoutes);
 app.use("/api/client/bu/findings", findingsRouter);
-app.use("/api/client/bu/chiefComplaint/",ccRouter )
+app.use("/api/client/bu/chiefComplaint",ccRouter )
 app.use("/api/client/bu/investigation",investigationRouter)
 app.use("/api/client/bu/booking",bookingRoutes)
 

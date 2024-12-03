@@ -1,5 +1,5 @@
 const sanitizeBody = require("../../utils/sanitizeBody")
-const { createMedicalCases,updateMedicalCases, readAllMedicalCases ,deleteMedicalCase, revokeDeletedMedicalCase, toggleMedicalCases} = require("../services/medicalCases.service")
+const { createMedicalCases,updateMedicalCases, readAllMedicalCases ,deleteMedicalCase, revokeDeletedMedicalCase, toggleMedicalCases, readAllMedicalCasesByPage} = require("../services/medicalCases.service")
 
 
 exports.createMedicalCases = async (req,res,next)=>{
@@ -64,3 +64,13 @@ exports.toggleMedicalCases = async (req,res,next)=>{
         next(error)
     }
 }
+exports.getReadActiveCasesByPage = async (req,res,next)=>{
+    try {
+        const data = await sanitizeBody(req.query)
+        const result = await readAllMedicalCasesByPage(data)
+        res.status(result.statusCode||200).json(result)
+    } catch (error) {
+        next(error)
+    }
+}
+

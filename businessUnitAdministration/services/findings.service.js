@@ -7,10 +7,10 @@ const { validateObjectId } = require("./validate.serialNumber");
 const createFindings = async (input) => {
     try {
         // Connect to the client database
-        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
-        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
-        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.buId,collectionName:'businessunit'})) return {status:false,message:message.lblBusinessUnitinValid, statusCode:httpStatusCode.Unauthorized}
-        
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
+
         const db = await getClientDatabaseConnection(input?.clientId);
         const findings = db.model('finding', findingsSchema);
 
@@ -24,7 +24,7 @@ const createFindings = async (input) => {
                     message: 'Findings already exist.',
                 };
             }
-            input.findingsId = await getserialNumber('findings', input?.clientId, '',input?.buId);
+            input.findingsId = await getserialNumber('findings', input?.clientId, '', input?.buId);
         }
 
         const newData = {
@@ -66,11 +66,11 @@ const createFindings = async (input) => {
 
 const editFindings = async (input) => {
     try {
-        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
-        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
-        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.findingsId,collectionName:'finding'})) return {status:false,message:message.lblFindingsDoesNotExist, statusCode:httpStatusCode.Unauthorized}
-        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.buId,collectionName:'businessunit'})) return {status:false,message:message.lblBusinessUnitinValid, statusCode:httpStatusCode.Unauthorized}
-        
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.findingsId, collectionName: 'finding' })) return { status: false, message: message.lblFindingsDoesNotExist, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
+
         const db = await getClientDatabaseConnection(input?.clientId);
         const findings = db.model('finding', findingsSchema);
         if (!input._Id) return { status: false, statusCode: httpStatusCode.Conflict, message: message.lblFindingsDoesNotExist };
@@ -106,9 +106,9 @@ const editFindings = async (input) => {
 };
 
 const ToggleFindings = async (input) => {
-    if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
-    if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
-    if(! await validateObjectId({clientid:input?.clientId,objectId:input?.findingsId,collectionName:'finding'})) return {status:false,message:message.lblFindingsDoesNotExist, statusCode:httpStatusCode.Unauthorized}
+    if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+    if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+    if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.findingsId, collectionName: 'finding' })) return { status: false, message: message.lblFindingsDoesNotExist, statusCode: httpStatusCode.Unauthorized }
     const db = await getClientDatabaseConnection(input?.clientId)
     const findings = await db.model('finding', findingsSchema)
     const isExist = await findings.findOne({ _Id: input?._id })
@@ -120,9 +120,9 @@ const ToggleFindings = async (input) => {
 
 const deleteFindings = async (input) => {
     try {
-        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
-        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
-        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.findingsId,collectionName:'finding'})) return {status:false,message:message.lblFindingsDoesNotExist, statusCode:httpStatusCode.Unauthorized}
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.findingsId, collectionName: 'finding' })) return { status: false, message: message.lblFindingsDoesNotExist, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(input?.clientId)
         const findings = await db.model('finding', findingsSchema)
         const isExist = await findings.findOne({ _id: input?._Id })
@@ -138,9 +138,9 @@ const deleteFindings = async (input) => {
 }
 const revokeFindings = async (input) => {
     try {
-        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
-        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
-        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.findingsId,collectionName:'finding'})) return {status:false,message:message.lblFindingsDoesNotExist, statusCode:httpStatusCode.Unauthorized}
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.findingsId, collectionName: 'finding' })) return { status: false, message: message.lblFindingsDoesNotExist, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(input?.clientId)
         const findings = await db.model('finding', findingsSchema)
         const isExist = await findings.findOne({ _id: input?._Id })
@@ -156,11 +156,34 @@ const revokeFindings = async (input) => {
 }
 const readAllFindings = async (input) => {
     try {
-        if(!input?.clientId ) return {status:false,message:message.lblClinetIdIsRequired, statusCode:httpStatusCode.Unauthorized}
-        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(input?.clientId)
         const findings = await db.model('finding', findingsSchema)
-        const isExist = await findings.find({ deletedAt: null})
+        const isExist = await findings.find({ deletedAt: null })
+        if (isExist.length) return { status: true, statusCode: httpStatusCode.OK, message: message.lblFindingsFetched, data: isExist }
+        else return { status: true, statusCode: httpStatusCode.OK, message: message.lblFindingsDoesNotExist }
+    } catch (error) {
+
+    }
+}
+const readAllFindingsByPage = async (input) => {
+    try {
+        !input?.keyWord ? input.keyWord = "" : ''
+        !input?.page ? input.page = 0 : input.page = parseInt(input.page)
+        !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        const db = await getClientDatabaseConnection(input?.clientId)
+        const findings = await db.model('finding', findingsSchema)
+        const isExist = await findings.find({ 
+            $or:[
+                {findingsName:{$regex:input.keyWord,$options:'i'}},
+                {discription :{$regex:input.keyWord,$options:'i'}}
+            ] ,
+            deletedAt: null })
+        .skip((input.page-1) * input.perPage )
+        .limit( input.page * input.perPage)
         if (isExist.length) return { status: true, statusCode: httpStatusCode.OK, message: message.lblFindingsFetched, data: isExist }
         else return { status: true, statusCode: httpStatusCode.OK, message: message.lblFindingsDoesNotExist }
     } catch (error) {
@@ -172,4 +195,4 @@ const readAllFindings = async (input) => {
 
 
 
-module.exports = { createFindings, editFindings, ToggleFindings, deleteFindings, revokeFindings, readAllFindings };
+module.exports = { readAllFindingsByPage, createFindings, editFindings, ToggleFindings, deleteFindings, revokeFindings, readAllFindings };

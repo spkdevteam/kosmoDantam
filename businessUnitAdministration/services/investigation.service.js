@@ -3,7 +3,8 @@ const investigationSchema = require("../../client/model/investigationSchema");
 const { getClientDatabaseConnection } = require("../../db/connection");
 const getserialNumber = require("../../model/services/getserialNumber");
 const httpStatusCode = require("../../utils/http-status-code");
-const message = require("../../utils/message")
+const message = require("../../utils/message");
+const { validateObjectId } = require("./validate.serialNumber");
 // input =  {
 //     "complaintId": "67444ddab193ebcde507e2a4",
 //     "complaintName": "Severe Headache",
@@ -181,6 +182,30 @@ const readAllinvestigation = async (input) => {
         return { status: false, message: 'invalid credential', statusCode: httpStatusCode.NotFound }
     }
 }
+const readAllinvestigationByPage = async  (input) => {
+    try {
+        !input?.keyWord ? input.keyWord = "" : ''
+        !input?.page ? input.page = 0 : input.page = parseInt(input.page)
+        !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        console.log(input)
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        const db = await getClientDatabaseConnection(input?.clientId);
+        const investigation = await db.model('investigation', investigationSchema)
+        const isExist = await investigation.find({
+            $or:[
+                {investigationName:{$regex:input?.keyWord,$options:'i'}},
+                {discription:{$regex:input?.keyWord,$options:'i'}},
+            ],
+            deletedAt: null, 
+        })
+        .skip((input.page-1) * input.perPage )
+        .limit( input.page * input.perPage)
+        return { statusCode: httpStatusCode.OK, status: true, message: message.lblInvestigationFetched,data:isExist }
+         } catch (error) {
+        return { status: false, message: 'invalid credential', statusCode: httpStatusCode.NotFound }
+    }
+}
 
 
-module.exports = { createInvestigation,editinvestigation,toggleInvestigation ,deleteInvestigation,revokeinvestigation,readActiveinvestigation,readAllinvestigation}
+module.exports = {readAllinvestigationByPage, createInvestigation,editinvestigation,toggleInvestigation ,deleteInvestigation,revokeinvestigation,readActiveinvestigation,readAllinvestigation}

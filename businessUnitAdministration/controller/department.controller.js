@@ -6,7 +6,8 @@ const {
     getallDepartments,
     toggleDepartment, 
     editDepartment, 
-    revokeDeleteDepartment
+    revokeDeleteDepartment,
+    allDepartmentsByPage
 } = require("../services/department.service")
 
 
@@ -75,3 +76,14 @@ exports.revokeDepartment = async (req,res,next)=>{
         next(error);
     }
     }
+    exports.getallDepartmentsByPage = async (req,res,next)=>{
+    
+        try {
+            const data = await sanitizeBody(req.query)
+            const  result  = await allDepartmentsByPage(data)
+            res.status(result.statusCode || 200).json(result)
+        } catch (error) {
+            next(error);
+        }
+    } 
+    

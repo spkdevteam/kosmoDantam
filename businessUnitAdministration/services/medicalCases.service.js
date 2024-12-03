@@ -150,7 +150,37 @@ const toggleMedicalCases = async (input) => {
 
     } 
 }
+
+const readAllMedicalCasesByPage = async (input)=>{
+    try {
+        !input?.keyWord ? input.keyWord = "" : ''
+        !input?.page ? input.page = 0 : input.page = parseInt(input.page)
+        !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        const db =await getClientDatabaseConnection(input?.clientId)
+        const medicalCases =await db.model('medicalCase', medicalCasesSchema)
+        const activeCases = await medicalCases.find({
+            $or:[
+                {caseName:{$regex:input?.keyWord,$options:'i'}},
+                {displayId:{$regex:input?.keyWord,$options:'i'}},
+                {remark:{$regex:input?.keyWord,$options:'i'}},
+            ],
+            deletedAt: null, 
+        })
+        .skip((input.page-1) * input.perPage )
+        .limit( input.page * input.perPage)
+        
+
+        
+        console.log(activeCases,'activeCases')
+        return {status:true,statusCode:httpStatusCode.OK ,message:'Medical cases fetched ',data: activeCases}
+    } catch (error) {
+        console.log(error)
+    }
+}
 module.exports = { 
+    readAllMedicalCasesByPage,
     createMedicalCases,
     updateMedicalCases ,
     readAllMedicalCases,

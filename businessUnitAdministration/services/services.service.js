@@ -107,7 +107,6 @@ const readActiveServices = async (input) => {
         }
     }
 }
-
 const toggleServiceStatus = async (input) => {
     try {
         if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
@@ -169,7 +168,6 @@ const editService = async (input) => {
         return { status: false, statusCode: 500, message: error.message }
     }
 }
-
 const serviceUnderDepartment  = async (input) => {
     try {
         if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
@@ -201,5 +199,44 @@ const serviceUnderDepartment  = async (input) => {
         }
     }
 }
+const readActiveServicesbyPage = async (input) => {
+    try {
+        !input?.keyWord ? input.keyWord = "" : ''
+        !input?.page ? input.page = 0 : input.page = parseInt(input.page)
+        !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
+        
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        const db = await getClientDatabaseConnection(input.clientId);
+        const services = await db.model('services', serviceSchema);
+        const data = await services.find({
+            $or:[
+                {serviceName:{$regex:input?.keyWord,$options:'i'}},
+                {displayId:{$regex:input?.keyWord,$options:'i'}},
+                {description:{$regex:input?.keyWord,$options:'i'}},
+            ],
+            deletedAt:null})
+        .skip((input?.page-1)*input.perPage )
+        .limit(input.page*input.perpage)
+        console.log(data, 'dey data fetched ')
 
-module.exports = { createService, deleteService, readActiveServices, toggleServiceStatus,editService,serviceUnderDepartment  }
+        if (data) {
+            return {
+                status: true, statusCode: 200, message: message.lblSuccess, services: data }
+        } else {
+            return {
+                status: false, statusCode: 404, message: message.lblFailed, } 
+            }
+    } catch (error) {
+        return {
+            status: false, statusCode: 500, message: error.message, } }
+}
+module.exports = { 
+    readActiveServicesbyPage,
+    createService, 
+    deleteService,
+    readActiveServices, 
+    toggleServiceStatus,
+    editService,
+    serviceUnderDepartment  
+}
