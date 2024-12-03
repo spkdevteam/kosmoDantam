@@ -3,658 +3,857 @@
 
 // default permission list
 const defaultPersmissionsList = [
-
     {
-        name: "Roles & Permissions",
-        displayName: "All Roles & Permissions",
+        name: "administration",
         access: false,
-        subMenus: {
-            create: {
+        menu: [
+            {
+                name: "Roles & Permissions",
+                displayName: "All Roles & Permissions",
                 access: false,
-                api: "/demo/path",
+                subMenus: {
+                    create: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    delete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                }
             },
-            view: {
+            {
+                name: "Employee",
+                displayName: "All Emoloyee",
                 access: false,
-                api: "/demo/path",
+                subMenus: {
+                    list: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                }
             },
-            update: {
+            {
+                name: "Branch",
+                displayName: "All Branch",
                 access: false,
-                api: "/demo/path",
+                subMenus: {
+                    list: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                }
             },
-            delete: {
+            {
+                name: "Chair",
+                displayName: "All Chairs",
                 access: false,
-                api: "/demo/path",
+                subMenus: {
+                    list: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                }
             },
-        }
+            {
+                name: "Department",
+                displayName: "All Department",
+                access: false,
+                subMenus: {
+                    list: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                }
+            },
+            {
+                name: "Services",
+                displayName: "All Services",
+                access: false,
+                subMenus: {
+                    list: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                }
+            },
+            {
+                name: "Procedure",
+                displayName: "All Procedure",
+                access: false,
+                subMenus: {
+                    list: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                }
+            },
+        ]
     },
     {
-        name: "Employee",
-        displayName: "All Emoloyee",
+        name: "Pataints",
         access: false,
-        subMenus: {
-            list: {
+        menu: [
+            {
+                name: "Patient",
+                displayName: "All Patient",
                 access: false,
-                api: "/demo/path",
+                subMenus: {
+                    list: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                }
             },
-            create: {
+            {
+                name: "Appointment",
+                displayName: "All Appointment",
                 access: false,
-                api: "/demo/path",
+                subMenus: {
+                    list: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                }
             },
-            view: {
+            {
+                name: "CaseSheet",
+                displayName: "All Case Sheet",
                 access: false,
-                api: "/demo/path",
+                subMenus: {
+                    list: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                }
             },
-            update: {
+            {
+                name: "Prescription",
+                displayName: "All Prescription",
                 access: false,
-                api: "/demo/path",
+                subMenus: {
+                    list: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                }
             },
-            softDelete: {
+            {
+                name: "Invoices",
+                displayName: "All Invoices",
                 access: false,
-                api: "/demo/path",
+                subMenus: {
+                    list: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                }
             },
-            hardDelete: {
-                access: false,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: false,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "Branch",
-        displayName: "All Branch",
-        access: false,
-        subMenus: {
-            list: {
-                access: false,
-                api: "/demo/path",
-            },
-            create: {
-                access: false,
-                api: "/demo/path",
-            },
-            view: {
-                access: false,
-                api: "/demo/path",
-            },
-            update: {
-                access: false,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: false,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: false,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: false,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "Chair",
-        displayName: "All Chairs",
-        access: false,
-        subMenus: {
-            list: {
-                access: false,
-                api: "/demo/path",
-            },
-            create: {
-                access: false,
-                api: "/demo/path",
-            },
-            view: {
-                access: false,
-                api: "/demo/path",
-            },
-            update: {
-                access: false,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: false,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: false,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: false,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "Department",
-        displayName: "All Department",
-        access: false,
-        subMenus: {
-            list: {
-                access: false,
-                api: "/demo/path",
-            },
-            create: {
-                access: false,
-                api: "/demo/path",
-            },
-            view: {
-                access: false,
-                api: "/demo/path",
-            },
-            update: {
-                access: false,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: false,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: false,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: false,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "Services",
-        displayName: "All Services",
-        access: false,
-        subMenus: {
-            list: {
-                access: false,
-                api: "/demo/path",
-            },
-            create: {
-                access: false,
-                api: "/demo/path",
-            },
-            view: {
-                access: false,
-                api: "/demo/path",
-            },
-            update: {
-                access: false,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: false,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: false,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: false,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "Procedure",
-        displayName: "All Procedure",
-        access: false,
-        subMenus: {
-            list: {
-                access: false,
-                api: "/demo/path",
-            },
-            create: {
-                access: false,
-                api: "/demo/path",
-            },
-            view: {
-                access: false,
-                api: "/demo/path",
-            },
-            update: {
-                access: false,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: false,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: false,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: false,
-                api: "/demo/path",
-            },
-        }
-    },
-
-    {
-        name: "CaseSheet",
-        displayName: "All Case Sheet",
-        access: true,
-        subMenus: {
-            list: {
-                access: true,
-                api: "/demo/path",
-            },
-            create: {
-                access: true,
-                api: "/demo/path",
-            },
-            view: {
-                access: true,
-                api: "/demo/path",
-            },
-            update: {
-                access: true,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: true,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "Patient",
-        displayName: "All Patient",
-        access: true,
-        subMenus: {
-            list: {
-                access: true,
-                api: "/demo/path",
-            },
-            create: {
-                access: true,
-                api: "/demo/path",
-            },
-            view: {
-                access: true,
-                api: "/demo/path",
-            },
-            update: {
-                access: true,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: true,
-                api: "/demo/path",
-            },
-        }
-    },
+        ]
+    }
 
 ]
 
 // business Unit Permission list
 const businessUnitPersmissionsList = [
 
-    {
-        name: "Roles & Permissions",
-        displayName: "Roles & Permissions",
-        access: true,
-        subMenus: {
-            create: {
-                access: true,
-                api: "/demo/path",
-            },
-            view: {
-                access: true,
-                api: "/demo/path",
-            },
-            update: {
-                access: true,
-                api: "/demo/path",
-            },
-            delete: {
-                access: true,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "Employee",
-        displayName: "All Emoloyee",
-        access: true,
-        subMenus: {
-            list: {
-                access: true,
-                api: "/demo/path",
-            },
-            create: {
-                access: true,
-                api: "/demo/path",
-            },
-            view: {
-                access: true,
-                api: "/demo/path",
-            },
-            update: {
-                access: true,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: true,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "Branch",
-        displayName: "All Branch",
-        access: true,
-        subMenus: {
-            list: {
-                access: true,
-                api: "/demo/path",
-            },
-            create: {
-                access: true,
-                api: "/demo/path",
-            },
-            view: {
-                access: true,
-                api: "/demo/path",
-            },
-            update: {
-                access: true,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: true,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "Chair",
-        displayName: "All Chairs",
-        access: true,
-        subMenus: {
-            list: {
-                access: true,
-                api: "/demo/path",
-            },
-            create: {
-                access: true,
-                api: "/demo/path",
-            },
-            view: {
-                access: true,
-                api: "/demo/path",
-            },
-            update: {
-                access: true,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: true,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "Department",
-        displayName: "All Department",
-        access: true,
-        subMenus: {
-            list: {
-                access: true,
-                api: "/demo/path",
-            },
-            create: {
-                access: true,
-                api: "/demo/path",
-            },
-            view: {
-                access: true,
-                api: "/demo/path",
-            },
-            update: {
-                access: true,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: true,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "Services",
-        displayName: "All Services",
-        access: true,
-        subMenus: {
-            list: {
-                access: true,
-                api: "/demo/path",
-            },
-            create: {
-                access: true,
-                api: "/demo/path",
-            },
-            view: {
-                access: true,
-                api: "/demo/path",
-            },
-            update: {
-                access: true,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: true,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "Procedure",
-        displayName: "All Procedure",
-        access: true,
-        subMenus: {
-            list: {
-                access: true,
-                api: "/demo/path",
-            },
-            create: {
-                access: true,
-                api: "/demo/path",
-            },
-            view: {
-                access: true,
-                api: "/demo/path",
-            },
-            update: {
-                access: true,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: true,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "CaseSheet",
-        displayName: "All Case Sheet",
-        access: true,
-        subMenus: {
-            list: {
-                access: true,
-                api: "/demo/path",
-            },
-            create: {
-                access: true,
-                api: "/demo/path",
-            },
-            view: {
-                access: true,
-                api: "/demo/path",
-            },
-            update: {
-                access: true,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: true,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "Patient",
-        displayName: "All Patient",
-        access: true,
-        subMenus: {
-            list: {
-                access: true,
-                api: "/demo/path",
-            },
-            create: {
-                access: true,
-                api: "/demo/path",
-            },
-            view: {
-                access: true,
-                api: "/demo/path",
-            },
-            update: {
-                access: true,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: true,
-                api: "/demo/path",
-            },
-        }
-    },
-    {
-        name: "Department",
-        displayName: "All Department",
-        access: true,
-        subMenus: {
-            list: {
-                access: true,
-                api: "/demo/path",
-            },
-            create: {
-                access: true,
-                api: "/demo/path",
-            },
-            view: {
-                access: true,
-                api: "/demo/path",
-            },
-            update: {
-                access: true,
-                api: "/demo/path",
-            },
-            softDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            hardDelete: {
-                access: true,
-                api: "/demo/path",
-            },
-            activeActive: {
-                access: true,
-                api: "/demo/path",
-            },
-        }
-    },
 
+    {
+        name: "administration",
+        access: true,
+        menu: [
+            {
+                name: "Roles & Permissions",
+                displayName: "All Roles & Permissions",
+                access: true,
+                subMenus: {
+                    create: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    delete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                }
+            },
+            {
+                name: "Employee",
+                displayName: "All Emoloyee",
+                access: true,
+                subMenus: {
+                    list: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                }
+            },
+            {
+                name: "Branch",
+                displayName: "All Branch",
+                access: true,
+                subMenus: {
+                    list: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                }
+            },
+            {
+                name: "Chair",
+                displayName: "All Chairs",
+                access: true,
+                subMenus: {
+                    list: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                }
+            },
+            {
+                name: "Department",
+                displayName: "All Department",
+                access: true,
+                subMenus: {
+                    list: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                }
+            },
+            {
+                name: "Services",
+                displayName: "All Services",
+                access: true,
+                subMenus: {
+                    list: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                }
+            },
+            {
+                name: "Procedure",
+                displayName: "All Procedure",
+                access: true,
+                subMenus: {
+                    list: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                }
+            },
+        ]
 
-]
+    },
+    {
+        name: "Pataints",
+        access: true,
+        menu: [
+            {
+                name: "Patient",
+                displayName: "All Patient",
+                access: true,
+                subMenus: {
+                    list: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                }
+            },
+            {
+                name: "Appointment",
+                displayName: "All Appointment",
+                access: true,
+                subMenus: {
+                    list: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                }
+            },
+            {
+                name: "CaseSheet",
+                displayName: "All Case Sheet",
+                access: true,
+                subMenus: {
+                    list: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                }
+            },
+            {
+                name: "Prescription",
+                displayName: "All Prescription",
+                access: true,
+                subMenus: {
+                    list: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                }
+            },
+            {
+                name: "Invoices",
+                displayName: "All Invoices",
+                access: true,
+                subMenus: {
+                    list: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    create: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    view: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    update: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    softDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                }
+            },
+        ]
+    }
+
+];
+
 
 // clients role
 const clientRoles = [

@@ -12,29 +12,29 @@ const businessUnitCaseSheetController = require("../controller/caseSheet.control
 
 
 const {
-    uploadInvestigation, 
+    uploadInvestigation,
 } = require('../../utils/multer');
 
 
 
 
 // cheif complain part
-router.post('/createCheifComplaints', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.createCheifComplaints);
-router.put('/updateCheifComplaints', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.updateCheifComplaints);
-router.delete('/deleteCheifComplaints', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.deleteCheifComplaints);
+router.post('/createCheifComplaints', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.createCheifComplaints);
+router.put('/updateCheifComplaints', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.updateCheifComplaints);
+router.delete('/deleteCheifComplaints', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.deleteCheifComplaints);
 
 // clinical finding part
-router.post('/createClinicalFinding', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.createClinicalFinding);
-router.put('/updateClinicalFinding', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.updateClinicalFinding);
-router.delete('/deleteClinicalFinding', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.deleteClinicalFinding);
+router.post('/createClinicalFinding', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.createClinicalFinding);
+router.put('/updateClinicalFinding', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.updateClinicalFinding);
+router.delete('/deleteClinicalFinding', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.deleteClinicalFinding);
 
 // medical history
-router.post('/createMedicalHistory', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.createMedicalHistory);
-router.put('/updateMedicalHistory', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.updateMedicalHistory);
-router.delete('/deleteMedicalHistory', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.deleteMedicalHistory);
+router.post('/createMedicalHistory', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.createMedicalHistory);
+router.put('/updateMedicalHistory', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.updateMedicalHistory);
+router.delete('/deleteMedicalHistory', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.deleteMedicalHistory);
 
 // investigaton
-router.post('/createInvestigation',  entityAuth.authorizeEntity("CaseSheet", "create"), (req, res, next) => {
+router.post('/createInvestigation', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), (req, res, next) => {
     uploadInvestigation.single("file")(req, res, (err) => {
         if (err) {
             if (err instanceof multer.MulterError) {
@@ -51,7 +51,7 @@ router.post('/createInvestigation',  entityAuth.authorizeEntity("CaseSheet", "cr
         next();
     });
 }, businessUnitCaseSheetController.createInvestigation);
-router.post('/updateInvestigation',  entityAuth.authorizeEntity("CaseSheet", "create"), (req, res, next) => {
+router.post('/updateInvestigation', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), (req, res, next) => {
     uploadInvestigation.single("file")(req, res, (err) => {
         if (err) {
             if (err instanceof multer.MulterError) {
@@ -68,10 +68,10 @@ router.post('/updateInvestigation',  entityAuth.authorizeEntity("CaseSheet", "cr
         next();
     });
 }, businessUnitCaseSheetController.updateInvestigation);
-router.delete('/deleteInvestigation', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.deleteInvestigation);
+router.delete('/deleteInvestigation', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.deleteInvestigation);
 
 // other attachment
-router.post('/createOtherAttachment',  entityAuth.authorizeEntity("CaseSheet", "create"), (req, res, next) => {
+router.post('/createOtherAttachment', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), (req, res, next) => {
     uploadInvestigation.single("file")(req, res, (err) => {
         if (err) {
             if (err instanceof multer.MulterError) {
@@ -88,7 +88,7 @@ router.post('/createOtherAttachment',  entityAuth.authorizeEntity("CaseSheet", "
         next();
     });
 }, businessUnitCaseSheetController.createOtherAttachment);
-router.post('/updateOtherAttachment',  entityAuth.authorizeEntity("CaseSheet", "create"), (req, res, next) => {
+router.post('/updateOtherAttachment', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), (req, res, next) => {
     uploadInvestigation.single("file")(req, res, (err) => {
         if (err) {
             if (err instanceof multer.MulterError) {
@@ -105,18 +105,24 @@ router.post('/updateOtherAttachment',  entityAuth.authorizeEntity("CaseSheet", "
         next();
     });
 }, businessUnitCaseSheetController.updateOtherAttachment);
-router.delete('/deleteOtherAttachment', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.deleteOtherAttachment);
+router.delete('/deleteOtherAttachment', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.deleteOtherAttachment);
 
 // notes
-router.post('/createNotes', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.createNotes);
-router.put('/updateNotes', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.updateNotes);
-router.delete('/deleteNotes', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.deleteNotes);
+router.post('/createNotes', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.createNotes);
+router.put('/updateNotes', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.updateNotes);
+router.delete('/deleteNotes', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.deleteNotes);
 
 // services
-router.post('/createServices', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.createServices);
-router.put('/updateServices', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.updateServices);
-router.delete('/deleteServices', entityAuth.authorizeEntity("CaseSheet", "create"), businessUnitCaseSheetController.deleteServices);
+router.post('/createServices', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.createServices);
+router.put('/updateServices', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.updateServices);
+router.delete('/deleteServices', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.deleteServices);
 
+
+
+// procedures
+router.post('/createProcedure', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.createProcedure);
+router.put('/updateProcedure', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.updateProcedure);
+router.delete('/deleteProcedure', entityAuth.authorizeEntity("Pataints", "CaseSheet", "create"), businessUnitCaseSheetController.deleteProcedure);
 
 
 

@@ -12,10 +12,11 @@ const clinetUserSchema = require("../../../client/model/user");
 const clientRoleSchema = require("../../../client/model/role")
 
 
-exports.authorizeEntity = (entityName, subMenuAction = 'create') => async (req, res, next) => {
+exports.authorizeEntity = (module, entityName, subMenuAction = 'create') => async (req, res, next) => {
     try {
-        const { capability, user } = await commonCheckOfEntity(req.headers, entityName);
-        if (!capability?.subMenus?.[subMenuAction]?.access) {
+        const { capability, user } = await commonCheckOfEntity(req.headers, module, entityName);
+        const menu = capability?.menu?.find((item) => item.name === entityName);
+        if (!menu?.access || !menu?.subMenus?.[subMenuAction]?.access) {
             return res.status(statusCode.Forbidden).send({ message: message.lblUnauthorize });
         }
         req.user = user;
@@ -26,7 +27,7 @@ exports.authorizeEntity = (entityName, subMenuAction = 'create') => async (req, 
     }
 };
 
-const commonCheckOfEntity = async (header, entityName) => {
+const commonCheckOfEntity = async (header, module, entityName) => {
     const { authorization } = header;
 
     if (!authorization || !authorization.startsWith("Bearer")) {
@@ -35,11 +36,9 @@ const commonCheckOfEntity = async (header, entityName) => {
     try {
         const token = authorization.split(" ")[1];
         const { id, email } = jwt.verify(token, PRIVATEKEY);
-
         if (!id) {
             throw new Error(message.lblUnauthorizeUser || "Unauthorized user");
         }
-
         const clientConnection = await getClientDatabaseConnection(id);
         const userModel = clientConnection.model('clientUsers', clinetUserSchema);
         clientConnection.model('clientRoles', clientRoleSchema);
@@ -48,9 +47,9 @@ const commonCheckOfEntity = async (header, entityName) => {
         if (!user) {
             throw new Error(message.lblUserNotFound || "User not found");
         }
-        const capability = user?.role?.capability?.find((item) => item.name === entityName);
+        const capability = user?.role?.capability?.find((item) => item.name === module);
         if (!capability || !capability.access) {
-            throw new Error(message.lblUnauthorize || `Unauthorized access for ${entityName}`);
+            throw new Error(message.lblUnauthorize || `Unauthorized access for ${module}`);
         }
         return { capability, user };
     } catch (error) {

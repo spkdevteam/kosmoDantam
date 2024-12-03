@@ -916,7 +916,6 @@ exports.deleteNotes = async (req, res, next) => {
 
 
 
-// -------------
 
 
 
@@ -1037,6 +1036,152 @@ exports.updateServices = async (req, res, next) => {
 
 // delete services by business unit
 exports.deleteServices = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId, serviceId } = req.body;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        if (!cheifComplaintId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblCheifComplaintsIdRequired,
+            });
+        }
+        const deleted = await cheifComplaintsService.deleteServices(clientId, caseSheetId, serviceId);
+        return res.status(statusCode.OK).send({
+            message: message.lblServicesDeletedSuccess,
+            data: { caseSheetId: deleted?._id }
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+
+
+/// ---------------------------------
+
+
+
+
+// create procedure by business unit
+exports.createProcedure = async (req, res, next) => {
+    try {
+        const { clientId, patientId, branchId, businessUnitId, procedures, } = req.body;
+        const mainUser = req.user;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        if (!patientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblPatientIdRequired,
+            });
+        }
+        if (!branchId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblBranchIRequired,
+            });
+        }
+        if (!businessUnitId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblBusinessUnitIdIsRequired,
+            });
+        }
+        if (!procedures) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
+        const branch = await Branch.findById(branchId);
+        if (!branch) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblBranchNotFound,
+            });
+        }
+        const bu = await BusinessUnit.findById(businessUnitId)
+        if (!bu) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblBusinessUnitNotFound,
+            });
+        }
+        const serialNumber = await getserialNumber('caseSheet', clientId, "", businessUnitId)
+        const newCheifComplaint = await cheifComplaintsService.createServices(clientId, {
+            patientId, branchId, businessUnitId, createdBy: mainUser?._id, services, displayId: serialNumber,
+        });
+        return res.status(statusCode.OK).send({
+            message: message.lblServicesCreatedSuccess,
+            data: { caseSheetId: newCheifComplaint._id },
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+// update procedure by busines unit
+exports.updateProcedure = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId, patientId, branchId, businessUnitId, services, } = req.body;
+        const mainUser = req.user;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        if (!patientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblPatientIdRequired,
+            });
+        }
+        if (!branchId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblBranchIRequired,
+            });
+        }
+        if (!businessUnitId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblBusinessUnitIdIsRequired,
+            });
+        }
+        if (!services) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
+        const branch = await Branch.findById(branchId);
+        if (!branch) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblBranchNotFound,
+            });
+        }
+        const bu = await BusinessUnit.findById(businessUnitId)
+        if (!bu) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblBusinessUnitNotFound,
+            });
+        }
+        const newCheifComplaint = await cheifComplaintsService.updateServices(clientId, caseSheetId, {
+            patientId, branchId, businessUnitId, createdBy: mainUser?._id, services,
+        });
+        return res.status(statusCode.OK).send({
+            message: message.lblServicesUpdatedSuccess,
+            data: { caseSheetId: newCheifComplaint._id },
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+// delete procedure by business unit
+exports.deleteProcedure = async (req, res, next) => {
     try {
         const { clientId, caseSheetId, serviceId } = req.body;
         if (!clientId) {

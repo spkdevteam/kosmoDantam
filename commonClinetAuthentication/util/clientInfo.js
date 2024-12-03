@@ -20,7 +20,7 @@ exports.clientInfo = async (clientId, email) => {
         const client = await ClientUser.findOne({ email: email }).select('-deletedAt -createdAt -updatedAt -isActive -isUserVerified -tc -password').populate('role', '-deletedAt -isActive -createdAt -updatedAt');
 
         // Check if clinet exists
-        if (!ClientUser) {
+        if (!client) {
             throw new CustomError(statusCode.NotFound, message.lblUserNotFound);
         }
         return client

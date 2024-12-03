@@ -119,7 +119,7 @@ exports.createBusinessUnit = async (req, res) => {
 
     const clientUser = clientConnection.model('clientUsers', clinetUserSchema);
 
-
+    
     const newClient = await clientUser.create({
 
       role: buRoleId?._id,

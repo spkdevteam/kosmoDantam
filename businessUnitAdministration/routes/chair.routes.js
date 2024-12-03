@@ -15,19 +15,19 @@ const entityAuth = require("../../middleware/authorization/commonEntityAuthoriza
 // # create, update, view, list, activate/inactive, delete Chair by business unit routes starts here
 
 
-router.post('/createChair', entityAuth.authorizeEntity("Chair","create"), businessUnitChairContrller.createChairByBusinessUnit);
+router.post('/createChair', entityAuth.authorizeEntity("administration", "Chair", "create"), businessUnitChairContrller.createChairByBusinessUnit);
 
-router.put('/updateChair', entityAuth.authorizeEntity("Chair","update"), businessUnitChairContrller.updateChairByBusinessUnit);
+router.put('/updateChair', entityAuth.authorizeEntity("administration", "Chair", "update"), businessUnitChairContrller.updateChairByBusinessUnit);
 
-router.get('/Chair/:clientId/:chairId',  entityAuth.authorizeEntity("Chair","view"), businessUnitChairContrller.getParticularChairByBusinessUnit);
+router.get('/Chair/:clientId/:chairId', entityAuth.authorizeEntity("administration", "Chair", "view"), businessUnitChairContrller.getParticularChairByBusinessUnit);
 
-router.get('/listChair', entityAuth.authorizeEntity("Chair","list"), businessUnitChairContrller.listChair);
+router.get('/listChair', entityAuth.authorizeEntity("administration", "Chair", "list"), businessUnitChairContrller.listChair);
 
-router.post("/activeInactiveChair",  entityAuth.authorizeEntity("Chair","activeActive"), businessUnitChairContrller.activeinactiveChairByBusinessUnit);
+router.post("/activeInactiveChair", entityAuth.authorizeEntity("administration", "Chair", "activeActive"), businessUnitChairContrller.activeinactiveChairByBusinessUnit);
 
-router.post("/softDeleteChair", entityAuth.authorizeEntity("Chair","softDelete"), businessUnitChairContrller.softDeleteChairByBusinesssUnit);
+router.post("/softDeleteChair", entityAuth.authorizeEntity("administration", "Chair", "softDelete"), businessUnitChairContrller.softDeleteChairByBusinesssUnit);
 
-router.post("/restoreChair",entityAuth.authorizeEntity("Chair","update"), businessUnitChairContrller.restoreChairByBusinessUnit);
+router.post("/restoreChair", entityAuth.authorizeEntity("administration", "Chair", "update"), businessUnitChairContrller.restoreChairByBusinessUnit);
 
 
 // # create, update, view, list, activate/inactive, delete Chair by business unit routes ends here

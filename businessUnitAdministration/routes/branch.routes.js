@@ -14,19 +14,19 @@ const entityAuth = require("../../middleware/authorization/commonEntityAuthoriza
 // # create, update, view, list, activate/inactive, delete Branch by business unit routes starts here
 
 
-router.post('/createBranch', entityAuth.authorizeEntity("Branch", "create"), businessUnitBranchContrller.createBranchByBusinessUnit);
+router.post('/createBranch', entityAuth.authorizeEntity("administration", "Branch", "create"), businessUnitBranchContrller.createBranchByBusinessUnit);
 
-router.put('/updateBranch', entityAuth.authorizeEntity("Branch", "update"), businessUnitBranchContrller.updateBranchByBusinessUnit);
+router.put('/updateBranch', entityAuth.authorizeEntity("administration", "Branch", "update"), businessUnitBranchContrller.updateBranchByBusinessUnit);
 
-router.get('/branch/:clientId/:branchId', entityAuth.authorizeEntity("Branch", "create"), businessUnitBranchContrller.getParticularBranchByBusinessUnit);
+router.get('/branch/:clientId/:branchId', entityAuth.authorizeEntity("administration", "Branch", "view"), businessUnitBranchContrller.getParticularBranchByBusinessUnit);
 
-router.get('/listBranch', entityAuth.authorizeEntity("Branch", "create"), businessUnitBranchContrller.listBranch);
+router.get('/listBranch', entityAuth.authorizeEntity("administration", "Branch", "list"), businessUnitBranchContrller.listBranch);
 
-router.post("/activeInactiveBranch", entityAuth.authorizeEntity("Branch", "create"), businessUnitBranchContrller.activeinactiveBranchByBusinessUnit);
+router.post("/activeInactiveBranch", entityAuth.authorizeEntity("administration", "Branch", "activeActive"), businessUnitBranchContrller.activeinactiveBranchByBusinessUnit);
 
-router.post("/softDeleteBranch", entityAuth.authorizeEntity("Branch", "create"), businessUnitBranchContrller.softDeleteBranchByBusinesssUnit);
+router.post("/softDeleteBranch", entityAuth.authorizeEntity("administration", "Branch", "softDelete"), businessUnitBranchContrller.softDeleteBranchByBusinesssUnit);
 
-router.post("/restoreBranch", entityAuth.authorizeEntity("Branch", "create"), businessUnitBranchContrller.restoreBranchByBusinessUnit);
+router.post("/restoreBranch", entityAuth.authorizeEntity("administration", "Branch", "hardDelete"), businessUnitBranchContrller.restoreBranchByBusinessUnit);
 
 
 
