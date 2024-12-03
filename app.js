@@ -13,6 +13,12 @@ const swaggerDocs = require("./documentation/swagger.js");
 const swaggerUi = require('swagger-ui-express');
 
 
+const clientRoleSchema = require("./client/model/role.js");
+const clinetPatientSchema = require("./client/model/patient.js");
+const serialNumberSchema = require("./model/serialNumber.js")
+const {defaultPersmissionsList, businessUnitPersmissionsList} = require("./utils/constant.js")
+
+
 // upsertTeeth([
 //     {
 //       "toothNumber": 1,
@@ -286,7 +292,7 @@ dotnev.config();
 const { app, server } = require("./socket/socket.js");
 
 // databse connection setup
-const { ConnectDb, createClientDatabase } = require("./db/connection.js");
+const { ConnectDb, createClientDatabase, getClientDatabaseConnection } = require("./db/connection.js");
 
 
 // routes import
@@ -302,6 +308,10 @@ const clinetBranchRouter = require("./businessUnitAdministration/routes/branch.r
 const clinetChairhRouter = require("./businessUnitAdministration/routes/chair.routes.js");
 const clientEmployeeRouter = require("./businessUnitAdministration/routes/employee.routes.js")
 const clinetRoleRouter = require("./businessUnitAdministration/routes/rolesAndPermission.routes.js");
+const clientPatientRouter = require("./businessUnitPatientCare/routes/patient.routes.js");
+const clientCaseSheetRouter = require("./businessUnitPatientCare/routes/caseSheet.routes.js")
+
+
 const clientDepartment = require("./businessUnitAdministration/routes/department.routes.js");
 const clientservicesRouter= require("./businessUnitAdministration/routes/service.routes.js");
 const clientProcedureRouter= require("./businessUnitAdministration/routes/procedure.routes.js");
@@ -351,6 +361,9 @@ app.use("/api/clinet/bu/chair", clinetChairhRouter.router);
 app.use("/api/client/bu/employee", clientEmployeeRouter.router);
 app.use("/api/clinet/branch/chair", clinetChairhRouter.router);
 app.use("/api/clinet/bu/role", clinetRoleRouter.router);
+app.use("/api/clinet/bu/patient", clientPatientRouter.router);
+app.use("/api/clinet/bu/caseSheet", clientCaseSheetRouter.router);
+
 app.use("/api/client/bu/department", clientDepartment);
 app.use("/api/client/bu/services", clientservicesRouter);
 app.use("/api/client/bu/procedures", clientProcedureRouter);
@@ -518,6 +531,115 @@ async function createNewRole(params) {
 
 
 // createNewRole()
+
+
+
+async function createRoleInDatbaseInstance () {
+    try {
+        const clientId = "67441b73cbc8975325e14a3f";
+        const data = { id: 17, name: "patienit", capability: defaultPersmissionsList };
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Role = clientConnection.model('clientRoles', clientRoleSchema);
+        const existing = await Role.findOne({id : 17});
+        if(existing){
+            console.log("patient role already exists");
+            return false
+        }
+        const create = await Role.create(data);
+        console.log("patient role created successfully");
+        return true;
+    } catch (error) {
+        console.log("error while creating the petient", error);
+    }
+}
+// createRoleInDatbaseInstance()
+
+
+
+async function updateRoleInDatbaseInstance () {
+    try {
+        const clientId = "67441b73cbc8975325e14a3f";
+        const buCapability = businessUnitPersmissionsList;
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Role = clientConnection.model('clientRoles', clientRoleSchema);
+        const existing = await Role.findOne({id : 2});
+        if(existing){
+            existing.capability = buCapability;
+            await  existing.save()
+        }else{
+            console.log("role not found");
+        }
+      
+    } catch (error) {
+        console.log("error while creating the petient", error);
+    }
+}
+
+// updateRoleInDatbaseInstance()
+
+async function dropIndexes() {
+    const clientId = "67441b73cbc8975325e14a3f";
+    try {
+        // Establish client-specific connection
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Patient = clientConnection.model('patient', clinetPatientSchema);
+        // Drop indexes if they exist
+        const indexes = await Patient.collection.indexes();
+
+        if (indexes.some(index => index.name === 'email_1')) {
+            await Patient.collection.dropIndex('email_1');
+            console.log('Dropped email index successfully');
+        }
+        if (indexes.some(index => index.name === 'phone_1')) {
+            await Patient.collection.dropIndex('phone_1');
+            console.log('Dropped phone index successfully');
+        }
+    } catch (error) {
+        console.error('Error dropping indexes:', error.message);
+    } finally {
+        // Optionally close the connection or leave it in the pool for reuse
+        console.log("11");
+    }
+}
+
+// dropIndexes()
+
+
+// create serial numbers in instance of database
+
+async function createSerialNumber () {
+    try {
+        const clientId = "67441b73cbc8975325e14a3f";
+        const collectionName = "service";
+        const prefix = "SV";
+        const nextNum = 100010;
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const SerialNumber = clientConnection.model('serialNumber', serialNumberSchema);
+        const existing = await SerialNumber.findOne({collectionName : collectionName});
+        if(existing){
+            console.log("serial Number already exists");
+            return 
+        }
+        await SerialNumber.create({
+            collectionName : collectionName,
+            prefix : prefix,
+            nextNum : nextNum
+        })
+        console.log("serial number created successfully");
+    } catch (error) {
+        console.log("error while creating the serial number");
+        
+    }
+}
+
+// createSerialNumber()
+
+
+
+
+
+
+
 
 
 
