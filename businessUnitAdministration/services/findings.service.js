@@ -138,6 +138,7 @@ const deleteFindings = async (input) => {
 }
 const revokeFindings = async (input) => {
     try {
+        console.log(input,'revokeFindings ')
         if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.findingsId, collectionName: 'finding' })) return { status: false, message: message.lblFindingsDoesNotExist, statusCode: httpStatusCode.Unauthorized }

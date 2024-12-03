@@ -1,6 +1,14 @@
 
 const express = require('express')
-const { getReadActiveCasesByPage,createMedicalCases, updateMedicalCases, getActiveCases, deleteMedicalCases, revokeDeleteMedicalCases,toggleMedicalCases } = require('../controller/medicalCases.controller')
+const { 
+    getReadActiveCasesByPage,
+    createMedicalCases, 
+    updateMedicalCases, 
+    getActiveCases, 
+    deleteMedicalCases, 
+    revokeDeleteMedicalCases,
+    putToggleMediCaseByPage,
+    toggleMedicalCases } = require('../controller/medicalCases.controller')
  
 const medHistoryRoutes = express.Router()
 
@@ -9,6 +17,7 @@ medHistoryRoutes
     .put('/update',updateMedicalCases)
     .get('/readActiveCases',getActiveCases)
     .get('/readActiveCasesByPage',getReadActiveCasesByPage)
+    .put('/toggleMediCaseByPage',putToggleMediCaseByPage)
     .delete('/delete',deleteMedicalCases) 
     .patch('/revokeDelete',revokeDeleteMedicalCases)
     .patch('/toggle',toggleMedicalCases )

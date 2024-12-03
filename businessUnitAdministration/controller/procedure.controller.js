@@ -91,4 +91,17 @@ exports.getAllProceduresByPage = async (req, res) => {
     }
 }
 
+exports.putToggleProcedureByPage = async (req, res) => {
+    try {
+        const data = await sanitizeBody(req.body)
+        const toggle = await toggleProcedure(data)
+        const result = await getAllProceduresByPage(data)
+        result.message = toggle.message
+        res.status(toggle?.statusCode || 200).json(result)
+    } catch (error) {
+        res.json({ status: false, message: error.message, statusCode: 500 })
+    }
+}
+ 
+
 

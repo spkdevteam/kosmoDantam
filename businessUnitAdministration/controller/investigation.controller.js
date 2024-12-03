@@ -77,3 +77,15 @@ exports.getallInvestigationByPage = async (req,res,next)=>{
        next(error) 
     }
 }
+
+exports.getToggleInvestigationByPage = async (req,res,next)=>{
+    try {
+        const data =await sanitizeBody(req.body)
+        const toggle = await toggleInvestigation(data)
+        const result = await readAllinvestigationByPage(data)
+        result.message = toggle.message
+        res.status(toggle?.statusCode).json(result)
+    } catch (error) {
+       next(error) 
+    }
+}

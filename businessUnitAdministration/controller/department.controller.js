@@ -87,3 +87,14 @@ exports.revokeDepartment = async (req,res,next)=>{
         }
     } 
     
+    exports.putToggleDepartmentsWithPage = async (req,res,next)=>{
+        try {
+            const data = await sanitizeBody(req.body)
+            const  result  = await toggleDepartment(data)
+            const  fetchResult  = await allDepartmentsByPage(data)
+            fetchResult.message = result.message
+            res.status(fetchResult?.statusCode || 200).json(fetchResult)
+        } catch (error) {
+            next(error);
+        }
+        }

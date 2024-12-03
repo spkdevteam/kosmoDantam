@@ -73,4 +73,15 @@ exports.getReadActiveCasesByPage = async (req,res,next)=>{
         next(error)
     }
 }
+exports.putToggleMediCaseByPage =  async (req,res,next)=>{
+    try {
+        const data = await sanitizeBody(req.body)
+        const toggle = await toggleMedicalCases(data)
+        const result = await readAllMedicalCasesByPage(data)
+        result.message = toggle.message
+        res.status(toggle.statusCode||200).json(result)
+    } catch (error) {
+        next(error)
+    }
+}
 

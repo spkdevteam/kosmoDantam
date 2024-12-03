@@ -74,3 +74,15 @@ exports.getReadAllFindingsByPage =  async (req,res,next)=>{
         next(error)
     }
 }
+
+exports.putToggleFindingsByPage = async (req,res,next)=>{
+    try {
+        const data = await sanitizeBody(req.body)
+        const toggleStatus =  await ToggleFindings(data)
+        const result = await readAllFindingsByPage(data)
+        result.message = toggleStatus.message
+        res.status(result?.statusCode|| 200).json(result)
+    } catch (error) {
+        next(error)
+    }
+}

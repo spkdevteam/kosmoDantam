@@ -155,6 +155,7 @@ const editDepartment = async (input) => {
 
 const toggleDepartment = async (input) => {
     try {
+        
         if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.deptId, collectionName: 'department' })) return { status: false, message: message.lbldepartmentNotFound, statusCode: httpStatusCode.Unauthorized }
@@ -170,6 +171,7 @@ const toggleDepartment = async (input) => {
 }
 const allDepartmentsByPage = async (input) => {
     try {
+        console.log(input,'input')
         !input?.keyWord ? input.keyWord = "" : ''
         !input?.page ? input.page = 0 : input.page = parseInt(input.page)
         !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)

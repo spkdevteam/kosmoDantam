@@ -74,3 +74,16 @@ exports.getReadActiveServicesbyPage = async (req,res,next)=>{
        next(error)
     } 
 }
+
+exports.putToggleServiceByPage = async (req,res,next)=>{
+    try {
+        const data = await sanitizeBody(req.body)
+        const toggle = await toggleServiceStatus(data)   
+        const result = await readActiveServicesbyPage(data)
+        result.message = toggle.message
+        res.status(toggle?.statusCode).json(result)
+    } catch (error) {
+       next(error)
+    } 
+}
+

@@ -7,7 +7,8 @@ const {
     revokeProcedure ,
     getAllProcedures,
     getProcedureUnderService,
-    getAllProceduresByPage
+    getAllProceduresByPage,
+    putToggleProcedureByPage
 } = require('../controller/procedure.controller');
 
 
@@ -19,6 +20,7 @@ procedureRouter
     .put('/edit', editProcedure)     
     .delete('/delete', deleteProcedure) 
     .patch('/toggleActivestatus', toggleProcedure) 
+    .put('/toggleProcedureByPage',putToggleProcedureByPage)
     .put('/revoke',revokeProcedure)
     .get('/getAllProcedures',getAllProcedures)
     .get('/proceduresByPage',getAllProceduresByPage)
