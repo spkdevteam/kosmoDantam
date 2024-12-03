@@ -5,7 +5,7 @@ const caseSheetSchema = new mongoose.Schema({
     patientId: { type: mongoose.Schema.ObjectId, ref: 'patient', required: true },
     branchId: { type: mongoose.Schema.ObjectId, ref: 'branch', required: true },
     buId: { type: mongoose.Schema.ObjectId, ref: "businessUnit", default: null, index: true },
-    createdBy: { type: mongoose.Schema.ObjectId, ref: "clientUsers", default:null, index: true }, 
+    createdBy: { type: mongoose.Schema.ObjectId, ref: "clientUsers", default: null, index: true },
 
     cheifComplaints: {
         type: [
@@ -17,7 +17,7 @@ const caseSheetSchema = new mongoose.Schema({
                 complaints: {
                     type: [
                         {
-                            type: mongoose.Schema.ObjectId, ref: "CheifComplaint"
+                            compId: { type: mongoose.Schema.ObjectId, ref: "CheifComplaint" }
                         }
                     ]
                 }
@@ -36,7 +36,7 @@ const caseSheetSchema = new mongoose.Schema({
                 findings: {
                     type: [
                         {
-                            type: mongoose.Schema.ObjectId, ref: "finding"
+                            findId: { type: mongoose.Schema.ObjectId, ref: "finding" }
                         }
                     ]
                 }
@@ -47,7 +47,7 @@ const caseSheetSchema = new mongoose.Schema({
     medicalHistory: {
         type: [
             {
-                type: mongoose.Schema.ObjectId, ref: "medicalCase"
+                id: { type: mongoose.Schema.ObjectId, ref: "medicalCase" }
             }
         ],
         default: [],
@@ -71,10 +71,10 @@ const caseSheetSchema = new mongoose.Schema({
                         default: [],
                     },
                     department: {
-                        type: mongoose.Schema.ObjectId, ref: "department"
+                        deptId: { type: mongoose.Schema.ObjectId, ref: "department" }
                     },
                     service: {
-                        type: mongoose.Schema.ObjectId, ref: "services"
+                        servId: { type: mongoose.Schema.ObjectId, ref: "services" }
                     },
                     rate: { type: Number, default: null },
                     quaintity: { type: Number, default: null },
@@ -92,13 +92,13 @@ const caseSheetSchema = new mongoose.Schema({
                     type: [],
                     default: [],
                 },
-                service : { type: mongoose.Schema.ObjectId, ref: "services"},
-                procedure : {
-                    type : [
-                        {type: mongoose.Schema.ObjectId, ref: "procedure"}
+                service: { servId: { type: mongoose.Schema.ObjectId, ref: "services" } },
+                procedure: {
+                    type: [
+                        { procedId: { type: mongoose.Schema.ObjectId, ref: "procedure" } }
                     ]
                 }
-              
+
             },
         ],
         default: [],

@@ -14,7 +14,8 @@ const swaggerUi = require('swagger-ui-express');
 
 
 const clientRoleSchema = require("./client/model/role.js");
-const clinetPatientSchema = require("./client/model/patient.js")
+const clinetPatientSchema = require("./client/model/patient.js");
+const serialNumberSchema = require("./model/serialNumber.js")
 const {defaultPersmissionsList, businessUnitPersmissionsList} = require("./utils/constant.js")
 
 
@@ -600,6 +601,36 @@ async function dropIndexes() {
 }
 
 // dropIndexes()
+
+
+// create serial numbers in instance of database
+
+async function createSerialNumber () {
+    try {
+        const clientId = "67441b73cbc8975325e14a3f";
+        const collectionName = "service";
+        const prefix = "SV";
+        const nextNum = 100010;
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const SerialNumber = clientConnection.model('serialNumber', serialNumberSchema);
+        const existing = await SerialNumber.findOne({collectionName : collectionName});
+        if(existing){
+            console.log("serial Number already exists");
+            return 
+        }
+        await SerialNumber.create({
+            collectionName : collectionName,
+            prefix : prefix,
+            nextNum : nextNum
+        })
+        console.log("serial number created successfully");
+    } catch (error) {
+        console.log("error while creating the serial number");
+        
+    }
+}
+
+// createSerialNumber()
 
 
 

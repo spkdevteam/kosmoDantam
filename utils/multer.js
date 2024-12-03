@@ -13,6 +13,12 @@ if(!fs.existsSync('./public/profile')){
 }
 
 
+// create investigation folder
+if(!fs.existsSync('./public/investigation')){
+    fs.mkdirSync('./public/investigation')
+}
+
+
 
 
 // image filter
@@ -56,4 +62,27 @@ const uploadProfile = multer({
 });
 
 
+// upload investigation
+
+// upload profile image
+const investigationStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './public/investigation');
+    },
+    filename: async (req, file, cb) => {
+        cb(null, `${Date.now()}_${file.originalname.toLowerCase().replaceAll(' ', '')}`);
+    },
+});
+
+const uploadInvestigation = multer({
+    storage: investigationStorage,
+    limits: {
+        fileSize: 1024 * 1024,
+        files: 1
+    },
+    fileFilter: imageFilter
+});
+
+
 exports.uploadProfile = uploadProfile;
+exports.uploadInvestigation = uploadInvestigation;

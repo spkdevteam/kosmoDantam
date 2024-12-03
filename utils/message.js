@@ -180,12 +180,85 @@ module.exports = {
 
   
   // cheif complaints 
-  lblCheifComplaintshAlreadyExists: "CheifComplaints already exists with the location or CheifComplaints number!",
+  lblCheifComplaintshAlreadyExists: "CheifComplaints already exists!",
   lblCheifComplaintsCreatedSuccess: "CheifComplaints created successfully!",
   lblCheifComplaintsUpdatedSuccess: "CheifComplaints updated successfully!",
+  lblCheifComplaintsDeletedSuccess: "CheifComplaints deleted successfully!",
   lblCheifComplaintsIdIdAndClientIdRequired: "CheifComplaints Id and Client Id are required!",
+  lblCheifComplaintsIdRequired: "CheifComplaints Id is required!",
   lblCheifComplaintsNotFound: "CheifComplaints not found!",
   lblCheifComplaintsFoundSucessfully: "CheifComplaints found successfully!",
+
+  
+  // services 
+  lblServiceshAlreadyExists: "Services already exists!",
+  lblServicesCreatedSuccess: "Services created successfully!",
+  lblServicesUpdatedSuccess: "Services updated successfully!",
+  lblServicesDeletedSuccess: "Services deleted successfully!",
+  lblServicesIdIdAndClientIdRequired: "Services Id and Client Id are required!",
+  lblServicesIdRequired: "Services Id is required!",
+  lblServicesNotFound: "Services not found!",
+  lblServicesFoundSucessfully: "Services found successfully!",
+
+  // clinical findings
+  lblClinicalFindinghAlreadyExists: "ClinicalFinding already exists!",
+  lblClinicalFindingCreatedSuccess: "ClinicalFinding created successfully!",
+  lblClinicalFindingUpdatedSuccess: "ClinicalFinding updated successfully!",
+  lblClinicalFindingDeletedSuccess: "ClinicalFinding deleted successfully!",
+  lblClinicalFindingIdIdAndClientIdRequired: "ClinicalFinding Id and Client Id are required!",
+  lblClinicalFindingIdRequired: "ClinicalFinding Id is required!",
+  lblClinicalFindingNotFound: "ClinicalFinding not found!",
+  lblClinicalFindingFoundSucessfully: "ClinicalFinding found successfully!",
+
+  
+  // medical history
+  lblMedicalHistoryhAlreadyExists: "MedicalHistory already exists!",
+  lblMedicalHistoryCreatedSuccess: "MedicalHistory created successfully!",
+  lblMedicalHistoryUpdatedSuccess: "MedicalHistory updated successfully!",
+  lblMedicalHistoryDeletedSuccess: "MedicalHistory deleted successfully!",
+  lblMedicalHistoryIdIdAndClientIdRequired: "MedicalHistory Id and Client Id are required!",
+  lblMedicalHistoryIdRequired: "MedicalHistory Id is required!",
+  lblMedicalHistoryNotFound: "MedicalHistory not found!",
+  lblMedicalHistoryFoundSucessfully: "MedicalHistory found successfully!",
+
+
+  
+  
+  //  note
+  lblNotehAlreadyExists: "Note already exists!",
+  lblNoteCreatedSuccess: "Note created successfully!",
+  lblNoteUpdatedSuccess: "Note updated successfully!",
+  lblNoteDeletedSuccess: "Note deleted successfully!",
+  lblNoteIdIdAndClientIdRequired: "Note Id and Client Id are required!",
+  lblNoteIdRequired: "Note Id is required!",
+  lblNoteNotFound: "Note not found!",
+  lblNoteFoundSucessfully: "Note found successfully!",
+
+
+  
+  // investigation
+  lblInvestigationhAlreadyExists: "Investigation already exists!",
+  lblInvestigationCreatedSuccess: "Investigation created successfully!",
+  lblInvestigationUpdatedSuccess: "Investigation updated successfully!",
+  lblInvestigationDeletedSuccess: "Investigation deleted successfully!",
+  lblInvestigationIdIdAndClientIdRequired: "Investigation Id and Client Id are required!",
+  lblInvestigationIdRequired: "Investigation Id is required!",
+  lblInvestigationNotFound: "Investigation not found!",
+  lblInvestigationFoundSucessfully: "Investigation found successfully!",
+
+  
+  // other attachment
+  lblOtherAttachmenthAlreadyExists: "OtherAttachment already exists!",
+  lblOtherAttachmentCreatedSuccess: "OtherAttachment created successfully!",
+  lblOtherAttachmentUpdatedSuccess: "OtherAttachment updated successfully!",
+  lblOtherAttachmentDeletedSuccess: "OtherAttachment deleted successfully!",
+  lblOtherAttachmentIdIdAndClientIdRequired: "OtherAttachment Id and Client Id are required!",
+  lblOtherAttachmentIdRequired: "OtherAttachment Id is required!",
+  lblOtherAttachmentNotFound: "OtherAttachment not found!",
+  lblOtherAttachmentFoundSucessfully: "OtherAttachment found successfully!",
+
+  
+
 
   
   // case sheet 

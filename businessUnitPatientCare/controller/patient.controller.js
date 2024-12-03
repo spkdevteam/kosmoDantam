@@ -31,21 +31,7 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
             });
         }
         const clientConnection = await getClientDatabaseConnection(clientId);
-        const Branch = clientConnection.model('branch', clinetBranchSchema);
-        const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
         const Role = clientConnection.model('clientRoles', clientRoleSchema);
-        const branch = await Branch.findById(branchId);
-        if (!branch) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblBranchNotFound,
-            });
-        }
-        const bu = await BusinessUnit.findById(businessUnit)
-        if (!bu) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblBusinessUnitNotFound,
-            });
-        }
         const role = await Role.findById(roleId);
         if (!role) {
             throw new CustomError(statusCode.Conflict, message.lblRoleNotFound);
@@ -101,21 +87,6 @@ exports.createSubPatientByBusinessUnit = async (req, res, next) => {
             });
         }
         const clientConnection = await getClientDatabaseConnection(clientId);
-        const Branch = clientConnection.model('branch', clinetBranchSchema);
-        const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
-        const branch = await Branch.findById(branchId);
-        if (!branch) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblBranchNotFound,
-            });
-        }
-        const bu = await BusinessUnit.findById(businessUnit)
-        if (!bu) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblBusinessUnitNotFound,
-            });
-        }
-
         const User = clientConnection.model('clientUsers', clinetUserSchema);
         const mainPatient = await User.findById(mainPatientLinkedId);
 
@@ -158,20 +129,6 @@ exports.updatePatientByBusinessUnit = async (req, res, next) => {
             });
         }
         const clientConnection = await getClientDatabaseConnection(clientId);
-        const Branch = clientConnection.model('branch', clinetBranchSchema);
-        const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
-        const branch = await Branch.findById(branchId);
-        if (!branch) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblBranchNotFound,
-            });
-        }
-        const bu = await BusinessUnit.findById(businessUnit)
-        if (!bu) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblBusinessUnitNotFound,
-            });
-        }
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const patient = await Patient.findById(patientId);
         if (!patient) {
@@ -300,6 +257,17 @@ const commonIdCheck = async (data) => {
         }
         if (!data.businessUnit) {
             throw new CustomError(statusCode.BadRequest, message.lblBusinessUnitIdIsRequired);
+        }
+        const clientConnection = await getClientDatabaseConnection(data.clientId);
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
+        const branch = await Branch.findById(data.branchId);
+        if (!branch) {
+            throw new CustomError(statusCode.BadRequest, message.lblBranchNotFound);
+        }
+        const bu = await BusinessUnit.findById(data.businessUnit)
+        if (!bu) {
+            throw new CustomError(statusCode.BadRequest, message.lblBusinessUnitNotFound);
         }
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error creating patient: ${error.message}`);

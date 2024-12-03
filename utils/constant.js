@@ -617,6 +617,41 @@ const businessUnitPersmissionsList = [
             },
         }
     },
+    {
+        name: "Department",
+        displayName: "All Department",
+        access: true,
+        subMenus: {
+            list: {
+                access: true,
+                api: "/demo/path",
+            },
+            create: {
+                access: true,
+                api: "/demo/path",
+            },
+            view: {
+                access: true,
+                api: "/demo/path",
+            },
+            update: {
+                access: true,
+                api: "/demo/path",
+            },
+            softDelete: {
+                access: true,
+                api: "/demo/path",
+            },
+            hardDelete: {
+                access: true,
+                api: "/demo/path",
+            },
+            activeActive: {
+                access: true,
+                api: "/demo/path",
+            },
+        }
+    },
 
 
 ]
