@@ -200,6 +200,17 @@ module.exports = {
   lblServicesNotFound: "Services not found!",
   lblServicesFoundSucessfully: "Services found successfully!",
 
+   // procedure 
+   lblProcedurehAlreadyExists: "Procedure already exists!",
+   lblProcedureCreatedSuccess: "Procedure created successfully!",
+   lblProcedureUpdatedSuccess: "Procedure updated successfully!",
+   lblProcedureDeletedSuccess: "Procedure deleted successfully!",
+   lblProcedureIdIdAndClientIdRequired: "Procedure Id and Client Id are required!",
+   lblProcedureIdRequired: "Procedure Id is required!",
+   lblProcedureNotFound: "Procedure not found!",
+   lblProcedureFoundSucessfully: "Procedure found successfully!",
+ 
+
   // clinical findings
   lblClinicalFindinghAlreadyExists: "ClinicalFinding already exists!",
   lblClinicalFindingCreatedSuccess: "ClinicalFinding created successfully!",
@@ -268,6 +279,8 @@ module.exports = {
   lblCaseSheetIdIdAndClientIdRequired: "CaseSheet Id and Client Id are required!",
   lblCaseSheetNotFound: "CaseSheet not found!",
   lblCaseSheetFoundSucessfully: "CaseSheet found successfully!",
+  lblCaseSheetIdIdRequired: "CaseSheet Id is required!",
+
 
 
 
