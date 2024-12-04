@@ -7,7 +7,7 @@ const cheifComplaintSchema = mongoose.Schema({
     buId:{ type: mongoose.Schema.ObjectId, ref: "businessUnit", default:null, index: true  },
     isActive:{type:Boolean,default:true},
     deletedAt:{type:Date,default:null},
-    createdBy: { type: mongoose.Schema.ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
+    createdBy: { type: mongoose.Schema.ObjectId, ref: "clientUsers", default:null, index: true },
 })
 
 module.exports = cheifComplaintSchema

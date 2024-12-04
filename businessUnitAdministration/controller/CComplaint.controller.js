@@ -49,9 +49,6 @@ exports.patchToggleComplaintWithPage = async (req,res,next)=>{
     }
 }
 
-
-
-
 exports.deleteCComplaint = async (req,res,next)=>{
     try {
         const data =await sanitizeBody(req.body)

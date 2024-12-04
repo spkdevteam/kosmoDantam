@@ -330,6 +330,7 @@ const findingsRouter = require("./businessUnitAdministration/routes/findings.rou
 const ccRouter = require("./businessUnitAdministration/routes/cheifComplaint..routes.js");
 const investigationRouter = require("./businessUnitAdministration/routes/investigation.routes.js");
 const bookingRoutes = require("./businessUnitAdministration/routes/appointment.routes.js");
+const leaveRouter = require("./businessUnitAdministration/routes/leaveRegister.routes.js");
 
 
 // middleware setup
@@ -372,6 +373,7 @@ app.use("/api/client/bu/findings", findingsRouter);
 app.use("/api/client/bu/chiefComplaint",ccRouter )
 app.use("/api/client/bu/investigation",investigationRouter)
 app.use("/api/client/bu/booking",bookingRoutes)
+app.use("/api/client/bu/leave",leaveRouter)
 
 app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 

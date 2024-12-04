@@ -15,4 +15,5 @@ deptRouter
 .patch('/toggleDepartment',deptController.toggleDepartments)
 .put('/revokeDepartment',deptController.revokeDepartment)
 .put('/toggleDepartmentWithPage',deptController.putToggleDepartmentsWithPage)
+
 module.exports = deptRouter

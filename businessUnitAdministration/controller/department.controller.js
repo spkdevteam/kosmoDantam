@@ -13,7 +13,6 @@ const {
 
 exports.createDepartment =async (req, res,next) => {
     try {
-        
         const data =await sanitizeBody(req.body)
         const result = await createDepartment(data)
         res.status(result.statusCode || 200).json(result)

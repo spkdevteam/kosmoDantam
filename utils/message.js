@@ -339,6 +339,24 @@ module.exports = {
     lblAppointmentAlreadyExist: "An Appointment with the same details already exists.",
 
     lblClinetIdInvalid:"invalid Client id",
+
+    lblLeaveRegisterCreated: "New Leave Registration added to the system.",
+    lblLeaveRegisterEdited: "Changes to the Leave Registration have been saved.",
+    lblLeaveRegisterDeleted: "The Leave Registration has been removed from the system.",
+    lblLeaveRegisterFetched: "Leave Registration data loaded.",
+    lblLeaveRegisterBulkOperations: "Leave Registrations imported/exported successfully.",
+    lblLeaveRegisterCreationFailed: "Unable to add a new Leave Registration. Ensure all required fields are provided.",
+    lblLeaveRegisterEditingFailed: "Leave Registration update unsuccessful. Ensure the Leave Registration exists.",
+    lblLeaveRegisterEditingNotDone: "No changes found in the Leave Registration.",
+    lblLeaveRegisterDeletionFailed: "Leave Registration deletion unsuccessful. Please try again later.",
+    lblLeaveRegisterRetrievalFailed: "No Leave Registration found with the given ID.",
+    lblLeaveRegisterAuthorizationFailed: "Invalid input data for the Leave Registration operation.",
+    lblLeaveRegisterPendingAction: "Leave Registration updates are pending approval.",
+    lblLeaveRegisterNoChanges: "The Leave Registration details are already up to date.",
+    lblLeaveRegisterDependencies: "Please resolve linked issues before proceeding with this action.",
+    lblLeaveRegisterDoesNotExist: "The specified Leave Registration does not exist in the system.",
+    lblLeaveRegisterAlreadyExist: "A Leave Registration with the same details already exists."
+
     
 
 };

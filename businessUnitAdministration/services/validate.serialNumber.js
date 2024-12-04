@@ -12,10 +12,11 @@ const clinetUserSchema = require("../../client/model/user");
 const clinetChairSchema = require("../../client/model/chair");
 const clinetBusinessUnitSchema = require("../../client/model/businessUnit");
 const userModel = require("../../model/user");
+const leaveRegisterSchema = require("../../client/model/leaveRegister");
 
 exports.validateObjectId = async ({clientid='',objectId='',collectionName=''})=>{
     try {
-        collectionName=='clientuser' ? console.log(clientid,objectId,collectionName,):''
+        console.log(clientid,objectId,collectionName,'clientid,objectId,collectionName') 
         const db = await getClientDatabaseConnection(clientid)
         const appointments = await db.model('appointment',appointmentSchema)
         const cheifComplaint = await db.model('CheifComplaint', cheifComplaintSchema)
@@ -28,6 +29,7 @@ exports.validateObjectId = async ({clientid='',objectId='',collectionName=''})=>
         const branch = await db.model('branch', clinetBranchSchema);
         const User =await db.model('clientUsers', clinetUserSchema);
         const businessUnit = db.model('businessUnit', clinetBusinessUnitSchema);
+        const leaveRegister =await db.model('leaveRegister',leaveRegisterSchema )
         const chair = db.model('chair', clinetChairSchema);
         switch (collectionName) {
             case 'appointment':
@@ -48,17 +50,20 @@ exports.validateObjectId = async ({clientid='',objectId='',collectionName=''})=>
                 return await services.findOne({ _id: objectId, deletedAt: null }) ? true : false;
             case 'branch':
                 return  await branch.findOne({ _id: objectId, deletedAt: null }) ? true : false;
-            case 'clientuser':
+            case 'clientuser' :
                 return await User.findOne({ _id: objectId, deletedAt: null }) ? true : false;
-            case 'businessunit':
+            case 'businessunit' :
                 return await businessUnit.findOne({ _id: objectId, deletedAt: null }) ? true : false;
             case 'chair':
                 return await chair.findOne({ _id: objectId, deletedAt: null }) ? true : false;
+            case 'leaveRegister':
+                return await leaveRegister.findOne({ _id: objectId, deletedAt: null }) ? true : false;
             case 'clientId':
-                console.log(await userModel.findOne({ _id: objectId, deletedAt: null }) ? true : false,'aaaaa')
+                console.log('*******')
                 return await userModel.findOne({ _id: objectId, deletedAt: null }) ? true : false;
             default:
                 return false;
+                
         }
         
     } catch (error) {
