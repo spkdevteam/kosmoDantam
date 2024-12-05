@@ -189,7 +189,7 @@ exports.softDeleteRolesAndPermissionByBusinesssUnit = async (req, res) => {
             role.deletedAt = new Date();
             await role.save()
         }else{
-            await role.remove()
+           await RolesAndpermission.deleteOne({_id :  roleId});
         }
         this.listRolesAndPermission(req, res);
     } catch (error) {
