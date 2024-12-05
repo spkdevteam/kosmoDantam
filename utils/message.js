@@ -177,6 +177,20 @@ module.exports = {
   lblPatientNotFound: "Patient not found!",
   lblPatientFoundSucessfully: "Patient found successfully!",
   lblPatientIdRequired: "Patient Id is required!",
+  lblDoctorIdRequired: "Doctor Id is required!",
+  lblDoctorNotFound: "Doctor not found!",
+
+
+  // prescription
+  
+  // patient
+  lblPrescriptionAlreadyExists: "Prescription already exists with email or phone!",
+  lblPrescriptionCreatedSuccess: "Prescription created successfully!",
+  lblPrescriptionUpdatedSuccess: "Prescription updated successfully!",
+  lblPrescriptionIdIdAndClientIdRequired: "Prescription Id and Client Id are required!",
+  lblPrescriptionNotFound: "Prescription not found!",
+  lblPrescriptionFoundSucessfully: "Prescription found successfully!",
+  lblPrescriptionIdRequired: "Prescription Id is required!",
 
   
   // cheif complaints 
