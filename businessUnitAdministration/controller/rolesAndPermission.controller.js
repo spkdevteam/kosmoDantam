@@ -141,8 +141,14 @@ exports.getParticularRoleAndPermissionByBusinessUnit = async (req, res) => {
 exports.listRolesAndPermission = async (req, res) => {
     try {
         const clientId = req.query.clientId;
+        const keyword = req.query.keyword;
         let whereCondition = {
             deletedAt: null,
+            ...(keyword && {
+                $or: [
+                    { name: { $regex: keyword.trim(), $options: "i" } },
+                ],
+            }),
         };
         if (!clientId) {
             return res.status(400).send({
