@@ -20,9 +20,9 @@ router.get('/rolesAndPermission/:clientId/:roleId', entityAuth.authorizeEntity("
 
 router.get('/listRolesAndPermission', entityAuth.authorizeEntity("administration", "Roles & Permissions", "view"), rolesAndPermissionContrller.listRolesAndPermission);
 
-router.post("/softDeleteRolesAndPermission", entityAuth.authorizeEntity("administration", "Roles & Permissions", "delete"), rolesAndPermissionContrller.softDeleteRolesAndPermissionByBusinesssUnit);
+router.post("/softDeleteRolesAndPermission", entityAuth.authorizeEntity("administration", "Roles & Permissions", "softDelete"), rolesAndPermissionContrller.softDeleteRolesAndPermissionByBusinesssUnit);
 
-router.post("/restoreRolesAndPermission", entityAuth.authorizeEntity("administration", "Roles & Permissions", "delete"), rolesAndPermissionContrller.restoreRoleAndPermissionByBusinessUnit);
+// router.post("/restoreRolesAndPermission", entityAuth.authorizeEntity("administration", "Roles & Permissions", "delete"), rolesAndPermissionContrller.restoreRoleAndPermissionByBusinessUnit);
 
 
 // # create, update, view, list, delete RolesAndPermission by business unit routes ends here

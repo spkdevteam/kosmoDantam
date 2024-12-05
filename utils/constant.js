@@ -12,6 +12,10 @@ const defaultPersmissionsList = [
                 displayName: "All Roles & Permissions",
                 access: false,
                 subMenus: {
+                    list: {
+                        access: false,
+                        api: "/demo/path",
+                    },
                     create: {
                         access: false,
                         api: "/demo/path",
@@ -24,7 +28,15 @@ const defaultPersmissionsList = [
                         access: false,
                         api: "/demo/path",
                     },
-                    delete: {
+                    softDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: false,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
                         access: false,
                         api: "/demo/path",
                     },
@@ -439,6 +451,10 @@ const businessUnitPersmissionsList = [
                 displayName: "All Roles & Permissions",
                 access: true,
                 subMenus: {
+                    list: {
+                        access: true,
+                        api: "/demo/path",
+                    },
                     create: {
                         access: true,
                         api: "/demo/path",
@@ -451,7 +467,15 @@ const businessUnitPersmissionsList = [
                         access: true,
                         api: "/demo/path",
                     },
-                    delete: {
+                    softDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    hardDelete: {
+                        access: true,
+                        api: "/demo/path",
+                    },
+                    activeActive: {
                         access: true,
                         api: "/demo/path",
                     },
