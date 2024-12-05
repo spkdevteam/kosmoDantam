@@ -169,4 +169,25 @@ exports.readActiveLeaveApplicationByPage = async (input)=>{
     }
 }
 
+exports.getDateWiseLeaVeDetails = async (input)=>{
+    try {
+        if ( ! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if ( ! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
+        if ( ! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
+        const db =await getClientDatabaseConnection(input?.clientId)
+        const leaveRegister = db.model('leaveRegister',leaveRegisterSchema)
+        const absentees = await leaveRegister.find({
+            buId:input?.buId,
+            branchId:input?.branchId, 
+            startDate: { $lte: input?.bookingDate  },
+            endDate: { $gte: input?.bookingDate  },
+            isActive: true,
+        }) 
+        console.log(input,absentees,'aaaaaa')
+          return { status: true, message:message.lblLeaveRegisterFetched , statusCode: httpStatusCode.OK,data:absentees   }  
+    } catch (error) {
+         return {status:false,message:'error'}
+    }
+}
+
 

@@ -5,7 +5,7 @@ const { saveLeaveApplication,
         toggleLeaveApplication, 
         editLeaveApplication,
         readActiveLeaveApplicationByPage,
-        } = require("../services/leaveRegister.services")
+        } = require("../services/leaveRegister.service")
 
 exports.postSaveLeaveRequest = async(req,res,next)=>{
     try {
@@ -89,3 +89,4 @@ exports.postToggleLeaveApplicationByPage = async(req,res,next)=>{
         next(error)
     }
 } 
+

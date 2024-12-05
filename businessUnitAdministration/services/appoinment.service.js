@@ -4,6 +4,7 @@ const httpStatusCode = require("../../utils/http-status-code");
 const appointmentSchema = require("../../client/model/appointments");
 const getserialNumber = require("../../model/services/getserialNumber");
 const { validateObjectId } = require("./validate.serialNumber");
+const { getDateWiseLeaVeDetails } = require("./leaveRegister.service");
 
 
 exports.creatAppointment = async (input) => { 
@@ -55,5 +56,42 @@ exports.creatAppointment = async (input) => {
         else return  {status:false,message:message.lblCredentialMissing, statusCode:httpStatusCode.Unauthorized}
     } catch (error) {
         return {status:false,message:error.message, statusCode:httpStatusCode.InternalServerError}
+    }
+}
+
+exports.getDateWiseBookidDetails = async (input)=>{
+    try {
+        if ( ! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if ( ! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
+        if ( ! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
+        const db =await getClientDatabaseConnection(input?.clientId)
+        const appointment =await db.model('appointment',appointmentSchema)
+        console.log(input,'---------------------------------',input?.bookingDate)
+        const startOfDay = new Date(input?.bookingDate);
+        startOfDay.setUTCHours(0, 0, 0, 0); // Set to the start of the day
+        const endOfDay = new Date(input?.bookingDate);
+        endOfDay.setUTCHours(23, 59, 59, 999); // Set to the end of the day
+
+        const bookingdetails = await appointment.find({
+             buId:input?.buId,
+             branchId:input?.branchId, 
+             isActive: true,
+             date:{ $gte: startOfDay, $lte: endOfDay }
+        })
+        return {status:true,message:'appointmentFetched' ,data:bookingdetails}
+    } catch (error) {
+        return {status:false,message:'appointment Fetch failed ' }
+    }
+}
+
+exports.getBookingChart = async (input)=>{
+    try {
+        console.log(input)
+        const absentees = await getDateWiseLeaVeDetails(input);
+        const booking = await this.getDateWiseBookidDetails(input)
+        console.log(absentees,booking,'absentees')
+        return absentees
+    } catch (error) {
+        
     }
 }
