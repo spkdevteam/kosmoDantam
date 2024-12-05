@@ -170,7 +170,7 @@ exports.listRolesAndPermission = async (req, res) => {
 // Soft delete Roles and permission by business unit
 exports.softDeleteRolesAndPermissionByBusinesssUnit = async (req, res) => {
     try {
-        const { clientId, roleId } = req.body;
+        const { clientId, roleId, softDelete = "1" } = req.body;
         req.query.clientId = clientId;
         if (!roleId || !clientId) {
             return res.status(400).send({
@@ -185,8 +185,12 @@ exports.softDeleteRolesAndPermissionByBusinesssUnit = async (req, res) => {
                 message: message.lblRoleNotFound,
             });
         }
-        role.deletedAt = new Date();
-        await role.save()
+        if(softDelete == "1"){
+            role.deletedAt = new Date();
+            await role.save()
+        }else{
+            await role.remove()
+        }
         this.listRolesAndPermission(req, res);
     } catch (error) {
         return res.status(statusCode.InternalServerError).send({
