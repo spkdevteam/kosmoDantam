@@ -40,6 +40,7 @@ exports.createRolesAndPermissionByBusinessUnit = async (req, res) => {
         const RolesAndpermission = clientConnection.model('clientRoles', clientRoleSchema);
 
         const role = await RolesAndpermission.findOne({ name: name });
+        const lastRole = await RolesAndpermission.findOne().sort({ _id: -1 });
 
         if (role) {
             return res.status(statusCode.BadRequest).send({
@@ -51,7 +52,7 @@ exports.createRolesAndPermissionByBusinessUnit = async (req, res) => {
         const newRole = await RolesAndpermission.create(
             [
                 {
-                    name, createdBy: superAdmin?._id, capability : defaultPersmissionsList
+                    name, createdBy: superAdmin?._id, id : lastRole?.id + 1, capability : defaultPersmissionsList
                 },
             ],
         );
