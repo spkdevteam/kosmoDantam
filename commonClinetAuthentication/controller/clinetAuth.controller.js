@@ -151,6 +151,7 @@ exports.signInByOtp = async (req, res, next) => {
             token,
             expiryTime,
             adminInfo: client,
+            clinetId : user?._id,
             message: message.lblLoginSuccess
         });
 

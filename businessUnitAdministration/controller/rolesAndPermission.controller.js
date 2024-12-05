@@ -17,8 +17,10 @@ exports.createRolesAndPermissionByBusinessUnit = async (req, res) => {
 
     try {
 
+        const superAdmin = req.user;
+
         // Destructure fields from request body
-        const { clientId, createdBy, name } = req.body;
+        const { clientId, name } = req.body;
 
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
@@ -49,7 +51,7 @@ exports.createRolesAndPermissionByBusinessUnit = async (req, res) => {
         const newRole = await RolesAndpermission.create(
             [
                 {
-                    name, createdBy: createdBy, capability : defaultPersmissionsList
+                    name, createdBy: superAdmin?._id, capability : defaultPersmissionsList
                 },
             ],
         );
@@ -211,7 +213,7 @@ exports.listRolesAndPermission = async (req, res) => {
 
 
         const [roles] = await Promise.all([
-            RolesAndpermission.find(whereCondition).select("name id createdBy"),
+            RolesAndpermission.find(whereCondition).select("name id createdBy").sort({_id : -1}),
         ]);
 
         return res.json({
