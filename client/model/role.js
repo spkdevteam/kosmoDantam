@@ -19,30 +19,37 @@ const clientRoleSchema = new mongoose.Schema({
                             access: { type: Boolean, default: false },
                             subMenus: {
                                 list: {
+                                    id: { type: Number, require: true },
                                     access: { type: Boolean, default: false },
                                     api: { type: String, default: null },
                                 },
                                 create: {
+                                    id: { type: Number, require: true },
                                     access: { type: Boolean, default: false },
                                     api: { type: String, default: null },
                                 },
                                 view: {
+                                    id: { type: Number, require: true },
                                     access: { type: Boolean, default: false },
                                     api: { type: String, default: null },
                                 },
                                 update: {
+                                    id: { type: Number, require: true },
                                     access: { type: Boolean, default: false },
                                     api: { type: String, default: null },
                                 },
                                 softDelete: {
+                                    id: { type: Number, require: true },
                                     access: { type: Boolean, default: false },
                                     api: { type: String, default: null },
                                 },
                                 hardDelete: {
+                                    id: { type: Number, require: true },
                                     access: { type: Boolean, default: false },
                                     api: { type: String, default: null },
                                 },
                                 activeActive: {
+                                    id: { type: Number, require: true },
                                     access: { type: Boolean, default: false },
                                     api: { type: String, default: null },
                                 },
