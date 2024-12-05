@@ -152,7 +152,7 @@ exports.listRolesAndPermission = async (req, res) => {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const RolesAndpermission = clientConnection.model('clientRoles', clientRoleSchema);
         const [roles] = await Promise.all([
-            RolesAndpermission.find(whereCondition).select("name id createdBy").sort({_id : -1}),
+            RolesAndpermission.find(whereCondition).select("name id createdBy isActive").sort({_id : -1}),
         ]);
         return res.json({
             message: 'List of all roles!',
