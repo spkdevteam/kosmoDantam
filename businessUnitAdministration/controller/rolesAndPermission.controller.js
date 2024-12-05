@@ -53,7 +53,7 @@ exports.createRolesAndPermissionByBusinessUnit = async (req, res) => {
             message: message.lblInternalServerError,
             error: error.message, 
         });
-    }
+    } 
 };
 
 // update Roles and permission by business unit
