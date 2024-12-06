@@ -18,6 +18,7 @@ const MasterUser = require("../../model/user")
 
 const employeeService = require("../../client/service/employee.service");
 const getserialNumber = require("../../model/services/getserialNumber");
+const CustomError = require("../../utils/customeError");
 
 // create Employee by business unit
 exports.createEmployeeByBusinessUnit = async (req, res, next) => {
@@ -41,12 +42,12 @@ exports.createEmployeeByBusinessUnit = async (req, res, next) => {
         const Branch = clientConnection.model('branch', clinetBranchSchema);
         const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
         const Role = clientConnection.model('clientRoles', clientRoleSchema);
-        const branch = await Branch.findById(branchId);
-        if (!branch) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblBranchNotFound,
-            });
-        }
+        // const branch = await Branch.findById(branchId);
+        // if (!branch) {
+        //     return res.status(statusCode.BadRequest).send({
+        //         message: message.lblBranchNotFound,
+        //     });
+        // }
         const bu = await BusinessUnit.findById(businessUnit)
         if (!bu) {
             return res.status(statusCode.BadRequest).send({
@@ -59,14 +60,15 @@ exports.createEmployeeByBusinessUnit = async (req, res, next) => {
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const displayId = await getserialNumber('employee', clientId, '', businessUnit);
+        console.log("displayId",displayId);
+        
         // create new employee with service
         const newEmployee = await employeeService.createEmployee(clientId, {
             displayId : displayId,
             firstName,
             lastName,
             email,
-            phone, gender, city, state, country, ZipCode, address, panNumber, adharNumber, emergencyPhone, bloodGroup,
-            password: hashedPassword,
+            phone,   password: hashedPassword,
             branch: branchId,
             role: roleId,
             roleId: role.id,
