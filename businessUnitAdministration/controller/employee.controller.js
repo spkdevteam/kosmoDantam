@@ -24,7 +24,7 @@ exports.createEmployeeByBusinessUnit = async (req, res, next) => {
     try {
 
         // Destructure fields from request body
-        const { clientId, branchId, roleId, businessUnit, firstName, lastName, email, phone, password } = req.body;
+        const { clientId, branchId, roleId, businessUnit, firstName, lastName, email, phone, gender, city, state, country, ZipCode, address, panNumber, adharNumber, emergencyPhone, bloodGroup, password } = req.body;
 
         const mainUser = req.user;
 
@@ -35,7 +35,7 @@ exports.createEmployeeByBusinessUnit = async (req, res, next) => {
         }
 
         // Check if required fields are missing
-        if (!firstName || !lastName || !email || !phone || !password || !roleId) {
+        if (!firstName || !lastName || !email || !phone || !gender || !password || !roleId || !country) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
@@ -75,7 +75,7 @@ exports.createEmployeeByBusinessUnit = async (req, res, next) => {
             firstName,
             lastName,
             email,
-            phone,
+            phone, gender, city, state, country, ZipCode, address, panNumber, adharNumber, emergencyPhone, bloodGroup,
             password: hashedPassword,
             branch: branchId,
             role: roleId,
@@ -158,7 +158,7 @@ exports.updateEmployeeByBusinessUnit = async (req, res, next) => {
 
     try {
         // Destructure fields from request body
-        const { clientId, branchId, roleId, businessUnit, employeeId, firstName, lastName, email, phone, password } = req.body;
+        const { clientId, branchId, roleId, businessUnit, employeeId, firstName, lastName, email, phone, gender, city, state, country, ZipCode, address, panNumber, adharNumber, emergencyPhone, bloodGroup, password } = req.body;
 
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
@@ -204,7 +204,7 @@ exports.updateEmployeeByBusinessUnit = async (req, res, next) => {
             firstName,
             lastName,
             email,
-            phone,
+            phone, gender, city, state, country, ZipCode, address, panNumber, adharNumber, emergencyPhone, bloodGroup,
             branch: branchId,
             role: roleId,
             businessUnit: businessUnit,

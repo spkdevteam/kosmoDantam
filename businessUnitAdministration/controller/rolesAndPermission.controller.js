@@ -173,6 +173,8 @@ exports.listRolesAndPermission = async (req, res) => {
 };
 
 
+
+
 // Soft delete Roles and permission by business unit
 exports.softDeleteRolesAndPermissionByBusinesssUnit = async (req, res) => {
     try {
@@ -205,6 +207,46 @@ exports.softDeleteRolesAndPermissionByBusinesssUnit = async (req, res) => {
         });
     }
 };
+
+// get roles list
+exports.getRolesList = async (req, res) => {
+    try {
+        const admin = req.user;
+        const roleIdOfCurrentUser = admin?.role?.id;
+        const clientId = req.query.clientId;
+        if (!clientId) {
+            return res.status(400).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const RolesAndPermission = clientConnection.model('clientRoles', clientRoleSchema);
+        const roles = await RolesAndPermission.find({ deletedAt: null })
+            .select("name id createdBy isActive _id")
+            .sort({ _id: -1 });
+
+        const filterRoles = (roles, roleId) => {
+            if (roleId === 1) {
+                return roles.filter(role => role.id !== 1);
+            }
+            if (roleId === 2) {
+                return roles.filter(role => role.id !== 1 && role.id !== 2);
+            }
+            return roles.filter(role => role.id !== 1 && role.id !== 2);
+        };
+        const rolesList = filterRoles(roles, roleIdOfCurrentUser);
+        return res.json({
+            message: 'List of all roles!',
+            listOfRoles: rolesList,
+        });
+    } catch (error) {
+        return res.status(statusCode.InternalServerError).send({
+            message: message.lblInternalServerError,
+            error: error.message,
+        });
+    }
+};
+
 
 // restore role and permission
 exports.restoreRoleAndPermissionByBusinessUnit = async (req, res) => {
