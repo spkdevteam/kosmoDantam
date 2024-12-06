@@ -395,6 +395,26 @@ const clientRoles = [
 
 
 
+// serial numbers data
+
+const serialNumber = [
+    { collectionName : "department", prefix: "DP"},
+    { collectionName : "service", prefix: "SV"},
+    { collectionName : "procedure", prefix: "PC"},
+    { collectionName : "mediCases", prefix: "MC"},
+    { collectionName : "findings", prefix: "FS"},
+    { collectionName : "cheifComplaint", prefix: "CC"},
+    { collectionName : "investigation", prefix: "IG"},
+    { collectionName : "leaveRegister", prefix: "LA"},
+    { collectionName : "employee", prefix: "EM"},
+    { collectionName : "branch", prefix: "BR"},
+    { collectionName : "chair", prefix: "CH"},
+]
+
+
+
+
 exports.clientRoles = clientRoles;
 exports.defaultPersmissionsList = defaultPersmissionsList;
 exports.businessUnitPersmissionsList = businessUnitPersmissionsList;
+exports.serialNumber = serialNumber;

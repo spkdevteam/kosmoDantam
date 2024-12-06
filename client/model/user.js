@@ -6,6 +6,7 @@ const ObjectId = Schema.ObjectId;
 
 const clinetUserSchema = new Schema(
     {
+        displayId:{type:String,unique:true},
         role: { type: ObjectId, ref: "clientRoles", index: true }, // Index for role-based queries
         branch: { type: ObjectId, ref: "branch", default: null, index: true },
         businessUnit: { type: ObjectId, ref: "businessUnit", default: null, index: true },

@@ -16,62 +16,52 @@ const clientRoleSchema = require("../../client/model/role");
 const RoleModel = require("../../model/role");
 const MasterUser = require("../../model/user")
 
-const employeeService = require("../../client/service/employee.service")
+const employeeService = require("../../client/service/employee.service");
+const getserialNumber = require("../../model/services/getserialNumber");
 
 // create Employee by business unit
 exports.createEmployeeByBusinessUnit = async (req, res, next) => {
 
     try {
-
         // Destructure fields from request body
         const { clientId, branchId, roleId, businessUnit, firstName, lastName, email, phone, gender, city, state, country, ZipCode, address, panNumber, adharNumber, emergencyPhone, bloodGroup, password } = req.body;
-
         const mainUser = req.user;
-
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
             });
         }
-
         // Check if required fields are missing
-        if (!firstName || !lastName || !email || !phone || !gender || !password || !roleId || !country) {
+        if (!firstName || !lastName || !email || !phone  || !password || !roleId ) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
-
         const clientConnection = await getClientDatabaseConnection(clientId);
-
         const Branch = clientConnection.model('branch', clinetBranchSchema);
         const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
         const Role = clientConnection.model('clientRoles', clientRoleSchema);
-
         const branch = await Branch.findById(branchId);
-
         if (!branch) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblBranchNotFound,
             });
         }
-
         const bu = await BusinessUnit.findById(businessUnit)
         if (!bu) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblBusinessUnitNotFound,
             });
         }
-
         const role = await Role.findById(roleId);
-
         if (!role) {
             throw new CustomError(statusCode.Conflict, message.lblRoleNotFound);
         }
-
         const hashedPassword = await bcrypt.hash(password, 10);
-
+        const displayId = await getserialNumber('employee', clientId, '', businessUnit);
         // create new employee with service
         const newEmployee = await employeeService.createEmployee(clientId, {
+            displayId : displayId,
             firstName,
             lastName,
             email,
@@ -86,19 +76,12 @@ exports.createEmployeeByBusinessUnit = async (req, res, next) => {
             createdBy: mainUser._id,
 
         });
-
-
         // create employee in main database 
-
         const masterRole = await RoleModel.findOne({ id: 5 });
-
-
         const existingStaff = await MasterUser.findOne({
             $or: [{ email: email.toLowerCase() }, { phone }],
         });
-
         if (existingStaff) {
-
             const isAccessUnitAlreadyExists = existingStaff.accessUnit.find((item) => item.id == clientId);
 
             if (isAccessUnitAlreadyExists) {

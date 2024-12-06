@@ -12,10 +12,12 @@ const clientRoleSchema = require("../../client/model/role");
 const clinetUserSchema = require("../../client/model/user");
 const clinetBusinessUnitSchema = require("../../client/model/businessUnit");
 const clinetBranchSchema = require("../../client/model/branch");
+const serialNumebrSchema = require("../../model/serialNumber");
 
 
 
-const { clientRoles } = require("../../utils/constant")
+
+const { clientRoles, serialNumber } = require("../../utils/constant")
 
 
 
@@ -145,6 +147,10 @@ exports.createBusinessUnit = async (req, res) => {
       contactNumber: newUser[0].phone,
       createdBy: newClient._id
     });
+
+    const SerialNumber = clientConnection.model("serialNumber", serialNumebrSchema);
+    await SerialNumber.insertMany(serialNumber);
+
 
 
     // Commit the transaction (if everything goes well)
