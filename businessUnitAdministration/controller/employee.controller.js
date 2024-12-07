@@ -250,7 +250,7 @@ exports.getParticularEmployeeByBusinessUnit = async (req, res, next) => {
 // list employee by business unit
 exports.listEmployee = async (req, res, next) => {
     try {
-        const { clientId, keyword = '', page = 1, perPage = 10, roleId = 3 } = req.query;
+        const { clientId, keyword = '', page = 1, perPage = 10, roleId = 4 } = req.query;
 
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
