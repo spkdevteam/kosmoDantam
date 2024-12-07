@@ -177,14 +177,28 @@ exports.getDateWiseLeaVeDetails = async (input)=>{
         const db =await getClientDatabaseConnection(input?.clientId)
         const leaveRegister = db.model('leaveRegister',leaveRegisterSchema)
         const absentees = await leaveRegister.find({
-            buId:input?.buId,
-            branchId:input?.branchId, 
-            startDate: { $lte: input?.bookingDate  },
-            endDate: { $gte: input?.bookingDate  },
+            buId: input?.buId,
+            branchId: input?.branchId,
+            startDate: { $lte: `${input?.bookingDate}T00:00:00.000Z` },
+            endDate: { $gte: `${input?.bookingDate}T23:59:00.000Z` },
             isActive: true,
-        }) 
-        console.log(input,absentees,'aaaaaa')
-          return { status: true, message:message.lblLeaveRegisterFetched , statusCode: httpStatusCode.OK,data:absentees   }  
+        }).populate('employeeId', 'firstName role');
+        const data = absentees?.map((req)=>{
+            if(req.startDate!= input?.bookingDate ) {
+                req.startTime='10:00:00'
+                req.endTime='17:00:00'}
+            return {
+                bookingType:'leave',
+                date:new Date(input?.bookingDate),
+                slotFrom:req.startTime,
+                slotTo:req.endTime,
+                staffName:req?.employeeId?.firstName,
+                role:req?.employeeId?.role,
+
+            }
+        })
+         
+          return { status: true, message:message.lblLeaveRegisterFetched , statusCode: httpStatusCode.OK,data:data   }  
     } catch (error) {
          return {status:false,message:'error'}
     }

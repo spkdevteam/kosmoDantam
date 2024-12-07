@@ -5,6 +5,8 @@ const appointmentSchema = require("../../client/model/appointments");
 const getserialNumber = require("../../model/services/getserialNumber");
 const { validateObjectId } = require("./validate.serialNumber");
 const { getDateWiseLeaVeDetails } = require("./leaveRegister.service");
+const timeSlots = require("../../utils/timeSlots");
+const { listEmployeeByRole } = require("./clientUser.service");
 
 
 exports.creatAppointment = async (input) => { 
@@ -66,32 +68,110 @@ exports.getDateWiseBookidDetails = async (input)=>{
         if ( ! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
         const db =await getClientDatabaseConnection(input?.clientId)
         const appointment =await db.model('appointment',appointmentSchema)
-        console.log(input,'---------------------------------',input?.bookingDate)
         const startOfDay = new Date(input?.bookingDate);
         startOfDay.setUTCHours(0, 0, 0, 0); // Set to the start of the day
         const endOfDay = new Date(input?.bookingDate);
         endOfDay.setUTCHours(23, 59, 59, 999); // Set to the end of the day
-
+        
         const bookingdetails = await appointment.find({
-             buId:input?.buId,
-             branchId:input?.branchId, 
-             isActive: true,
-             date:{ $gte: startOfDay, $lte: endOfDay }
+            buId:input?.buId,
+            branchId:input?.branchId, 
+            isActive: true,
+            date:{ $gte: startOfDay, $lte: endOfDay }
         })
-        return {status:true,message:'appointmentFetched' ,data:bookingdetails}
+        .populate('dutyDoctorId','firstName')
+        .populate('dentalAssistant','firstName')
+        .populate('patientId','firstName')
+        .populate('buId','name')
+        .populate('branchId','incorporationName')
+        .populate('chairId','chairNumber chairLocation')
+      
+        const bookings =  bookingdetails?.map((item)=>{
+             
+            return {
+                    _id:item?._id,
+                    bookingType: 'appointment',
+                    bookingId:item?.displayId,
+                    date: new Date(input?.bookingDate),
+                    slotFrom: item?.slotFrom,
+                    slotTo: item?.slotTo,
+                    cancelled:!item?.isActive,
+                    bUnit:{
+                        name:item?.buId?.name,
+                        _id:item?.buId?._id
+                    },
+                    branch:{
+                        name:item?.branchId?.incorporationName,
+                        _id:item?.branchId?._id
+                    },
+                    doctor:{ 
+                        name: item?.dutyDoctorId.firstName,
+                        _id: item?.dutyDoctorId._id
+                    },
+                    dentalAssistant:{
+                        name:item?.dentalAssistant.firstName,
+                        _id: item?.dentalAssistant._id
+                    },
+                    patient:{
+                        name:item?.patientId.firstName,
+                        _id: item?.patientId._id
+                    },
+                    chair:{
+                        _id:item?.chairId?._id,
+                        location:item?.chairId?.chairLocation,
+                        number:item?.chairId?.chairNumber,
+                    }
+                     
+                    
+                  
+            }
+        })
+        return {status:true,message:'appointmentFetched' ,data:bookings}
     } catch (error) {
         return {status:false,message:'appointment Fetch failed ' }
     }
 }
 
-exports.getBookingChart = async (input)=>{
+exports.getBookingChart = async (input) => {
     try {
-        console.log(input)
-        const absentees = await getDateWiseLeaVeDetails(input);
-        const booking = await this.getDateWiseBookidDetails(input)
-        console.log(absentees,booking,'absentees')
-        return absentees
+        console.log(input);
+        input.roleId = 3;
+        const absentees = await getDateWiseLeaVeDetails(input); // Note: Fix the typo in function name if needed
+        const booking = await this.getDateWiseBookidDetails(input); // Assuming this function exists
+        const daystatus = [...absentees?.data, ...booking?.data];
+        const doctors = await listEmployeeByRole(input); 
+
+        let data = [];
+
+        for (let i = 0; i <= timeSlots?.length; i++) {
+            if (!data[i]) data[i] = [];
+            for (let j = 0; j <= doctors?.length; j++) {
+                if(i==0 && j!=0 ) {
+                    data[i][j] = doctors[j-1]?.lastName 
+                    continue 
+                } 
+                if(j==0 && i!= 0){
+                    data[i][j] = timeSlots[i-1] 
+                    continue 
+                }
+                doc_And_Time =  {...doctors[j-1],...timeSlots[i-1]} 
+                const record = daystatus.filter((record) => {
+                    return (
+                        doc_And_Time.end > record.slotFrom && //doc_And_Time.end <record.slotTo &&
+                        doc_And_Time.start < record.slotTo && //doc_And_Time.start > record.slotFrom &&
+                        doc_And_Time?._doc?.firstName === record?.doctor?.name // Adjusted doctor name key
+                    );
+                });
+                data[i][j] = record||null
+            }
+        }
+         console.table(data);
+//        console.log('---------++++----',data,'-----------+++------')
+        return { absentees, booking, data }; // Return combined result if needed
     } catch (error) {
-        
+        console.error('Error in getBookingChart:', error);
+        throw error; // Rethrow if needed for further handling
     }
-}
+};
+
+

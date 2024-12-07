@@ -16,7 +16,6 @@ const leaveRegisterSchema = require("../../client/model/leaveRegister");
 
 exports.validateObjectId = async ({clientid='',objectId='',collectionName=''})=>{
     try {
-        console.log(clientid,objectId,collectionName,'clientid,objectId,collectionName') 
         const db = await getClientDatabaseConnection(clientid)
         const appointments = await db.model('appointment',appointmentSchema)
         const cheifComplaint = await db.model('CheifComplaint', cheifComplaintSchema)
