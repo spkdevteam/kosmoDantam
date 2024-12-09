@@ -5,25 +5,25 @@ let router = express.Router();
 
 const auth = require("../../middleware/authorization/chairAuthorization/chairAuthorization")
 
-const businessUnitEmployeeContrller = require("../controller/employee.controller");
+const employeeContrller = require("../controller/employee.controller");
 
 const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization")
 
 
-// # create, update, view, list, activate/inactive Employee by business unit routes starts here
+// # create, update, view, list, activate/inactive Employee routes starts here
 
-router.post('/createEmployee', entityAuth.authorizeEntity("administration", "Employee", "create"), businessUnitEmployeeContrller.createEmployeeByBusinessUnit);
+router.post('/createEmployee', entityAuth.authorizeEntity("administration", "Employee", "create"), employeeContrller.createEmployee);
 
-router.put('/updateEmployee', entityAuth.authorizeEntity("administration", "Employee", "update"), businessUnitEmployeeContrller.updateEmployeeByBusinessUnit);
+router.put('/updateEmployee', entityAuth.authorizeEntity("administration", "Employee", "update"), employeeContrller.updateEmployee);
 
-router.get('/getEmployee/:clientId/:employeeId', entityAuth.authorizeEntity("administration", "Employee", "view"), businessUnitEmployeeContrller.getParticularEmployeeByBusinessUnit);
+router.get('/getEmployee/:clientId/:employeeId', entityAuth.authorizeEntity("administration", "Employee", "view"), employeeContrller.getParticularEmployee);
 
-router.get('/listEmployee', entityAuth.authorizeEntity("administration", "Employee", "list"), businessUnitEmployeeContrller.listEmployee);
+router.get('/listEmployee', entityAuth.authorizeEntity("administration", "Employee", "list"), employeeContrller.listEmployee);
 
-router.post("/activeInactiveEmployee", entityAuth.authorizeEntity("administration", "Employee", "activeActive"), businessUnitEmployeeContrller.activeinactiveEmployeeByBusinessUnit);
+router.post("/activeInactiveEmployee", entityAuth.authorizeEntity("administration", "Employee", "activeActive"), employeeContrller.activeinactiveEmployee);
 
 
-// # create, update, view, list, activate/inactive Employee by business unit routes ends here
+// # create, update, view, list, activate/inactive Employee routes ends here
 
 
 

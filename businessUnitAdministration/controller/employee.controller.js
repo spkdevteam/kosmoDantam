@@ -20,8 +20,8 @@ const employeeService = require("../../client/service/employee.service");
 const getserialNumber = require("../../model/services/getserialNumber");
 const CustomError = require("../../utils/customeError");
 
-// create Employee by business unit
-exports.createEmployeeByBusinessUnit = async (req, res, next) => {
+// create Employee 
+exports.createEmployee = async (req, res, next) => {
 
     try {
         // Destructure fields from request body
@@ -138,8 +138,8 @@ exports.createEmployeeByBusinessUnit = async (req, res, next) => {
     }
 };
 
-// update employee by business unit
-exports.updateEmployeeByBusinessUnit = async (req, res, next) => {
+// update employee 
+exports.updateEmployee = async (req, res, next) => {
 
     try {
         // Destructure fields from request body
@@ -223,8 +223,8 @@ exports.updateEmployeeByBusinessUnit = async (req, res, next) => {
     }
 };
 
-// get particular employee by business unit
-exports.getParticularEmployeeByBusinessUnit = async (req, res, next) => {
+// get particular employee 
+exports.getParticularEmployee = async (req, res, next) => {
     try {
         const { clientId, employeeId } = req.params; // Extract clientId and branchId from request params
 
@@ -247,7 +247,7 @@ exports.getParticularEmployeeByBusinessUnit = async (req, res, next) => {
     }
 };
 
-// list employee by business unit
+// list employee 
 exports.listEmployee = async (req, res, next) => {
     try {
         const { clientId, keyword = '', page = 1, perPage = 10, roleId = 4 } = req.query;
@@ -283,8 +283,8 @@ exports.listEmployee = async (req, res, next) => {
     }
 };
 
-// active inactive employee by business unit
-exports.activeinactiveEmployeeByBusinessUnit = async (req, res, next) => {
+// active inactive employee 
+exports.activeinactiveEmployee = async (req, res, next) => {
     try {
         const { status, employeeId, clientId, roleId, keyword, page, perPage } = req.body;
 

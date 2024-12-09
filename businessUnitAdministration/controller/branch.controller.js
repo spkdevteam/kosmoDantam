@@ -16,8 +16,9 @@ const clinetBusinessUnitSchema = require("../../client/model/businessUnit")
 exports.createBranchByBusinessUnit = async (req, res) => {
     try {
         // Destructure fields from request body
-        const { clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnitId, branchHeadId  } = req.body;
+        const { clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit, branchHeadId  } = req.body;
 
+        
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
@@ -44,7 +45,7 @@ exports.createBranchByBusinessUnit = async (req, res) => {
         const newBranch = await Branch.create(
             [
                 {
-                    clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit : businessUnitId, branchHead : branchHeadId
+                    clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit : businessUnit, branchHead : branchHeadId
                 },
             ],
         );
