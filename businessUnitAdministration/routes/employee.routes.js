@@ -22,6 +22,7 @@ router.get('/listEmployee', entityAuth.authorizeEntity("administration", "Employ
 
 router.post("/activeInactiveEmployee", entityAuth.authorizeEntity("administration", "Employee", "activeActive"), employeeContrller.activeinactiveEmployee);
 
+router.post("/softDeleteEmployee", entityAuth.authorizeEntity("administration", "Employee", "softDelete"), employeeContrller.softDeleteEmployee);
 
 // # create, update, view, list, activate/inactive Employee routes ends here
 

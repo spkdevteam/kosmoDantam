@@ -19,14 +19,17 @@ const MasterUser = require("../../model/user")
 const employeeService = require("../../client/service/employee.service");
 const getserialNumber = require("../../model/services/getserialNumber");
 const CustomError = require("../../utils/customeError");
+const clinetUserSchema = require("../../client/model/user");
 
 // create Employee 
 exports.createEmployee = async (req, res, next) => {
 
     try {
         // Destructure fields from request body
-        const { clientId, branchId, roleId, businessUnit, firstName, lastName, email, phone, gender, city, state, country, ZipCode, address, panNumber, adharNumber, emergencyPhone, bloodGroup, password } = req.body;
+        const { clientId, branchId, roleId, businessUnit, firstName, lastName, email, phone, gender, city, state, country, ZipCode, address, panNumber, aadharNumber, emergencyPhone, bloodGroup, password } = req.body;
         const mainUser = req.user;
+        console.log("req.body",req.body);
+        
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
@@ -67,7 +70,7 @@ exports.createEmployee = async (req, res, next) => {
             displayId : displayId,
             firstName,
             lastName,
-            email,gender, city, state, country, ZipCode, address, panNumber, adharNumber, emergencyPhone, bloodGroup,
+            email,gender, city, state, country, ZipCode, address, panNumber, adharNumber : aadharNumber, emergencyPhone, bloodGroup,
             phone,   password: hashedPassword,
             branch: branchId,
             role: roleId,
@@ -143,7 +146,7 @@ exports.updateEmployee = async (req, res, next) => {
 
     try {
         // Destructure fields from request body
-        const { clientId, branchId, roleId, businessUnit, employeeId, firstName, lastName, email, phone, gender, city, state, country, ZipCode, address, panNumber, adharNumber, emergencyPhone, bloodGroup, password } = req.body;
+        const { clientId, branchId, roleId, businessUnit, employeeId, firstName, lastName, email, phone, gender, city, state, country, ZipCode, address, panNumber, aadharNumber, emergencyPhone, bloodGroup, password } = req.body;
 
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
@@ -189,7 +192,7 @@ exports.updateEmployee = async (req, res, next) => {
             firstName,
             lastName,
             email,
-            phone, gender, city, state, country, ZipCode, address, panNumber, adharNumber, emergencyPhone, bloodGroup,
+            phone, gender, city, state, country, ZipCode, address, panNumber, adharNumber : aadharNumber, emergencyPhone, bloodGroup,
             branch: branchId,
             role: roleId,
             businessUnit: businessUnit,
@@ -260,13 +263,22 @@ exports.listEmployee = async (req, res, next) => {
 
         const filters = {
             deletedAt: null,
-            roleId: roleId,
+            roleId: { $gt: 2, $ne: 17 },
             ...(keyword && {
                 $or: [
                     { firstName: { $regex: keyword.trim(), $options: "i" } },
                     { lastName: { $regex: keyword.trim(), $options: "i" } },
                     { email: { $regex: keyword.trim(), $options: "i" } },
                     { phone: { $regex: keyword.trim(), $options: "i" } },
+                    {
+                        $expr: {
+                            $regexMatch: {
+                                input: { $concat: ["$firstName", " ", "$lastName"] }, // Combine firstName and lastName
+                                regex: keyword.trim(),
+                                options: "i",
+                            },
+                        },
+                    },
                 ],
             }),
         };
@@ -309,6 +321,40 @@ exports.activeinactiveEmployee = async (req, res, next) => {
 
     } catch (error) {
         next(error);
+    }
+};
+
+
+// soft delete employee
+exports.softDeleteEmployee = async (req, res) => {
+    try {
+        const { keyword, page, perPage, employeeId, clientId } = req.body;
+        req.query.keyword = keyword;
+        req.query.page = page;
+        req.query.perPage = perPage;
+        req.query.clientId = clientId;
+        if (!clientId || !employeeId) {
+            return res.status(400).send({
+                message: message.lblEmployeeIdIdAndClientIdRequired,
+            });
+        }
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const User = clientConnection.model('clientUsers', clinetUserSchema);
+        const employee = await User.findById(employeeId)
+        if (!employee) {
+            return res.status(statusCode.ExpectationFailed).send({
+                message: message.lblUserNotFound,
+            });
+        }
+        employee.deletedAt = new Date();
+        await employee.save()
+        this.listEmployee(req, res);
+    } catch (error) {
+        console.error("Error in softDelete employee:", error);
+        return res.status(statusCode.InternalServerError).send({
+            message: message.lblInternalServerError,
+            error: error.message,
+        });
     }
 };
 

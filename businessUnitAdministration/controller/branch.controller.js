@@ -7,7 +7,8 @@ const message = require("../../utils/message");
 
 const { getClientDatabaseConnection } = require("../../db/connection");
 const clinetBranchSchema = require("../../client/model/branch");
-const clinetBusinessUnitSchema = require("../../client/model/businessUnit")
+const clinetBusinessUnitSchema = require("../../client/model/businessUnit");
+const getserialNumber = require("../../model/services/getserialNumber");
 
 
 
@@ -15,22 +16,17 @@ const clinetBusinessUnitSchema = require("../../client/model/businessUnit")
 // create branch by business unit
 exports.createBranchByBusinessUnit = async (req, res) => {
     try {
-        // Destructure fields from request body
         const { clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit, branchHeadId } = req.body;
-
-
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
             });
         }
-        // Check if required fields are missing
         if (!name || !incorporationName || !emailContact || !contactNumber) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
-
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
         const existingBranch = await Branch.findOne({
@@ -41,20 +37,18 @@ exports.createBranchByBusinessUnit = async (req, res) => {
                 message: message.lblBranchAlreadyExists,
             });
         }
-        // Create new brnanch 
+        const displayId = await getserialNumber('branch', clientId, "", businessUnit);
         const newBranch = await Branch.create(
             [
                 {
-                    clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId
+                    displayId: displayId, clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId
                 },
             ],
         );
-
         return res.status(statusCode.OK).send({
             message: message.lblBranchCreatedSuccess,
             data: { branchId: newBranch[0]._id, emailContact: newBranch[0].emailContact },
         });
-
     } catch (error) {
         console.error("Error in createBranch:", error);
         return res.status(statusCode.InternalServerError).send({

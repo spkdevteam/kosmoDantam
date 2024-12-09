@@ -235,9 +235,10 @@ exports.getRolesList = async (req, res) => {
             return roles.filter(role => role.id !== 1 && role.id !== 2);
         };
         const rolesList = filterRoles(roles, roleIdOfCurrentUser);
+        const pataintentExcluded = rolesList?.filter((item) => item?.name !== "patienit");
         return res.json({
             message: 'List of all roles!',
-            listOfRoles: rolesList,
+            listOfRoles: pataintentExcluded,
         });
     } catch (error) {
         return res.status(statusCode.InternalServerError).send({
