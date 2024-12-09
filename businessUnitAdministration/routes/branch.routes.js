@@ -28,6 +28,7 @@ router.post("/softDeleteBranch", entityAuth.authorizeEntity("administration", "B
 
 router.post("/restoreBranch", entityAuth.authorizeEntity("administration", "Branch", "hardDelete"), businessUnitBranchContrller.restoreBranchByBusinessUnit);
 
+router.get('/getAllActiveBranch', entityAuth.authorizeEntity("administration", "Branch", "list"), businessUnitBranchContrller.getAllActiveBranch)
 
 
 // # create, update, view, list, activate/inactive, delete Branch by business unit routes ends here

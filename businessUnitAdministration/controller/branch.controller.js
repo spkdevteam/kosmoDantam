@@ -16,9 +16,9 @@ const clinetBusinessUnitSchema = require("../../client/model/businessUnit")
 exports.createBranchByBusinessUnit = async (req, res) => {
     try {
         // Destructure fields from request body
-        const { clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit, branchHeadId  } = req.body;
+        const { clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit, branchHeadId } = req.body;
 
-        
+
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
@@ -45,7 +45,7 @@ exports.createBranchByBusinessUnit = async (req, res) => {
         const newBranch = await Branch.create(
             [
                 {
-                    clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit : businessUnit, branchHead : branchHeadId
+                    clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId
                 },
             ],
         );
@@ -59,7 +59,7 @@ exports.createBranchByBusinessUnit = async (req, res) => {
         console.error("Error in createBranch:", error);
         return res.status(statusCode.InternalServerError).send({
             message: message.lblInternalServerError,
-            error: error.message,  
+            error: error.message,
         });
     }
 };
@@ -166,11 +166,11 @@ exports.getParticularBranchByBusinessUnit = async (req, res) => {
 
         // Fetch the branch by ID
         const branch = await Branch.findById(branchId)
-        .populate({
-            path: 'businessUnit',
-            model: BusinessUnit,
-            select: 'name emailContact city state', // Specify fields to return from businessUnit
-        });
+            .populate({
+                path: 'businessUnit',
+                model: BusinessUnit,
+                select: 'name emailContact city state', // Specify fields to return from businessUnit
+            });
 
 
         if (!branch) {
@@ -410,6 +410,38 @@ exports.restoreBranchByBusinessUnit = async (req, res) => {
         session.endSession();
 
         console.error("Error in restoreBusinessUnit:", error);
+        return res.status(statusCode.InternalServerError).send({
+            message: message.lblInternalServerError,
+            error: error.message,
+        });
+    }
+};
+
+// get all active branch
+exports.getAllActiveBranch = async (req, res) => {
+    try {
+
+        const clientId = req.query.clientId;
+        let whereCondition = {
+            deletedAt: null,
+            isActive: true,
+        };
+        if (!clientId) {
+            return res.status(400).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const [branches] = await Promise.all([
+            Branch.find(whereCondition).sort({ _id: 'desc' }),
+        ]);
+        return res.json({
+            message: 'List of all Branches!',
+            listOfBranches: branches,
+        });
+    } catch (error) {
+        console.error("Error in list Branches:", error);
         return res.status(statusCode.InternalServerError).send({
             message: message.lblInternalServerError,
             error: error.message,

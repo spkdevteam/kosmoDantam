@@ -67,7 +67,7 @@ exports.createEmployee = async (req, res, next) => {
             displayId : displayId,
             firstName,
             lastName,
-            email,
+            email,gender, city, state, country, ZipCode, address, panNumber, adharNumber, emergencyPhone, bloodGroup,
             phone,   password: hashedPassword,
             branch: branchId,
             role: roleId,
