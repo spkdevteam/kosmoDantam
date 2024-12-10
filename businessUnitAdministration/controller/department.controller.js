@@ -1,19 +1,23 @@
+const httpStatusCode = require("../../utils/http-status-code")
 const message = require("../../utils/message")
 const sanitizeBody = require("../../utils/sanitizeBody")
-const { 
-    createDepartment, 
+const {
+    createDepartment,
     deleteDepartment,
     getallDepartments,
-    toggleDepartment, 
-    editDepartment, 
+    toggleDepartment,
+    editDepartment,
     revokeDeleteDepartment,
-    allDepartmentsByPage
+    allDepartmentsByPage,
+    list,
+    activeInactive,
+    deleteDept
 } = require("../services/department.service")
 
 
-exports.createDepartment =async (req, res,next) => {
+exports.createDepartment = async (req, res, next) => {
     try {
-        const data =await sanitizeBody(req.body)
+        const data = await sanitizeBody(req.body)
         const result = await createDepartment(data)
         res.status(result.statusCode || 200).json(result)
     } catch (error) {
@@ -21,7 +25,7 @@ exports.createDepartment =async (req, res,next) => {
     }
 }
 
-exports.deleteDepartment = async (req,res,next)=>{
+exports.deleteDepartment = async (req, res, next) => {
     try {
         const data = await sanitizeBody(req.query)
         console.log(req.query, data)
@@ -34,66 +38,148 @@ exports.deleteDepartment = async (req,res,next)=>{
 
 
 
-exports.editDepartment =async (req, res,next) => {
-    try {
-        const data =await sanitizeBody(req.body)
-        if(!data.deptId) res.json({status:false,message:message.lblCredentialMissing})
-            const result = await editDepartment(data)
-        res.status(result.statusCode || 200).json(result)
-    } catch (error) {
-        next(error);
-    }
-}
-
-exports.getAllActiveDepartment = async (req,res,next)=>{
-    
-    try {
-        const data = await sanitizeBody(req.query)
-        const  result  = await getallDepartments(data)
-        res.status(result.statusCode || 200).json(result)
-    } catch (error) {
-        next(error);
-    }
-} 
-
-exports.toggleDepartments = async (req,res,next)=>{
-try {
-    const data = await sanitizeBody(req.body)
-    const  result  = await toggleDepartment(data)
-    res.status(result?.statusCode || 200).json(result)
-} catch (error) {
-    next(error);
-}
-}
-
-exports.revokeDepartment = async (req,res,next)=>{
+exports.editDepartment = async (req, res, next) => {
     try {
         const data = await sanitizeBody(req.body)
-        const  result  = await revokeDeleteDepartment(data)
+        if (!data.deptId) res.json({ status: false, message: message.lblCredentialMissing })
+        const result = await editDepartment(data)
         res.status(result.statusCode || 200).json(result)
     } catch (error) {
         next(error);
     }
+}
+
+exports.getAllActiveDepartment = async (req, res, next) => {
+
+    try {
+        const data = await sanitizeBody(req.query)
+        const result = await getallDepartments(data)
+        res.status(result.statusCode || 200).json(result)
+    } catch (error) {
+        next(error);
     }
-    exports.getallDepartmentsByPage = async (req,res,next)=>{
-    
-        try {
-            const data = await sanitizeBody(req.query)
-            const  result  = await allDepartmentsByPage(data)
-            res.status(result.statusCode || 200).json(result)
-        } catch (error) {
-            next(error);
+}
+
+exports.toggleDepartments = async (req, res, next) => {
+    try {
+        const data = await sanitizeBody(req.body)
+        const result = await toggleDepartment(data)
+        res.status(result?.statusCode || 200).json(result)
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.revokeDepartment = async (req, res, next) => {
+    try {
+        const data = await sanitizeBody(req.body)
+        const result = await revokeDeleteDepartment(data)
+        res.status(result.statusCode || 200).json(result)
+    } catch (error) {
+        next(error);
+    }
+}
+exports.getallDepartmentsByPage = async (req, res, next) => {
+
+    try {
+        const data = await sanitizeBody(req.query)
+        const result = await allDepartmentsByPage(data)
+        res.status(result.statusCode || 200).json(result)
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.putToggleDepartmentsWithPage = async (req, res, next) => {
+    try {
+        const data = await sanitizeBody(req.body)
+        const result = await toggleDepartment(data)
+        const fetchResult = await allDepartmentsByPage(data)
+        fetchResult.message = result.message
+        res.status(fetchResult?.statusCode || 200).json(fetchResult)
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+exports.listDepartment = async (req, res, next) => {
+    try {
+        const { clientId, keyword = '', page = 1, perPage = 10 } = req.query;
+        if (!clientId) {
+            return res.status(httpStatusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
         }
-    } 
-    
-    exports.putToggleDepartmentsWithPage = async (req,res,next)=>{
-        try {
-            const data = await sanitizeBody(req.body)
-            const  result  = await toggleDepartment(data)
-            const  fetchResult  = await allDepartmentsByPage(data)
-            fetchResult.message = result.message
-            res.status(fetchResult?.statusCode || 200).json(fetchResult)
-        } catch (error) {
-            next(error);
+        const filters = {
+            deletedAt: null,
+            ...(keyword && {
+                $or: [
+                    { deptName: { $regex: keyword.trim(), $options: "i" } },
+                    { description: { $regex: keyword.trim(), $options: "i" } },
+                ],
+            }),
+        };
+        const result = await list(clientId, filters, { page, limit: perPage });
+        return res.status(httpStatusCode.OK).send({
+            message: message.lblDepartFound,
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+exports.activeinactiveDepartment = async (req, res, next) => {
+    try {
+        const { status, departmentId, clientId } = req.body;
+        if (!clientId || !departmentId) {
+            return res.status(400).send({
+                message: message.lblRequiredFieldMissing,
+            });
         }
+        const updated = await activeInactive(clientId, departmentId, {
+            isActive: status === "1",
+        });
+        return res.status(httpStatusCode.OK).send({
+            message: message.lblDpartmentModified,
+            data: updated,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+exports.softDeleteDepartment = async (req, res, next) => {
+
+    try {
+
+        const { keyword, page, perPage, departmentId, clientId } = req.body;
+
+        console.log("clientId",req.body);
+        
+
+        req.query.keyword = keyword;
+        req.query.page = page;
+        req.query.perPage = perPage;
+        req.query.clientId = clientId;
+
+
+        // Validate inputs
+        if (!clientId || !departmentId) {
+            return res.status(400).send({
+                message: message.lblRequiredFieldMissing,
+            });
         }
+
+        await deleteDept(clientId, departmentId, softDelete = true)
+
+        this.listDepartment(req, res, next);
+
+
+    } catch (error) {
+        next(error);
+    }
+};

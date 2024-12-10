@@ -109,6 +109,7 @@ module.exports = {
   lblDepartmentDeleted: "Department deleted successfully ",
   lbldepartmentNotFound: "department not found ",
   lblDepartmentRestored: "Department restored",
+  lblDepartFound: "Department found successfully",
   //service 
   lblServiceExist: "Service alredy exist in the same name ",
   lblServiceCreated: "New service created ",

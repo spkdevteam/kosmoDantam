@@ -16,13 +16,13 @@ const getserialNumber = require("../../model/services/getserialNumber");
 // create branch by business unit
 exports.createBranchByBusinessUnit = async (req, res) => {
     try {
-        const { clientId,branchPrefix, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit, branchHeadId } = req.body;
+        const { clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit, branchHeadId } = req.body;
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
             });
         }
-        if (!name || !incorporationName || !emailContact || !contactNumber || branchPrefix) {
+        if (!name || !incorporationName || !emailContact || !contactNumber ) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
@@ -37,17 +37,17 @@ exports.createBranchByBusinessUnit = async (req, res) => {
                 message: message.lblBranchAlreadyExists,
             });
         }
-        const prefixExist = await Branch.findOne({branchPrefix});
-        if (prefixExist) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblBranchprefixConflict,
-            });
-        }
+        // const prefixExist = await Branch.findOne({branchPrefix});
+        // if (prefixExist) {
+        //     return res.status(statusCode.BadRequest).send({
+        //         message: message.lblBranchprefixConflict,
+        //     });
+        // }
         const displayId = await getserialNumber('branch', clientId, "", businessUnit);
         const newBranch = await Branch.create(
             [
                 {
-                    displayId: displayId, branchPrefix,clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId
+                    displayId: displayId,clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId
                 },
             ],
         );
@@ -69,8 +69,8 @@ exports.updateBranchByBusinessUnit = async (req, res) => {
 
     try {
         // Destructure fields from request body
-        const { branchId,branchPrefix, clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber } = req.body;
-camera
+        const { branchId, clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber } = req.body;
+
         // Check if branchId and clientId are provided
         if (!branchId || !clientId) {
             return res.status(statusCode.BadRequest).send({
@@ -109,12 +109,12 @@ camera
                 },
             ],
         });
-        const prefixExist = await Branch.findOne({branchPrefix:branchPrefix,_id: { $ne: branchId }});
-        if (prefixExist) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblBranchprefixConflict,
-            });
-        }
+        // const prefixExist = await Branch.findOne({branchPrefix:branchPrefix,_id: { $ne: branchId }});
+        // if (prefixExist) {
+        //     return res.status(statusCode.BadRequest).send({
+        //         message: message.lblBranchprefixConflict,
+        //     });
+        // }
 
 
         if (existingBranch) {
@@ -135,7 +135,7 @@ camera
         branch.incorporationName = incorporationName;
         branch.cinNumber = cinNumber;
         branch.gstNumber = gstNumber;
-        branchPrefix ? branch.branchPrefix = branchPrefix:'';
+        // branchPrefix ? branch.branchPrefix = branchPrefix:'';
 
         // Save the updated branch
         await branch.save();
