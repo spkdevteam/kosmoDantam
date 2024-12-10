@@ -5,7 +5,7 @@ const serviceSchema = new mongoose.Schema({
     departmentId: {type: mongoose.Schema.ObjectId,ref:'department',  required: true  },
     procedures: { type: [String], default: [] },  
     serviceName: { type: String, unique: true, required: true },
-    branchId :  { type: mongoose.Schema.ObjectId,ref:'branch',required:true },
+    branchId :  { type: mongoose.Schema.ObjectId,ref:'branch' },
     description: { type: String },
     buId:{ type: mongoose.Schema.ObjectId, ref: "businessUnit", default:null, index: true  },
     price:{ type: Number,default:0.00 },
