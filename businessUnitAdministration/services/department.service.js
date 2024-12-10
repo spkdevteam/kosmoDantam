@@ -197,4 +197,70 @@ const allDepartmentsByPage = async (input) => {
         return { status: false, message: error.message }
     }
 }
-module.exports = { allDepartmentsByPage,createDepartment, deleteDepartment, getallDepartments, toggleDepartment, editDepartment, revokeDeleteDepartment }
+
+
+const list = async (clientId, filters = {}, options = { page: 1, limit: 10 }) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Department = clientConnection.model('department', departmentSchema);
+
+        const { page, limit } = options;
+        const skip = (page - 1) * limit;
+
+        const [departments, total] = await Promise.all([
+            Department.find(filters).skip(skip).limit(limit).sort({ _id: -1 }),
+            Department.countDocuments(filters),
+        ]);
+
+        return { count: total, departments };
+
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error listing department: ${error.message}`);
+
+    }
+};
+
+
+const activeInactive = async (clientId, departmentId, updateData) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Department = clientConnection.model('department', departmentSchema);
+        const department = await Department.findById(departmentId);
+        if (!department) {
+            throw new CustomError(statusCode.NotFound, message.lbldepartmentNotFound);
+        }
+        Object.assign(department, updateData);
+        return await department.save();
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error active inactive department: ${error.message}`);
+    }
+};
+
+
+
+const deleteDept = async (clientId, chairId, softDelete = true) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Department = clientConnection.model('department', departmentSchema);
+
+        const department = await Department.findById(chairId);
+        if (!department) {
+            throw new CustomError(statusCode.NotFound, message.lbldepartmentNotFound);
+        }
+
+        if (softDelete) {
+            department.deletedAt = new Date();
+            await department.save();
+        } else {
+            await department.remove();
+        }
+
+        return department;
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error soft delete chair: ${error.message}`);
+    }
+};
+
+
+
+module.exports = {list,activeInactive,deleteDept, allDepartmentsByPage,createDepartment, deleteDepartment, getallDepartments, toggleDepartment, editDepartment, revokeDeleteDepartment }

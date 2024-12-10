@@ -4,6 +4,7 @@ const serviceSchema = require("../../client/model/service")
 const { getClientDatabaseConnection } = require("../../db/connection")
 
 const getserialNumber = require("../../model/services/getserialNumber")
+const CustomError = require("../../utils/customeError")
 const httpStatusCode = require("../../utils/http-status-code")
 const message = require("../../utils/message")
 const validateSerialnumber = require("../../utils/validateSerialNumber")
@@ -222,7 +223,7 @@ const readActiveServicesbyPage = async (input) => {
 
         if (data) {
             return {
-                status: true, statusCode: 200, message: message.lblSuccess, services: data }
+                status: true, statusCode: 200, message: message.lblSuccess, services: data, count : data.lenght }
         } else {
             return {
                 status: false, statusCode: 404, message: message.lblFailed, } 
@@ -231,6 +232,69 @@ const readActiveServicesbyPage = async (input) => {
         return {
             status: false, statusCode: 500, message: error.message, } }
 }
+
+
+
+const list = async (clientId, filters = {}, options = { page: 1, limit: 10 }) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Service = clientConnection.model('services', serviceSchema);
+        const { page, limit } = options;
+        const skip = (page - 1) * limit;
+
+        const [services, total] = await Promise.all([
+            Service.find(filters).skip(skip).limit(limit).sort({ _id: -1 }),
+            Service.countDocuments(filters),
+        ]);
+
+        return { count: total, services };
+
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error listing department: ${error.message}`);
+
+    }
+};
+
+
+const activeInactive = async (clientId, serviceId, updateData) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Service = clientConnection.model('services', serviceSchema);
+        const service = await Service.findById(serviceId);
+        if (!service) {
+            throw new CustomError(statusCode.NotFound, message.lblServicenotFound);
+        }
+        Object.assign(service, updateData);
+        return await service.save();
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error active inactive department: ${error.message}`);
+    }
+};
+
+
+
+const deleteServ = async (clientId, serviceId, softDelete = true) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Service = clientConnection.model('services', serviceSchema);
+        const service = await Service.findById(serviceId);
+        if (!service) {
+            throw new CustomError(httpStatusCode.NotFound, message.lblServicenotFound);
+        }
+        if (softDelete) {
+            service.deletedAt = new Date();
+            await service.save();
+        } else {
+            await service.remove();
+        }
+        return service;
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error soft delete chair: ${error.message}`);
+    }
+};
+
+
+
 module.exports = { 
     readActiveServicesbyPage,
     createService, 
@@ -238,5 +302,8 @@ module.exports = {
     readActiveServices, 
     toggleServiceStatus,
     editService,
-    serviceUnderDepartment  
+    serviceUnderDepartment ,
+    list,
+    activeInactive,
+    deleteServ
 }
