@@ -10,8 +10,7 @@ const statusCode = require("../../utils/http-status-code");
 const CustomError = require("../../utils/customeError");
 const { default: mongoose } = require("mongoose");
 
-
-const createCheifComplaints = async (clientId, data) => {
+const create = async (clientId, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
@@ -21,7 +20,7 @@ const createCheifComplaints = async (clientId, data) => {
     }
 };
 
-const updateCheifComplaints = async (clientId, caseSheetId, data) => {
+const update = async (clientId, caseSheetId, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
@@ -57,31 +56,6 @@ const deleteCheifComplaints = async (clientId, caseSheetId, cheifComplaintId) =>
     }
 };
 
-const createClinicalFinding = async (clientId, data) => {
-    try {
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        return await CaseSheet.create(data);
-    } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
-    }
-};
-
-const updateClinicalFinding = async (clientId, caseSheetId, data) => {
-    try {
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const existing = await CaseSheet.findById(caseSheetId);
-        if (!existing) {
-            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
-        }
-        Object.assign(existing, data);
-        return await existing.save();
-    } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
-    }
-};
-
 const deleteClinicalFinding = async (clientId, caseSheetId, clinicalFindingId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
@@ -99,32 +73,6 @@ const deleteClinicalFinding = async (clientId, caseSheetId, clinicalFindingId) =
         return  await existing.save();
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
-    }
-};
-
-
-const createMedicalHistory = async (clientId, data) => {
-    try {
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        return await CaseSheet.create(data);
-    } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
-    }
-};
-
-const updateMedicalHistory = async (clientId, caseSheetId, data) => {
-    try {
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const existing = await CaseSheet.findById(caseSheetId);
-        if (!existing) {
-            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
-        }
-        Object.assign(existing, data);
-        return await existing.save();
-    } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
     }
 };
 
@@ -148,32 +96,6 @@ const deleteMedicalHistory = async (clientId, caseSheetId, medicalHistoryId) => 
     }
 };
 
-
-const createInvestigation = async (clientId, data) => {
-    try {
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        return await CaseSheet.create(data);
-    } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
-    }
-};
-
-const updateInvestigation = async (clientId, caseSheetId, data) => {
-    try {
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const existing = await CaseSheet.findById(caseSheetId);
-        if (!existing) {
-            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
-        }
-        Object.assign(existing, data);
-        return await existing.save();
-    } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
-    }
-};
-
 const deleteInvestigation = async (clientId, caseSheetId, investigationId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
@@ -191,34 +113,6 @@ const deleteInvestigation = async (clientId, caseSheetId, investigationId) => {
         return  await existing.save();
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
-    }
-};
-
-
-
-
-const createOtherAttachment = async (clientId, data) => {
-    try {
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        return await CaseSheet.create(data);
-    } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
-    }
-};
-
-const updateOtherAttachment = async (clientId, caseSheetId, data) => {
-    try {
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const existing = await CaseSheet.findById(caseSheetId);
-        if (!existing) {
-            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
-        }
-        Object.assign(existing, data);
-        return await existing.save();
-    } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
     }
 };
 
@@ -242,34 +136,6 @@ const deleteOtherAttachment = async (clientId, caseSheetId, otherAttachmentId) =
     }
 };
 
-
-
-
-const createNote = async (clientId, data) => {
-    try {
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        return await CaseSheet.create(data);
-    } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
-    }
-};
-
-const updateNote = async (clientId, caseSheetId, data) => {
-    try {
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const existing = await CaseSheet.findById(caseSheetId);
-        if (!existing) {
-            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
-        }
-        Object.assign(existing, data);
-        return await existing.save();
-    } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
-    }
-};
-
 const deleteNote = async (clientId, caseSheetId, noteId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
@@ -290,19 +156,7 @@ const deleteNote = async (clientId, caseSheetId, noteId) => {
     }
 };
 
-
-
-const createServices = async (clientId, data) => {
-    try {
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        return await CaseSheet.create(data);
-    } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
-    }
-};
-
-const updateServices = async (clientId, caseSheetId, data) => {
+const deleteServices = async (clientId, caseSheetId, serviceId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
@@ -310,59 +164,102 @@ const updateServices = async (clientId, caseSheetId, data) => {
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
-        Object.assign(existing, data);
-        return await existing.save();
-    } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
-    }
-};
-
-const deleteServices = async (clientId, caseSheetId, cheifComplaintId) => {
-    try {
-        const clientConnection = await getClientDatabaseConnection(clientId);
-        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const existing = await CaseSheet.findById(caseSheetId);
-        if (!existing) {
-            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
-        }
-        const cheifComlaintArray = existing?.cheifComplaints;
-        const mongObjId = new mongoose.Types.ObjectId(cheifComplaintId);
-        const newCheifComplaint = cheifComlaintArray.filter((item) =>{
+        const array = existing?.services;
+        const mongObjId = new mongoose.Types.ObjectId(serviceId);
+        const newArray = array.filter((item) =>{
             return !item._id.equals(mongObjId)
         });
-        
-        existing.cheifComplaints = newCheifComplaint;
+        existing.services = newArray;
         return  await existing.save();
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
 };
 
+const deleteProcedure = async (clientId, caseSheetId, procedureId) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const existing = await CaseSheet.findById(caseSheetId);
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        const array = existing?.procedures;
+        const mongObjId = new mongoose.Types.ObjectId(procedureId);
+        const newArray = array.filter((item) =>{
+            return !item._id.equals(mongObjId)
+        });
+        existing.procedures = newArray;
+        return  await existing.save();
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
+    }
+};
 
+const list = async (clientId, filters = {}, options = { page: 1, limit: 10 }) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const { page, limit } = options;
+        const skip = (page - 1) * limit;
+        const [patients, total] = await Promise.all([
+            CaseSheet.find(filters).skip(skip).limit(limit).sort({ _id: -1 }),
+            CaseSheet.countDocuments(filters),
+        ]);
+        return { count: total, patients };
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
+    }
+};
 
+const getById = async (clientId, caseSheetId) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const caseSheet = await CaseSheet.findById(caseSheetId);
+        if (!caseSheet) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        return caseSheet;
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error getting case sheet: ${error.message}`);
+    }
+};
 
-
+const updateTreatmentProcedure = async (clientId, caseSheetId, procedureId) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const existing = await CaseSheet.findById(caseSheetId);
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        const newProcedureArray = existing?.procedures?.map((item) => {
+            if(item?._id == procedureId){
+                item.finished = true
+            }else{
+                return item
+            }
+        })
+        existing.procedures = newProcedureArray
+        return await existing.save();
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error in updating treatment procedure: ${error.message}`);
+    }
+};
 
 module.exports = {
-    createCheifComplaints,
-    updateCheifComplaints,
+    create,
+    update,
     deleteCheifComplaints,
-    createClinicalFinding,
-    updateClinicalFinding,
     deleteClinicalFinding,
-    createMedicalHistory,
-    updateMedicalHistory,
     deleteMedicalHistory,
-    createInvestigation,
-    updateInvestigation,
     deleteInvestigation,
-    createOtherAttachment,
-    updateOtherAttachment,
     deleteOtherAttachment,
-    createNote,
-    updateNote,
     deleteNote,
-    createServices,
-    updateServices,
-    deleteServices
+    deleteServices,
+    deleteProcedure,
+    list,
+    getById,
+    updateTreatmentProcedure
 };

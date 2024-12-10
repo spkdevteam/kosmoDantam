@@ -16,67 +16,62 @@ const clientRoleSchema = require("../../client/model/role");
 const RoleModel = require("../../model/role");
 const MasterUser = require("../../model/user")
 
-const employeeService = require("../../client/service/employee.service")
+const employeeService = require("../../client/service/employee.service");
+const getserialNumber = require("../../model/services/getserialNumber");
+const CustomError = require("../../utils/customeError");
+const clinetUserSchema = require("../../client/model/user");
 
-// create Employee by business unit
-exports.createEmployeeByBusinessUnit = async (req, res, next) => {
+// create Employee 
+exports.createEmployee = async (req, res, next) => {
 
     try {
-
         // Destructure fields from request body
-        const { clientId, branchId, roleId, businessUnit, firstName, lastName, email, phone, password } = req.body;
-
+        const { clientId, branchId, roleId, businessUnit, firstName, lastName, email, phone, gender, city, state, country, ZipCode, address, panNumber, aadharNumber, emergencyPhone, bloodGroup, password } = req.body;
         const mainUser = req.user;
-
+        console.log("req.body",req.body);
+        
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
             });
         }
-
         // Check if required fields are missing
-        if (!firstName || !lastName || !email || !phone || !password || !roleId) {
+        if (!firstName || !lastName || !email || !phone  || !password || !roleId ) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
-
         const clientConnection = await getClientDatabaseConnection(clientId);
-
         const Branch = clientConnection.model('branch', clinetBranchSchema);
         const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
         const Role = clientConnection.model('clientRoles', clientRoleSchema);
-
-        const branch = await Branch.findById(branchId);
-
-        if (!branch) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblBranchNotFound,
-            });
-        }
-
+        // const branch = await Branch.findById(branchId);
+        // if (!branch) {
+        //     return res.status(statusCode.BadRequest).send({
+        //         message: message.lblBranchNotFound,
+        //     });
+        // }
         const bu = await BusinessUnit.findById(businessUnit)
         if (!bu) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblBusinessUnitNotFound,
             });
         }
-
         const role = await Role.findById(roleId);
-
         if (!role) {
             throw new CustomError(statusCode.Conflict, message.lblRoleNotFound);
         }
-
         const hashedPassword = await bcrypt.hash(password, 10);
-
+        const displayId = await getserialNumber('employee', clientId, '', businessUnit);
+        console.log("displayId",displayId);
+        
         // create new employee with service
         const newEmployee = await employeeService.createEmployee(clientId, {
+            displayId : displayId,
             firstName,
             lastName,
-            email,
-            phone,
-            password: hashedPassword,
+            email,gender, city, state, country, ZipCode, address, panNumber, adharNumber : aadharNumber, emergencyPhone, bloodGroup,
+            phone,   password: hashedPassword,
             branch: branchId,
             role: roleId,
             roleId: role.id,
@@ -86,19 +81,12 @@ exports.createEmployeeByBusinessUnit = async (req, res, next) => {
             createdBy: mainUser._id,
 
         });
-
-
         // create employee in main database 
-
         const masterRole = await RoleModel.findOne({ id: 5 });
-
-
         const existingStaff = await MasterUser.findOne({
             $or: [{ email: email.toLowerCase() }, { phone }],
         });
-
         if (existingStaff) {
-
             const isAccessUnitAlreadyExists = existingStaff.accessUnit.find((item) => item.id == clientId);
 
             if (isAccessUnitAlreadyExists) {
@@ -153,12 +141,12 @@ exports.createEmployeeByBusinessUnit = async (req, res, next) => {
     }
 };
 
-// update employee by business unit
-exports.updateEmployeeByBusinessUnit = async (req, res, next) => {
+// update employee 
+exports.updateEmployee = async (req, res, next) => {
 
     try {
         // Destructure fields from request body
-        const { clientId, branchId, roleId, businessUnit, employeeId, firstName, lastName, email, phone, password } = req.body;
+        const { clientId, branchId, roleId, businessUnit, employeeId, firstName, lastName, email, phone, gender, city, state, country, ZipCode, address, panNumber, aadharNumber, emergencyPhone, bloodGroup, password } = req.body;
 
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
@@ -204,7 +192,7 @@ exports.updateEmployeeByBusinessUnit = async (req, res, next) => {
             firstName,
             lastName,
             email,
-            phone,
+            phone, gender, city, state, country, ZipCode, address, panNumber, adharNumber : aadharNumber, emergencyPhone, bloodGroup,
             branch: branchId,
             role: roleId,
             businessUnit: businessUnit,
@@ -238,8 +226,8 @@ exports.updateEmployeeByBusinessUnit = async (req, res, next) => {
     }
 };
 
-// get particular employee by business unit
-exports.getParticularEmployeeByBusinessUnit = async (req, res, next) => {
+// get particular employee 
+exports.getParticularEmployee = async (req, res, next) => {
     try {
         const { clientId, employeeId } = req.params; // Extract clientId and branchId from request params
 
@@ -262,10 +250,10 @@ exports.getParticularEmployeeByBusinessUnit = async (req, res, next) => {
     }
 };
 
-// list employee by business unit
+// list employee 
 exports.listEmployee = async (req, res, next) => {
     try {
-        const { clientId, keyword = '', page = 1, perPage = 10, roleId = 3 } = req.query;
+        const { clientId, keyword = '', page = 1, perPage = 10, roleId = 4 } = req.query;
 
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
@@ -275,13 +263,22 @@ exports.listEmployee = async (req, res, next) => {
 
         const filters = {
             deletedAt: null,
-            roleId: roleId,
+            roleId: { $gt: 2, $ne: 17 },
             ...(keyword && {
                 $or: [
                     { firstName: { $regex: keyword.trim(), $options: "i" } },
                     { lastName: { $regex: keyword.trim(), $options: "i" } },
                     { email: { $regex: keyword.trim(), $options: "i" } },
                     { phone: { $regex: keyword.trim(), $options: "i" } },
+                    {
+                        $expr: {
+                            $regexMatch: {
+                                input: { $concat: ["$firstName", " ", "$lastName"] }, // Combine firstName and lastName
+                                regex: keyword.trim(),
+                                options: "i",
+                            },
+                        },
+                    },
                 ],
             }),
         };
@@ -298,8 +295,8 @@ exports.listEmployee = async (req, res, next) => {
     }
 };
 
-// active inactive employee by business unit
-exports.activeinactiveEmployeeByBusinessUnit = async (req, res, next) => {
+// active inactive employee 
+exports.activeinactiveEmployee = async (req, res, next) => {
     try {
         const { status, employeeId, clientId, roleId, keyword, page, perPage } = req.body;
 
@@ -324,6 +321,40 @@ exports.activeinactiveEmployeeByBusinessUnit = async (req, res, next) => {
 
     } catch (error) {
         next(error);
+    }
+};
+
+
+// soft delete employee
+exports.softDeleteEmployee = async (req, res) => {
+    try {
+        const { keyword, page, perPage, employeeId, clientId } = req.body;
+        req.query.keyword = keyword;
+        req.query.page = page;
+        req.query.perPage = perPage;
+        req.query.clientId = clientId;
+        if (!clientId || !employeeId) {
+            return res.status(400).send({
+                message: message.lblEmployeeIdIdAndClientIdRequired,
+            });
+        }
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const User = clientConnection.model('clientUsers', clinetUserSchema);
+        const employee = await User.findById(employeeId)
+        if (!employee) {
+            return res.status(statusCode.ExpectationFailed).send({
+                message: message.lblUserNotFound,
+            });
+        }
+        employee.deletedAt = new Date();
+        await employee.save()
+        this.listEmployee(req, res);
+    } catch (error) {
+        console.error("Error in softDelete employee:", error);
+        return res.status(statusCode.InternalServerError).send({
+            message: message.lblInternalServerError,
+            error: error.message,
+        });
     }
 };
 

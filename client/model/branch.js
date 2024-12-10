@@ -7,7 +7,7 @@ const ObjectId = Schema.ObjectId;
 const clinetBranchSchema = new Schema(
     {
 
-
+        displayId : {type:String,unique:true},
         businessUnit: { type: ObjectId, ref: "businessUnit", default:null, index: true }, 
         branchHead: { type: ObjectId, ref: "clientUsers", default:null, index: true }, 
 

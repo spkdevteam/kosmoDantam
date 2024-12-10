@@ -6,59 +6,29 @@ const ObjectId = Schema.ObjectId;
 
 const clinetUserSchema = new Schema(
     {
+        displayId:{type:String,unique:true},
         role: { type: ObjectId, ref: "clientRoles", index: true }, // Index for role-based queries
-        branch: { type: ObjectId, ref: "branch", default:null, index: true },
-        businessUnit: { type: ObjectId, ref: "businessUnit", default:null, index: true }, 
-
+        branch: { type: ObjectId, ref: "branch", default: null, index: true },
+        businessUnit: { type: ObjectId, ref: "businessUnit", default: null, index: true },
         roleId: { type: Number },
-
         firstName: { type: String, required: true },
         lastName: { type: String },
-
-        email: {
-            type: String, unique: true, lowecase: true,
-            trim: true, sparse: true, index: true
-        },
+        email: { type: String, unique: true, lowecase: true, trim: true, sparse: true, index: true },
         phone: { type: String, unique: true, sparse: true, trim: true, index: true },
-
         password: { type: String, required: true },
         tc: { type: Boolean, required: true },
-
         isUserVerified: { type: Boolean, default: false },
-
         isActive: { type: Boolean, default: true },
-
         gender: {
             type: String,
             enum: ['Male', 'Female', 'Other', 'Prefer not to say'],
             default: 'Prefer not to say',
             trim: true,
         },
-
-        age: {
-            type: Number,
-            default: null
-        },
-
-        bloodGroup: {
-            type: String,
-            trim: true,
-            default: null
-        },
-
-        patientGroup: {
-            type: String,
-            trim: true,
-            default: null
-        },
-
-        referedBy: {
-            type: String,
-            trim: true,
-            default: null
-        },
-
-
+        age: { type: Number, default: null },
+        bloodGroup: { type: String, trim: true, default: null },
+        patientGroup: { type: String, trim: true, default: null },
+        referedBy: { type: String, trim: true, default: null },
         dateOfBirth: {
             type: Date,
             validate: {
@@ -68,7 +38,6 @@ const clinetUserSchema = new Schema(
                 message: 'Invalid Date of Birth.',
             },
         },
-
         optionalEmail: {
             type: String,
             lowercase: true,
@@ -81,7 +50,6 @@ const clinetUserSchema = new Schema(
                 message: 'Invalid email format.',
             },
         },
-
         emergencyPhone: {
             type: String,
             trim: true,
@@ -92,45 +60,21 @@ const clinetUserSchema = new Schema(
                 message: 'Invalid phone number format.',
             },
         },
-
-
-
-        city: {
-            type: String,
-            trim: true,
-        },
-
-        state: {
-            type: String,
-            trim: true,
-        },
-
-        country: {
-            type: String,
-            trim: true,
-        },
-
-        ZipCode: {
-            type: String,
-            trim: true,
-        },
-
-        address: {
-            type: String,
-            trim: true,
-        },
-
+        city: { type: String, trim: true, },
+        state: { type: String, trim: true, },
+        country: { type: String, trim: true, },
+        ZipCode: { type: String, trim: true, },
+        address: { type: String, trim: true, },
         profileImage: { type: String, default: null },
         profileCreated: { type: Boolean, default: false },
-
+        // corporate detail
+        panNumber: { type: String, default: null },
+        adharNumber: { type: String, default: null },
         verificationOtp: { type: String },
         otpGeneratedAt: { type: Date },
         OTP: { type: String },
-
-
         // handlign created by
         createdBy: { type: ObjectId, ref: "clientUsers", index: true }, // Index for admin/user relationships
-
         deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality
     },
 

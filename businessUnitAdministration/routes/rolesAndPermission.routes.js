@@ -5,23 +5,26 @@ let router = express.Router();
 
 
 
-const businessUnitHeadRolesAndPermissionContrller = require("../controller/rolesAndPermission.controller");
+const rolesAndPermissionContrller = require("../controller/rolesAndPermission.controller");
 
+const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization")
 
 
 // # create, update, view, list,  delete RolesAndPermission by business unit routes starts here
 
-router.post('/createRolesAndPermission', businessUnitHeadRolesAndPermissionContrller.createRolesAndPermissionByBusinessUnit);
+router.post('/createRolesAndPermission', entityAuth.authorizeEntity("administration", "Roles & Permissions", "create"), rolesAndPermissionContrller.createRolesAndPermissionByBusinessUnit);
 
-router.put('/updateRolesAndPermission', businessUnitHeadRolesAndPermissionContrller.updateRoleAndPermissionByBusinessUnit);
+router.put('/updateRolesAndPermission', entityAuth.authorizeEntity("administration", "Roles & Permissions", "update"), rolesAndPermissionContrller.updateRoleAndPermissionByBusinessUnit);
 
-router.get('/RolesAndPermission/:clientId/:roleId', businessUnitHeadRolesAndPermissionContrller.getParticularRoleAndPermissionByBusinessUnit);
+router.get('/rolesAndPermission/:clientId/:roleId', entityAuth.authorizeEntity("administration", "Roles & Permissions", "view"), rolesAndPermissionContrller.getParticularRoleAndPermissionByBusinessUnit);
 
-router.get('/listRolesAndPermission', businessUnitHeadRolesAndPermissionContrller.listRolesAndPermission);
+router.get('/listRolesAndPermission', entityAuth.authorizeEntity("administration", "Roles & Permissions", "view"), rolesAndPermissionContrller.listRolesAndPermission);
 
-router.post("/softDeleteRolesAndPermission", businessUnitHeadRolesAndPermissionContrller.softDeleteRolesAndPermissionByBusinesssUnit);
+router.post("/softDeleteRolesAndPermission", entityAuth.authorizeEntity("administration", "Roles & Permissions", "softDelete"), rolesAndPermissionContrller.softDeleteRolesAndPermissionByBusinesssUnit);
 
-router.post("/restoreRolesAndPermission", businessUnitHeadRolesAndPermissionContrller.restoreRoleAndPermissionByBusinessUnit);
+router.get('/getRolesList', entityAuth.authorizeEntity("administration", "Roles & Permissions", "view"), rolesAndPermissionContrller.getRolesList);
+
+// router.post("/restoreRolesAndPermission", entityAuth.authorizeEntity("administration", "Roles & Permissions", "delete"), rolesAndPermissionContrller.restoreRoleAndPermissionByBusinessUnit);
 
 
 // # create, update, view, list, delete RolesAndPermission by business unit routes ends here

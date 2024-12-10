@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { finished } = require('nodemailer/lib/xoauth2');
 
 const caseSheetSchema = new mongoose.Schema({
     displayId: { type: String, unique: true, required: true },
@@ -63,27 +64,28 @@ const caseSheetSchema = new mongoose.Schema({
         default: [],
     },
     services: {
-        serviceArray: {
-            type: [
-                {
-                    tooth: {
-                        type: [],
-                        default: [],
-                    },
-                    department: {
-                        deptId: { type: mongoose.Schema.ObjectId, ref: "department" }
-                    },
-                    service: {
-                        servId: { type: mongoose.Schema.ObjectId, ref: "services" }
-                    },
-                    rate: { type: Number, default: null },
-                    quaintity: { type: Number, default: null },
-                    subTotal: { type: Number, default: null },
-                }
-            ]
-        },
-        discount: { type: Number, default: null },
-        grantTotal: { type: Number, default: null },
+        type: [
+            {
+                tooth: {
+                    type: [],
+                    default: [],
+                },
+                department: {
+                    deptId: { type: mongoose.Schema.ObjectId, ref: "department" }
+                },
+                service: {
+                    servId: { type: mongoose.Schema.ObjectId, ref: "services" }
+                },
+                rate: { type: Number, default: null },
+                quaintity: { type: Number, default: null },
+                subTotal: { type: Number, default: null },
+                discount: { type: Number, default: null },
+                grantTotal: { type: Number, default: null },
+            }
+
+        ],
+        default: []
+
     },
     procedures: {
         type: [
@@ -97,8 +99,8 @@ const caseSheetSchema = new mongoose.Schema({
                     type: [
                         { procedId: { type: mongoose.Schema.ObjectId, ref: "procedure" } }
                     ]
-                }
-
+                },
+                finished: { type: Boolean, default: false }
             },
         ],
         default: [],
@@ -123,6 +125,15 @@ const caseSheetSchema = new mongoose.Schema({
     },
     isActive: { type: Boolean, default: true },
     deletedAt: { type: Date, default: null },
+    drafted: { type: Boolean, default: true },
+    status: {
+        type: String,
+        enum: ['In Progress', 'Cancelled', 'Completed'],
+        default: 'In Progress',
+        trim: true,
+    },
+
+
 });
 
 

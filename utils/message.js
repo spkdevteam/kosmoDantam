@@ -177,6 +177,20 @@ module.exports = {
   lblPatientNotFound: "Patient not found!",
   lblPatientFoundSucessfully: "Patient found successfully!",
   lblPatientIdRequired: "Patient Id is required!",
+  lblDoctorIdRequired: "Doctor Id is required!",
+  lblDoctorNotFound: "Doctor not found!",
+
+
+  // prescription
+  
+  // patient
+  lblPrescriptionAlreadyExists: "Prescription already exists with email or phone!",
+  lblPrescriptionCreatedSuccess: "Prescription created successfully!",
+  lblPrescriptionUpdatedSuccess: "Prescription updated successfully!",
+  lblPrescriptionIdIdAndClientIdRequired: "Prescription Id and Client Id are required!",
+  lblPrescriptionNotFound: "Prescription not found!",
+  lblPrescriptionFoundSucessfully: "Prescription found successfully!",
+  lblPrescriptionIdRequired: "Prescription Id is required!",
 
   
   // cheif complaints 
@@ -199,6 +213,17 @@ module.exports = {
   lblServicesIdRequired: "Services Id is required!",
   lblServicesNotFound: "Services not found!",
   lblServicesFoundSucessfully: "Services found successfully!",
+
+   // procedure 
+   lblProcedurehAlreadyExists: "Procedure already exists!",
+   lblProcedureCreatedSuccess: "Procedure created successfully!",
+   lblProcedureUpdatedSuccess: "Procedure updated successfully!",
+   lblProcedureDeletedSuccess: "Procedure deleted successfully!",
+   lblProcedureIdIdAndClientIdRequired: "Procedure Id and Client Id are required!",
+   lblProcedureIdRequired: "Procedure Id is required!",
+   lblProcedureNotFound: "Procedure not found!",
+   lblProcedureFoundSucessfully: "Procedure found successfully!",
+ 
 
   // clinical findings
   lblClinicalFindinghAlreadyExists: "ClinicalFinding already exists!",
@@ -268,6 +293,8 @@ module.exports = {
   lblCaseSheetIdIdAndClientIdRequired: "CaseSheet Id and Client Id are required!",
   lblCaseSheetNotFound: "CaseSheet not found!",
   lblCaseSheetFoundSucessfully: "CaseSheet found successfully!",
+  lblCaseSheetIdIdRequired: "CaseSheet Id is required!",
+
 
 
 

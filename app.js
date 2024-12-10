@@ -354,16 +354,16 @@ app.use("/api/superAdmin", superAdminRouter.router);
 app.use("/api/superAdmin/tooth", toothRouter); 
 app.use("/api/superAdmin/bu/", superAdminBuRouter.router);
 
-app.use("/api/clinet/auth/", clientAuthRouter.router);
-app.use("/api/clinet/staff/auth/", staffAuthRouter.router);
+app.use("/api/client/auth/", clientAuthRouter.router);
+app.use("/api/client/staff/auth/", staffAuthRouter.router);
 
-app.use("/api/clinet/bu/branch", clinetBranchRouter.router);
-app.use("/api/clinet/bu/chair", clinetChairhRouter.router);
+app.use("/api/client/bu/branch", clinetBranchRouter.router);
+app.use("/api/client/bu/chair", clinetChairhRouter.router);
 app.use("/api/client/bu/employee", clientEmployeeRouter.router);
-app.use("/api/clinet/branch/chair", clinetChairhRouter.router);
-app.use("/api/clinet/bu/role", clinetRoleRouter.router);
-app.use("/api/clinet/bu/patient", clientPatientRouter.router);
-app.use("/api/clinet/bu/caseSheet", clientCaseSheetRouter.router);
+app.use("/api/client/branch/chair", clinetChairhRouter.router);
+app.use("/api/client/bu/role", clinetRoleRouter.router);
+app.use("/api/client/bu/patient", clientPatientRouter.router);
+app.use("/api/client/bu/caseSheet", clientCaseSheetRouter.router);
 
 app.use("/api/client/bu/department", clientDepartment);
 app.use("/api/client/bu/services", clientservicesRouter);
