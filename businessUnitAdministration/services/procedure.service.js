@@ -188,6 +188,7 @@ const getAllProceduresByPage = async (input) => {
                 {displayId:{$regex:input?.keyWord,$options:'i'}}
             ]
         })
+        .populate('branchId','name')
         .skip((input.page-1) *  input.perPage )
         .limit(input.page * input.perPage)
         return { status: true, statusCode: 200, result: result, message: message.lblProcedureFetched }

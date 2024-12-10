@@ -354,7 +354,7 @@ app.use("/api/superAdmin", superAdminRouter.router);
 app.use("/api/superAdmin/tooth", toothRouter); 
 app.use("/api/superAdmin/bu/", superAdminBuRouter.router);
 
-app.use("/api/client/auth/", clientAuthRouter.router);
+app.use("/api/clinet/auth/", clientAuthRouter.router);
 app.use("/api/client/staff/auth/", staffAuthRouter.router);
 
 app.use("/api/client/bu/branch", clinetBranchRouter.router);

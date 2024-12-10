@@ -14,6 +14,7 @@ const {
 exports.createDepartment =async (req, res,next) => {
     try {
         const data =await sanitizeBody(req.body)
+        console.log('data')
         const result = await createDepartment(data)
         res.status(result.statusCode || 200).json(result)
     } catch (error) {
@@ -78,6 +79,7 @@ exports.revokeDepartment = async (req,res,next)=>{
     exports.getallDepartmentsByPage = async (req,res,next)=>{
     
         try {
+            
             const data = await sanitizeBody(req.query)
             const  result  = await allDepartmentsByPage(data)
             res.status(result.statusCode || 200).json(result)

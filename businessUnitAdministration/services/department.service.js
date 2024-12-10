@@ -171,7 +171,7 @@ const toggleDepartment = async (input) => {
 }
 const allDepartmentsByPage = async (input) => {
     try {
-        console.log(input,'input')
+        console.log(input,'input-------------')
         !input?.keyWord ? input.keyWord = "" : ''
         !input?.page ? input.page = 0 : input.page = parseInt(input.page)
         !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
@@ -188,6 +188,7 @@ const allDepartmentsByPage = async (input) => {
                 ], 
                 deletedAt: null, isActive: true
             })
+            .populate('branchId','name')
             .skip((input?.page - 1) * input?.perPage)
             .limit(input?.page * input?.perPage);
         if (result) return { status: true, message: 'success', result: result, statusCode: 200 }

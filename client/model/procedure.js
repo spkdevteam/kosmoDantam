@@ -7,7 +7,7 @@ const procedureSchema = new mongoose.Schema({
   displayId: {type: String,  default: null  },
   buId:{ type: mongoose.Schema.ObjectId, ref: "businessUnit", default:null, index: true  },
   description: {type: String,  required: true  },
-  branchId: {type: mongoose.Schema.ObjectId,ref:'branch',  required: true  },
+  branchId: {type: mongoose.Schema.ObjectId,ref:'branch',  required: true,index:true  },
   deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality
   isActive:{type:Boolean,default:true},
 }, { timestamps: true });

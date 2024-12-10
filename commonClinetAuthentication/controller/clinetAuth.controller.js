@@ -128,18 +128,14 @@ exports.signInByOtp = async (req, res, next) => {
 
         // Query based on whether it's email or phone
         const query = isEmail ? { email: identifier } : { phone: identifier };
-
         // Find user and check if exists
         const user = await User.findOne(query).select('-password  -createdBy -isCreatedBySuperAdmin -deletedAt -createdAt -updatedAt -otpGeneratedAt ').populate('role', '-isActive -createdAt -updatedAt');
-
         await commonCheckForClient(user);
-
         if (otp !== user.verificationOtp) {
             return res.status(statusCode.Unauthorized).send({
                 message: message.lblOtpNotMatched
             });
         }
-
         const expiresIn = rememberMe ? '7d' : '1d';
         const token = jwt.sign({ id: user._id, email: user.email }, process.env.PRIVATEKEY, { expiresIn });
 

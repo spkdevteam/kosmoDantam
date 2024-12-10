@@ -8,13 +8,13 @@ const statusCode = require("../../utils/http-status-code")
 exports.commonCheckForClient = async (user) => {
 
     try {
-
+        console.log(user,'user')
         if (!user) {
             throw new CustomError(statusCode.BadRequest, message.lblNotFoundUser);
         }
 
         // Check if account is active
-        if (!user.isActive) {
+        if (!user?.isActive) {
             throw new CustomError(statusCode.Unauthorized, message.lblAccountDeactivate);
         }
 
