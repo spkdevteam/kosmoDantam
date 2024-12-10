@@ -3,17 +3,20 @@ const { getClientDatabaseConnection } = require("../../db/connection")
 const getserialNumber = require("../../model/services/getserialNumber")
 const httpStatusCode = require("../../utils/http-status-code")
 const message = require("../../utils/message")
+const { validateObjectId } = require("./validate.serialNumber")
 
 
 const createMedicalCases = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.buId,collectionName:'businessunit'})) return {status:false,message:message.lblBusinessUnitinValid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId)
         const medicalCases = db.model('medicalCase', medicalCasesSchema)
         if (!input.caseId) {
             const isExist = await medicalCases.findOne({ caseName: input?.caseName, deletedAt: null })
             if (isExist) return { status: false, statusCode: httpStatusCode.Conflict, message: message.lblChairhAlreadyExists }
             input.caseId = await getserialNumber('mediCases', input?.clientId, '',input?.buId)
-             
         }
  
         const newData = {
@@ -42,6 +45,10 @@ const createMedicalCases = async (input) => {
 }
 const updateMedicalCases = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.caseId,collectionName:'medicalCase'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.buId,collectionName:'businessunit'})) return {status:false,message:message.lblBusinessUnitinValid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId)
         const medicalCases = db.model('medicalCase', medicalCasesSchema)
         if (!input.caseId) {
@@ -70,7 +77,8 @@ const updateMedicalCases = async (input) => {
 }
 const readAllMedicalCases = async (input)=>{
     try {
-        console.log(input)
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db =await getClientDatabaseConnection(input?.clientId)
         const medicalCases =await db.model('medicalCase', medicalCasesSchema)
         const activeCases = await medicalCases.find({ deletedAt: null });
@@ -82,8 +90,9 @@ const readAllMedicalCases = async (input)=>{
 }
 const deleteMedicalCase = async (input)=>{
     try {
-        console.log(input)
-        const db =await getClientDatabaseConnection(input?.clientId)
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.caseId,collectionName:'medicalCase'})) return {status:false,message:message.lblMedCaseDoesNotExist, statusCode:httpStatusCode.Unauthorized}
+         const db =await getClientDatabaseConnection(input?.clientId)
         const medicalCases =await db.model('medicalCase', medicalCasesSchema)
         const activeCases = await medicalCases.findOne({ deletedAt: null,_id:input?.caseId });
         
@@ -97,7 +106,9 @@ const deleteMedicalCase = async (input)=>{
 }
 const revokeDeletedMedicalCase = async (input)=>{
     try {
-        console.log(input)
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        // if(! await validateObjectId({clientid:input?.clientId,objectId:input?.caseId,collectionName:'medicalCase'})) return {status:false,message:message.lblMedCaseDoesNotExist, statusCode:httpStatusCode.Unauthorized}
         const db =await getClientDatabaseConnection(input?.clientId)
         const medicalCases =await db.model('medicalCase', medicalCasesSchema)
         const activeCases = await medicalCases.findOne({ deletedAt: {$ne:null} ,_id:input?.caseId });
@@ -118,6 +129,9 @@ const revokeDeletedMedicalCase = async (input)=>{
 }
 const toggleMedicalCases = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.caseId,collectionName:'medicalCase'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input?.clientId)
         const medicalCases = db.model('medicalCase', medicalCasesSchema)
         
@@ -136,7 +150,37 @@ const toggleMedicalCases = async (input) => {
 
     } 
 }
+
+const readAllMedicalCasesByPage = async (input)=>{
+    try {
+        !input?.keyWord ? input.keyWord = "" : ''
+        !input?.page ? input.page = 0 : input.page = parseInt(input.page)
+        !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        const db =await getClientDatabaseConnection(input?.clientId)
+        const medicalCases =await db.model('medicalCase', medicalCasesSchema)
+        const activeCases = await medicalCases.find({
+            $or:[
+                {caseName:{$regex:input?.keyWord,$options:'i'}},
+                {displayId:{$regex:input?.keyWord,$options:'i'}},
+                {remark:{$regex:input?.keyWord,$options:'i'}},
+            ],
+            deletedAt: null, 
+        })
+        .skip((input.page-1) * input.perPage )
+        .limit( input.page * input.perPage)
+        
+
+        
+        console.log(activeCases,'activeCases')
+        return {status:true,statusCode:httpStatusCode.OK ,message:'Medical cases fetched ',data: activeCases}
+    } catch (error) {
+        console.log(error)
+    }
+}
 module.exports = { 
+    readAllMedicalCasesByPage,
     createMedicalCases,
     updateMedicalCases ,
     readAllMedicalCases,

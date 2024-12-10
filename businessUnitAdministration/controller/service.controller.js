@@ -1,5 +1,5 @@
 const sanitizeBody = require("../../utils/sanitizeBody")
-const { createService, deleteService, readActiveServices,toggleServiceStatus, editService, serviceUnderDepartment } = require("../services/services.service")
+const { createService, deleteService, readActiveServices,toggleServiceStatus, editService, serviceUnderDepartment, readActiveServicesbyPage } = require("../services/services.service")
 
 exports.createServices = async (req,res,next)=>{
     try {
@@ -64,3 +64,26 @@ exports.getServiceUnderDepartment = async (req,res,next)=>{
          next(error)
     }
 }
+
+exports.getReadActiveServicesbyPage = async (req,res,next)=>{
+    try {
+        const data = await sanitizeBody(req.query)
+        const result = await readActiveServicesbyPage(data)
+        res.status(result?.statusCode).json(result)
+    } catch (error) {
+       next(error)
+    } 
+}
+
+exports.putToggleServiceByPage = async (req,res,next)=>{
+    try {
+        const data = await sanitizeBody(req.body)
+        const toggle = await toggleServiceStatus(data)   
+        const result = await readActiveServicesbyPage(data)
+        result.message = toggle.message
+        res.status(toggle?.statusCode).json(result)
+    } catch (error) {
+       next(error)
+    } 
+}
+

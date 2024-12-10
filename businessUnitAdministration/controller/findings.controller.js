@@ -1,6 +1,6 @@
 
 const sanitizeBody = require("../../utils/sanitizeBody")
-const { createFindings,editFindings,ToggleFindings,deleteFindings,revokeFindings,readAllFindings } = require("../services/findings.service")
+const { createFindings,editFindings,ToggleFindings,deleteFindings,revokeFindings,readAllFindings,readAllFindingsByPage } = require("../services/findings.service")
 
 exports.createFindings = async (req,res,next)=>{
     try {
@@ -60,6 +60,28 @@ exports.readAllFindings = async (req,res,next)=>{
         const data = await sanitizeBody(req.body)
         const result = await readAllFindings(data)
         res.status(result.statusCode).json(result)
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.getReadAllFindingsByPage =  async (req,res,next)=>{
+    try {
+        const data = await sanitizeBody(req.query)
+        const result = await readAllFindingsByPage(data)
+        res.status(result.statusCode).json(result)
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.putToggleFindingsByPage = async (req,res,next)=>{
+    try {
+        const data = await sanitizeBody(req.body)
+        const toggleStatus =  await ToggleFindings(data)
+        const result = await readAllFindingsByPage(data)
+        result.message = toggleStatus.message
+        res.status(result?.statusCode|| 200).json(result)
     } catch (error) {
         next(error)
     }

@@ -1,5 +1,5 @@
 const sanitizeBody = require("../../utils/sanitizeBody")
-const { createInvestigation, editinvestigation, toggleInvestigation, deleteInvestigation, revokeinvestigation, readAllinvestigation, readActiveinvestigation } = require("../services/investigation.service")
+const { createInvestigation, editinvestigation, toggleInvestigation, deleteInvestigation, revokeinvestigation, readAllinvestigation, readActiveinvestigation, readAllinvestigationByPageasync, readAllinvestigationByPage } = require("../services/investigation.service")
 
 exports.createInvestigation = async (req,res,next)=>{
     try {
@@ -64,6 +64,27 @@ exports.getAllInvestigation = async (req,res,next)=>{
         const data =await sanitizeBody(req.query)
         const result = await readAllinvestigation(data)
         res.status(result?.statusCode).json(result)
+    } catch (error) {
+       next(error) 
+    }
+}
+exports.getallInvestigationByPage = async (req,res,next)=>{
+    try {
+        const data =await sanitizeBody(req.query)
+        const result = await readAllinvestigationByPage(data)
+        res.status(result?.statusCode).json(result)
+    } catch (error) {
+       next(error) 
+    }
+}
+
+exports.getToggleInvestigationByPage = async (req,res,next)=>{
+    try {
+        const data =await sanitizeBody(req.body)
+        const toggle = await toggleInvestigation(data)
+        const result = await readAllinvestigationByPage(data)
+        result.message = toggle.message
+        res.status(toggle?.statusCode).json(result)
     } catch (error) {
        next(error) 
     }

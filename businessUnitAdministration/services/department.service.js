@@ -11,9 +11,16 @@ const { getClientDatabaseConnection } = require("../../db/connection")
 const buSettingsSchema = require("../../model/buSettings")
 
 const getserialNumber = require("../../model/services/getserialNumber")
+const httpStatusCode = require("../../utils/http-status-code")
 const message = require("../../utils/message")
+const { validateObjectId } = require("./validate.serialNumber")
 const createDepartment = async (input) => {
     try {
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
+
         const db = await getClientDatabaseConnection(input?.clientId)
         const department = await db.model('department', departmentSchema)
         // If deptId doesn't exist, generate a new one or check if the department already exists
@@ -26,9 +33,9 @@ const createDepartment = async (input) => {
                     statusCode: 400 // Bad Request (department already exists)
                 }
             }
-            input.deptId = await getserialNumber('department', input?.clientId, input?.branchId,input?.buId)
+            input.deptId = await getserialNumber('department', input?.clientId, input?.branchId, input?.buId)
         }
-        
+
         const newData = {
             deptName: input.deptName,
             branchId: input.branchId,
@@ -37,7 +44,7 @@ const createDepartment = async (input) => {
             buId: input?.buId,
             isActive: true,
         }
-        console.log(newData,'iput')
+        console.log(newData, 'iput')
 
 
         const result = await department.findOneAndUpdate(
@@ -72,6 +79,10 @@ const createDepartment = async (input) => {
 
 const deleteDepartment = async (input) => {
     try {
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.deptId, collectionName: 'department' })) return { status: false, message: message.lbldepartmentNotFound, statusCode: httpStatusCode.Unauthorized }
+
         const db = await getClientDatabaseConnection(input?.clientId)
         const department = await db.model('department', departmentSchema)
 
@@ -85,7 +96,9 @@ const deleteDepartment = async (input) => {
 
 const revokeDeleteDepartment = async (input) => {
     try {
-        console.log(input, 'kkksksksks')
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+
         const db = await getClientDatabaseConnection(input?.clientId)
         const department = await db.model('department', departmentSchema)
         const result = await department.updateOne({ _id: input.deptId }, { $set: { deletedAt: null } })
@@ -98,9 +111,11 @@ const revokeDeleteDepartment = async (input) => {
 
 const getallDepartments = async (input) => {
     try {
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(input.clientId)
         const departments = await db.model('department', departmentSchema)
-        const result = await departments.find({ deletedAt: null,isActive:true })
+        const result = await departments.find({ deletedAt: null, isActive: true })
         if (result) return { status: true, message: 'success', result: result, statusCode: 200 }
         else return { status: false, message: 'unKnown error ', statusCode: 500 }
     } catch (error) {
@@ -110,6 +125,11 @@ const getallDepartments = async (input) => {
 
 const editDepartment = async (input) => {
     try {
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.deptId, collectionName: 'department' })) return { status: false, message: message.lbldepartmentNotFound, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
+
         const db = await getClientDatabaseConnection(input?.clientId)
         const department = await db.model('department', departmentSchema)
         // const buSettings =await db.model('BUSetting',buSettingsSchema)
@@ -135,6 +155,10 @@ const editDepartment = async (input) => {
 
 const toggleDepartment = async (input) => {
     try {
+        
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.deptId, collectionName: 'department' })) return { status: false, message: message.lbldepartmentNotFound, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(input.clientId)
         const departments = await db.model('department', departmentSchema)
         const isExist = await departments.findOne({ _id: input?.deptId })
@@ -145,4 +169,31 @@ const toggleDepartment = async (input) => {
         return { statusCode: 200, status: true, message: error.message }
     }
 }
-module.exports = { createDepartment, deleteDepartment, getallDepartments, toggleDepartment, editDepartment, revokeDeleteDepartment }
+const allDepartmentsByPage = async (input) => {
+    try {
+        console.log(input,'input')
+        !input?.keyWord ? input.keyWord = "" : ''
+        !input?.page ? input.page = 0 : input.page = parseInt(input.page)
+        !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        const db = await getClientDatabaseConnection(input.clientId)
+        const departments = await db.model('department', departmentSchema)
+        const result = await departments.find(
+            {
+                $or:
+                [
+                    {deptName: { $regex: input?.keyWord || '', $options: 'i' }},
+                    {description: { $regex: input?.keyWord || '', $options: 'i' }}
+                ], 
+                deletedAt: null, isActive: true
+            })
+            .skip((input?.page - 1) * input?.perPage)
+            .limit(input?.page * input?.perPage);
+        if (result) return { status: true, message: 'success', result: result, statusCode: 200 }
+        else return { status: false, message: 'unKnown error ', statusCode: 500 }
+    } catch (error) {
+        return { status: false, message: error.message }
+    }
+}
+module.exports = { allDepartmentsByPage,createDepartment, deleteDepartment, getallDepartments, toggleDepartment, editDepartment, revokeDeleteDepartment }

@@ -2,7 +2,7 @@ const { sanitizeFilter } = require("mongoose")
 const sanitizeBody = require("../../utils/sanitizeBody")
 
 const { create } = require("../../model/user")
-const { createCheifComplaint,editCheifComplaint, toggleCheifComplain, deleteCheifComplaint, revokeCheifComplaint ,readActiveCheifComplaint, readAllCheifComplaint} = require("../services/CComplaint.service")
+const { createCheifComplaint,editCheifComplaint,toggleComplaintWithPage, toggleCheifComplain, deleteCheifComplaint, revokeCheifComplaint ,readActiveCheifComplaint, readAllCheifComplaint, listComplaintByPage} = require("../services/CComplaint.service")
 
 
 exports.createCComplaint = async (req,res,next)=>{
@@ -35,6 +35,20 @@ exports.toggleCComplaint = async (req,res,next)=>{
        next(error) 
     }
 }
+
+
+exports.patchToggleComplaintWithPage = async (req,res,next)=>{
+    try {
+        const data =await sanitizeBody(req.body)
+        const result = await toggleCheifComplain(data)
+        const fetchData = await listComplaintByPage(data)
+        fetchData.message = result.message
+        res.status(fetchData?.statusCode|| 200).json(fetchData)
+    } catch (error) {
+       next(error) 
+    }
+}
+
 exports.deleteCComplaint = async (req,res,next)=>{
     try {
         const data =await sanitizeBody(req.body)
@@ -68,6 +82,15 @@ exports.getAllCComplaint = async (req,res,next)=>{
     try {
         const data =await sanitizeBody(req.query)
         const result = await readAllCheifComplaint(data)
+        res.status(result?.statusCode|| 200).json(result)
+    } catch (error) {
+       next(error) 
+    }
+}
+exports.getListComplaintByPage = async (req,res,next)=>{
+    try {
+        const data =await sanitizeBody(req.query)
+        const result = await listComplaintByPage(data)
         res.status(result?.statusCode|| 200).json(result)
     } catch (error) {
        next(error) 

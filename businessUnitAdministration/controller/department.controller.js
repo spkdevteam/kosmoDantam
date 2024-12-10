@@ -6,13 +6,13 @@ const {
     getallDepartments,
     toggleDepartment, 
     editDepartment, 
-    revokeDeleteDepartment
+    revokeDeleteDepartment,
+    allDepartmentsByPage
 } = require("../services/department.service")
 
 
 exports.createDepartment =async (req, res,next) => {
     try {
-        
         const data =await sanitizeBody(req.body)
         const result = await createDepartment(data)
         res.status(result.statusCode || 200).json(result)
@@ -75,3 +75,25 @@ exports.revokeDepartment = async (req,res,next)=>{
         next(error);
     }
     }
+    exports.getallDepartmentsByPage = async (req,res,next)=>{
+    
+        try {
+            const data = await sanitizeBody(req.query)
+            const  result  = await allDepartmentsByPage(data)
+            res.status(result.statusCode || 200).json(result)
+        } catch (error) {
+            next(error);
+        }
+    } 
+    
+    exports.putToggleDepartmentsWithPage = async (req,res,next)=>{
+        try {
+            const data = await sanitizeBody(req.body)
+            const  result  = await toggleDepartment(data)
+            const  fetchResult  = await allDepartmentsByPage(data)
+            fetchResult.message = result.message
+            res.status(fetchResult?.statusCode || 200).json(fetchResult)
+        } catch (error) {
+            next(error);
+        }
+        }

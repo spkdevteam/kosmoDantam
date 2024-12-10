@@ -4,12 +4,19 @@ const serviceSchema = require("../../client/model/service")
 const { getClientDatabaseConnection } = require("../../db/connection")
 
 const getserialNumber = require("../../model/services/getserialNumber")
+const httpStatusCode = require("../../utils/http-status-code")
 const message = require("../../utils/message")
 const validateSerialnumber = require("../../utils/validateSerialNumber")
+const { validateObjectId } = require("./validate.serialNumber")
 
 const createService = async (input) => {
     try {
-        console.log(input)
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.deptId,collectionName:'department'})) return {status:false,message:message.lbldepartmentNotFound, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.branchId,collectionName:'branch'})) return {status:false,message:message.lblBranchIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.buId,collectionName:'businessunit'})) return {status:false,message:message.lblBusinessUnitinValid, statusCode:httpStatusCode.Unauthorized}
+        
         const db = await getClientDatabaseConnection(input.clientId)
         const services = db.model('services', serviceSchema)
         const department = db.model('department', departmentSchema)
@@ -44,6 +51,9 @@ const createService = async (input) => {
 }
 const deleteService = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.serviceId,collectionName:'services'})) return {status:false,message:message.lblServicenotFound, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId);
         const services = db.model('services', serviceSchema);
         const result = await services.findOne({ _id: input?.serviceId });
@@ -68,6 +78,8 @@ const deleteService = async (input) => {
 };
 const readActiveServices = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId);
         const services = await db.model('services', serviceSchema);
         const data = await services.find({ deletedAt:null,isActive:true})
@@ -95,10 +107,11 @@ const readActiveServices = async (input) => {
         }
     }
 }
-
 const toggleServiceStatus = async (input) => {
     try {
-
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.serviceId,collectionName:'services'})) return {status:false,message:message.lblServicenotFound, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId);
         const services = await db.model('services', serviceSchema);
         const isExist = await services.findOne({ _id: input?.serviceId })
@@ -116,6 +129,11 @@ const toggleServiceStatus = async (input) => {
 }
 const editService = async (input) => {
     try {
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.serviceId,collectionName:'services'})) return {status:false,message:message.lblServicenotFound, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.deptId,collectionName:'department'})) return {status:false,message:message.lbldepartmentNotFound, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.branchId,collectionName:'branch'})) return {status:false,message:message.lblBranchIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        
         const db = await getClientDatabaseConnection(input.clientId)
         const services = db.model('services', serviceSchema)
         const department = db.model('department', departmentSchema)
@@ -135,7 +153,6 @@ const editService = async (input) => {
         const newData = {
             branchId:input?.branchId, 
             departmentId: input?.deptId,
-            procedures: input?.procedures || [],
             serviceName: input?.serviceName,
             description: input?.description,
             price: input?.price,
@@ -151,9 +168,11 @@ const editService = async (input) => {
         return { status: false, statusCode: 500, message: error.message }
     }
 }
-
 const serviceUnderDepartment  = async (input) => {
     try {
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.departmentId ,collectionName:'department'})) return {status:false,message:message.lbldepartmentNotFound, statusCode:httpStatusCode.Unauthorized}
         const db = await getClientDatabaseConnection(input.clientId);
         const services = await db.model('services', serviceSchema);
         const data = await services.find({ deletedAt:null,departmentId:input?.departmentId ,isActive:true })
@@ -180,5 +199,44 @@ const serviceUnderDepartment  = async (input) => {
         }
     }
 }
+const readActiveServicesbyPage = async (input) => {
+    try {
+        !input?.keyWord ? input.keyWord = "" : ''
+        !input?.page ? input.page = 0 : input.page = parseInt(input.page)
+        !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
+        
+        if(!input?.clientId) return  { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
+        if(! await validateObjectId({clientid:input?.clientId,objectId:input?.clientId,collectionName:'clientId'})) return {status:false,message:message.lblClinetIdInvalid, statusCode:httpStatusCode.Unauthorized}
+        const db = await getClientDatabaseConnection(input.clientId);
+        const services = await db.model('services', serviceSchema);
+        const data = await services.find({
+            $or:[
+                {serviceName:{$regex:input?.keyWord,$options:'i'}},
+                {displayId:{$regex:input?.keyWord,$options:'i'}},
+                {description:{$regex:input?.keyWord,$options:'i'}},
+            ],
+            deletedAt:null})
+        .skip((input?.page-1)*input.perPage )
+        .limit(input.page*input.perpage)
+        console.log(data, 'dey data fetched ')
 
-module.exports = { createService, deleteService, readActiveServices, toggleServiceStatus,editService,serviceUnderDepartment  }
+        if (data) {
+            return {
+                status: true, statusCode: 200, message: message.lblSuccess, services: data }
+        } else {
+            return {
+                status: false, statusCode: 404, message: message.lblFailed, } 
+            }
+    } catch (error) {
+        return {
+            status: false, statusCode: 500, message: error.message, } }
+}
+module.exports = { 
+    readActiveServicesbyPage,
+    createService, 
+    deleteService,
+    readActiveServices, 
+    toggleServiceStatus,
+    editService,
+    serviceUnderDepartment  
+}

@@ -346,6 +346,44 @@ module.exports = {
     lblInvestigationNoChanges: "The Investigation details are already up to date.",
     lblInvestigationDependencies: "Please resolve linked issues before proceeding with this action.",
     lblInvestigationDoesNotExist: "The specified Investigation does not exist in the system.",
-    lblInvestigationAlreadyExist: "An Investigation with the same name already exists."
+    lblInvestigationAlreadyExist: "An Investigation with the same name already exists.",
     
+    lblAppointmentCreated: "New Appointment added to the system.",
+    lblAppointmentEdited: "Changes to the Appointment have been saved.",
+    lblAppointmentDeleted: "The Appointment has been removed from the system.",
+    lblAppointmentFetched: "Appointment data loaded.",
+    lblAppointmentBulkOperations: "Appointments imported/exported successfully.",
+    lblAppointmentCreationFailed: "Unable to add a new Appointment. Ensure all required fields are provided.",
+    lblAppointmentEditingFailed: "Appointment update unsuccessful. Ensure the Appointment exists.",
+    lblAppointmentEditingNotDone: "No changes found in the Appointment.",
+    lblAppointmentDeletionFailed: "Appointment deletion unsuccessful. Please try again later.",
+    lblAppointmentRetrievalFailed: "No Appointment found with the given ID.",
+    lblAppointmentAuthorizationFailed: "Invalid input data for the Appointment operation.",
+    lblAppointmentPendingAction: "Appointment updates are pending approval.",
+    lblAppointmentNoChanges: "The Appointment details are already up to date.",
+    lblAppointmentDependencies: "Please resolve linked issues before proceeding with this action.",
+    lblAppointmentDoesNotExist: "The specified Appointment does not exist in the system.",
+    lblAppointmentAlreadyExist: "An Appointment with the same details already exists.",
+
+    lblClinetIdInvalid:"invalid Client id",
+
+    lblLeaveRegisterCreated: "New Leave Registration added to the system.",
+    lblLeaveRegisterEdited: "Changes to the Leave Registration have been saved.",
+    lblLeaveRegisterDeleted: "The Leave Registration has been removed from the system.",
+    lblLeaveRegisterFetched: "Leave Registration data loaded.",
+    lblLeaveRegisterBulkOperations: "Leave Registrations imported/exported successfully.",
+    lblLeaveRegisterCreationFailed: "Unable to add a new Leave Registration. Ensure all required fields are provided.",
+    lblLeaveRegisterEditingFailed: "Leave Registration update unsuccessful. Ensure the Leave Registration exists.",
+    lblLeaveRegisterEditingNotDone: "No changes found in the Leave Registration.",
+    lblLeaveRegisterDeletionFailed: "Leave Registration deletion unsuccessful. Please try again later.",
+    lblLeaveRegisterRetrievalFailed: "No Leave Registration found with the given ID.",
+    lblLeaveRegisterAuthorizationFailed: "Invalid input data for the Leave Registration operation.",
+    lblLeaveRegisterPendingAction: "Leave Registration updates are pending approval.",
+    lblLeaveRegisterNoChanges: "The Leave Registration details are already up to date.",
+    lblLeaveRegisterDependencies: "Please resolve linked issues before proceeding with this action.",
+    lblLeaveRegisterDoesNotExist: "The specified Leave Registration does not exist in the system.",
+    lblLeaveRegisterAlreadyExist: "A Leave Registration with the same details already exists."
+
+    
+
 };
