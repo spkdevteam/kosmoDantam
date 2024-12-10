@@ -48,7 +48,7 @@ exports.createBranchByBusinessUnit = async (req, res) => {
             [
                 {
                     displayId: displayId, clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId
->>>>>>>>> Temporary merge branch 2
+ 
                 },
             ],
         );
