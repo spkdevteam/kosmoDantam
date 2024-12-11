@@ -20,14 +20,14 @@ exports.createServices = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
     try {
-        const { clientId, departmentId, serviceName, description, buId } = req.body;
+        const { clientId, departmentId, serviceName, description, buId,branchId } = req.body;
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
             });
         }
         if (!serviceName || !description) {
-            return res.status(statusCode.BadRequest).send({
+            return res.status(httpStatusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
@@ -53,7 +53,8 @@ exports.create = async (req, res, next) => {
             departmentId: departmentId,
             serviceName: serviceName,
             description: description,
-            buId: buId
+            buId: buId,
+            branchId:branchId
         });
         return res.status(httpStatusCode.OK).send({
             message: message.lblServiceCreated,

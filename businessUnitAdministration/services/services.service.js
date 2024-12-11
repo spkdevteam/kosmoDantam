@@ -24,27 +24,28 @@ const createService = async (input) => {
         const branch = db.model('branch', clinetBranchSchema)
         if (!input.serviceId) {
             const isNameExist = await services.findOne({ serviceName: input?.serviceName })
-            if (isNameExist) return { status: false, statusCode: 409, messsage: message.lblServiceExist }
+            if (isNameExist) return { status: false, statusCode: 409, message: message.lblServiceExist }
             input.serviceId = await getserialNumber('service', input?.clientId, input?.branchId,input?.buId)
         }
         const isDepartmentValid = await department.findOne({ _id: input?.deptId })
         const isBranchValid = await branch.findOne({ _id: input?.branchId })
-        if (!isDepartmentValid) return { status: false, statusCode: 404, messsage: message.lbldepartmentNotFound }
-        if (!isBranchValid) return { status: false, statusCode: 404, messsage: message.lblBranchNotFound }
-        if (typeof (input.price) != 'number' || input.price < 0) return { status: false, statusCode: 400, messsage: message.lblNotavalidAmount }
+        if (!isDepartmentValid) return { status: false, statusCode: 404, message: message.lbldepartmentNotFound }
+        if (!isBranchValid) return { status: false, statusCode: 404, message: message.lblBranchNotFound }
+       // if (typeof (input.price) != 'number' || input.price < 0) return { status: false, statusCode: 400, message: message.lblNotavalidAmount }
         const newData = {
             displayId: input?.serviceId,
             departmentId: isDepartmentValid._id,
-            branchId:isBranchValid._id,
+            branchId:input?.branchId,
             serviceName: input?.serviceName,
             description: input?.description,
-            price: input?.price,
+            price: input?.price||0.00,
             buId: input?.buId,
             isActive: true,
             deletedAt: null
         }
+        console.log(newData,'newDatanewData')
         const result = await services.findOneAndUpdate({ displayId: newData.serviceId }, { $set: newData }, { upsert: true,new:true,returnDocument:'after'})
-        if (result) return { status: true, statusCode: 201, messsage: message.lblServiceCreated, ...result._doc }
+        if (result) return { status: true, statusCode: 201, message: message.lblServiceCreated, ...result._doc }
 
     } catch (error) {
         return { status: false, statusCode: 500, message: error.message }
@@ -140,15 +141,10 @@ const editService = async (input) => {
         const department = db.model('department', departmentSchema)
         const branch = db.model('branch', clinetBranchSchema)
         if (input.serviceId) {
-            const isNameExist = await services.findOne({ id: { $ne: input.serviceId }, serviceName: input?.serviceName })
-            if (isNameExist) return { status: false, statusCode: 409, messsage: message.lblServiceExist }
+            const isNameExist = await services.findOne({ _id: { $ne: input.serviceId }, serviceName: input?.serviceName })
+            if (isNameExist) return { status: false, statusCode: 409, message: message.lblServiceExist }
             
-        }
-        const isDepartmentValid = await department.findOne({ _id: input?.deptId })
-        const isBranchValid = await branch.findOne({ _id: input?.branchId })
-        if (!isDepartmentValid) return { status: false, statusCode: 404, messsage: message.lbldepartmentNotFound }
-        if (!isBranchValid) return { status: false, statusCode: 404, messsage: message.lblBranchNotFound }
-        if (typeof (input.price) != 'number' || input.price < 0) return { status: false, statusCode: 400, messsage: message.lblNotavalidAmount }
+        
         
         
         const newData = {
@@ -156,15 +152,15 @@ const editService = async (input) => {
             departmentId: input?.deptId,
             serviceName: input?.serviceName,
             description: input?.description,
-            price: input?.price,
+            price: input?.price||0.00,
             isActive: true,
             deletedAt: null
         }
         const result = await services.updateOne({ _id: input.serviceId }, { $set: newData })
         console.log(newData,result)
-        if (result.modifiedCount) return { status: true, statusCode: 201, messsage: message.lblServiceModified, ...newData }
-        else  return { status: false, statusCode: 404, messsage: message.lblServicenotModified }
-
+        if (result.modifiedCount) return { status: true, statusCode: 201, message: message.lblServiceModified, ...newData }
+        else  return { status: false, statusCode: 404, message: message.lblServicenotModified }
+    }
     } catch (error) {
         return { status: false, statusCode: 500, message: error.message }
     }

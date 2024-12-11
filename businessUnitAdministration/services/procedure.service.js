@@ -113,7 +113,7 @@ const editProcedure = async (input) => {
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.deptId, collectionName: 'department' })) return { status: false, message: message.lbldepartmentNotFound, statusCode: httpStatusCode.Unauthorized }
         
-        const serviceValidations = await Promise.all(input?.services.map(async (serviceid) => {
+        const serviceValidations = await Promise.all(input?.services?.map(async (serviceid) => {
             if (! await validateObjectId({ clientid: input?.clientId, objectId: serviceid, collectionName: 'services' })) return false
             else return true
         }))

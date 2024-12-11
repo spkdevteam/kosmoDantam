@@ -12,8 +12,8 @@ const entityAuth = require("../../middleware/authorization/commonEntityAuthoriza
 
 
 serviceRouter
-    .post('/createServices', entityAuth.authorizeEntity("administration", "Services", "create"), create)
-    .put('/editService', entityAuth.authorizeEntity("administration", "Services", "update"), update)
+    .post('/createServices', entityAuth.authorizeEntity("administration", "Services", "create"), createServices)
+    .put('/editService', entityAuth.authorizeEntity("administration", "Services", "update"), editService)
     .delete('/deleteService', deleteService)
     .post('/softDeleteService', softDeleteService)
     .get('/getAllActiveServices', readActiveServices)

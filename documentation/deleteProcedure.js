@@ -3,27 +3,24 @@
  * /api/client/bu/procedures/delete:
  *   delete:
  *     summary: Delete a procedure
- *     description: Deletes a procedure based on the provided `clientId` and `procedureId`.
+ *     description: Deletes a procedure based on the provided `clientId` and `procedureId` passed as query parameters.
  *     tags:
  *       - Procedures
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               clientId:
- *                 type: string
- *                 description: The ID of the client associated with the procedure.
- *                 example: "6735e64c5c58f271b1ce1678"
- *               procedureId:
- *                 type: string
- *                 description: The unique ID of the procedure to be deleted.
- *                 example: "6746b6a2b193ebcde5080459"
- *           example:
- *             clientId: "6735e64c5c58f271b1ce1678"
- *             procedureId: "6746b6a2b193ebcde5080459"
+ *     parameters:
+ *       - in: query
+ *         name: clientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the client associated with the procedure.
+ *         example: "6735e64c5c58f271b1ce1678"
+ *       - in: query
+ *         name: procedureId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The unique ID of the procedure to be deleted.
+ *         example: "6746b6a2b193ebcde5080459"
  *     responses:
  *       200:
  *         description: Procedure deleted successfully.
