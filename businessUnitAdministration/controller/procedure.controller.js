@@ -32,7 +32,7 @@ exports.editProcedure = async (req, res) => {
 
 exports.deleteProcedure = async (req, res) => {
     try {
-        const data = await sanitizeBody(req.body)
+        const data = await sanitizeBody(req.query)
         const result = await deleteProcedure(data)
         res.status(result?.statusCode || 200).json(result)
     } catch (error) {

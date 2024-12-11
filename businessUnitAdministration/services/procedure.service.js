@@ -113,7 +113,7 @@ const editProcedure = async (input) => {
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.deptId, collectionName: 'department' })) return { status: false, message: message.lbldepartmentNotFound, statusCode: httpStatusCode.Unauthorized }
         
-        const serviceValidations = await Promise.all(input?.services.map(async (serviceid) => {
+        const serviceValidations = await Promise.all(input?.services?.map(async (serviceid) => {
             if (! await validateObjectId({ clientid: input?.clientId, objectId: serviceid, collectionName: 'services' })) return false
             else return true
         }))
@@ -188,6 +188,7 @@ const getAllProceduresByPage = async (input) => {
                 {displayId:{$regex:input?.keyWord,$options:'i'}}
             ]
         })
+        .populate('branchId','name')
         .skip((input.page-1) *  input.perPage )
         .limit(input.page * input.perPage)
         return { status: true, statusCode: 200, result: result, message: message.lblProcedureFetched }
