@@ -10,8 +10,8 @@ const appointmentSchema = new mongoose.Schema({
     caseId: { type: mongoose.Schema.ObjectId, ref: 'medicalcase', required: true,index:true },
     dutyDoctorId: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', required: true,index:true },
     dentalAssistant: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', required: true,index:true }, 
-    slotFrom: { type: String, required: true }, 
-    slotTo: { type: String, required: true }, 
+    slotFrom: { type: Date  }, 
+    slotTo: { type: Date }, 
     chairId: { type: mongoose.Schema.ObjectId, ref: 'chair', required: true,index:true },  
     patientId: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', required: true,index:true },
     status: { 
