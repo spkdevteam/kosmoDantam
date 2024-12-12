@@ -16,7 +16,7 @@ const getserialNumber = require("../../model/services/getserialNumber");
 // create branch by business unit
 exports.createBranchByBusinessUnit = async (req, res) => {
     try {
-        const { clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit, branchHeadId } = req.body;
+        const { clientId, name, emailContact,branchPrefix, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit, branchHeadId } = req.body;
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
@@ -47,7 +47,7 @@ exports.createBranchByBusinessUnit = async (req, res) => {
         const newBranch = await Branch.create(
             [
                 {
-                    displayId: displayId, clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId
+                    displayId: displayId,branchPrefix:branchPrefix, clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId
  
                 },
             ],
