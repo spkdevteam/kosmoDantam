@@ -23,6 +23,10 @@ exports.commonCheckForClient = async (user) => {
             throw new CustomError(statusCode.Unauthorized, message.lblUnVerified);
         }
 
+        if (user.deletedAt) {
+            throw new CustomError(statusCode.Unauthorized, message.lblAccountDeleted);
+        }
+
         // Check if user has the appropriate role
         if (user.roleId < 3) {
             throw new CustomError(statusCode.Unauthorized, message.lblUnauthorize);

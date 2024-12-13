@@ -66,6 +66,7 @@ module.exports = {
   lblUnauthorizeUser: 'Unauthorized user!',
   lblUnVerified: 'Unverified User, please verify you email!',
   lblSigninVerificationOtpSent: "A SignIn Verification OTP Has Been sent To Your Mail Id",
+  lblAccountDeleted: 'Your account has been deleted on the platform, Please contact admin for help!',
 
 
   // Business unit
