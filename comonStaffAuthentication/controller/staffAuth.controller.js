@@ -77,7 +77,7 @@ exports.signIn = async (req, res, next) => {
         const mailOptions = {
             from: process.env.EMAIL_FROM,
             to: user.email,
-            subject: "Email Verification for DYNO",
+            subject: "Email Verification for Kosmo",
             template: "loginOtp",
             context: {
                 otp,
