@@ -111,7 +111,8 @@ const revokeDeleteDepartment = async (input) => {
 
 const getallDepartments = async (input) => {
     try {
-        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        console.log(input,'getallDepartments')
+       // if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(input.clientId)
         const departments = await db.model('department', departmentSchema)

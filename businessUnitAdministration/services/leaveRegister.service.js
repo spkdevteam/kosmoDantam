@@ -223,15 +223,18 @@ exports.filterLeaveApplication = async (input) => {
         }
         if (input?.startTime) query.startTime =  { $lte: input?.startTime };
         if (input?.endTime) query.endTime = { $gte: input?.endTime  }; ;
-        const absentees = await leaveRegister.find({...query})
-        const engagedList =  absentees?.map((item)=>{
-            return item.employeeId
-        })
+        console.log(query,'query')
         
+        const absentees = new Set()
+        const engagedList = await leaveRegister.find({...query})
+        engagedList?.map((item)=>{
+            absentees.add(item.employeeId.toString()) 
+        })
+        console.log(absentees,'engagedListengagedList')
         // .populate('employeeId', 'name email')
         // .populate('branchId', '
         
-        return { data: absentees }
+        return  absentees  
     } catch (error) {
 
     }

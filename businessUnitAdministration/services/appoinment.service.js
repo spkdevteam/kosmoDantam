@@ -7,7 +7,7 @@ const { validateObjectId } = require("./validate.serialNumber");
 const { getDateWiseLeaVeDetails, filterLeaveApplication } = require("./leaveRegister.service");
 const timeSlots = require("../../utils/timeSlots");
 const { listEmployeeByRole } = require("./clientUser.service");
-
+const mongoose = require('mongoose')
 
 exports.creatAppointment = async (input) => {
     try {
@@ -40,12 +40,12 @@ exports.creatAppointment = async (input) => {
             branchId: input?.branchId,
             buId: input?.buId,
             token: input?.token || null,
-            date: input?.date + 'T00:00:00.000Z' || new Date().setHours(0, 0, 0, 0),
+            date: input?.date ? new Date(input.date.includes('T') ? input.date.split('T')[0] + 'T00:00:00.000Z' : input.date + 'T00:00:00.000Z') : null,
             caseId: input?.caseId || null,
             dutyDoctorId: input?.dutyDoctorId,
             dentalAssistant: input?.dentalAssistant,
-            slotFrom: input?.slotFrom,
-            slotTo: input?.slotTo,
+            slotFrom: input?.date ? new Date(input.date.includes('T') ? input.date.split('T')[0] + `T${input.slotFrom}:00.000Z` : input.date + `T${input.slotFrom}:00.000Z`) : null,
+            slotTo: input?.date ? new Date(input.date.includes('T') ? input.date.split('T')[0] + `T${input.slotTo}:00.000Z` : input.date + `T${input.slotTo}:00.000Z`) : null,
             chairId: input?.chairId,
             patientId: input?.patientId,
             status: input?.status,
@@ -53,6 +53,8 @@ exports.creatAppointment = async (input) => {
             deletedAt: input?.deletedAt || null,
             createdUser: input?.createdUser,
         }
+
+        console.log(newData, 'newDatanewData')
         const result = await appointments.findOneAndUpdate({ displayId: input?.displayId }, { $set: newData }, { upsert: true, returnDocument: 'after', new: true })
         if (result?._doc) return { status: true, message: message.lblAppointmentCreated, statusCode: httpStatusCode.OK, data: result?._doc }
         else return { status: false, message: message.lblCredentialMissing, statusCode: httpStatusCode.Unauthorized }
@@ -66,18 +68,18 @@ exports.getDateWiseBookidDetails = async (input) => {
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
+        if(input?.bookingDate.length > 10)  input?.bookingDate.splice(0,10)
+            console.log(input?.bookingDate)
         const db = await getClientDatabaseConnection(input?.clientId)
         const appointment = await db.model('appointment', appointmentSchema)
-        const startOfDay = new Date(input?.bookingDate);
-        startOfDay.setUTCHours(0, 0, 0, 0); // Set to the start of the day
-        const endOfDay = new Date(input?.bookingDate);
-        endOfDay.setUTCHours(23, 59, 59, 999); // Set to the end of the day
-
+        const startOfDay = new Date(input?.bookingDate+'T00:00:00.000Z');
+        const endOfDay = new Date(input?.bookingDate+'T00:00:00.000Z');
+        
         const bookingdetails = await appointment.find({
             buId: input?.buId,
             branchId: input?.branchId,
             isActive: true,
-            date: { $gte: startOfDay, $lte: endOfDay }
+            date: new Date(input?.bookingDate+'T00:00:00.000Z')
         })
             .populate('dutyDoctorId', 'firstName')
             .populate('dentalAssistant', 'firstName')
@@ -87,7 +89,7 @@ exports.getDateWiseBookidDetails = async (input) => {
             .populate('chairId', 'chairNumber chairLocation')
 
         const bookings = bookingdetails?.map((item) => {
-
+           
             return {
                 _id: item?._id,
                 bookingType: 'appointment',
@@ -140,9 +142,8 @@ exports.getBookingChart = async (input) => {
         const booking = await this.getDateWiseBookidDetails(input);
         const daystatus = [...absentees?.data, ...booking?.data];
         const doctors = await listEmployeeByRole(input);
-
         let data = [];
-
+        
         for (let i = 0; i <= timeSlots?.length; i++) {
             if (!data[i]) data[i] = [];
             for (let j = 0; j <= doctors?.length; j++) {
@@ -155,13 +156,15 @@ exports.getBookingChart = async (input) => {
                     continue
                 }
                 doc_And_Time = { ...doctors[j - 1], ...timeSlots[i - 1] }
-                const record = daystatus.filter((record) => {
-                    return (
-                        doc_And_Time.end > record.slotFrom &&
-                        doc_And_Time.start < record.slotTo &&
+                console.log(doc_And_Time,'saasasasasassassasasas')
+                const record = daystatus.filter((record) =>  {
+                     console.log(  new Date(input?.bookingDate+'T'+doc_And_Time.end+':00.000Z'))
+                    return new Date(input?.bookingDate+'T'+doc_And_Time.end+':00.000Z') > record.slotFrom &&
+                    new Date(input?.bookingDate+'T'+doc_And_Time.start+':00.000Z') < record.slotTo &&
                         doc_And_Time?._doc?.firstName === record?.doctor?.name
-                    );
-                });
+                     
+                 });
+                 console.log(record,'rerecordrecordcord')
                 data[i][j] = record || null
             }
         }
@@ -185,38 +188,77 @@ const filterAppointment = async (input) => {
 
         if (input?.branchId) query.branchId = input.branchId;
         if (input?.bookingDate) {
-            query.date = new Date(input.bookingDate+'T00:00:00.000Z');
-            console.log(new Date(input.bookingDate+'T00:00:00.000Z'));
+            query.date = new Date(input.bookingDate + 'T00:00:00.000Z');
+            console.log(new Date(input.bookingDate + 'T00:00:00.000Z'));
         }
-        const andCondition = []
-          if (input?.startTime) andCondition.push([  { slotFrom: { $gte: '10:05' } },]);
-          if (input?.endTime) query.slotTo = { $lte: input.endTime ,$gte: input.startTime};
         const orConditions = [];
+        if (input?.startTime) query.slotFrom = { $gte: new Date(input.bookingDate + 'T' + input.startTime + ':00.000Z'), $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z') };
+        if (input?.endTime) query.slotTo = { $gte: new Date(input.bookingDate + 'T' + input.startTime + ':00.000Z'), $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z') };
         if (input?.chairId) orConditions.push({ chairId: input.chairId });
         if (input?.doctorId) orConditions.push({ dutyDoctorId: input.doctorId });
         if (input?.dentalAssistantId) orConditions.push({ dentalAssistant: input.dentalAssistantId });
         if (orConditions.length > 0) {
             query.$or = orConditions;
         }
-        console.log(query)
-        const result = await appointment.find({...query})
+         const out = await appointment.aggregate([
+            {
+                $match: {
+                    isActive: true,
+                    deletedAt: null,
+                    date: new Date(input.bookingDate + 'T00:00:00.000Z'),
 
-        
+                    $or: [
+                        {
+                            slotFrom: {
+                                $gte: new Date(input.bookingDate + 'T' + input.startTime + ':00.000Z'),
+                                $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z')
+                            }
+                        },
+                        {
+                            slotTo: {
+                                $gte: new Date(input.bookingDate + 'T' + input.startTime + ':00.000Z'),
+                                $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z')
+                            }
+                        }
+                    ],
 
-        console.log(result, result.length,'aaaaaaaaa')
+
+                }
+            },
+            {
+                $match:
+                {
+                    $or: [
+                        { chairId: new mongoose.Types.ObjectId(input.chairId) },
+                        { dutyDoctorId: new mongoose.Types.ObjectId(input.doctorId) },
+                        { dentalAssistant: new mongoose.Types.ObjectId(input.dentalAssistantId) },
+                      //  { specialistDoctorId:new mongoose.Types.ObjectId(input.specialistDoctorId) }
+                    ]
+                }
+            }
+        ]);
+        const bookedDoctors = new Set()
+        const bookedChairs =  new Set()
+        const bookedAssistants =  new Set()
+        const bookedSpecialist =  new Set()
+        out?.map((item)=> {
+            bookedDoctors.add(JSON.stringify( item.dutyDoctorId).slice(1,JSON.stringify( item.dutyDoctorId)?.length-1)) 
+            bookedChairs.add(JSON.stringify(item.chairId).slice(1,JSON.stringify( item.chairId)?.length-1))
+            bookedAssistants.add(JSON.stringify(item.dentalAssistant).slice(1,JSON.stringify( item.dentalAssistant)?.length-1)) 
+          //  bookedSpecialist.add(JSON.stringify(item.specialistDoctorId).slice(1,JSON.stringify( item.specialistDoctorId)?.length-1)) 
+        })
+        return {bookedDoctors,bookedChairs,bookedAssistants,bookedSpecialist} 
     } catch (error) {
 
     }
 }
 
-
 exports.generateAvailabiltyChart = async (input) => {
     const absentees = await filterLeaveApplication(input);
     const booking = await filterAppointment(input);
-    const daystatus = [absentees];
-    // console.log(daystatus,'daystatus') 
-
-    return input
+    const daystatus = {...booking,absentees};
+    console.log(daystatus,'9999999999999999999999999')
+    return daystatus
 }
 
 

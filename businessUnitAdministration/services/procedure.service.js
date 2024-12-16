@@ -5,20 +5,25 @@ const getserialNumber = require("../../model/services/getserialNumber")
 const httpStatusCode = require("../../utils/http-status-code")
 const { validateObjectId } = require("./validate.serialNumber")
 const createProcedure = async (input) => {
+
     try {
+        console.log(input,input)
         if (!input?.clientId) return { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
-        const serviceValidations = await Promise.all(input?.services.map(async (serviceid) => {
+        // if(input?.services?.length){
+        const serviceValidations = await Promise.all(input?.services?.map(async (serviceid) => {
             if (! await validateObjectId({ clientid: input?.clientId, objectId: serviceid, collectionName: 'services' })) return false
             else return true
         }))
+        
 
         if (serviceValidations.includes(false)) {
             const index = serviceValidations.findIndex(value => value == false)
             return { status: false, message: message.lblServicenotFound + input?.services[index], statusCode: httpStatusCode.Unauthorized };
         }
+    // }
         const db = await getClientDatabaseConnection(input.clientId)
         const procedures = await db.model('procedure', procedureSchema)
         if (!input.procedureId) {
@@ -173,21 +178,19 @@ const procedureUnderService = async (input) => {
 }
 const getAllProceduresByPage = async (input) => {
     try {
-        !input?.keyWord ? input.keyWord = "" : ''
+        !input?.keyWord === undefined ? input.keyWord = "" : ''
         !input?.page ? input.page = 0 : input.page = parseInt(input.page)
         !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
-        
+        const orArray = input?.keyWord?.length ? {$or:[
+            {procedureName:{$regex:input?.keyWord,$options:'i'}},
+            {description:{$regex:input?.keyWord,$options:'i'}},
+            {displayId:{$regex:input?.keyWord,$options:'i'}}
+        ] } :null
         if (!input?.clientId) return { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(input.clientId)
         const procedures = await db.model('procedure', procedureSchema)
-        const result = await procedures.find({ deletedAt: null,
-            $or:[
-                {procedureName:{$regex:input?.keyWord,$options:'i'}},
-                {description:{$regex:input?.keyWord,$options:'i'}},
-                {displayId:{$regex:input?.keyWord,$options:'i'}}
-            ]
-        })
+        const result = await procedures.find({ deletedAt: null,...orArray})
         .populate('branchId','name')
         .skip((input.page-1) *  input.perPage )
         .limit(input.page * input.perPage)
