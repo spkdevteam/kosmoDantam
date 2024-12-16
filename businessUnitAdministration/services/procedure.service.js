@@ -192,7 +192,7 @@ const getAllProceduresByPage = async (input) => {
         const procedures = await db.model('procedure', procedureSchema)
         const result = await procedures.find({ deletedAt: null,...orArray})
         .populate('branchId','name')
-        .skip((input.page-1) *  input.perPage )
+        .skip((input.page) *  input.perPage )
         .limit(input.page * input.perPage)
         return { status: true, statusCode: 200, result: result, message: message.lblProcedureFetched }
     } catch (error) {
