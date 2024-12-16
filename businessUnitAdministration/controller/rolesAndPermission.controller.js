@@ -140,6 +140,9 @@ exports.getParticularRoleAndPermissionByBusinessUnit = async (req, res) => {
 // list Role and permission for business unit
 exports.listRolesAndPermission = async (req, res) => {
     try {
+        const admin = req.user;
+        console.log("admin",admin);
+        
         const clientId = req.query.clientId;
         const keyword = req.query.keyword;
         let whereCondition = {
@@ -150,6 +153,15 @@ exports.listRolesAndPermission = async (req, res) => {
                 ],
             }),
         };
+
+        // if(admin?.roleId !== 1 && admin?.roleId !==2){
+        //     whereCondition ={
+        //         ...whereCondition,
+        //         createdBy : admin?._id
+        //     }
+        // }
+
+
         if (!clientId) {
             return res.status(400).send({
                 message: message.lblClinetIdIsRequired,
