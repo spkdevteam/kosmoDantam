@@ -18,11 +18,11 @@ const clientRoleSchema = new mongoose.Schema({
                             displayName: { type: String, default: null },
                             access: { type: Boolean, default: false },
                             subMenus: {
-                                list: {
-                                    id: { type: Number, require: true },
-                                    access: { type: Boolean, default: false },
-                                    api: { type: String, default: null },
-                                },
+                                // list: {
+                                //     id: { type: Number, require: true },
+                                //     access: { type: Boolean, default: false },
+                                //     api: { type: String, default: null },
+                                // },
                                 create: {
                                     id: { type: Number, require: true },
                                     access: { type: Boolean, default: false },
@@ -43,16 +43,16 @@ const clientRoleSchema = new mongoose.Schema({
                                     access: { type: Boolean, default: false },
                                     api: { type: String, default: null },
                                 },
-                                hardDelete: {
-                                    id: { type: Number, require: true },
-                                    access: { type: Boolean, default: false },
-                                    api: { type: String, default: null },
-                                },
-                                activeActive: {
-                                    id: { type: Number, require: true },
-                                    access: { type: Boolean, default: false },
-                                    api: { type: String, default: null },
-                                },
+                                // hardDelete: {
+                                //     id: { type: Number, require: true },
+                                //     access: { type: Boolean, default: false },
+                                //     api: { type: String, default: null },
+                                // },
+                                // activeActive: {
+                                //     id: { type: Number, require: true },
+                                //     access: { type: Boolean, default: false },
+                                //     api: { type: String, default: null },
+                                // },
                             }
                         }
                     ],

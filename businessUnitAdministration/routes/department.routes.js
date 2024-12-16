@@ -7,14 +7,14 @@ const entityAuth = require("../../middleware/authorization/commonEntityAuthoriza
 
 
 deptRouter
-    .post('/createDepartment', entityAuth.authorizeEntity("administration", "Department", "create"), deptController.createDepartment)
-    .put('/editDepartment', entityAuth.authorizeEntity("administration", "Department", "update"), deptController.editDepartment)
+    .post('/createDepartment', entityAuth.authorizeEntity("Administration", "Department", "create"), deptController.createDepartment)
+    .put('/editDepartment', entityAuth.authorizeEntity("Administration", "Department", "update"), deptController.editDepartment)
     .delete('/deleteDepartment', deptController.deleteDepartment)
     .post('/softDeleteDepartment', deptController.softDeleteDepartment)
     .get('/activeDepartments', deptController.getAllActiveDepartment)
-    .get('/allDepartmentsByPage', entityAuth.authorizeEntity("administration", "Department", "list"), deptController.listDepartment)
+    .get('/allDepartmentsByPage', entityAuth.authorizeEntity("Administration", "Department", "view"), deptController.listDepartment)
     // .patch('/toggleDepartment', deptController.toggleDepartments)
-    .patch('/activeInactiveDepartment', entityAuth.authorizeEntity("administration", "Department", "update"), deptController.activeinactiveDepartment)
+    .patch('/activeInactiveDepartment', entityAuth.authorizeEntity("Administration", "Department", "update"), deptController.activeinactiveDepartment)
     .put('/revokeDepartment', deptController.revokeDepartment)
     .put('/toggleDepartmentWithPage', deptController.putToggleDepartmentsWithPage)
 

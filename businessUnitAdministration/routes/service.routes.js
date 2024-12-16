@@ -12,14 +12,14 @@ const entityAuth = require("../../middleware/authorization/commonEntityAuthoriza
 
 
 serviceRouter
-    .post('/createServices', entityAuth.authorizeEntity("administration", "Services", "create"), createServices)
-    .put('/editService', entityAuth.authorizeEntity("administration", "Services", "update"), editService)
+    .post('/createServices', entityAuth.authorizeEntity("Administration", "Services", "create"), createServices)
+    .put('/editService', entityAuth.authorizeEntity("Administration", "Services", "update"), editService)
     .delete('/deleteService', deleteService)
     .post('/softDeleteService', softDeleteService)
     .get('/getAllActiveServices', readActiveServices)
-    .get('/allServicesByPage', entityAuth.authorizeEntity("administration", "Services", "list"), listServices)
-    // .patch('/toggleService', entityAuth.authorizeEntity("administration", "Services", "update"), toggleService)
-    .patch('/activeInactiveService', entityAuth.authorizeEntity("administration", "Services", "update"), activeinactiveService)
+    .get('/allServicesByPage', entityAuth.authorizeEntity("Administration", "Services", "list"), listServices)
+    // .patch('/toggleService', entityAuth.authorizeEntity("Administration", "Services", "update"), toggleService)
+    .patch('/activeInactiveService', entityAuth.authorizeEntity("Administration", "Services", "update"), activeinactiveService)
 
     .put('/toggleServiceByPage', putToggleServiceByPage)
     .get('/serviceUnderDepartment', getServiceUnderDepartment)

@@ -13,8 +13,8 @@ const { mailSender } = require("../../email/emailSend");
 const statusCode = require("../../utils/http-status-code");
 const message = require("../../utils/message");
 
-const {commonCheckForClient} = require("../util/commonCheck"); 
-const {staffInfo} = require("../util/staffInfo")
+const { commonCheckForClient } = require("../util/commonCheck");
+const { staffInfo } = require("../util/staffInfo")
 
 // env 
 dotnev.config();
@@ -52,7 +52,7 @@ exports.signIn = async (req, res, next) => {
         // Check if user exists
         const user = await User.findOne(query).populate('role');
 
-        await  commonCheckForClient(user);
+        await commonCheckForClient(user);
 
         // Validate password
         const isPasswordValid = await user.isPasswordCorrect(password);
@@ -126,9 +126,9 @@ exports.signInByOtp = async (req, res, next) => {
         const query = isEmail ? { email: identifier } : { phone: identifier };
 
         // Find user and check if exists
-        const user = await User.findOne(query).select('-password  -createdBy -isCreatedBySuperAdmin -deletedAt -createdAt -updatedAt -otpGeneratedAt ').populate('role','-isActive -createdAt -updatedAt');
+        const user = await User.findOne(query).select('-password  -createdBy -isCreatedBySuperAdmin -deletedAt -createdAt -updatedAt -otpGeneratedAt ').populate('role', '-isActive -createdAt -updatedAt');
 
-        await  commonCheckForClient(user);
+        await commonCheckForClient(user);
 
         // Validate OTP
         if (otp !== user.verificationOtp) {
@@ -137,24 +137,38 @@ exports.signInByOtp = async (req, res, next) => {
             });
         }
 
-        // Set token expiration time
-        // const expiresIn = rememberMe ? '7d' : '1d';
-        // const token = jwt.sign({ id: user._id, email :  user.email }, process.env.PRIVATEKEY, { expiresIn });
+        const accessUnits = user?.accessUnit;
+        console.log("accessUnits", accessUnits);
 
-        // Calculate expiry timestamp for frontend use
+        if (accessUnits?.length == 0) {
+
+            return res.status(statusCode.NotFound).send({
+                message: "You dont have any access."
+            })
+
+        }
+
+        // Set token expiration time
+        const expiresIn = rememberMe ? '7d' : '1d';
+        const token = jwt.sign({ id: accessUnits[0].id, email: user.email }, process.env.PRIVATEKEY, { expiresIn });
         const expiryTime = new Date().getTime() + (rememberMe ? 7 : 1) * 24 * 60 * 60 * 1000;
 
-        const client = await staffInfo(user?._id, user?.email);
+
+        const client = await staffInfo(accessUnits[0].id, user?.email);
+        console.log("staff", client.role.capability);
+        
 
         return res.status(statusCode.OK).send({
             token,
             expiryTime,
             adminInfo: client,
+            clientId: accessUnits[0].id,
+            businessUnitId: client?.businessUnit,
             message: message.lblLoginSuccess
         });
 
     } catch (error) {
-       next(error)
+        next(error)
     }
 };
 
@@ -187,7 +201,7 @@ exports.resendSignInOtp = async (req, res, next) => {
         // Check if user exists
         const user = await User.findOne(query);
 
-        await  commonCheckForClient(user);
+        await commonCheckForClient(user);
 
         // Generate OTP
         const otp = generateOtp();
@@ -224,7 +238,7 @@ exports.resendSignInOtp = async (req, res, next) => {
 
 
     } catch (error) {
-       next(error)
+        next(error)
     }
 };
 
@@ -258,7 +272,7 @@ exports.forgetPassword = async (req, res, next) => {
         // Check if user exists
         const user = await User.findOne(query);
 
-        await  commonCheckForClient(user);
+        await commonCheckForClient(user);
 
         // Generate OTP
         const otp = generateOtp();
@@ -294,7 +308,7 @@ exports.forgetPassword = async (req, res, next) => {
         });
 
     } catch (error) {
-       next(error)
+        next(error)
     }
 };
 
@@ -328,7 +342,7 @@ exports.resetPassword = async (req, res, next) => {
         // Check if user exists
         const user = await User.findOne(query);
 
-        await  commonCheckForClient(user);
+        await commonCheckForClient(user);
 
         // Check if OTP exists (user must have requested a password reset)
         if (!user.OTP) {
