@@ -333,9 +333,17 @@ const bookingRoutes = require("./businessUnitAdministration/routes/appointment.r
 const leaveRouter = require("./businessUnitAdministration/routes/leaveRegister.routes.js");
 
 
+const corsOptions = {
+    origin:true,
+    credentials: true,
+    methods: ['GET', 'PATCH', 'PUT', 'POST','DELETE'],
+    allowedHeaders: ['Origin','Access-Control-Allow-Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'x-refresh-token', 'x-user-role','x-verify-token'],
+    optionsSuccessStatus: 204,
+  }; 
+
 // middleware setup
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json())
 app.use(express.static('public'))
 app.use(bodyParser.json());
