@@ -1,0 +1,7 @@
+{
+    "build": {
+      "src": "api/**/*",
+      "use": "@vercel/node"
+    }
+  }
+  
