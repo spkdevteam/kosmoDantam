@@ -9,6 +9,7 @@ const appointmentSchema = new mongoose.Schema({
     date: { type: Date, required: true }, 
     caseId: { type: mongoose.Schema.ObjectId, ref: 'medicalcase', required: true,index:true },
     dutyDoctorId: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', required: true,index:true },
+    specialistDoctorId: { type: mongoose.Schema.ObjectId, ref: 'clientUsers',index:true },
     dentalAssistant: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', required: true,index:true }, 
     slotFrom: { type: Date  }, 
     slotTo: { type: Date }, 

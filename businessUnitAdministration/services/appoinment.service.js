@@ -68,18 +68,18 @@ exports.getDateWiseBookidDetails = async (input) => {
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
+        if(input?.bookingDate.length > 10)  input?.bookingDate.splice(0,10)
+            console.log(input?.bookingDate)
         const db = await getClientDatabaseConnection(input?.clientId)
         const appointment = await db.model('appointment', appointmentSchema)
-        const startOfDay = new Date(input?.bookingDate);
-        startOfDay.setUTCHours(0, 0, 0, 0); // Set to the start of the day
-        const endOfDay = new Date(input?.bookingDate);
-        endOfDay.setUTCHours(23, 59, 59, 999); // Set to the end of the day
-
+        const startOfDay = new Date(input?.bookingDate+'T00:00:00.000Z');
+        const endOfDay = new Date(input?.bookingDate+'T00:00:00.000Z');
+        
         const bookingdetails = await appointment.find({
             buId: input?.buId,
             branchId: input?.branchId,
             isActive: true,
-            date: { $gte: startOfDay, $lte: endOfDay }
+            date: new Date(input?.bookingDate+'T00:00:00.000Z')
         })
             .populate('dutyDoctorId', 'firstName')
             .populate('dentalAssistant', 'firstName')
@@ -89,7 +89,7 @@ exports.getDateWiseBookidDetails = async (input) => {
             .populate('chairId', 'chairNumber chairLocation')
 
         const bookings = bookingdetails?.map((item) => {
-
+           
             return {
                 _id: item?._id,
                 bookingType: 'appointment',
@@ -142,9 +142,8 @@ exports.getBookingChart = async (input) => {
         const booking = await this.getDateWiseBookidDetails(input);
         const daystatus = [...absentees?.data, ...booking?.data];
         const doctors = await listEmployeeByRole(input);
-
         let data = [];
-
+        
         for (let i = 0; i <= timeSlots?.length; i++) {
             if (!data[i]) data[i] = [];
             for (let j = 0; j <= doctors?.length; j++) {
@@ -157,13 +156,15 @@ exports.getBookingChart = async (input) => {
                     continue
                 }
                 doc_And_Time = { ...doctors[j - 1], ...timeSlots[i - 1] }
-                const record = daystatus.filter((record) => {
-                    return (
-                        doc_And_Time.end > record.slotFrom &&
-                        doc_And_Time.start < record.slotTo &&
+                console.log(doc_And_Time,'saasasasasassassasasas')
+                const record = daystatus.filter((record) =>  {
+                     console.log(  new Date(input?.bookingDate+'T'+doc_And_Time.end+':00.000Z'))
+                    return new Date(input?.bookingDate+'T'+doc_And_Time.end+':00.000Z') > record.slotFrom &&
+                    new Date(input?.bookingDate+'T'+doc_And_Time.start+':00.000Z') < record.slotTo &&
                         doc_And_Time?._doc?.firstName === record?.doctor?.name
-                    );
-                });
+                     
+                 });
+                 console.log(record,'rerecordrecordcord')
                 data[i][j] = record || null
             }
         }
@@ -199,16 +200,13 @@ const filterAppointment = async (input) => {
         if (orConditions.length > 0) {
             query.$or = orConditions;
         }
-        console.log(query)
-        const result = await appointment.find({ ...query })
-
-        const out = await appointment.aggregate([
+         const out = await appointment.aggregate([
             {
                 $match: {
                     isActive: true,
                     deletedAt: null,
                     date: new Date(input.bookingDate + 'T00:00:00.000Z'),
-                    
+
                     $or: [
                         {
                             slotFrom: {
@@ -223,25 +221,33 @@ const filterAppointment = async (input) => {
                             }
                         }
                     ],
-                   
+
 
                 }
             },
             {
-                $match: 
+                $match:
                 {
                     $or: [
-                        { chairId: new  mongoose.Types.ObjectId(input.chairId) },
-                        { dutyDoctorId: new mongoose.Types.ObjectId( input.doctorId) },
-                        { dentalAssistant: new mongoose.Types.ObjectId( input.dentalAssistantId) }
+                        { chairId: new mongoose.Types.ObjectId(input.chairId) },
+                        { dutyDoctorId: new mongoose.Types.ObjectId(input.doctorId) },
+                        { dentalAssistant: new mongoose.Types.ObjectId(input.dentalAssistantId) },
+                      //  { specialistDoctorId:new mongoose.Types.ObjectId(input.specialistDoctorId) }
                     ]
                 }
-            } 
+            }
         ]);
-        console.log({ chairId: input.chairId },
-            { dutyDoctorId: input.doctorId },
-            { dentalAssistant: input.dentalAssistantId })
-        console.log(out, 'aaaaaaaaa')
+        const bookedDoctors = new Set()
+        const bookedChairs =  new Set()
+        const bookedAssistants =  new Set()
+        const bookedSpecialist =  new Set()
+        out?.map((item)=> {
+            bookedDoctors.add(JSON.stringify( item.dutyDoctorId).slice(1,JSON.stringify( item.dutyDoctorId)?.length-1)) 
+            bookedChairs.add(JSON.stringify(item.chairId).slice(1,JSON.stringify( item.chairId)?.length-1))
+            bookedAssistants.add(JSON.stringify(item.dentalAssistant).slice(1,JSON.stringify( item.dentalAssistant)?.length-1)) 
+          //  bookedSpecialist.add(JSON.stringify(item.specialistDoctorId).slice(1,JSON.stringify( item.specialistDoctorId)?.length-1)) 
+        })
+        return {bookedDoctors,bookedChairs,bookedAssistants,bookedSpecialist} 
     } catch (error) {
 
     }
@@ -250,10 +256,9 @@ const filterAppointment = async (input) => {
 exports.generateAvailabiltyChart = async (input) => {
     const absentees = await filterLeaveApplication(input);
     const booking = await filterAppointment(input);
-    const daystatus = [absentees];
-    // console.log(daystatus,'daystatus') 
-
-    return input
+    const daystatus = {...booking,absentees};
+    console.log(daystatus,'9999999999999999999999999')
+    return daystatus
 }
 
 

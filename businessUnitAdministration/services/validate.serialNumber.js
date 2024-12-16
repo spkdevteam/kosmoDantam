@@ -58,7 +58,7 @@ exports.validateObjectId = async ({clientid='',objectId='',collectionName=''})=>
             case 'leaveRegister':
                 return await leaveRegister.findOne({ _id: objectId, deletedAt: null }) ? true : false;
             case 'clientId':
-                console.log('*******')
+                //console.log('*******', await userModel.findOne({ _id: objectId, deletedAt: null }))
                 return await userModel.findOne({ _id: objectId, deletedAt: null }) ? true : false;
             default:
                 return false;
