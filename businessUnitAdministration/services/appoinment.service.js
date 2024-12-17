@@ -257,7 +257,6 @@ exports.generateAvailabiltyChart = async (input) => {
     const absentees = await filterLeaveApplication(input);
     const booking = await filterAppointment(input);
     const daystatus = {...booking,absentees};
-    console.log(daystatus,'9999999999999999999999999')
     return daystatus
 }
 
