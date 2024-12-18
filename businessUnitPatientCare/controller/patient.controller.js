@@ -24,7 +24,7 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
     try {
         const { clientId, branchId, roleId, businessUnit, firstName, lastName, email, phone, gender, age, bloodGroup, patientGroup, referedBy, city, state, country, ZipCode, address, password } = req.body;
         const mainUser = req.user;
-        
+
         await commonIdCheck({ clientId, branchId, businessUnit });
         if (!firstName || !lastName || !email || !phone || !roleId || !city || !state || !country || !ZipCode || !address) {
             return res.status(statusCode.BadRequest).send({
@@ -262,6 +262,46 @@ exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
         this.listPatient(req, res)
     } catch (error) {
         next(error);
+    }
+};
+
+
+exports.softDeletePatient = async (req, res) => {
+    try {
+        const { keyword, page, perPage, patientId, clientId } = req.body;
+        req.query.keyword = keyword;
+        req.query.page = page;
+        req.query.perPage = perPage;
+        req.query.clientId = clientId;
+        if (!clientId || !patientId) {
+            return res.status(400).send({
+                message: message.lblPatientIdIdAndClientIdRequired,
+            });
+        }
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Patient = clientConnection.model('patient', clinetPatientSchema);
+        const patient = await Patient.findById(patientId);
+        if (!patient) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblPatientNotFound,
+            });
+        }
+        if (!patient.isChainedWithMainPatient) {
+            await patientService.deleteOne(clientId, patient.email, {
+                deletedAt: new Date()
+            });
+        }
+        Object.assign(patient, {
+            deletedAt: new Date()
+        });
+        await patient.save();
+        this.listPatient(req, res)
+    } catch (error) {
+        console.error("Error in deleting the patient :", error);
+        return res.status(statusCode.InternalServerError).send({
+            message: message.lblInternalServerError,
+            error: error.message,
+        });
     }
 };
 

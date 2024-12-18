@@ -110,10 +110,26 @@ const activeInactive = async (clientId, email, data) => {
     }
 };
 
+const deleteOne = async (clientId, email, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const User = clientConnection.model('clientUsers', clinetUserSchema);
+        const patient = await User.findOne({email : email});
+        if (!patient) {
+            throw new CustomError(statusCode.NotFound, message.lblPatientNotFound);
+        }
+        Object.assign(patient, data);
+        return await patient.save();
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error active inactive patient: ${error.message}`);
+    }
+};
+
 module.exports = {
     create,
     update,
     getById,
     list,
     activeInactive,
+    deleteOne
 };

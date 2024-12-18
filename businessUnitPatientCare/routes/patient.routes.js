@@ -71,6 +71,9 @@ router.get('/listPatient', entityAuth.authorizeEntity("Patient", "Patient", "vie
 
 router.post("/activeInactivePatient", entityAuth.authorizeEntity("Patient", "Patient", "update"), businessUnitPatientContrller.activeinactivePatientByBusinessUnit);
 
+router.post("/softDeletePatient", entityAuth.authorizeEntity("Patient", "Patient", "softDelete"), businessUnitPatientContrller.softDeletePatient);
+
+
 router.get('/getPatientRoleId/:clientId',  businessUnitPatientContrller.getPatientRoleId);
 
 
