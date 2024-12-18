@@ -6,7 +6,8 @@ const clinetPatientSchema = require("../../client/model/patient")
 const message = require("../../utils/message");
 const statusCode = require("../../utils/http-status-code");
 
-const CustomError = require("../../utils/customeError")
+const CustomError = require("../../utils/customeError");
+const clinetBranchSchema = require("../../client/model/branch");
 
 
 const create = async (clientId, data) => {
@@ -77,10 +78,15 @@ const list = async (clientId, filters = {}, options = { page: 1, limit: 10 }) =>
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Patient = clientConnection.model('patient', clinetPatientSchema);
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
         const { page, limit } = options;
         const skip = (page - 1) * limit;
         const [patients, total] = await Promise.all([
-            Patient.find(filters).skip(skip).limit(limit).sort({ _id: -1 }),
+            Patient.find(filters).skip(skip).limit(limit).sort({ _id: -1 }).populate({
+                path: 'branch',
+                model: Branch,
+                select: 'displayId name _id'
+            }),
             Patient.countDocuments(filters),
         ]);
         return { count: total, patients };
