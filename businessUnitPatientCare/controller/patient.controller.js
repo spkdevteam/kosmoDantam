@@ -22,10 +22,11 @@ const patientService = require("../services/patient.service")
 // create Main Patient by business unit
 exports.createMainPatientByBusinessUnit = async (req, res, next) => {
     try {
-        const { clientId, branchId, roleId, businessUnit, firstName, lastName, email, phone, gender, age, bloodGroup, patientGroup, referedBy, city, state, country, password } = req.body;
+        const { clientId, branchId, roleId, businessUnit, firstName, lastName, email, phone, gender, age, bloodGroup, patientGroup, referedBy, city, state, country, ZipCode, address, password } = req.body;
         const mainUser = req.user;
+
         await commonIdCheck({ clientId, branchId, businessUnit });
-        if (!firstName || !lastName || !email || !phone || !roleId || !city || !state || !country) {
+        if (!firstName || !lastName || !email || !phone || !roleId || !city || !state || !country || !ZipCode || !address) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
@@ -36,14 +37,14 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
         if (!role) {
             throw new CustomError(statusCode.Conflict, message.lblRoleNotFound);
         }
-
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        const newPatient = await patientService.create(clientId, {
+        const displayId = await getserialNumber('patient', clientId, '', businessUnit);
+        let profileUpdates = {
+            displayId: displayId,
             firstName,
             lastName,
             email,
-            phone, city, state, country,
+            phone, city, state, country, ZipCode, address,
             gender, age, bloodGroup, patientGroup, referedBy,
             password: hashedPassword,
             branch: branchId,
@@ -53,19 +54,27 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
             tc: true,
             isUserVerified: true,
             createdBy: mainUser._id,
-
-        });
+        }
+        if (req.file?.filename) {
+            profileUpdates.profileImage = req.file.filename;
+        }
+        const newPatient = await patientService.create(clientId, { ...profileUpdates });
         const Patient = clientConnection.model('patient', clinetPatientSchema);
-        const newPatientInstance = await Patient.create({
+        let profileUpdates2 = {
+            displayId: displayId,
             firstName,
             lastName,
             email,
-            phone, city, state, country,
+            phone, city, state, country, ZipCode, address,
             gender, age, bloodGroup, patientGroup, referedBy,
             branch: branchId,
             businessUnit: businessUnit,
             createdBy: mainUser._id,
-        })
+        }
+        if (req.file?.filename) {
+            profileUpdates2.profileImage = req.file.filename;
+        }
+        const newPatientInstance = await Patient.create({ ...profileUpdates2 })
         return res.status(statusCode.OK).send({
             message: message.lblPatientCreatedSuccess,
             data: { patientId: newPatient._id },
@@ -121,7 +130,7 @@ exports.createSubPatientByBusinessUnit = async (req, res, next) => {
 // update Patient by business unit
 exports.updatePatientByBusinessUnit = async (req, res, next) => {
     try {
-        const { clientId, branchId, businessUnit, patientId, firstName, lastName, email, phone, gender, age, bloodGroup, patientGroup, referedBy, city, state, country } = req.body;
+        const { clientId, branchId, businessUnit, patientId, firstName, lastName, email, phone, gender, age, bloodGroup, patientGroup, referedBy, city, state, country, ZipCode, address, } = req.body;
         await commonIdCheck({ clientId, branchId, businessUnit });
         if (!patientId) {
             return res.status(statusCode.BadRequest).send({
@@ -140,10 +149,14 @@ exports.updatePatientByBusinessUnit = async (req, res, next) => {
             firstName,
             lastName,
             email,
-            phone, city, state, country,
+            phone, city, state, country, ZipCode, address,
             gender, age, bloodGroup, patientGroup, referedBy,
             branch: branchId,
             businessUnit: businessUnit,
+        }
+
+        if (req.file?.filename) {
+            dataObject.profileImage = req.file.filename;
         }
         if (!patient.isChainedWithMainPatient) {
             await patientService.update(clientId, patient.email, dataObject);
@@ -194,6 +207,15 @@ exports.listPatient = async (req, res, next) => {
                     { lastName: { $regex: keyword.trim(), $options: "i" } },
                     { email: { $regex: keyword.trim(), $options: "i" } },
                     { phone: { $regex: keyword.trim(), $options: "i" } },
+                    {
+                        $expr: {
+                            $regexMatch: {
+                                input: { $concat: ["$firstName", " ", "$lastName"] },
+                                regex: keyword.trim(),
+                                options: "i",
+                            },
+                        },
+                    },
                 ],
             }),
         };
@@ -244,7 +266,64 @@ exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
 };
 
 
-const CustomError = require("../../utils/customeError")
+exports.softDeletePatient = async (req, res) => {
+    try {
+        const { keyword, page, perPage, patientId, clientId } = req.body;
+        req.query.keyword = keyword;
+        req.query.page = page;
+        req.query.perPage = perPage;
+        req.query.clientId = clientId;
+        if (!clientId || !patientId) {
+            return res.status(400).send({
+                message: message.lblPatientIdIdAndClientIdRequired,
+            });
+        }
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Patient = clientConnection.model('patient', clinetPatientSchema);
+        const patient = await Patient.findById(patientId);
+        if (!patient) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblPatientNotFound,
+            });
+        }
+        if (!patient.isChainedWithMainPatient) {
+            await patientService.deleteOne(clientId, patient.email, {
+                deletedAt: new Date()
+            });
+        }
+        Object.assign(patient, {
+            deletedAt: new Date()
+        });
+        await patient.save();
+        this.listPatient(req, res)
+    } catch (error) {
+        console.error("Error in deleting the patient :", error);
+        return res.status(statusCode.InternalServerError).send({
+            message: message.lblInternalServerError,
+            error: error.message,
+        });
+    }
+};
+
+
+exports.getPatientRoleId = async (req, res, next) => {
+    try {
+        const { clientId } = req.params;
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Role = clientConnection.model('clientRoles', clientRoleSchema);
+        const role = await Role.findOne({ id: 17 });
+        return res.status(statusCode.OK).send({
+            message: "Patient role id found successfully",
+            data: role,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+const CustomError = require("../../utils/customeError");
+const getserialNumber = require("../../model/services/getserialNumber");
 
 
 const commonIdCheck = async (data) => {

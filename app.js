@@ -619,9 +619,9 @@ async function dropIndexes() {
 
 async function createSerialNumber () {
     try {
-        const clientId = "67441b73cbc8975325e14a3f";
-        const collectionName = "service";
-        const prefix = "SV";
+        const clientId = "6760241a890afbdafd08198b";
+        const collectionName = "patient";
+        const prefix = "PT";
         const nextNum = 100010;
         const clientConnection = await getClientDatabaseConnection(clientId);
         const SerialNumber = clientConnection.model('serialNumber', serialNumberSchema);
