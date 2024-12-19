@@ -7,7 +7,8 @@ const { validateObjectId } = require("./validate.serialNumber");
 const { getDateWiseLeaVeDetails, filterLeaveApplication } = require("./leaveRegister.service");
 const timeSlots = require("../../utils/timeSlots");
 const { listEmployeeByRole } = require("./clientUser.service");
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const { getchairList } = require("./chairs.service");
 
 exports.creatAppointment = async (input) => {
     try {
@@ -69,7 +70,6 @@ exports.getDateWiseBookidDetails = async (input) => {
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
         if(input?.bookingDate.length > 10)  input?.bookingDate.splice(0,10)
-            console.log(input?.bookingDate)
         const db = await getClientDatabaseConnection(input?.clientId)
         const appointment = await db.model('appointment', appointmentSchema)
         const startOfDay = new Date(input?.bookingDate+'T00:00:00.000Z');
@@ -142,6 +142,8 @@ exports.getBookingChart = async (input) => {
         const booking = await this.getDateWiseBookidDetails(input);
         const daystatus = [...absentees?.data, ...booking?.data];
         const doctors = await listEmployeeByRole(input);
+        const chairs = await getchairList(input);
+        console.log(chairs,'chairschairs')
         let data = [];
         
         for (let i = 0; i <= timeSlots?.length; i++) {
@@ -158,7 +160,7 @@ exports.getBookingChart = async (input) => {
                 doc_And_Time = { ...doctors[j - 1], ...timeSlots[i - 1] }
                 console.log(doc_And_Time,'saasasasasassassasasas')
                 const record = daystatus.filter((record) =>  {
-                     console.log(  new Date(input?.bookingDate+'T'+doc_And_Time.end+':00.000Z'))
+                      
                     return new Date(input?.bookingDate+'T'+doc_And_Time.end+':00.000Z') > record.slotFrom &&
                     new Date(input?.bookingDate+'T'+doc_And_Time.start+':00.000Z') < record.slotTo &&
                         doc_And_Time?._doc?.firstName === record?.doctor?.name
