@@ -32,9 +32,11 @@ exports.createCheifComplaints = async (req, res, next) => {
         const newCheifComplaint = await caseSheetService.create(clientId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, cheifComplaints, displayId: serialNumber,
         });
+        console.log("newCheifComplaint",newCheifComplaint);
+        
         return res.status(statusCode.OK).send({
             message: message.lblCheifComplaintsCreatedSuccess,
-            data: { caseSheetId: newCheifComplaint._id },
+            data: { cheifComplaints: newCheifComplaint.cheifComplaints, _id : newCheifComplaint._id },
         });
     } catch (error) {
         next(error)
@@ -703,6 +705,29 @@ exports.listCaseSheet = async (req, res, next) => {
             // }),
         };
         const result = await caseSheetService.list(clientId, filters, { page, limit: perPage });
+        return res.status(statusCode.OK).send({
+            message: message.lblCaseSheetFoundSucessfully,
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// get all drafted case sheet
+exports.getAllDrafted = async (req, res, next) => {
+    try {
+        const { clientId } = req.params;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        const filters = {
+            deletedAt: null,
+            status : "In Progress"
+        };
+        const result = await caseSheetService.listDrafted(clientId, filters);
         return res.status(statusCode.OK).send({
             message: message.lblCaseSheetFoundSucessfully,
             data: result,

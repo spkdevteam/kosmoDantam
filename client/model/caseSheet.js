@@ -18,11 +18,12 @@ const caseSheetSchema = new mongoose.Schema({
                 complaints: {
                     type: [
                         {
-                            compId: { type: mongoose.Schema.ObjectId, ref: "CheifComplaint" }
+                            compId: { type: mongoose.Schema.ObjectId, ref: "complaint" }
                         }
+                    //   { type: mongoose.Schema.ObjectId, ref: "complaint" }
+                       
                     ]
                 }
-
             },
         ],
         default: [],

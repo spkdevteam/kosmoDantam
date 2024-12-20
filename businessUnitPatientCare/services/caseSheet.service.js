@@ -9,16 +9,52 @@ const statusCode = require("../../utils/http-status-code");
 
 const CustomError = require("../../utils/customeError");
 const { default: mongoose } = require("mongoose");
+const complaintSchema = require("../../client/model/complaint");
+const { path } = require("../../model/patient");
 
 const create = async (clientId, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        return await CaseSheet.create(data);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+
+        const newCheifComplaint = await CaseSheet.create(data);
+        const populatedCaseSheet = await CaseSheet.findById(newCheifComplaint._id).populate({
+            path: 'cheifComplaints.complaints.compId',
+            model: Complaint,
+            select: 'complaintName _id'
+        })
+
+        return populatedCaseSheet
+        // return await CaseSheet.create(data);
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
     }
 };
+
+// const create = async (clientId, data) => {
+//     try {
+//         const clientConnection = await getClientDatabaseConnection(clientId);
+//         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+
+//         // Create a new case sheet
+//         const newCaseSheet = await CaseSheet.create(data);
+
+//         // Populate the compId field in cheifComplaints
+//         const populatedCaseSheet = await CaseSheet.findById(newCaseSheet._id).populate({
+//             path: 'cheifComplaints.complaints.compId',
+//             select: 'name _id', // Select specific fields to include
+//         });
+
+//         return populatedCaseSheet;
+//     } catch (error) {
+//         throw new CustomError(error.statusCode || 500, `Error creating chief complaint of case sheet: ${error.message}`);
+//     }
+// };
+
+
+
+
 
 const update = async (clientId, caseSheetId, data) => {
     try {
@@ -45,12 +81,12 @@ const deleteCheifComplaints = async (clientId, caseSheetId, cheifComplaintId) =>
         }
         const cheifComlaintArray = existing?.cheifComplaints;
         const mongObjId = new mongoose.Types.ObjectId(cheifComplaintId);
-        const newCheifComplaint = cheifComlaintArray.filter((item) =>{
+        const newCheifComplaint = cheifComlaintArray.filter((item) => {
             return !item._id.equals(mongObjId)
         });
-        
+
         existing.cheifComplaints = newCheifComplaint;
-        return  await existing.save();
+        return await existing.save();
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
@@ -66,11 +102,11 @@ const deleteClinicalFinding = async (clientId, caseSheetId, clinicalFindingId) =
         }
         const clinicalFindingsArray = existing?.clinicalFindings;
         const mongObjId = new mongoose.Types.ObjectId(clinicalFindingId);
-        const newArray = clinicalFindingsArray.filter((item) =>{
+        const newArray = clinicalFindingsArray.filter((item) => {
             return !item._id.equals(mongObjId)
         });
         existing.clinicalFindings = newArray;
-        return  await existing.save();
+        return await existing.save();
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
@@ -86,11 +122,11 @@ const deleteMedicalHistory = async (clientId, caseSheetId, medicalHistoryId) => 
         }
         const medicalHistoryArray = existing?.medicalHistory;
         const mongObjId = new mongoose.Types.ObjectId(medicalHistoryId);
-        const newArray = medicalHistoryArray.filter((item) =>{
+        const newArray = medicalHistoryArray.filter((item) => {
             return !item._id.equals(mongObjId)
         });
         existing.medicalHistory = newArray;
-        return  await existing.save();
+        return await existing.save();
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
@@ -106,11 +142,11 @@ const deleteInvestigation = async (clientId, caseSheetId, investigationId) => {
         }
         const investigationArray = existing?.investigation;
         const mongObjId = new mongoose.Types.ObjectId(investigationId);
-        const newArray = investigationArray.filter((item) =>{
+        const newArray = investigationArray.filter((item) => {
             return !item._id.equals(mongObjId)
         });
         existing.investigation = newArray;
-        return  await existing.save();
+        return await existing.save();
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
@@ -126,11 +162,11 @@ const deleteOtherAttachment = async (clientId, caseSheetId, otherAttachmentId) =
         }
         const otherAttachmentArray = existing?.otherAttachment;
         const mongObjId = new mongoose.Types.ObjectId(otherAttachmentId);
-        const newArray = otherAttachmentArray.filter((item) =>{
+        const newArray = otherAttachmentArray.filter((item) => {
             return !item._id.equals(mongObjId)
         });
         existing.otherAttachment = newArray;
-        return  await existing.save();
+        return await existing.save();
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
@@ -146,11 +182,11 @@ const deleteNote = async (clientId, caseSheetId, noteId) => {
         }
         const noteArray = existing?.note;
         const mongObjId = new mongoose.Types.ObjectId(noteId);
-        const newArray = noteArray.filter((item) =>{
+        const newArray = noteArray.filter((item) => {
             return !item._id.equals(mongObjId)
         });
         existing.note = newArray;
-        return  await existing.save();
+        return await existing.save();
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
@@ -166,11 +202,11 @@ const deleteServices = async (clientId, caseSheetId, serviceId) => {
         }
         const array = existing?.services;
         const mongObjId = new mongoose.Types.ObjectId(serviceId);
-        const newArray = array.filter((item) =>{
+        const newArray = array.filter((item) => {
             return !item._id.equals(mongObjId)
         });
         existing.services = newArray;
-        return  await existing.save();
+        return await existing.save();
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
@@ -186,11 +222,11 @@ const deleteProcedure = async (clientId, caseSheetId, procedureId) => {
         }
         const array = existing?.procedures;
         const mongObjId = new mongoose.Types.ObjectId(procedureId);
-        const newArray = array.filter((item) =>{
+        const newArray = array.filter((item) => {
             return !item._id.equals(mongObjId)
         });
         existing.procedures = newArray;
-        return  await existing.save();
+        return await existing.save();
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
@@ -212,11 +248,44 @@ const list = async (clientId, filters = {}, options = { page: 1, limit: 10 }) =>
     }
 };
 
+const listDrafted = async (clientId, filters = {}) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Patient = clientConnection.model('patient', clinetPatientSchema);
+        const [caseSheets] = await Promise.all([
+            CaseSheet.find(filters).sort({ _id: -1 }).populate({
+                path: 'cheifComplaints.complaints.compId',
+                model: Complaint,
+                select: 'complaintName _id'
+            }).populate({
+                path: 'patientId',
+                model: Patient,
+                select: 'firstName lastName displayId'
+            }),
+        ]);
+        // const populatedCaseSheet = await CaseSheet.findById(newCheifComplaint._id).populate({
+        //     path: 'cheifComplaints.complaints.compId',
+        //     model: Complaint,
+        //     select: 'complaintName _id'
+        // })
+        return { caseSheets };
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
+    }
+};
+
 const getById = async (clientId, caseSheetId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const caseSheet = await CaseSheet.findById(caseSheetId);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const caseSheet = await CaseSheet.findById(caseSheetId).populate({
+            path: 'cheifComplaints.complaints.compId',
+            model: Complaint,
+            select: 'complaintName _id'
+        });
         if (!caseSheet) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
@@ -230,14 +299,19 @@ const updateTreatmentProcedure = async (clientId, caseSheetId, procedureId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const existing = await CaseSheet.findById(caseSheetId);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const existing = await CaseSheet.findById(caseSheetId).populate({
+            path: 'cheifComplaints.complaints.compId',
+            model: Complaint,
+            select: 'complaintName _id'
+        });
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
         const newProcedureArray = existing?.procedures?.map((item) => {
-            if(item?._id == procedureId){
+            if (item?._id == procedureId) {
                 item.finished = true
-            }else{
+            } else {
                 return item
             }
         })
@@ -261,5 +335,6 @@ module.exports = {
     deleteProcedure,
     list,
     getById,
-    updateTreatmentProcedure
+    updateTreatmentProcedure,
+    listDrafted
 };

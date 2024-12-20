@@ -413,9 +413,23 @@ const serialNumber = [
 ]
 
 
+// cheif complaints data
+
+const cheifComplaints = [
+    { complaintName : "Swelling Large", discription: "Any description"},
+    { complaintName : "Toothache", discription: "Any description"},
+    { complaintName : "Bleeding Gums", discription: "Any description"},
+    { complaintName : "Pain in Tooth", discription: "Any description"},
+    { complaintName : "Consultation", discription: "Any description"},
+    { complaintName : "Faulty Crown", discription: "Any description"},
+    { complaintName : "Difficulty in Chewing", discription: "Any description"},
+]
+
+
 
 
 exports.clientRoles = clientRoles;
 exports.defaultPersmissionsList = defaultPersmissionsList;
 exports.businessUnitPersmissionsList = businessUnitPersmissionsList;
 exports.serialNumber = serialNumber;
+exports.cheifComplaints = cheifComplaints

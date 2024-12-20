@@ -9,14 +9,14 @@ const { upsertTeeth } = require("./client/model/tooth.js");
 
 const errorHandler = require("./middleware/errorHandler/errorHandler.js");
 
-const swaggerDocs = require("./documentation/swagger.js");  
+const swaggerDocs = require("./documentation/swagger.js");
 const swaggerUi = require('swagger-ui-express');
 
 
 const clientRoleSchema = require("./client/model/role.js");
 const clinetPatientSchema = require("./client/model/patient.js");
 const serialNumberSchema = require("./model/serialNumber.js")
-const {defaultPersmissionsList, businessUnitPersmissionsList} = require("./utils/constant.js")
+const { defaultPersmissionsList, businessUnitPersmissionsList, cheifComplaints } = require("./utils/constant.js")
 
 
 // upsertTeeth([
@@ -309,12 +309,13 @@ const clinetChairhRouter = require("./businessUnitAdministration/routes/chair.ro
 const clientEmployeeRouter = require("./businessUnitAdministration/routes/employee.routes.js")
 const clinetRoleRouter = require("./businessUnitAdministration/routes/rolesAndPermission.routes.js");
 const clientPatientRouter = require("./businessUnitPatientCare/routes/patient.routes.js");
-const clientCaseSheetRouter = require("./businessUnitPatientCare/routes/caseSheet.routes.js")
+const clientCaseSheetRouter = require("./businessUnitPatientCare/routes/caseSheet.routes.js");
+const clientComplaintRouter = require("./businessUnitAdministration/routes/complaint.routes.js")
 
 
 const clientDepartment = require("./businessUnitAdministration/routes/department.routes.js");
-const clientservicesRouter= require("./businessUnitAdministration/routes/service.routes.js");
-const clientProcedureRouter= require("./businessUnitAdministration/routes/procedure.routes.js");
+const clientservicesRouter = require("./businessUnitAdministration/routes/service.routes.js");
+const clientProcedureRouter = require("./businessUnitAdministration/routes/procedure.routes.js");
 
 
 
@@ -331,6 +332,8 @@ const ccRouter = require("./businessUnitAdministration/routes/cheifComplaint..ro
 const investigationRouter = require("./businessUnitAdministration/routes/investigation.routes.js");
 const bookingRoutes = require("./businessUnitAdministration/routes/appointment.routes.js");
 const leaveRouter = require("./businessUnitAdministration/routes/leaveRegister.routes.js");
+const cheifComplaintSchema = require("./client/model/cheifcomplaint.js");
+const complaintSchema = require("./client/model/complaint.js");
 
 
 // middleware setup
@@ -339,7 +342,7 @@ app.use(cors());
 app.use(express.json())
 app.use(express.static('public'))
 app.use(bodyParser.json());
-app.use(express.urlencoded({extended:true}))
+app.use(express.urlencoded({ extended: true }))
 
 
 
@@ -351,7 +354,7 @@ ConnectDb(DATABASE_URL);
 // routes setup
 app.use("/api", welcomeRouter.router);
 app.use("/api/superAdmin", superAdminRouter.router);
-app.use("/api/superAdmin/tooth", toothRouter); 
+app.use("/api/superAdmin/tooth", toothRouter);
 app.use("/api/superAdmin/bu/", superAdminBuRouter.router);
 
 app.use("/api/client/auth/", clientAuthRouter.router);
@@ -364,18 +367,19 @@ app.use("/api/client/branch/chair", clinetChairhRouter.router);
 app.use("/api/client/bu/role", clinetRoleRouter.router);
 app.use("/api/client/bu/patient", clientPatientRouter.router);
 app.use("/api/client/bu/caseSheet", clientCaseSheetRouter.router);
+app.use("/api/client/bu/complaint", clientComplaintRouter.router);
 
 app.use("/api/client/bu/department", clientDepartment);
 app.use("/api/client/bu/services", clientservicesRouter);
 app.use("/api/client/bu/procedures", clientProcedureRouter);
 app.use("/api/client/bu/MediCases", medHistoryRoutes);
 app.use("/api/client/bu/findings", findingsRouter);
-app.use("/api/client/bu/chiefComplaint",ccRouter )
-app.use("/api/client/bu/investigation",investigationRouter)
-app.use("/api/client/bu/booking",bookingRoutes)
-app.use("/api/client/bu/leave",leaveRouter)
+app.use("/api/client/bu/chiefComplaint", ccRouter);
+app.use("/api/client/bu/investigation", investigationRouter)
+app.use("/api/client/bu/booking", bookingRoutes)
+app.use("/api/client/bu/leave", leaveRouter)
 
-app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocs))
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 
 // insert role
 const roles = [
@@ -515,7 +519,7 @@ async function createNewRole(params) {
         const role = await Roles.findOne({ name: roleData.name });
 
         if (role) {
-            
+
             console.log("ROle already Exisits", role);
 
             return
@@ -536,14 +540,14 @@ async function createNewRole(params) {
 
 
 
-async function createRoleInDatbaseInstance () {
+async function createRoleInDatbaseInstance() {
     try {
         const clientId = "67441b73cbc8975325e14a3f";
         const data = { id: 17, name: "patienit", capability: defaultPersmissionsList };
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Role = clientConnection.model('clientRoles', clientRoleSchema);
-        const existing = await Role.findOne({id : 17});
-        if(existing){
+        const existing = await Role.findOne({ id: 17 });
+        if (existing) {
             console.log("patient role already exists");
             return false
         }
@@ -558,20 +562,20 @@ async function createRoleInDatbaseInstance () {
 
 
 
-async function updateRoleInDatbaseInstance () {
+async function updateRoleInDatbaseInstance() {
     try {
         const clientId = "67441b73cbc8975325e14a3f";
         const buCapability = businessUnitPersmissionsList;
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Role = clientConnection.model('clientRoles', clientRoleSchema);
-        const existing = await Role.findOne({id : 2});
-        if(existing){
+        const existing = await Role.findOne({ id: 2 });
+        if (existing) {
             existing.capability = buCapability;
-            await  existing.save()
-        }else{
+            await existing.save()
+        } else {
             console.log("role not found");
         }
-      
+
     } catch (error) {
         console.log("error while creating the petient", error);
     }
@@ -609,32 +613,54 @@ async function dropIndexes() {
 
 // create serial numbers in instance of database
 
-async function createSerialNumber () {
+async function createSerialNumber() {
     try {
         const clientId = "6760241a890afbdafd08198b";
-        const collectionName = "patient";
-        const prefix = "PT";
+        const collectionName = "caseSheet";
+        const prefix = "CS";
         const nextNum = 100010;
         const clientConnection = await getClientDatabaseConnection(clientId);
         const SerialNumber = clientConnection.model('serialNumber', serialNumberSchema);
-        const existing = await SerialNumber.findOne({collectionName : collectionName});
-        if(existing){
+        const existing = await SerialNumber.findOne({ collectionName: collectionName });
+        if (existing) {
             console.log("serial Number already exists");
-            return 
+            return
         }
         await SerialNumber.create({
-            collectionName : collectionName,
-            prefix : prefix,
-            nextNum : nextNum
+            collectionName: collectionName,
+            prefix: prefix,
+            nextNum: nextNum
         })
         console.log("serial number created successfully");
     } catch (error) {
         console.log("error while creating the serial number");
-        
+
     }
 }
 
 // createSerialNumber()
+
+
+// create cheif complaints
+
+async function createCheifComplaints() {
+    try {
+        const clientId = "6760241a890afbdafd08198b";
+        const data = cheifComplaints;
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const count = await Complaint.countDocuments({});
+        if (count == 0) {
+            await Complaint.insertMany(data);
+        }else{
+            console.log("complaints alrady exits");
+        }
+    } catch (error) {
+        console.log("error while creating cheif complaint", error);
+    }
+}
+
+// createCheifComplaints()
 
 
 
