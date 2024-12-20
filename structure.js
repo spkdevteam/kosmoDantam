@@ -1,3 +1,5 @@
+const { upsertTeeth } = require("./client/model/tooth")
+
 patientMaster =[ {
     contactNumber:7907441232,
     referedPatientCode:'hum00001',
@@ -322,3 +324,4 @@ patientMaster =[ {
             ]
         },
     }
+ 

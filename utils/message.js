@@ -90,7 +90,7 @@ module.exports = {
   lblBranchIRequired: " Brach Id is required!",
   lblBranchNotFound: "Branch not found!",
   lblBranchFoundSucessfully: "Branch found successfully!",
-
+  lblBranchIdInvalid:"invalid Branch Id",
 
 
   // chair 
@@ -368,7 +368,7 @@ module.exports = {
     lblAppointmentAlreadyExist: "An Appointment with the same details already exists.",
 
     lblClinetIdInvalid:"invalid Client id",
-
+    
     lblLeaveRegisterCreated: "New Leave Registration added to the system.",
     lblLeaveRegisterEdited: "Changes to the Leave Registration have been saved.",
     lblLeaveRegisterDeleted: "The Leave Registration has been removed from the system.",

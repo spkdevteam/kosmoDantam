@@ -178,7 +178,7 @@ const procedureUnderService = async (input) => {
 }
 const getAllProceduresByPage = async (input) => {
     try {
-        !input?.keyWord === undefined ? input.keyWord = "" : ''
+        !input?.keyword === undefined || !input?.keyWord === undefined || !input?.keyWord.length || !input?.keyword.length ? input.keyWord = '' : ''
         !input?.page ? input.page = 0 : input.page = parseInt(input.page)
         !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
         const orArray = input?.keyWord?.length ? {$or:[

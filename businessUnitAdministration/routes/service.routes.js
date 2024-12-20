@@ -17,10 +17,9 @@ serviceRouter
     .delete('/deleteService', deleteService)
     .post('/softDeleteService', softDeleteService)
     .get('/getAllActiveServices', readActiveServices)
-    .get('/allServicesByPage', entityAuth.authorizeEntity("Administration", "Services", "list"), listServices)
+    .get('/allServicesByPage', entityAuth.authorizeEntity("Administration", "Services", "view"), listServices)
     // .patch('/toggleService', entityAuth.authorizeEntity("Administration", "Services", "update"), toggleService)
     .patch('/activeInactiveService', entityAuth.authorizeEntity("Administration", "Services", "update"), activeinactiveService)
-
     .put('/toggleServiceByPage', putToggleServiceByPage)
     .get('/serviceUnderDepartment', getServiceUnderDepartment)
 
