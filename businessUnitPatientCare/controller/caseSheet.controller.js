@@ -36,7 +36,7 @@ exports.createCheifComplaints = async (req, res, next) => {
         
         return res.status(statusCode.OK).send({
             message: message.lblCheifComplaintsCreatedSuccess,
-            data: { cheifComplaints: newCheifComplaint.cheifComplaints, _id : newCheifComplaint._id },
+            data: { cheifComplaints: newCheifComplaint.cheifComplaints, _id : newCheifComplaint._id, caseSheets : newCheifComplaint },
         });
     } catch (error) {
         next(error)
@@ -59,7 +59,7 @@ exports.updateCheifComplaints = async (req, res, next) => {
         });
         return res.status(statusCode.OK).send({
             message: message.lblCheifComplaintsUpdatedSuccess,
-            data: { caseSheetId: newCheifComplaint._id },
+            data: { cheifComplaints: newCheifComplaint.cheifComplaints, _id : newCheifComplaint._id }
         });
     } catch (error) {
         next(error)
@@ -83,7 +83,7 @@ exports.deleteCheifComplaints = async (req, res, next) => {
         const deleted = await caseSheetService.deleteCheifComplaints(clientId, caseSheetId, cheifComplaintId);
         return res.status(statusCode.OK).send({
             message: message.lblCheifComplaintsDeletedSuccess,
-            data: { caseSheetId: deleted?._id }
+            data: { cheifComplaints: deleted.cheifComplaints, _id : deleted._id }
         });
     } catch (error) {
         next(error)
@@ -717,14 +717,15 @@ exports.listCaseSheet = async (req, res, next) => {
 // get all drafted case sheet
 exports.getAllDrafted = async (req, res, next) => {
     try {
-        const { clientId } = req.params;
-        if (!clientId) {
+        const { clientId, patientId } = req.params;
+        if (!clientId || !patientId) {
             return res.status(statusCode.BadRequest).send({
-                message: message.lblClinetIdIsRequired,
+                message: message.lblRequiredFieldMissing,
             });
         }
         const filters = {
             deletedAt: null,
+            patientId : patientId,
             status : "In Progress"
         };
         const result = await caseSheetService.listDrafted(clientId, filters);

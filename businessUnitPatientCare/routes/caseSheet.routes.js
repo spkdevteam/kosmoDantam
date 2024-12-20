@@ -23,8 +23,8 @@ const {
 
 // cheif complain part
 router.post('/createCheifComplaints', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createCheifComplaints);
-router.put('/updateCheifComplaints', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.updateCheifComplaints);
-router.delete('/deleteCheifComplaints', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteCheifComplaints);
+router.put('/updateCheifComplaints', entityAuth.authorizeEntity("Patient", "Case Sheet", "update"), caseSheetController.updateCheifComplaints);
+router.post('/deleteCheifComplaints', entityAuth.authorizeEntity("Patient", "Case Sheet", "softDelete"), caseSheetController.deleteCheifComplaints);
 
 // clinical finding part
 router.post('/createClinicalFinding', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createClinicalFinding);
@@ -134,7 +134,7 @@ router.post('/removeAsDraft',entityAuth.authorizeEntity("Patient", "Case Sheet",
 
 router.get('/listCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.listCaseSheet);
 router.get('/getCaseSheet/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getParticularCaseSheet)
-router.get('/getAllDraftedCaseSheet/:clientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllDrafted);
+router.get('/getAllDraftedCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllDrafted);
 
 // ------- case sheet details routes ends here ------
 

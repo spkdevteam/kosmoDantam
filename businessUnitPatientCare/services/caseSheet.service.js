@@ -60,12 +60,23 @@ const update = async (clientId, caseSheetId, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+
         const existing = await CaseSheet.findById(caseSheetId);
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
         Object.assign(existing, data);
-        return await existing.save();
+
+        await existing.save();
+
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'cheifComplaints.complaints.compId',
+            model: Complaint,
+            select: 'complaintName _id'
+        })
+
+        return populatedCaseSheet
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
     }
@@ -75,6 +86,8 @@ const deleteCheifComplaints = async (clientId, caseSheetId, cheifComplaintId) =>
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+
         const existing = await CaseSheet.findById(caseSheetId);
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
@@ -86,7 +99,13 @@ const deleteCheifComplaints = async (clientId, caseSheetId, cheifComplaintId) =>
         });
 
         existing.cheifComplaints = newCheifComplaint;
-        return await existing.save();
+        await existing.save();
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'cheifComplaints.complaints.compId',
+            model: Complaint,
+            select: 'complaintName _id'
+        })
+        return populatedCaseSheet
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
