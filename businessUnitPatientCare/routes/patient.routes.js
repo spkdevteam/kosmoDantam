@@ -27,6 +27,7 @@ router.get('/listPatient', entityAuth.authorizeEntity("Pataints", "Patient", "li
 
 router.post("/activeInactivePatient", entityAuth.authorizeEntity("Pataints", "Patient", "activeActive"), businessUnitPatientContrller.activeinactivePatientByBusinessUnit);
 
+router.get('/searchPatient',businessUnitPatientContrller.searchPatients)
 
 // # create, update, view, list, activate/inactive, delete Patient by business unit routes ends here
 

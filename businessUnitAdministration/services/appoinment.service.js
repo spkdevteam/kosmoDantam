@@ -9,6 +9,7 @@ const timeSlots = require("../../utils/timeSlots");
 const { listEmployeeByRole } = require("./clientUser.service");
 const mongoose = require('mongoose');
 const getAvailableSlots = require("../../helper/getAvailableSlots");
+const { getchairList } = require("./chairs.service");
 
 exports.creatAppointment = async (input) => {
     try {
@@ -141,46 +142,86 @@ exports.getBookingChart = async (input) => {
     try {
         console.log(input);
         input.roleId = 3;
+        input.prepareBy='chair'
         const absentees = await getDateWiseLeaVeDetails(input);
         const booking = await this.getDateWiseBookidDetails(input);
         const daystatus = [...absentees?.data, ...booking?.data];
         //console.log(daystatus,'daystatus')
         const doctors = await listEmployeeByRole(input);
+        const chairs = await getchairList(input)
         let data = [];
-
-        for (let i = 0; i <= timeSlots?.length; i++) {
-            if (!data[i]) data[i] = [];
-            for (let j = 0; j <= doctors?.length; j++) {
-                if (i == 0 && j != 0) {
-                    data[i][j] = doctors[j - 1]?.firstName
-                    continue
+        if(input.prepareBy != 'chair'){
+            for (let i = 0; i <= timeSlots?.length; i++) {
+                if (!data[i]) data[i] = [];
+                for (let j = 0; j <= doctors?.length; j++) {
+                    if (i == 0 && j != 0) {
+                        data[i][j] = doctors[j - 1]?.firstName
+                        continue
+                    }
+                    else if (j == 0 && i != 0) {
+                        data[i][j] = timeSlots[i - 1]
+                        continue
+                    }
+                    else if (i && j ) {
+                        doc_And_Time = { ...doctors[j - 1], ...timeSlots[i - 1] }
+                        const record = daystatus.filter((record) => {
+                            console.log(doc_And_Time?._doc?._id.toString() == record?.doctor?._id.toString(),'recordrecord')
+                            return new Date(input?.bookingDate + 'T' + doc_And_Time.end + ':00.000Z') > record.slotFrom &&
+                                new Date(input?.bookingDate + 'T' + doc_And_Time.start + ':00.000Z') < record.slotTo &&
+                                doc_And_Time?._doc?._id.toString() == record?.doctor?._id.toString() 
+                        });
+                        const bookedSlots = record.map((item) => {
+                            //console.log(item?.slotFrom?.toISOString().split('T')[1].slice(0,5))
+                            return { slotFrom: item?.slotFrom?.toISOString().split('T')[1].slice(0,5), slotTo: item?.slotTo?.toISOString().split('T')[1].slice(0,5) }
+                        })
+                        const hourStart = data[i][0]?.start;
+                        const hourEnd = data[i][0]?.end;
+                       // console.log(data[i][0],hourStart,hourEnd ,bookedSlots)
+                        const availabilitySlot = getAvailableSlots({ hourStart: hourStart, hourEnd: hourEnd, bookedSlots: bookedSlots })?.map((vacantSlot)=> {return {bookingType:'vacant',slotFrom:new Date(input?.bookingDate + 'T' + vacantSlot?.slotFrom + ':00.000Z'),slotTo:new Date(input?.bookingDate + 'T' + vacantSlot?.slotTo + ':00.000Z')}})
+                        data[i][j] = [...record,...availabilitySlot]?.sort((a, b) => new Date(a.slotFrom) - new Date(b.slotFrom))  || []
+                      //  data[i][j].length > 1 ? console.log(data[i][j],'data[i][j]'):''
+    
+                    } 
                 }
-                else if (j == 0 && i != 0) {
-                    data[i][j] = timeSlots[i - 1]
-                    continue
+            } 
+        }
+        else{
+            for (let i = 0; i <= timeSlots?.length; i++) {
+                if (!data[i]) data[i] = [];
+                for (let j = 0; j <= chairs?.length; j++) {
+                    if (i == 0 && j != 0) {
+                        console.log(chairs[j - 1],'test here eeeee')
+                        data[i][j] = 'Chair '+ chairs[j - 1]?.chairNumber
+                        continue
+                    }
+                    else if (j == 0 && i != 0) {
+                        data[i][j] = timeSlots[i - 1]
+                        continue
+                    }
+                    else if (i && j ) {
+                        doc_And_Time = { ...chairs[j - 1], ...timeSlots[i - 1] }
+                        const record = daystatus.filter((record) => {
+                            console.log(doc_And_Time?._doc?._id.toString() == record?.doctor?._id.toString(),'recordrecord')
+                            return new Date(input?.bookingDate + 'T' + doc_And_Time.end + ':00.000Z') > record.slotFrom &&
+                                new Date(input?.bookingDate + 'T' + doc_And_Time.start + ':00.000Z') < record.slotTo &&
+                                doc_And_Time?._doc?._id.toString() == record?.chair?._id.toString() 
+                        });
+                        const bookedSlots = record.map((item) => {
+                            //console.log(item?.slotFrom?.toISOString().split('T')[1].slice(0,5))
+                            return { slotFrom: item?.slotFrom?.toISOString().split('T')[1].slice(0,5), slotTo: item?.slotTo?.toISOString().split('T')[1].slice(0,5) }
+                        })
+                        const hourStart = data[i][0]?.start;
+                        const hourEnd = data[i][0]?.end;
+                       // console.log(data[i][0],hourStart,hourEnd ,bookedSlots)
+                        const availabilitySlot = getAvailableSlots({ hourStart: hourStart, hourEnd: hourEnd, bookedSlots: bookedSlots })?.map((vacantSlot)=> {return {bookingType:'vacant',slotFrom:new Date(input?.bookingDate + 'T' + vacantSlot?.slotFrom + ':00.000Z'),slotTo:new Date(input?.bookingDate + 'T' + vacantSlot?.slotTo + ':00.000Z')}})
+                        data[i][j] = [...record,...availabilitySlot]?.sort((a, b) => new Date(a.slotFrom) - new Date(b.slotFrom))  || []
+                      //  data[i][j].length > 1 ? console.log(data[i][j],'data[i][j]'):''
+    
+                    } 
                 }
-                else if (i && j ) {
-                    doc_And_Time = { ...doctors[j - 1], ...timeSlots[i - 1] }
-                    const record = daystatus.filter((record) => {
-                        console.log(doc_And_Time?._doc?._id.toString() == record?.doctor?._id.toString(),'recordrecord')
-                        return new Date(input?.bookingDate + 'T' + doc_And_Time.end + ':00.000Z') > record.slotFrom &&
-                            new Date(input?.bookingDate + 'T' + doc_And_Time.start + ':00.000Z') < record.slotTo &&
-                            doc_And_Time?._doc?._id.toString() == record?.doctor?._id.toString() 
-                    });
-                    const bookedSlots = record.map((item) => {
-                        //console.log(item?.slotFrom?.toISOString().split('T')[1].slice(0,5))
-                        return { slotFrom: item?.slotFrom?.toISOString().split('T')[1].slice(0,5), slotTo: item?.slotTo?.toISOString().split('T')[1].slice(0,5) }
-                    })
-                    const hourStart = data[i][0]?.start;
-                    const hourEnd = data[i][0]?.end;
-                   // console.log(data[i][0],hourStart,hourEnd ,bookedSlots)
-                    const availabilitySlot = getAvailableSlots({ hourStart: hourStart, hourEnd: hourEnd, bookedSlots: bookedSlots })?.map((vacantSlot)=> {return {bookingType:'vacant',slotFrom:new Date(input?.bookingDate + 'T' + vacantSlot?.slotFrom + ':00.000Z'),slotTo:new Date(input?.bookingDate + 'T' + vacantSlot?.slotTo + ':00.000Z')}})
-                    data[i][j] = [...record,...availabilitySlot]?.sort((a, b) => new Date(a.slotFrom) - new Date(b.slotFrom))  || []
-                  //  data[i][j].length > 1 ? console.log(data[i][j],'data[i][j]'):''
-
-                } 
             }
         }
+       
         console.table(data);
         return { data };
     } catch (error) {
