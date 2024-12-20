@@ -32,8 +32,6 @@ exports.createCheifComplaints = async (req, res, next) => {
         const newCheifComplaint = await caseSheetService.create(clientId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, cheifComplaints, displayId: serialNumber,
         });
-        console.log("newCheifComplaint",newCheifComplaint);
-        
         return res.status(statusCode.OK).send({
             message: message.lblCheifComplaintsCreatedSuccess,
             data: { cheifComplaints: newCheifComplaint.cheifComplaints, _id : newCheifComplaint._id, caseSheets : newCheifComplaint },
@@ -106,12 +104,12 @@ exports.createClinicalFinding = async (req, res, next) => {
             });
         }
         const serialNumber = await getserialNumber('caseSheet', clientId, "", businessUnitId)
-        const created = await caseSheetService.create(clientId, {
+        const newCheifComplaint = await caseSheetService.createClinicalFinding(clientId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, clinicalFindings, displayId: serialNumber,
         });
         return res.status(statusCode.OK).send({
-            message: message.lblClinicalFindingCreatedSuccess,
-            data: { caseSheetId: created._id },
+            message: message.lblCheifComplaintsCreatedSuccess,
+            data: { clinicalFindings: newCheifComplaint.clinicalFindings, _id : newCheifComplaint._id, caseSheets : newCheifComplaint },
         });
     } catch (error) {
         next(error)
@@ -129,12 +127,12 @@ exports.updateClinicalFinding = async (req, res, next) => {
                 message: message.lblRequiredFieldMissing,
             });
         }
-        const newCheifComplaint = await caseSheetService.update(clientId, caseSheetId, {
+        const newCheifComplaint = await caseSheetService.updateClinicalFinding(clientId, caseSheetId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, clinicalFindings,
         });
         return res.status(statusCode.OK).send({
-            message: message.lblClinicalFindingUpdatedSuccess,
-            data: { caseSheetId: newCheifComplaint._id },
+            message: message.lblFindingsUpdated,
+            data: { clinicalFindings: newCheifComplaint.clinicalFindings, _id : newCheifComplaint._id }
         });
     } catch (error) {
         next(error)
@@ -158,7 +156,7 @@ exports.deleteClinicalFinding = async (req, res, next) => {
         const deleted = await caseSheetService.deleteClinicalFinding(clientId, caseSheetId, clinicalFindingId);
         return res.status(statusCode.OK).send({
             message: message.lblClinicalFindingDeletedSuccess,
-            data: { caseSheetId: deleted?._id }
+            data: { clinicalFindings: deleted.clinicalFindings, _id : deleted._id }
         });
     } catch (error) {
         next(error)

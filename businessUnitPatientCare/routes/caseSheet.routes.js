@@ -29,7 +29,7 @@ router.post('/deleteCheifComplaints', entityAuth.authorizeEntity("Patient", "Cas
 // clinical finding part
 router.post('/createClinicalFinding', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createClinicalFinding);
 router.put('/updateClinicalFinding', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.updateClinicalFinding);
-router.delete('/deleteClinicalFinding', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteClinicalFinding);
+router.post('/deleteClinicalFinding', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteClinicalFinding);
 
 // medical history
 router.post('/createMedicalHistory', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createMedicalHistory);

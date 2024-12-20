@@ -38,7 +38,7 @@ const caseSheetSchema = new mongoose.Schema({
                 findings: {
                     type: [
                         {
-                            findId: { type: mongoose.Schema.ObjectId, ref: "finding" }
+                            findId: { type: mongoose.Schema.ObjectId, ref: "patientFinding" }
                         }
                     ]
                 }

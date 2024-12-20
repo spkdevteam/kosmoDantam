@@ -314,6 +314,10 @@ module.exports = {
   lblFindingsNoChanges: "The finding details are already up to date.",
   lblFindingsDependencies: "Please resolve linked issues before proceeding with this action.",
   lblFindingsDoesNotExist: "The specified finding does not exist in the system."  ,
+  lblFindingsAlreadyExist: "finding already exists."  ,
+  lblFindingFound: "Finding found successfully."  ,
+  lblFindingsUpdated: "Finding updated successfully.",
+
 
 
     lblChiefComplaintCreated: "New Chief Complaint added to the system.",

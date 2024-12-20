@@ -427,9 +427,22 @@ const cheifComplaints = [
 
 
 
+const findings = [
+    { findingsName : "Swelling Large", discription: "Any description"},
+    { findingsName : "Toothache", discription: "Any description"},
+    { findingsName : "Bleeding Gums", discription: "Any description"},
+    { findingsName : "Pain in Tooth", discription: "Any description"},
+    { findingsName : "Consultation", discription: "Any description"},
+    { findingsName : "Faulty Crown", discription: "Any description"},
+    { findingsName : "Difficulty in Chewing", discription: "Any description"},
+]
+
+
+
 
 exports.clientRoles = clientRoles;
 exports.defaultPersmissionsList = defaultPersmissionsList;
 exports.businessUnitPersmissionsList = businessUnitPersmissionsList;
 exports.serialNumber = serialNumber;
-exports.cheifComplaints = cheifComplaints
+exports.cheifComplaints = cheifComplaints;
+exports.findings = findings;

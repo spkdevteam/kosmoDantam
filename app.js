@@ -16,7 +16,7 @@ const swaggerUi = require('swagger-ui-express');
 const clientRoleSchema = require("./client/model/role.js");
 const clinetPatientSchema = require("./client/model/patient.js");
 const serialNumberSchema = require("./model/serialNumber.js")
-const { defaultPersmissionsList, businessUnitPersmissionsList, cheifComplaints } = require("./utils/constant.js")
+const { defaultPersmissionsList, businessUnitPersmissionsList, cheifComplaints, findings } = require("./utils/constant.js")
 
 
 // upsertTeeth([
@@ -310,7 +310,8 @@ const clientEmployeeRouter = require("./businessUnitAdministration/routes/employ
 const clinetRoleRouter = require("./businessUnitAdministration/routes/rolesAndPermission.routes.js");
 const clientPatientRouter = require("./businessUnitPatientCare/routes/patient.routes.js");
 const clientCaseSheetRouter = require("./businessUnitPatientCare/routes/caseSheet.routes.js");
-const clientComplaintRouter = require("./businessUnitAdministration/routes/complaint.routes.js")
+const clientComplaintRouter = require("./businessUnitAdministration/routes/complaint.routes.js");
+const clientPatientFindingRouter = require("./businessUnitAdministration/routes/patientFinding.routes.js");
 
 
 const clientDepartment = require("./businessUnitAdministration/routes/department.routes.js");
@@ -334,6 +335,7 @@ const bookingRoutes = require("./businessUnitAdministration/routes/appointment.r
 const leaveRouter = require("./businessUnitAdministration/routes/leaveRegister.routes.js");
 const cheifComplaintSchema = require("./client/model/cheifcomplaint.js");
 const complaintSchema = require("./client/model/complaint.js");
+const patientFindingsSchema = require("./client/model/finding.js");
 
 
 const corsOptions = {
@@ -376,6 +378,7 @@ app.use("/api/client/bu/role", clinetRoleRouter.router);
 app.use("/api/client/bu/patient", clientPatientRouter.router);
 app.use("/api/client/bu/caseSheet", clientCaseSheetRouter.router);
 app.use("/api/client/bu/complaint", clientComplaintRouter.router);
+app.use("/api/client/bu/patientFinding", clientPatientFindingRouter.router);
 
 app.use("/api/client/bu/department", clientDepartment);
 app.use("/api/client/bu/services", clientservicesRouter);
@@ -417,7 +420,7 @@ async function insertRole() {
 
 }
 
-insertRole()
+// insertRole()
 
 // insert super admin
 async function createSuperAdmin() {
@@ -650,7 +653,6 @@ async function createSerialNumber() {
 
 
 // create cheif complaints
-
 async function createCheifComplaints() {
     try {
         const clientId = "6760241a890afbdafd08198b";
@@ -669,6 +671,28 @@ async function createCheifComplaints() {
 }
 
 // createCheifComplaints()
+
+
+
+// create clinical finding
+async function createClinicalFinding() {
+    try {
+        const clientId = "6760241a890afbdafd08198b";
+        const data = findings;
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const count = await Finding.countDocuments({});
+        if (count == 0) {
+            await Finding.insertMany(data);
+        }else{
+            console.log("Finding alrady exits");
+        }
+    } catch (error) {
+        console.log("error while creating Finding", error);
+    }
+}
+
+// createClinicalFinding()
 
 
 
