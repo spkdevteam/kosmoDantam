@@ -113,7 +113,7 @@ router.delete('/deleteOtherAttachment', entityAuth.authorizeEntity("Patient", "C
 // notes
 router.post('/createNotes', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createNotes);
 router.put('/updateNotes', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.updateNotes);
-router.delete('/deleteNotes', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteNotes);
+router.post('/deleteNotes', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteNotes);
 
 // services
 router.post('/createServices', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createServices);

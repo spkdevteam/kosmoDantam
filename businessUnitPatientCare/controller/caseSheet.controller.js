@@ -480,10 +480,10 @@ exports.deleteNotes = async (req, res, next) => {
                 message: message.lblNoteIdRequired,
             });
         }
-        const deleted = await caseSheetService.deleteMedicalHistory(clientId, caseSheetId, noteId);
+        const deleted = await caseSheetService.deleteNote(clientId, caseSheetId, noteId);
         return res.status(statusCode.OK).send({
             message: message.lblNoteDeletedSuccess,
-            data: { caseSheetId: deleted?._id }
+            data: { note: deleted.note, _id : deleted._id }
         });
     } catch (error) {
         next(error)
