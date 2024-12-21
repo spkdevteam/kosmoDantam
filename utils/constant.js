@@ -438,6 +438,24 @@ const findings = [
 ]
 
 
+const medicalHistory = [
+    { caseName : "Arthritis", remark: "Any remark"},
+    { caseName : "Migraine", remark: "Any remark"},
+    { caseName : "Asthma", remark: "Any remark"},
+    { caseName : "Cancer", remark: "Any remark"},
+    { caseName : "Blood Sugar", remark: "Any remark"},
+    { caseName : "Endocrinal", remark: "Any remark"},
+    { caseName : "Blood Pressure", remark: "Any remark"},
+    { caseName : "Bleeding Disorder", remark: "Any remark"},
+    { caseName : "Gastro Internal", remark: "Any remark"},
+    { caseName : "Fits / Faint / Epilepsy", remark: "Any remark"},
+    { caseName : "Congenital Discover", remark: "Any remark"},
+    { caseName : "HIV / HBV / Jaundice", remark: "Any remark"},
+    { caseName : "Genito Urinal", remark: "Any remark"},
+    { caseName : "Cardio Respiration", remark: "Any remark"},
+]
+
+
 
 
 exports.clientRoles = clientRoles;
@@ -446,3 +464,4 @@ exports.businessUnitPersmissionsList = businessUnitPersmissionsList;
 exports.serialNumber = serialNumber;
 exports.cheifComplaints = cheifComplaints;
 exports.findings = findings;
+exports.medicalHistory = medicalHistory;

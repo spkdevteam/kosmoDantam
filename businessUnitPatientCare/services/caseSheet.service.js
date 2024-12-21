@@ -12,6 +12,7 @@ const { default: mongoose } = require("mongoose");
 const complaintSchema = require("../../client/model/complaint");
 const { path } = require("../../model/patient");
 const patientFindingsSchema = require("../../client/model/finding");
+const medicalSchema = require("../../client/model/medical");
 
 const create = async (clientId, data) => {
     try {
@@ -156,10 +157,60 @@ const deleteClinicalFinding = async (clientId, caseSheetId, clinicalFindingId) =
     }
 };
 
+
+const createMedicalHistory = async (clientId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        // const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const Medical = clientConnection.model('medical', medicalSchema);
+
+        const newCheifComplaint = await CaseSheet.create(data);
+        const populatedCaseSheet = await CaseSheet.findById(newCheifComplaint._id).populate({
+            path: 'medicalHistory.medicals.medId',
+            model: Medical,
+            select: 'caseName _id'
+        })
+        return populatedCaseSheet
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
+const updateMedicalHistory = async (clientId, caseSheetId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        // const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const Medical = clientConnection.model('medical', medicalSchema);
+
+        const existing = await CaseSheet.findById(caseSheetId);
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        Object.assign(existing, data);
+        await existing.save();
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'medicalHistory.medicals.medId',
+            model: Medical,
+            select: 'caseName _id'
+        })
+        return populatedCaseSheet
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
+
+
+
+
+
 const deleteMedicalHistory = async (clientId, caseSheetId, medicalHistoryId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Medical = clientConnection.model('medical', medicalSchema);
         const existing = await CaseSheet.findById(caseSheetId);
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
@@ -170,7 +221,13 @@ const deleteMedicalHistory = async (clientId, caseSheetId, medicalHistoryId) => 
             return !item._id.equals(mongObjId)
         });
         existing.medicalHistory = newArray;
-        return await existing.save();
+        await existing.save();
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'medicalHistory.medicals.medId',
+            model: Medical,
+            select: 'caseName _id'
+        })
+        return populatedCaseSheet
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
@@ -326,6 +383,8 @@ const getById = async (clientId, caseSheetId) => {
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
         const Complaint = clientConnection.model('complaint', complaintSchema);
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const Medical = clientConnection.model('medical', medicalSchema);
+
 
         const caseSheet = await CaseSheet.findById(caseSheetId).populate({
             path: 'cheifComplaints.complaints.compId',
@@ -335,6 +394,10 @@ const getById = async (clientId, caseSheetId) => {
             path: 'clinicalFindings.findings.findId',
             model: Finding,
             select: 'findingsName _id'
+        }).populate({
+            path: 'medicalHistory.medicals.medId',
+            model: Medical,
+            select: 'caseName _id'
         });
         if (!caseSheet) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
@@ -383,7 +446,11 @@ module.exports = {
     updateClinicalFinding,
     deleteClinicalFinding,
 
+    createMedicalHistory,
+    updateMedicalHistory,
     deleteMedicalHistory,
+
+
     deleteInvestigation,
     deleteOtherAttachment,
     deleteNote,

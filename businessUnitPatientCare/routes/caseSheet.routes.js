@@ -34,7 +34,7 @@ router.post('/deleteClinicalFinding', entityAuth.authorizeEntity("Patient", "Cas
 // medical history
 router.post('/createMedicalHistory', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createMedicalHistory);
 router.put('/updateMedicalHistory', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.updateMedicalHistory);
-router.delete('/deleteMedicalHistory', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteMedicalHistory);
+router.post('/deleteMedicalHistory', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteMedicalHistory);
 
 // investigaton
 router.post('/createInvestigation', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), (req, res, next) => {

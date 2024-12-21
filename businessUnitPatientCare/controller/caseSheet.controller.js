@@ -180,12 +180,12 @@ exports.createMedicalHistory = async (req, res, next) => {
             });
         }
         const serialNumber = await getserialNumber('caseSheet', clientId, "", businessUnitId)
-        const created = await caseSheetService.create(clientId, {
+        const created = await caseSheetService.createMedicalHistory(clientId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, medicalHistory, displayId: serialNumber,
         });
         return res.status(statusCode.OK).send({
             message: message.lblMedicalHistoryCreatedSuccess,
-            data: { caseSheetId: created._id },
+            data: { medicalHistory: created.medicalHistory, _id : created._id, caseSheets : created },
         });
     } catch (error) {
         next(error)
@@ -203,12 +203,12 @@ exports.updateMedicalHistory = async (req, res, next) => {
                 message: message.lblRequiredFieldMissing,
             });
         }
-        const updated = await caseSheetService.update(clientId, caseSheetId, {
+        const updated = await caseSheetService.updateMedicalHistory(clientId, caseSheetId, {
             patientId, branchId, businessUnitId, medicalHistory,
         });
         return res.status(statusCode.OK).send({
             message: message.lblMedicalHistoryUpdatedSuccess,
-            data: { caseSheetId: updated._id },
+            data: { medicalHistory: updated.medicalHistory, _id : updated._id }
         });
     } catch (error) {
         next(error)
@@ -232,7 +232,7 @@ exports.deleteMedicalHistory = async (req, res, next) => {
         const deleted = await caseSheetService.deleteMedicalHistory(clientId, caseSheetId, medicalHistoryId);
         return res.status(statusCode.OK).send({
             message: message.lblMedicalHistoryDeletedSuccess,
-            data: { caseSheetId: deleted?._id }
+            data: { medicalHistory: deleted.medicalHistory, _id : deleted._id }
         });
     } catch (error) {
         next(error)

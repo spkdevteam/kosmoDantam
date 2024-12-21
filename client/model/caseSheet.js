@@ -20,8 +20,8 @@ const caseSheetSchema = new mongoose.Schema({
                         {
                             compId: { type: mongoose.Schema.ObjectId, ref: "complaint" }
                         }
-                    //   { type: mongoose.Schema.ObjectId, ref: "complaint" }
-                       
+                        //   { type: mongoose.Schema.ObjectId, ref: "complaint" }
+
                     ]
                 }
             },
@@ -49,7 +49,15 @@ const caseSheetSchema = new mongoose.Schema({
     medicalHistory: {
         type: [
             {
-                id: { type: mongoose.Schema.ObjectId, ref: "medicalCase" }
+                medicals: {
+                    type: [
+                        {
+                            medId: { type: mongoose.Schema.ObjectId, ref: "medicalCase" }
+                        }
+                    ],
+
+                }
+
             }
         ],
         default: [],

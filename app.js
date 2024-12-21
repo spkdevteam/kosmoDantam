@@ -16,7 +16,7 @@ const swaggerUi = require('swagger-ui-express');
 const clientRoleSchema = require("./client/model/role.js");
 const clinetPatientSchema = require("./client/model/patient.js");
 const serialNumberSchema = require("./model/serialNumber.js")
-const { defaultPersmissionsList, businessUnitPersmissionsList, cheifComplaints, findings } = require("./utils/constant.js")
+const { defaultPersmissionsList, businessUnitPersmissionsList, cheifComplaints, findings, medicalHistory } = require("./utils/constant.js")
 
 
 // upsertTeeth([
@@ -312,6 +312,7 @@ const clientPatientRouter = require("./businessUnitPatientCare/routes/patient.ro
 const clientCaseSheetRouter = require("./businessUnitPatientCare/routes/caseSheet.routes.js");
 const clientComplaintRouter = require("./businessUnitAdministration/routes/complaint.routes.js");
 const clientPatientFindingRouter = require("./businessUnitAdministration/routes/patientFinding.routes.js");
+const clientMedicalRouter = require("./businessUnitAdministration/routes/medical.routes.js");
 
 
 const clientDepartment = require("./businessUnitAdministration/routes/department.routes.js");
@@ -336,6 +337,7 @@ const leaveRouter = require("./businessUnitAdministration/routes/leaveRegister.r
 const cheifComplaintSchema = require("./client/model/cheifcomplaint.js");
 const complaintSchema = require("./client/model/complaint.js");
 const patientFindingsSchema = require("./client/model/finding.js");
+const medicalSchema = require("./client/model/medical.js");
 
 
 const corsOptions = {
@@ -379,6 +381,7 @@ app.use("/api/client/bu/patient", clientPatientRouter.router);
 app.use("/api/client/bu/caseSheet", clientCaseSheetRouter.router);
 app.use("/api/client/bu/complaint", clientComplaintRouter.router);
 app.use("/api/client/bu/patientFinding", clientPatientFindingRouter.router);
+app.use("/api/client/bu/medical", clientMedicalRouter.router);
 
 app.use("/api/client/bu/department", clientDepartment);
 app.use("/api/client/bu/services", clientservicesRouter);
@@ -693,6 +696,28 @@ async function createClinicalFinding() {
 }
 
 // createClinicalFinding()
+
+
+
+// create medical history data
+async function createMedicalData() {
+    try {
+        const clientId = "6760241a890afbdafd08198b";
+        const data = medicalHistory;
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Medical = clientConnection.model('medical', medicalSchema);
+        const count = await Medical.countDocuments({});
+        if (count == 0) {
+            await Medical.insertMany(data);
+        }else{
+            console.log("Medical alrady exits");
+        }
+    } catch (error) {
+        console.log("error while creating Medical", error);
+    }
+}
+
+// createMedicalData()
 
 
 
