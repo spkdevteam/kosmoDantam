@@ -315,7 +315,7 @@ exports.deleteInvestigation = async (req, res, next) => {
         const deleted = await caseSheetService.deleteInvestigation(clientId, caseSheetId, investigationId);
         return res.status(statusCode.OK).send({
             message: message.lblInvestigationDeletedSuccess,
-            data: { caseSheetId: deleted?._id }
+            data: { investigation: deleted.investigation, _id: deleted._id }
         });
     } catch (error) {
         next(error)
@@ -395,7 +395,7 @@ exports.deleteOtherAttachment = async (req, res, next) => {
         const deleted = await caseSheetService.deleteOtherAttachment(clientId, caseSheetId, otherAttachmentId);
         return res.status(statusCode.OK).send({
             message: message.lblOtherAttachmentDeletedSuccess,
-            data: { caseSheetId: deleted?._id }
+            data: { otherAttachment: deleted.otherAttachment, _id: deleted._id, },
         });
     } catch (error) {
         next(error)

@@ -71,7 +71,7 @@ router.post('/updateInvestigation', entityAuth.authorizeEntity("Patient", "Case 
         next();
     });
 }, caseSheetController.updateInvestigation);
-router.delete('/deleteInvestigation', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteInvestigation);
+router.post('/deleteInvestigation', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteInvestigation);
 
 // other attachment
 router.post('/createOtherAttachment', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), (req, res, next) => {
@@ -108,7 +108,7 @@ router.post('/updateOtherAttachment', entityAuth.authorizeEntity("Patient", "Cas
         next();
     });
 }, caseSheetController.updateOtherAttachment);
-router.delete('/deleteOtherAttachment', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteOtherAttachment);
+router.post('/deleteOtherAttachment', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteOtherAttachment);
 
 // notes
 router.post('/createNotes', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createNotes);
