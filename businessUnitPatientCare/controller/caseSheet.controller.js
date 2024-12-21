@@ -22,7 +22,7 @@ exports.createCheifComplaints = async (req, res, next) => {
     try {
         const { clientId, patientId, branchId, businessUnitId, cheifComplaints, } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!cheifComplaints) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
@@ -34,7 +34,7 @@ exports.createCheifComplaints = async (req, res, next) => {
         });
         return res.status(statusCode.OK).send({
             message: message.lblCheifComplaintsCreatedSuccess,
-            data: { cheifComplaints: newCheifComplaint.cheifComplaints, _id : newCheifComplaint._id, caseSheets : newCheifComplaint },
+            data: { cheifComplaints: newCheifComplaint.cheifComplaints, _id: newCheifComplaint._id, caseSheets: newCheifComplaint },
         });
     } catch (error) {
         next(error)
@@ -46,7 +46,7 @@ exports.updateCheifComplaints = async (req, res, next) => {
     try {
         const { clientId, caseSheetId, patientId, branchId, businessUnitId, cheifComplaints, } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!cheifComplaints) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
@@ -57,7 +57,7 @@ exports.updateCheifComplaints = async (req, res, next) => {
         });
         return res.status(statusCode.OK).send({
             message: message.lblCheifComplaintsUpdatedSuccess,
-            data: { cheifComplaints: newCheifComplaint.cheifComplaints, _id : newCheifComplaint._id }
+            data: { cheifComplaints: newCheifComplaint.cheifComplaints, _id: newCheifComplaint._id }
         });
     } catch (error) {
         next(error)
@@ -81,7 +81,7 @@ exports.deleteCheifComplaints = async (req, res, next) => {
         const deleted = await caseSheetService.deleteCheifComplaints(clientId, caseSheetId, cheifComplaintId);
         return res.status(statusCode.OK).send({
             message: message.lblCheifComplaintsDeletedSuccess,
-            data: { cheifComplaints: deleted.cheifComplaints, _id : deleted._id }
+            data: { cheifComplaints: deleted.cheifComplaints, _id: deleted._id }
         });
     } catch (error) {
         next(error)
@@ -97,7 +97,7 @@ exports.createClinicalFinding = async (req, res, next) => {
     try {
         const { clientId, patientId, branchId, businessUnitId, clinicalFindings, } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!clinicalFindings) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
@@ -109,7 +109,7 @@ exports.createClinicalFinding = async (req, res, next) => {
         });
         return res.status(statusCode.OK).send({
             message: message.lblCheifComplaintsCreatedSuccess,
-            data: { clinicalFindings: newCheifComplaint.clinicalFindings, _id : newCheifComplaint._id, caseSheets : newCheifComplaint },
+            data: { clinicalFindings: newCheifComplaint.clinicalFindings, _id: newCheifComplaint._id, caseSheets: newCheifComplaint },
         });
     } catch (error) {
         next(error)
@@ -121,7 +121,7 @@ exports.updateClinicalFinding = async (req, res, next) => {
     try {
         const { clientId, caseSheetId, patientId, branchId, businessUnitId, clinicalFindings, } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!clinicalFindings) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
@@ -132,7 +132,7 @@ exports.updateClinicalFinding = async (req, res, next) => {
         });
         return res.status(statusCode.OK).send({
             message: message.lblFindingsUpdated,
-            data: { clinicalFindings: newCheifComplaint.clinicalFindings, _id : newCheifComplaint._id }
+            data: { clinicalFindings: newCheifComplaint.clinicalFindings, _id: newCheifComplaint._id }
         });
     } catch (error) {
         next(error)
@@ -156,7 +156,7 @@ exports.deleteClinicalFinding = async (req, res, next) => {
         const deleted = await caseSheetService.deleteClinicalFinding(clientId, caseSheetId, clinicalFindingId);
         return res.status(statusCode.OK).send({
             message: message.lblClinicalFindingDeletedSuccess,
-            data: { clinicalFindings: deleted.clinicalFindings, _id : deleted._id }
+            data: { clinicalFindings: deleted.clinicalFindings, _id: deleted._id }
         });
     } catch (error) {
         next(error)
@@ -173,7 +173,7 @@ exports.createMedicalHistory = async (req, res, next) => {
     try {
         const { clientId, patientId, branchId, businessUnitId, medicalHistory, } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!medicalHistory) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
@@ -185,7 +185,7 @@ exports.createMedicalHistory = async (req, res, next) => {
         });
         return res.status(statusCode.OK).send({
             message: message.lblMedicalHistoryCreatedSuccess,
-            data: { medicalHistory: created.medicalHistory, _id : created._id, caseSheets : created },
+            data: { medicalHistory: created.medicalHistory, _id: created._id, caseSheets: created },
         });
     } catch (error) {
         next(error)
@@ -197,7 +197,7 @@ exports.updateMedicalHistory = async (req, res, next) => {
     try {
         const { clientId, caseSheetId, patientId, branchId, businessUnitId, medicalHistory, } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!medicalHistory) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
@@ -208,7 +208,7 @@ exports.updateMedicalHistory = async (req, res, next) => {
         });
         return res.status(statusCode.OK).send({
             message: message.lblMedicalHistoryUpdatedSuccess,
-            data: { medicalHistory: updated.medicalHistory, _id : updated._id }
+            data: { medicalHistory: updated.medicalHistory, _id: updated._id }
         });
     } catch (error) {
         next(error)
@@ -232,7 +232,7 @@ exports.deleteMedicalHistory = async (req, res, next) => {
         const deleted = await caseSheetService.deleteMedicalHistory(clientId, caseSheetId, medicalHistoryId);
         return res.status(statusCode.OK).send({
             message: message.lblMedicalHistoryDeletedSuccess,
-            data: { medicalHistory: deleted.medicalHistory, _id : deleted._id }
+            data: { medicalHistory: deleted.medicalHistory, _id: deleted._id }
         });
     } catch (error) {
         next(error)
@@ -242,28 +242,28 @@ exports.deleteMedicalHistory = async (req, res, next) => {
 // create investigation by business unit
 exports.createInvestigation = async (req, res, next) => {
     try {
-        const { clientId, patientId, branchId, businessUnitId, investigationObject, } = req.body;
+        const { clientId, patientId, branchId, businessUnitId, fileType, remark } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
-        if (!investigationObject) {
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
+        if (!fileType || !remark) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
         let dataObject = {
-            ...investigationObject,
-
+            fileType : fileType,
+            remark : remark,
         }
         if (req.file?.filename) {
             dataObject.file = req.file.filename;
         }
         const serialNumber = await getserialNumber('caseSheet', clientId, "", businessUnitId)
-        const created = await caseSheetService.create(clientId, {
+        const created = await caseSheetService.createInvestigation(clientId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, investigation: [dataObject], displayId: serialNumber,
         });
         return res.status(statusCode.OK).send({
             message: message.lblInvestigationCreatedSuccess,
-            data: { caseSheetId: created._id },
+            data: { investigation: created.investigation, _id: created._id, caseSheets: created },
         });
     } catch (error) {
         next(error)
@@ -273,26 +273,25 @@ exports.createInvestigation = async (req, res, next) => {
 // update investigation by busines unit
 exports.updateInvestigation = async (req, res, next) => {
     try {
-        const { clientId, caseSheetId, patientId, branchId, businessUnitId, investigationObject, } = req.body;
+        const { clientId, caseSheetId, patientId, branchId, businessUnitId,  fileType, remark , } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
-        if (!investigationObject) {
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
+        if (!fileType || !remark ) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
         let dataObject = {
-            ...investigationObject,
+            fileType : fileType,
+            remark : remark,
         }
-        if (req.file && req.file?.filename) {
+        if (req.file?.filename) {
             dataObject.file = req.file.filename;
         }
-        const updated = await caseSheetService.update(clientId, caseSheetId, {
-            patientId, branchId, businessUnitId, investigation: [dataObject],
-        });
+        const updated = await caseSheetService.updateInvestigation(clientId, caseSheetId, dataObject);
         return res.status(statusCode.OK).send({
             message: message.lblInvestigationUpdatedSuccess,
-            data: { caseSheetId: updated._id },
+            data: { investigation: updated.investigation, _id: updated._id, },
         });
     } catch (error) {
         next(error)
@@ -328,14 +327,14 @@ exports.createOtherAttachment = async (req, res, next) => {
     try {
         const { clientId, patientId, branchId, businessUnitId, remark, } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!remark) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
         let dataObject = {
-            remark : remark,
+            remark: remark,
         }
         if (req.file?.filename) {
             dataObject.file = req.file.filename;
@@ -346,7 +345,7 @@ exports.createOtherAttachment = async (req, res, next) => {
         });
         return res.status(statusCode.OK).send({
             message: message.lblOtherAttachmentCreatedSuccess,
-            data: { otherAttachment: created.otherAttachment, _id : created._id, caseSheets : created },
+            data: { otherAttachment: created.otherAttachment, _id: created._id, caseSheets: created },
         });
     } catch (error) {
         next(error)
@@ -357,22 +356,22 @@ exports.createOtherAttachment = async (req, res, next) => {
 exports.updateOtherAttachment = async (req, res, next) => {
     try {
         const { clientId, caseSheetId, patientId, branchId, businessUnitId, remark, } = req.body;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!remark) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
         let dataObject = {
-            remark : remark,
+            remark: remark,
         }
         if (req.file?.filename) {
             dataObject.file = req.file.filename;
         }
-        const updated = await caseSheetService.updateOtherAttachment(clientId, caseSheetId, dataObject );
+        const updated = await caseSheetService.updateOtherAttachment(clientId, caseSheetId, dataObject);
         return res.status(statusCode.OK).send({
             message: message.lblOtherAttachmentUpdatedSuccess,
-            data: { otherAttachment: updated.otherAttachment, _id : updated._id, },
+            data: { otherAttachment: updated.otherAttachment, _id: updated._id, },
         });
     } catch (error) {
         next(error)
@@ -419,7 +418,7 @@ exports.createNotes = async (req, res, next) => {
     try {
         const { clientId, patientId, branchId, businessUnitId, note, } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!note) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
@@ -431,7 +430,7 @@ exports.createNotes = async (req, res, next) => {
         });
         return res.status(statusCode.OK).send({
             message: message.lblNoteCreatedSuccess,
-            data: { note: created.note, _id : created._id, caseSheets : created },
+            data: { note: created.note, _id: created._id, caseSheets: created },
         });
     } catch (error) {
         next(error)
@@ -443,7 +442,7 @@ exports.updateNotes = async (req, res, next) => {
     try {
         const { clientId, caseSheetId, patientId, branchId, businessUnitId, note, } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!note) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
@@ -454,7 +453,7 @@ exports.updateNotes = async (req, res, next) => {
         });
         return res.status(statusCode.OK).send({
             message: message.lblNoteUpdatedSuccess,
-            data: { note: updated.note, _id : updated._id }
+            data: { note: updated.note, _id: updated._id }
         });
     } catch (error) {
         next(error)
@@ -478,7 +477,7 @@ exports.deleteNotes = async (req, res, next) => {
         const deleted = await caseSheetService.deleteNote(clientId, caseSheetId, noteId);
         return res.status(statusCode.OK).send({
             message: message.lblNoteDeletedSuccess,
-            data: { note: deleted.note, _id : deleted._id }
+            data: { note: deleted.note, _id: deleted._id }
         });
     } catch (error) {
         next(error)
@@ -507,7 +506,7 @@ exports.createServices = async (req, res, next) => {
     try {
         const { clientId, patientId, branchId, businessUnitId, services, } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!services) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
@@ -531,7 +530,7 @@ exports.updateServices = async (req, res, next) => {
     try {
         const { clientId, caseSheetId, patientId, branchId, businessUnitId, services, } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!services) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
@@ -581,7 +580,7 @@ exports.createProcedure = async (req, res, next) => {
     try {
         const { clientId, patientId, branchId, businessUnitId, procedures, } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!procedures) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
@@ -605,7 +604,7 @@ exports.updateProcedure = async (req, res, next) => {
     try {
         const { clientId, caseSheetId, patientId, branchId, businessUnitId, procedures, } = req.body;
         const mainUser = req.user;
-        await  commonCheck( clientId, patientId, branchId, businessUnitId);
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!procedures) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
@@ -663,7 +662,7 @@ exports.removeAsDraft = async (req, res, next) => {
             });
         }
         const update = await caseSheetService.update(clientId, caseSheetId, {
-            drafted : false
+            drafted: false
         });
         return res.status(statusCode.OK).send({
             message: message.lblCaseSheetCreatedSuccess,
@@ -718,8 +717,8 @@ exports.getAllDrafted = async (req, res, next) => {
         }
         const filters = {
             deletedAt: null,
-            patientId : patientId,
-            status : "In Progress"
+            patientId: patientId,
+            status: "In Progress"
         };
         const result = await caseSheetService.listDrafted(clientId, filters);
         return res.status(statusCode.OK).send({
