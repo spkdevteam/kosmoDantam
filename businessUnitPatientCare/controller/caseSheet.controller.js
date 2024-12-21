@@ -326,28 +326,27 @@ exports.deleteInvestigation = async (req, res, next) => {
 // create other attachment by business unit
 exports.createOtherAttachment = async (req, res, next) => {
     try {
-        const { clientId, patientId, branchId, businessUnitId, otherAttachmentObject, } = req.body;
+        const { clientId, patientId, branchId, businessUnitId, remark, } = req.body;
         const mainUser = req.user;
         await  commonCheck( clientId, patientId, branchId, businessUnitId);
-        if (!otherAttachmentObject) {
+        if (!remark) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
         let dataObject = {
-            ...otherAttachmentObject,
-
+            remark : remark,
         }
         if (req.file?.filename) {
             dataObject.file = req.file.filename;
         }
         const serialNumber = await getserialNumber('caseSheet', clientId, "", businessUnitId)
-        const created = await caseSheetService.create(clientId, {
+        const created = await caseSheetService.createOtherAttachment(clientId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, otherAttachment: [dataObject], displayId: serialNumber,
         });
         return res.status(statusCode.OK).send({
             message: message.lblOtherAttachmentCreatedSuccess,
-            data: { caseSheetId: created._id },
+            data: { otherAttachment: created.otherAttachment, _id : created._id, caseSheets : created },
         });
     } catch (error) {
         next(error)
@@ -357,27 +356,23 @@ exports.createOtherAttachment = async (req, res, next) => {
 // update other attachment by busines unit
 exports.updateOtherAttachment = async (req, res, next) => {
     try {
-        const { clientId, caseSheetId, patientId, branchId, businessUnitId, otherAttachmentObject, } = req.body;
-        const mainUser = req.user;
+        const { clientId, caseSheetId, patientId, branchId, businessUnitId, remark, } = req.body;
         await  commonCheck( clientId, patientId, branchId, businessUnitId);
-        if (!otherAttachmentObject) {
+        if (!remark) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
         let dataObject = {
-            ...otherAttachmentObject,
-
+            remark : remark,
         }
-        if (req.file && req.file?.filename) {
+        if (req.file?.filename) {
             dataObject.file = req.file.filename;
         }
-        const updated = await caseSheetService.update(clientId, caseSheetId, {
-            patientId, branchId, businessUnitId, otherAttachment: [dataObject],
-        });
+        const updated = await caseSheetService.updateOtherAttachment(clientId, caseSheetId, dataObject );
         return res.status(statusCode.OK).send({
             message: message.lblOtherAttachmentUpdatedSuccess,
-            data: { caseSheetId: updated._id },
+            data: { otherAttachment: updated.otherAttachment, _id : updated._id, },
         });
     } catch (error) {
         next(error)
