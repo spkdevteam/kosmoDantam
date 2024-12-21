@@ -273,6 +273,40 @@ const deleteOtherAttachment = async (clientId, caseSheetId, otherAttachmentId) =
     }
 };
 
+
+
+const createNote = async (clientId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+
+        const newCheifComplaint = await CaseSheet.create(data);
+        const populatedCaseSheet = await CaseSheet.findById(newCheifComplaint._id)
+
+        return populatedCaseSheet
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
+const updateNote = async (clientId, caseSheetId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+
+        const existing = await CaseSheet.findById(caseSheetId);
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        Object.assign(existing, data);
+        await existing.save();
+        const populatedCaseSheet = await CaseSheet.findById(existing._id)
+        return populatedCaseSheet
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
 const deleteNote = async (clientId, caseSheetId, noteId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
@@ -453,7 +487,12 @@ module.exports = {
 
     deleteInvestigation,
     deleteOtherAttachment,
+
+    createNote,
+    updateNote,
     deleteNote,
+
+
     deleteServices,
     deleteProcedure,
     list,

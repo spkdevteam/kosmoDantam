@@ -431,12 +431,12 @@ exports.createNotes = async (req, res, next) => {
             });
         }
         const serialNumber = await getserialNumber('caseSheet', clientId, "", businessUnitId)
-        const created = await caseSheetService.create(clientId, {
+        const created = await caseSheetService.createNote(clientId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, note, displayId: serialNumber,
         });
         return res.status(statusCode.OK).send({
             message: message.lblNoteCreatedSuccess,
-            data: { caseSheetId: created._id },
+            data: { note: created.note, _id : created._id, caseSheets : created },
         });
     } catch (error) {
         next(error)
@@ -454,12 +454,12 @@ exports.updateNotes = async (req, res, next) => {
                 message: message.lblRequiredFieldMissing,
             });
         }
-        const updated = await caseSheetService.update(clientId, caseSheetId, {
+        const updated = await caseSheetService.updateNote(clientId, caseSheetId, {
             patientId, branchId, businessUnitId, note,
         });
         return res.status(statusCode.OK).send({
             message: message.lblNoteUpdatedSuccess,
-            data: { caseSheetId: updated._id },
+            data: { note: updated.note, _id : updated._id }
         });
     } catch (error) {
         next(error)
