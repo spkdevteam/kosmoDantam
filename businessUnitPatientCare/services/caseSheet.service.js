@@ -2,7 +2,9 @@
 const { getClientDatabaseConnection } = require("../../db/connection");
 const clinetUserSchema = require("../../client/model/user");
 const clinetPatientSchema = require("../../client/model/patient");
-const caseSheetSchema = require("../../client/model/caseSheet")
+const caseSheetSchema = require("../../client/model/caseSheet");
+const departmentSchema = require("../../client/model/department");
+const serviceSchema = require("../../client/model/service")
 
 const message = require("../../utils/message");
 const statusCode = require("../../utils/http-status-code");
@@ -361,7 +363,7 @@ const updateOtherAttachment = async (clientId, caseSheetId, dataObject) => {
 
         // console.log("newData",newData);
 
-        return  await existing.save();
+        return await existing.save();
 
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
@@ -400,8 +402,67 @@ const updateInvestigation = async (clientId, caseSheetId, dataObject) => {
 
         // console.log("newData",newData);
 
-        return  await existing.save();
+        return await existing.save();
 
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
+
+const createService = async (clientId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Department = clientConnection.model('department', departmentSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+
+        const newCheifComplaint = await CaseSheet.create(data);
+        const populatedCaseSheet = await CaseSheet.findById(newCheifComplaint._id).populate({
+            path: 'services.department.deptId',
+            model: Department,
+            select: 'deptName _id'
+        }).populate({
+            path: 'services.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        })
+
+        return populatedCaseSheet
+        // return await CaseSheet.create(data);
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
+const updateService = async (clientId, caseSheetId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Department = clientConnection.model('department', departmentSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+
+        const existing = await CaseSheet.findById(caseSheetId);
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        Object.assign(existing, data);
+
+        await existing.save();
+
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'services.department.deptId',
+            model: Department,
+            select: 'deptName _id'
+        }).populate({
+            path: 'services.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        })
+
+        return populatedCaseSheet
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
     }
@@ -411,6 +472,8 @@ const deleteServices = async (clientId, caseSheetId, serviceId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Department = clientConnection.model('department', departmentSchema);
+        const Service = clientConnection.model('services', serviceSchema);
         const existing = await CaseSheet.findById(caseSheetId);
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
@@ -421,7 +484,17 @@ const deleteServices = async (clientId, caseSheetId, serviceId) => {
             return !item._id.equals(mongObjId)
         });
         existing.services = newArray;
-        return await existing.save();
+        await existing.save();
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'services.department.deptId',
+            model: Department,
+            select: 'deptName _id'
+        }).populate({
+            path: 'services.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        })
+        return populatedCaseSheet
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
@@ -498,7 +571,8 @@ const getById = async (clientId, caseSheetId) => {
         const Complaint = clientConnection.model('complaint', complaintSchema);
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
         const Medical = clientConnection.model('medical', medicalSchema);
-
+        const Department = clientConnection.model('department', departmentSchema);
+        const Service = clientConnection.model('services', serviceSchema);
 
         const caseSheet = await CaseSheet.findById(caseSheetId).populate({
             path: 'cheifComplaints.complaints.compId',
@@ -512,12 +586,20 @@ const getById = async (clientId, caseSheetId) => {
             path: 'medicalHistory.medicals.medId',
             model: Medical,
             select: 'caseName _id'
+        }).populate({
+            path: 'services.department.deptId',
+            model: Department,
+            select: 'deptName _id'
+        }).populate({
+            path: 'services.service.servId',
+            model: Service,
+            select: 'serviceName _id'
         });
+
         if (!caseSheet) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
         return caseSheet;
-
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error getting case sheet: ${error.message}`);
     }
@@ -577,6 +659,9 @@ module.exports = {
 
     createInvestigation,
     updateInvestigation,
+
+    createService,
+    updateService,
 
 
     deleteServices,

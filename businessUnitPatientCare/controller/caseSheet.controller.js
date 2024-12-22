@@ -513,12 +513,12 @@ exports.createServices = async (req, res, next) => {
             });
         }
         const serialNumber = await getserialNumber('caseSheet', clientId, "", businessUnitId)
-        const newCheifComplaint = await caseSheetService.create(clientId, {
+        const newCheifComplaint = await caseSheetService.createService(clientId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, services, displayId: serialNumber,
         });
         return res.status(statusCode.OK).send({
             message: message.lblServicesCreatedSuccess,
-            data: { caseSheetId: newCheifComplaint._id },
+            data: { services: newCheifComplaint.services, _id: newCheifComplaint._id, caseSheets: newCheifComplaint },
         });
     } catch (error) {
         next(error)
@@ -536,12 +536,12 @@ exports.updateServices = async (req, res, next) => {
                 message: message.lblRequiredFieldMissing,
             });
         }
-        const newCheifComplaint = await caseSheetService.update(clientId, caseSheetId, {
+        const newCheifComplaint = await caseSheetService.updateService(clientId, caseSheetId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, services,
         });
         return res.status(statusCode.OK).send({
             message: message.lblServicesUpdatedSuccess,
-            data: { caseSheetId: newCheifComplaint._id },
+            data: { services: newCheifComplaint.services, _id: newCheifComplaint._id }
         });
     } catch (error) {
         next(error)
@@ -557,15 +557,15 @@ exports.deleteServices = async (req, res, next) => {
                 message: message.lblClinetIdIsRequired,
             });
         }
-        if (!cheifComplaintId) {
+        if (!serviceId) {
             return res.status(statusCode.BadRequest).send({
-                message: message.lblCheifComplaintsIdRequired,
+                message: message.lblServicesIdRequired,
             });
         }
         const deleted = await caseSheetService.deleteServices(clientId, caseSheetId, serviceId);
         return res.status(statusCode.OK).send({
             message: message.lblServicesDeletedSuccess,
-            data: { caseSheetId: deleted?._id }
+            data: { services: deleted.services, _id: deleted._id }
         });
     } catch (error) {
         next(error)
