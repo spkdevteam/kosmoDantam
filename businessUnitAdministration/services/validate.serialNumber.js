@@ -13,6 +13,7 @@ const clinetChairSchema = require("../../client/model/chair");
 const clinetBusinessUnitSchema = require("../../client/model/businessUnit");
 const userModel = require("../../model/user");
 const leaveRegisterSchema = require("../../client/model/leaveRegister");
+const clinetPatientSchema = require("../../client/model/patient");
 
 exports.validateObjectId = async ({clientid='',objectId='',collectionName=''})=>{
     try {
@@ -30,6 +31,7 @@ exports.validateObjectId = async ({clientid='',objectId='',collectionName=''})=>
         const businessUnit = db.model('businessUnit', clinetBusinessUnitSchema);
         const leaveRegister =await db.model('leaveRegister',leaveRegisterSchema )
         const chair = db.model('chair', clinetChairSchema);
+        const patientregister = db.model('patient', clinetPatientSchema);
         switch (collectionName) {
             case 'appointment':
                 return await appointments.findOne({ _id: objectId, deletedAt: null }) ? true : false;
@@ -60,6 +62,9 @@ exports.validateObjectId = async ({clientid='',objectId='',collectionName=''})=>
             case 'clientId':
                 //console.log('*******', await userModel.findOne({ _id: objectId, deletedAt: null }))
                 return await userModel.findOne({ _id: objectId, deletedAt: null }) ? true : false;
+            case 'patient':
+                //console.log('*******', await userModel.findOne({ _id: objectId, deletedAt: null }))
+                return await patientregister.findOne({ _id: objectId, deletedAt: null }) ? true : false;    
             default:
                 return false;
                 

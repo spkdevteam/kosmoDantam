@@ -220,7 +220,7 @@ exports.searchPatients = async (req, res, next) => {
             ...({
                 $and: [
                     //{ firstName: { $regex: name.trim(), $options: "i" } },
-                    { lastName: { $regex: name.trim(), $options: "i" } },
+                    { firstName: { $regex: name.trim(), $options: "i" } },
                     { email: { $regex: email.trim(), $options: "i" } },
                     { phone: { $regex: contactNumber.trim(), $options: "i" } },
                 ],
