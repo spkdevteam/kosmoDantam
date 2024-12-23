@@ -34,7 +34,6 @@ exports.creatAppointment = async (input) => {
         const db = await getClientDatabaseConnection(input?.clientId)
         const appointments = await db.model('appointment', appointmentSchema)
         if (!input?.displayId) {
-            console.log('sdsdsds')
             input.displayId = await getserialNumber('appointment', input?.clientId, input?.branchId, input?.buId)
         }
 
@@ -47,10 +46,8 @@ exports.creatAppointment = async (input) => {
             caseId: input?.caseId || null,
             dutyDoctorId: input?.dutyDoctorId,
             dentalAssistant: input?.dentalAssistant,
-            // slotFrom: input?.date ? new Date(input.date.includes('T') ? input.date.split('T')[0] + `T${input.slotFrom}:00.000Z` : input.date + `T${input.slotFrom}:00.000Z`) : null,
-            // slotTo: input?.date ? new Date(input.date.includes('T') ? input.date.split('T')[0] + `T${input.slotTo}:00.000Z` : input.date + `T${input.slotTo}:00.000Z`) : null,
-            slotFrom:input?.slotFrom,
-            slotTo:input?.slotTo,
+            slotFrom: input?.slotFrom,
+            slotTo: input?.slotTo,
             chairId: input?.chairId,
             patientId: input?.patientId,
             status: input?.status,
@@ -59,11 +56,19 @@ exports.creatAppointment = async (input) => {
             createdUser: input?.createdUser,
         }
 
-        console.log(newData, 'newDatanewData')
-        const result = await appointments.findOneAndUpdate({ displayId: input?.displayId }, { $set: newData }, { upsert: true, returnDocument: 'after', new: true })
-        console.log(result)
-        if (result?._doc) return { status: true, message: message.lblAppointmentCreated, statusCode: httpStatusCode.OK, data: result?._doc }
-        else return { status: false, message: message.lblCredentialMissing, statusCode: httpStatusCode.Unauthorized }
+        
+        if (!input?._id) {
+            const result = await appointments.findOneAndUpdate({ displayId: input?.displayId }, { $set: newData }, { upsert: true, returnDocument: 'after', new: true })
+            console.log(result)
+            if (result?._doc) return { status: true, message: message.lblAppointmentCreated, statusCode: httpStatusCode.OK, data: result?._doc }
+            else return { status: false, message: message.lblCredentialMissing, statusCode: httpStatusCode.Unauthorized }
+        }
+        else {
+            const result = await appointments.findOneAndUpdate({ _id: input?._id }, { $set: newData }, { returnDocument: 'after', new: true })
+            console.log(result)
+            if (result?._doc) return { status: true, message: message.lblAppointmentEdited, statusCode: httpStatusCode.OK, data: result?._doc }
+            else return { status: false, message: message.lblCredentialMissing, statusCode: httpStatusCode.Unauthorized }
+        }
     } catch (error) {
         return { status: false, message: error.message, statusCode: httpStatusCode.InternalServerError }
     }
@@ -85,16 +90,17 @@ exports.getDateWiseBookidDetails = async (input) => {
             buId: input?.buId,
             branchId: input?.branchId,
             isActive: true,
+            deletedAt:null,
             date: new Date(input?.bookingDate + 'T00:00:00.000Z')
         })
             .populate('dutyDoctorId', 'firstName')
             .populate('dentalAssistant', 'firstName')
-            .populate('patientId', 'firstName')
+            .populate('patientId', 'firstName age email lastName phone mainPatientLinkedid displayId')
             .populate('buId', 'name')
             .populate('branchId', 'incorporationName')
             .populate('chairId', 'chairNumber chairLocation')
 
-        console.log(bookingdetails,'bookingdetails')
+        console.log(bookingdetails, 'bookingdetails')
 
         const bookings = bookingdetails?.map((item) => {
 
@@ -122,10 +128,7 @@ exports.getDateWiseBookidDetails = async (input) => {
                     name: item?.dentalAssistant?.firstName,
                     _id: item?.dentalAssistant?._id
                 },
-                patient: {
-                    name: item?.patientId?.firstName,
-                    _id: item?.patientId?._id
-                },
+                patient: item?.patientId,
                 chair: {
                     _id: item?.chairId?._id,
                     location: item?.chairId?.chairLocation,
@@ -136,7 +139,7 @@ exports.getDateWiseBookidDetails = async (input) => {
 
             }
         })
-        return { status: true, message: 'appointmentFetched', data: bookings||[] }
+        return { status: true, message: 'appointmentFetched', data: bookings || [] }
     } catch (error) {
         return { status: false, message: 'appointment Fetch failed ' }
     }
@@ -147,10 +150,10 @@ exports.getBookingChart = async (input) => {
         console.log(input);
         input.roleId = 3;
         //  input.prepareBy='chair'
-        const absentees = await getDateWiseLeaVeDetails(input)||[];
-        const booking = await this.getDateWiseBookidDetails(input)||[];
-        console.log(booking,'booking?.data')
-        const daystatus = [...absentees?.data,...booking.data  ];
+        const absentees = await getDateWiseLeaVeDetails(input) || [];
+        const booking = await this.getDateWiseBookidDetails(input) || [];
+        console.log(booking, 'booking?.data')
+        const daystatus = [...absentees?.data, ...booking.data];
         //console.log(daystatus,'daystatus')
         const doctors = await listEmployeeByRole(input);
         const chairs = await getchairList(input)
@@ -246,14 +249,14 @@ exports.getBookingChart = async (input) => {
 exports.getBookingChartNonTabular = async (input) => {
     try {
         console.log(input);
-        const absentees = await getDateWiseLeaVeDetails(input)||[];
-        const booking = await this.getDateWiseBookidDetails(input)||[];
-        const daystatus = [...absentees?.data,...booking.data  ];
-        const doctors = await listEmployeeByRole({...input,roleId:3});
+        const absentees = await getDateWiseLeaVeDetails(input) || [];
+        const booking = await this.getDateWiseBookidDetails(input) || [];
+        const daystatus = [...absentees?.data, ...booking.data];
+        const doctors = await listEmployeeByRole({ ...input, roleId: 3 });
         const chairs = await getchairList(input)
-        const assistant = await listEmployeeByRole({...input,roleId:4})
-        console.log(daystatus,'aaaaaaa')
-        return { chairs,doctors,daystatus,assistant,timeSlots };
+        const assistant = await listEmployeeByRole({ ...input, roleId: 4 })
+
+        return { chairs, doctors, daystatus, assistant, timeSlots };
     } catch (error) {
         console.error('Error in getBookingChart:', error);
         throw error;
@@ -275,8 +278,8 @@ const filterAppointment = async (input) => {
             query.date = new Date(input.bookingDate + 'T00:00:00.000Z');
             console.log(new Date(input.bookingDate + 'T00:00:00.000Z'));
         }
-        console.log(new Date(input.bookingDate+'T'+input.endTime + ':00.000Z'))
-        console.log(input.endTime,'------------------------')
+        console.log(new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z'))
+        console.log(input.endTime, '------------------------')
         const orConditions = [];
         if (input?.startTime) query.slotFrom = { $gte: new Date(input.bookingDate + 'T' + input.startTime + ':00.000Z'), $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z') };
         if (input?.endTime) query.slotTo = { $gte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z'), $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z') };
@@ -307,7 +310,7 @@ const filterAppointment = async (input) => {
             }
         ]);
 
-        
+
         const bookedDoctors = new Set()
         const bookedChairs = new Set()
         const bookedAssistants = new Set()
@@ -327,9 +330,32 @@ const filterAppointment = async (input) => {
 exports.generateAvailabiltyChart = async (input) => {
     const absentees = await filterLeaveApplication(input);
     const booking = await filterAppointment(input);
-    console.log(booking,'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    console.log(booking, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
     const daystatus = { ...booking, absentees };
     return daystatus
 }
+
+
+exports.delete = async (input) => {
+    try {
+        console.log(input);
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (!input?.branchId) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (!input?.buId) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
+        const db = await getClientDatabaseConnection(input?.clientId)
+        const appointments = await db.model('appointment', appointmentSchema)
+        const result = await appointments.findOneAndUpdate({_id:input.appointmentid},{$set:{deletedAt:new Date()}},{ returnDocument: 'after', new: true })
+       console.log(result.deletedAt)
+        if(result.deletedAt){
+            return {status:true,message:message.lblAppointmentDeleted,data:result}
+        }
+        else return {status:false,message:message.lblAppointmentDoesNotExist}
+        return 
+         
+    } catch (error) {
+        console.error('Error in getBookingChart:', error);
+        throw error;
+    }
+};
 
 

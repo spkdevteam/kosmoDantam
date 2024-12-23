@@ -3,6 +3,7 @@ const sanitizeBody = require("../../utils/sanitizeBody")
 const  appointmentServices = require("../services/appoinment.service")
 const { getchairList } = require("../services/chairs.service")
 const { listEmployeeByRole } = require("../services/clientUser.service")
+const { createToken } = require("../services/token.services")
 
 exports.postcreateBooking = async (req, res, next) => {
     try {
@@ -81,7 +82,7 @@ exports.getAvailability = async (req, res, next) => {
         
         const assistantAvailable =  assistantList?.filter((doc)=> !bookedAssistants?.has( doc._id.toString()) && !absentees.has( doc._id.toString()))||[]
         const specialistAvailable =  specialist?.filter((doc)=> !bookedSpecialist?.has( doc._id.toString()) && !absentees.has( doc._id.toString()))||[]
-        console.log({doctorsAvailable,chairAvailable,assistantAvailable,specialistAvailable},'availist')
+      
         res.status(200).json({message:'available slots fetched ',data:{doctorsAvailable,chairAvailable,assistantAvailable,specialistAvailable},status:true})
        // res.json(data)
     } catch (error) {
@@ -89,3 +90,24 @@ exports.getAvailability = async (req, res, next) => {
     }
 
 } 
+
+exports.delete = async (req, res, next)=>{
+    try {
+        const data = await sanitizeBody(req.query)
+        const result = await appointmentServices.delete(data)
+        res.status(200).json(result)
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.createToken = async (req, res, next)=>{
+    try {
+        const data = await sanitizeBody(req.query)
+        console.log(data)
+        const result = await createToken(data)
+        res.status(200).json(result)
+    } catch (error) {
+        next(error)
+    }
+}

@@ -8,5 +8,7 @@ bookingRoutes
        .get('/BookingByDate',appointment.getBookingByDate)
        .get('/BookingByDateNonTabular',appointment.getBookingByDateNonTabular)
        .get('/getAvailability',appointment.getAvailability)
+       .delete('/delete',appointment.delete)
+       .get('/createToken',appointment.createToken)
 
 module.exports = bookingRoutes
