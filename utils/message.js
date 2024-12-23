@@ -90,7 +90,7 @@ module.exports = {
   lblBranchIRequired: " Brach Id is required!",
   lblBranchNotFound: "Branch not found!",
   lblBranchFoundSucessfully: "Branch found successfully!",
-
+  lblBranchIdInvalid:"invalid Branch Id",
 
 
   // chair 
@@ -314,6 +314,10 @@ module.exports = {
   lblFindingsNoChanges: "The finding details are already up to date.",
   lblFindingsDependencies: "Please resolve linked issues before proceeding with this action.",
   lblFindingsDoesNotExist: "The specified finding does not exist in the system."  ,
+  lblFindingsAlreadyExist: "finding already exists."  ,
+  lblFindingFound: "Finding found successfully."  ,
+  lblFindingsUpdated: "Finding updated successfully.",
+
 
 
     lblChiefComplaintCreated: "New Chief Complaint added to the system.",
@@ -368,7 +372,7 @@ module.exports = {
     lblAppointmentAlreadyExist: "An Appointment with the same details already exists.",
 
     lblClinetIdInvalid:"invalid Client id",
-
+    
     lblLeaveRegisterCreated: "New Leave Registration added to the system.",
     lblLeaveRegisterEdited: "Changes to the Leave Registration have been saved.",
     lblLeaveRegisterDeleted: "The Leave Registration has been removed from the system.",

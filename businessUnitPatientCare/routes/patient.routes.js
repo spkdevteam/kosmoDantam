@@ -76,6 +76,7 @@ router.post("/softDeletePatient", entityAuth.authorizeEntity("Patient", "Patient
 
 router.get('/getPatientRoleId/:clientId',  businessUnitPatientContrller.getPatientRoleId);
 
+router.get('/searchPatient',businessUnitPatientContrller.searchPatients)
 
 // # create, update, view, list, activate/inactive, delete Patient by business unit routes ends here
 

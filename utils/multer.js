@@ -106,7 +106,7 @@ const investigationStorage = multer.diskStorage({
 const uploadInvestigation = multer({
     storage: investigationStorage,
     limits: {
-        fileSize: 1024 * 1024,
+        fileSize: 10 * 1024 * 1024, 
         files: 1
     },
     fileFilter: imageFilter

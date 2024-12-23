@@ -177,7 +177,7 @@ exports.getDateWiseLeaVeDetails = async (input) => {
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(input?.clientId)
         const leaveRegister = db.model('leaveRegister', leaveRegisterSchema)
-        console.log(input, 'input')
+        
         const absentees = await leaveRegister.find({
             buId: input?.buId,
             branchId: input?.branchId,
@@ -186,17 +186,20 @@ exports.getDateWiseLeaVeDetails = async (input) => {
             isActive: true,
         }).populate('employeeId', 'firstName role');
         const data = absentees?.map((req) => {
+            console.log(req,'```````````````````````````````````````````')
             if (req.startDate != input?.bookingDate) {
-                req.startTime = '10:00:00'
-                req.endTime = '17:00:00'
+                req.startTime = new Date(`${input?.bookingDate}T10:00:00.000Z`)
+                req.endTime = new Date(`${input?.bookingDate}T17:00:00.000Z`)
+                 
             }
             return {
                 bookingType: 'leave',
                 date: new Date(input?.bookingDate),
-                slotFrom: req.startTime,
-                slotTo: req.endTime,
+                slotFrom: new Date(req.startTime),
+                slotTo: new Date(req.endTime),
                 staffName: req?.employeeId?.firstName,
                 role: req?.employeeId?.role,
+                staffId:req?.employeeId?._id
 
             }
         })

@@ -229,6 +229,37 @@ exports.listPatient = async (req, res, next) => {
     }
 };
 
+exports.searchPatients = async (req, res, next) => {
+    try {
+        const { clientId, name = '',contactNumber='',email='', page = 1, perPage = 10, } = req.query;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        const filters = {
+            deletedAt: null,
+            ...({
+                $and: [
+                    //{ firstName: { $regex: name.trim(), $options: "i" } },
+                    { lastName: { $regex: name.trim(), $options: "i" } },
+                    { email: { $regex: email.trim(), $options: "i" } },
+                    { phone: { $regex: contactNumber.trim(), $options: "i" } },
+                ],
+            }),
+        };
+        const result = await patientService.list(clientId, filters, { page, limit: perPage });
+        return res.status(statusCode.OK).send({
+            message: message.lblPatientFoundSucessfully,
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+
 // active inactive Patient by business unit
 exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
     try {
