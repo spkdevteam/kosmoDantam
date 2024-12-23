@@ -410,6 +410,7 @@ const serialNumber = [
     { collectionName : "branch", prefix: "BR"},
     { collectionName : "chair", prefix: "CH"},
     { collectionName : "patient", prefix: "PT"},
+    { collectionName : "caseSheet", prefix: "CS"},
 ]
 
 
