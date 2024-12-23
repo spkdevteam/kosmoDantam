@@ -409,6 +409,51 @@ const serialNumber = [
     { collectionName : "employee", prefix: "EM"},
     { collectionName : "branch", prefix: "BR"},
     { collectionName : "chair", prefix: "CH"},
+    { collectionName : "patient", prefix: "PT"},
+    { collectionName : "caseSheet", prefix: "CS"},
+]
+
+
+// cheif complaints data
+
+const cheifComplaints = [
+    { complaintName : "Swelling Large", discription: "Any description"},
+    { complaintName : "Toothache", discription: "Any description"},
+    { complaintName : "Bleeding Gums", discription: "Any description"},
+    { complaintName : "Pain in Tooth", discription: "Any description"},
+    { complaintName : "Consultation", discription: "Any description"},
+    { complaintName : "Faulty Crown", discription: "Any description"},
+    { complaintName : "Difficulty in Chewing", discription: "Any description"},
+]
+
+
+
+const findings = [
+    { findingsName : "Swelling Large", discription: "Any description"},
+    { findingsName : "Toothache", discription: "Any description"},
+    { findingsName : "Bleeding Gums", discription: "Any description"},
+    { findingsName : "Pain in Tooth", discription: "Any description"},
+    { findingsName : "Consultation", discription: "Any description"},
+    { findingsName : "Faulty Crown", discription: "Any description"},
+    { findingsName : "Difficulty in Chewing", discription: "Any description"},
+]
+
+
+const medicalHistory = [
+    { caseName : "Arthritis", remark: "Any remark"},
+    { caseName : "Migraine", remark: "Any remark"},
+    { caseName : "Asthma", remark: "Any remark"},
+    { caseName : "Cancer", remark: "Any remark"},
+    { caseName : "Blood Sugar", remark: "Any remark"},
+    { caseName : "Endocrinal", remark: "Any remark"},
+    { caseName : "Blood Pressure", remark: "Any remark"},
+    { caseName : "Bleeding Disorder", remark: "Any remark"},
+    { caseName : "Gastro Internal", remark: "Any remark"},
+    { caseName : "Fits / Faint / Epilepsy", remark: "Any remark"},
+    { caseName : "Congenital Discover", remark: "Any remark"},
+    { caseName : "HIV / HBV / Jaundice", remark: "Any remark"},
+    { caseName : "Genito Urinal", remark: "Any remark"},
+    { caseName : "Cardio Respiration", remark: "Any remark"},
 ]
 
 
@@ -418,3 +463,6 @@ exports.clientRoles = clientRoles;
 exports.defaultPersmissionsList = defaultPersmissionsList;
 exports.businessUnitPersmissionsList = businessUnitPersmissionsList;
 exports.serialNumber = serialNumber;
+exports.cheifComplaints = cheifComplaints;
+exports.findings = findings;
+exports.medicalHistory = medicalHistory;

@@ -18,11 +18,12 @@ const caseSheetSchema = new mongoose.Schema({
                 complaints: {
                     type: [
                         {
-                            compId: { type: mongoose.Schema.ObjectId, ref: "CheifComplaint" }
+                            compId: { type: mongoose.Schema.ObjectId, ref: "complaint" }
                         }
+                        //   { type: mongoose.Schema.ObjectId, ref: "complaint" }
+
                     ]
                 }
-
             },
         ],
         default: [],
@@ -37,7 +38,7 @@ const caseSheetSchema = new mongoose.Schema({
                 findings: {
                     type: [
                         {
-                            findId: { type: mongoose.Schema.ObjectId, ref: "finding" }
+                            findId: { type: mongoose.Schema.ObjectId, ref: "patientFinding" }
                         }
                     ]
                 }
@@ -48,7 +49,15 @@ const caseSheetSchema = new mongoose.Schema({
     medicalHistory: {
         type: [
             {
-                id: { type: mongoose.Schema.ObjectId, ref: "medicalCase" }
+                medicals: {
+                    type: [
+                        {
+                            medId: { type: mongoose.Schema.ObjectId, ref: "medicalCase" }
+                        }
+                    ],
+
+                }
+
             }
         ],
         default: [],

@@ -17,7 +17,7 @@ const serialNumebrSchema = require("../../model/serialNumber");
 
 
 
-const { clientRoles, serialNumber } = require("../../utils/constant")
+const { clientRoles, serialNumber, cheifComplaints, findings, medicalHistory } = require("../../utils/constant")
 
 
 
@@ -27,6 +27,9 @@ const statusCode = require("../../utils/http-status-code");
 const message = require("../../utils/message");
 
 const { createClientDatabase } = require("../../db/connection");
+const complaintSchema = require("../../client/model/complaint");
+const patientFindingsSchema = require("../../client/model/finding");
+const medicalSchema = require("../../client/model/medical");
 
 
 // env 
@@ -151,6 +154,20 @@ exports.createBusinessUnit = async (req, res) => {
     const SerialNumber = clientConnection.model("serialNumber", serialNumebrSchema);
     await SerialNumber.insertMany(serialNumber);
 
+    // insert cheif complaints
+    const Complaint = clientConnection.model('complaint', complaintSchema);
+    const data1 = cheifComplaints;
+    await Complaint.insertMany(data1);
+
+    // insert clinical finding
+    const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+    const data2 = findings;
+    await Finding.insertMany(data2);
+
+    // insert medical case
+    const Medical = clientConnection.model('medical', medicalSchema);
+    const data3 = medicalHistory;
+    await Medical.insertMany(data3);
 
 
     // Commit the transaction (if everything goes well)

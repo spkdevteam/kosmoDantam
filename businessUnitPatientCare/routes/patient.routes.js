@@ -11,21 +11,70 @@ const entityAuth = require("../../middleware/authorization/commonEntityAuthoriza
 
 
 
+const {
+    uploadPatient, 
+} = require('../../utils/multer');
+
 
 // # create, update, view, list, activate/inactive, delete Patient by business unit routes starts here
 
 
-router.post('/createPatient', entityAuth.authorizeEntity("Pataints", "Patient", "create"), businessUnitPatientContrller.createMainPatientByBusinessUnit);
+// router.post('/createPatient', entityAuth.authorizeEntity("Patient", "Patient", "create"), businessUnitPatientContrller.createMainPatientByBusinessUnit);
 
-router.post('/createSubPatient', entityAuth.authorizeEntity("Pataints", "Patient", "create"), businessUnitPatientContrller.createSubPatientByBusinessUnit);
+router.post('/createPatient',entityAuth.authorizeEntity("Patient", "Patient", "create"), (req, res, next) => {
+    uploadPatient.single("img")(req, res, (err) => {
+        if (err) {
+            if (err instanceof multer.MulterError) {
+                // MulterError: File too large
+                return res.status(statusCode.BadRequest).send({
+                    message: 'File too large. Maximum file size allowed is 1 MB.'
+                });
+            } else {
+                // Other errors
+                console.error('Multer Error:', err.message);
+                return res.status(statusCode.BadRequest).send({
+                    message: err.message
+                });
+            }
+        }
+        next();
+    });
+}, businessUnitPatientContrller.createMainPatientByBusinessUnit);
 
-router.put('/updatePatient', entityAuth.authorizeEntity("Pataints", "Patient", "update"), businessUnitPatientContrller.updatePatientByBusinessUnit);
+router.post('/createSubPatient', entityAuth.authorizeEntity("Patient", "Patient", "create"), businessUnitPatientContrller.createSubPatientByBusinessUnit);
 
-router.get('/patient/:clientId/:patientId', entityAuth.authorizeEntity("Pataints", "Patient", "view"), businessUnitPatientContrller.getParticularPatientByBusinessUnit);
+// router.put('/updatePatient', entityAuth.authorizeEntity("Patient", "Patient", "update"), businessUnitPatientContrller.updatePatientByBusinessUnit);
 
-router.get('/listPatient', entityAuth.authorizeEntity("Pataints", "Patient", "list"), businessUnitPatientContrller.listPatient);
+router.put('/updatePatient',entityAuth.authorizeEntity("Patient", "Patient", "update"), (req, res, next) => {
+    uploadPatient.single("img")(req, res, (err) => {
+        if (err) {
+            if (err instanceof multer.MulterError) {
+                // MulterError: File too large
+                return res.status(statusCode.BadRequest).send({
+                    message: 'File too large. Maximum file size allowed is 1 MB.'
+                });
+            } else {
+                // Other errors
+                console.error('Multer Error:', err.message);
+                return res.status(statusCode.BadRequest).send({
+                    message: err.message
+                });
+            }
+        }
+        next();
+    });
+}, businessUnitPatientContrller.updatePatientByBusinessUnit);
 
-router.post("/activeInactivePatient", entityAuth.authorizeEntity("Pataints", "Patient", "activeActive"), businessUnitPatientContrller.activeinactivePatientByBusinessUnit);
+router.get('/patient/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Patient", "view"), businessUnitPatientContrller.getParticularPatientByBusinessUnit);
+
+router.get('/listPatient', entityAuth.authorizeEntity("Patient", "Patient", "view"), businessUnitPatientContrller.listPatient);
+
+router.post("/activeInactivePatient", entityAuth.authorizeEntity("Patient", "Patient", "update"), businessUnitPatientContrller.activeinactivePatientByBusinessUnit);
+
+router.post("/softDeletePatient", entityAuth.authorizeEntity("Patient", "Patient", "softDelete"), businessUnitPatientContrller.softDeletePatient);
+
+
+router.get('/getPatientRoleId/:clientId',  businessUnitPatientContrller.getPatientRoleId);
 
 router.get('/searchPatient',businessUnitPatientContrller.searchPatients)
 

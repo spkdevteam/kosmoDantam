@@ -20,6 +20,13 @@ if(!fs.existsSync('./public/investigation')){
 
 
 
+// create patient folder
+if(!fs.existsSync('./public/patient')){
+    fs.mkdirSync('./public/patient')
+}
+
+
+
 
 // image filter
 const imageFilter = (req, file, cb) => {
@@ -62,6 +69,28 @@ const uploadProfile = multer({
 });
 
 
+// upload patient image
+const patientStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './public/patient');
+    },
+    filename: async (req, file, cb) => {
+        cb(null, `${Date.now()}_${file.originalname.toLowerCase().replaceAll(' ', '')}`);
+    },
+});
+
+
+
+const uploadPatient = multer({
+    storage: patientStorage,
+    limits: {
+        fileSize: 1024 * 1024,
+        files: 1
+    },
+    fileFilter: imageFilter
+});
+
+
 // upload investigation
 
 // upload profile image
@@ -77,7 +106,7 @@ const investigationStorage = multer.diskStorage({
 const uploadInvestigation = multer({
     storage: investigationStorage,
     limits: {
-        fileSize: 1024 * 1024,
+        fileSize: 10 * 1024 * 1024, 
         files: 1
     },
     fileFilter: imageFilter
@@ -85,4 +114,5 @@ const uploadInvestigation = multer({
 
 
 exports.uploadProfile = uploadProfile;
+exports.uploadPatient = uploadPatient;
 exports.uploadInvestigation = uploadInvestigation;
