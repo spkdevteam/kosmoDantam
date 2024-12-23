@@ -135,6 +135,7 @@ router.post('/removeAsDraft',entityAuth.authorizeEntity("Patient", "Case Sheet",
 router.get('/listCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.listCaseSheet);
 router.get('/getCaseSheet/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getParticularCaseSheet)
 router.get('/getAllDraftedCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllDrafted);
+router.get('/getAllCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllCaseSheet);
 
 // ------- case sheet details routes ends here ------
 

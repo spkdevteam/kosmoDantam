@@ -731,6 +731,30 @@ exports.getAllDrafted = async (req, res, next) => {
 };
 
 
+// get all case sheet of particular patient
+exports.getAllCaseSheet = async (req, res, next) => {
+    try {
+        const { clientId, patientId } = req.params;
+        if (!clientId || !patientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const filters = {
+            deletedAt: null,
+            patientId: patientId,
+        };
+        const result = await caseSheetService.listAllCases(clientId, filters);
+        return res.status(statusCode.OK).send({
+            message: message.lblCaseSheetFoundSucessfully,
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
 
 // get particular case sheet
 exports.getParticularCaseSheet = async (req, res, next) => {

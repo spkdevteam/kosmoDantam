@@ -16,6 +16,7 @@ const { path } = require("../../model/patient");
 const patientFindingsSchema = require("../../client/model/finding");
 const medicalSchema = require("../../client/model/medical");
 const procedureSchema = require("../../client/model/procedure");
+const clinetBranchSchema = require("../../client/model/branch");
 
 const create = async (clientId, data) => {
     try {
@@ -706,10 +707,45 @@ const updateDraft = async (clientId, caseSheetId, data) => {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
         Object.assign(existing, data);
-        return  await existing.save();
-        
+        return await existing.save();
+
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
+const listAllCases = async (clientId, filters = {}) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Patient = clientConnection.model('patient', clinetPatientSchema);
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const User = clientConnection.model('clientUsers', clinetUserSchema);
+
+
+        const [caseSheets] = await Promise.all([
+            CaseSheet.find(filters).sort({ _id: -1 }).populate({
+                path: 'cheifComplaints.complaints.compId',
+                model: Complaint,
+                select: 'complaintName _id'
+            }).populate({
+                path: 'patientId',
+                model: Patient,
+                select: 'firstName lastName patientGroup displayId'
+            }).populate({
+                path: 'branchId',
+                model: Branch,
+                select: 'name displayId _id'
+            }).populate({
+                path: 'createdBy',
+                model: User,
+                select: 'firstName lastName _id'
+            }),
+        ]);
+        return { caseSheets };
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
     }
 };
 
@@ -752,5 +788,7 @@ module.exports = {
     getById,
     updateTreatmentProcedure,
     listDrafted,
-    updateDraft
+    updateDraft,
+
+    listAllCases
 };
