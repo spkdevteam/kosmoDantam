@@ -658,10 +658,10 @@ exports.removeAsDraft = async (req, res, next) => {
         }
         if (!caseSheetId) {
             return res.status(statusCode.BadRequest).send({
-                message: message.lblProlblCaseSheetIdIdRequiredcedureIdRequired,
+                message: message.lblCaseSheetIdIdRequired,
             });
         }
-        const update = await caseSheetService.update(clientId, caseSheetId, {
+        const update = await caseSheetService.updateDraft(clientId, caseSheetId, {
             drafted: false
         });
         return res.status(statusCode.OK).send({
@@ -718,7 +718,7 @@ exports.getAllDrafted = async (req, res, next) => {
         const filters = {
             deletedAt: null,
             patientId: patientId,
-            status: "In Progress"
+            status: "Proposed"
         };
         const result = await caseSheetService.listDrafted(clientId, filters);
         return res.status(statusCode.OK).send({

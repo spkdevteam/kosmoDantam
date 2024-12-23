@@ -137,8 +137,8 @@ const caseSheetSchema = new mongoose.Schema({
     drafted: { type: Boolean, default: true },
     status: {
         type: String,
-        enum: ['In Progress', 'Cancelled', 'Completed'],
-        default: 'In Progress',
+        enum: ['In Progress', 'Cancelled', 'Completed', 'Proposed'],
+        default: 'Proposed',
         trim: true,
     },
 

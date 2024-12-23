@@ -692,6 +692,27 @@ const updateTreatmentProcedure = async (clientId, caseSheetId, procedureId) => {
     }
 };
 
+
+
+
+const updateDraft = async (clientId, caseSheetId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+
+        const existing = await CaseSheet.findById(caseSheetId);
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        Object.assign(existing, data);
+        return  await existing.save();
+        
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
 module.exports = {
 
     create,
@@ -730,5 +751,6 @@ module.exports = {
     list,
     getById,
     updateTreatmentProcedure,
-    listDrafted
+    listDrafted,
+    updateDraft
 };
