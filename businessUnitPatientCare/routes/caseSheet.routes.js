@@ -123,7 +123,7 @@ router.post('/deleteServices', entityAuth.authorizeEntity("Patient", "Case Sheet
 // procedures
 router.post('/createProcedure', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createProcedure);
 router.put('/updateProcedure', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.updateProcedure);
-router.delete('/deleteProcedure', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteProcedure);
+router.post('/deleteProcedure', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteProcedure);
 
 // remove from draft
 router.post('/removeAsDraft',entityAuth.authorizeEntity("Patient", "Case Sheet", "create"),caseSheetController.removeAsDraft)

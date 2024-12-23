@@ -15,6 +15,7 @@ const complaintSchema = require("../../client/model/complaint");
 const { path } = require("../../model/patient");
 const patientFindingsSchema = require("../../client/model/finding");
 const medicalSchema = require("../../client/model/medical");
+const procedureSchema = require("../../client/model/procedure");
 
 const create = async (clientId, data) => {
     try {
@@ -468,6 +469,8 @@ const updateService = async (clientId, caseSheetId, data) => {
     }
 };
 
+
+
 const deleteServices = async (clientId, caseSheetId, serviceId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
@@ -500,10 +503,47 @@ const deleteServices = async (clientId, caseSheetId, serviceId) => {
     }
 };
 
+const updateProcedure = async (clientId, caseSheetId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Department = clientConnection.model('department', departmentSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
+
+
+        const existing = await CaseSheet.findById(caseSheetId);
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        Object.assign(existing, data);
+
+        await existing.save();
+
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'procedures.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'procedures.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        })
+
+        return populatedCaseSheet
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
 const deleteProcedure = async (clientId, caseSheetId, procedureId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema);
+
         const existing = await CaseSheet.findById(caseSheetId);
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
@@ -514,7 +554,17 @@ const deleteProcedure = async (clientId, caseSheetId, procedureId) => {
             return !item._id.equals(mongObjId)
         });
         existing.procedures = newArray;
-        return await existing.save();
+        await existing.save();
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'procedures.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'procedures.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        })
+        return populatedCaseSheet
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
@@ -573,6 +623,8 @@ const getById = async (clientId, caseSheetId) => {
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);
         const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
+
 
         const caseSheet = await CaseSheet.findById(caseSheetId).populate({
             path: 'cheifComplaints.complaints.compId',
@@ -592,6 +644,14 @@ const getById = async (clientId, caseSheetId) => {
             select: 'deptName _id'
         }).populate({
             path: 'services.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        }).populate({
+            path: 'procedures.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'procedures.service.servId',
             model: Service,
             select: 'serviceName _id'
         });
@@ -662,10 +722,11 @@ module.exports = {
 
     createService,
     updateService,
-
-
     deleteServices,
+
+    updateProcedure,
     deleteProcedure,
+
     list,
     getById,
     updateTreatmentProcedure,

@@ -610,12 +610,12 @@ exports.updateProcedure = async (req, res, next) => {
                 message: message.lblRequiredFieldMissing,
             });
         }
-        const newCheifComplaint = await caseSheetService.update(clientId, caseSheetId, {
+        const newCheifComplaint = await caseSheetService.updateProcedure(clientId, caseSheetId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, procedures,
         });
         return res.status(statusCode.OK).send({
             message: message.lblProcedureUpdatedSuccess,
-            data: { caseSheetId: newCheifComplaint._id },
+            data: { procedures: newCheifComplaint.procedures, _id: newCheifComplaint._id }
         });
     } catch (error) {
         next(error)
@@ -639,7 +639,7 @@ exports.deleteProcedure = async (req, res, next) => {
         const deleted = await caseSheetService.deleteProcedure(clientId, caseSheetId, procedureId);
         return res.status(statusCode.OK).send({
             message: message.lblProcedureDeletedSuccess,
-            data: { caseSheetId: deleted?._id }
+            data: { procedures: deleted.procedures, _id: deleted._id }
         });
     } catch (error) {
         next(error)
