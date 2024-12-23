@@ -158,35 +158,10 @@ exports.getBookingChart = async (input) => {
         const daystatus = [...absentees?.data, ...booking.data];
         //console.log(daystatus,'daystatus')
         const doctors = await listEmployeeByRole(input);
-        const chairs = await getchairList(input)
         const chairs = await getchairList(input);
         console.log(chairs,'chairschairs')
         let data = [];
-        
-        for (let i = 0; i <= timeSlots?.length; i++) {
-            if (!data[i]) data[i] = [];
-            for (let j = 0; j <= doctors?.length; j++) {
-                if (i == 0 && j != 0) {
-                    data[i][j] = doctors[j - 1]?.lastName
-                    continue
-                }
-                if (j == 0 && i != 0) {
-                    data[i][j] = timeSlots[i - 1]
-                    continue
-                }
-                doc_And_Time = { ...doctors[j - 1], ...timeSlots[i - 1] }
-                console.log(doc_And_Time,'saasasasasassassasasas')
-                const record = daystatus.filter((record) =>  {
-                      
-                    return new Date(input?.bookingDate+'T'+doc_And_Time.end+':00.000Z') > record.slotFrom &&
-                    new Date(input?.bookingDate+'T'+doc_And_Time.start+':00.000Z') < record.slotTo &&
-                        doc_And_Time?._doc?.firstName === record?.doctor?.name
-                     
-                 });
-                 console.log(record,'rerecordrecordcord')
-                data[i][j] = record || null
-            }
-        }
+         
         if(input.prepareBy != 'chair'){
             for (let i = 0; i <= timeSlots?.length; i++) {
                 if (!data[i]) data[i] = [];
