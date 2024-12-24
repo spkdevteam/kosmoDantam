@@ -90,6 +90,7 @@ const caseSheetSchema = new mongoose.Schema({
                 subTotal: { type: Number, default: null },
                 discount: { type: Number, default: null },
                 grantTotal: { type: Number, default: null },
+                finished: { type: Boolean, default: false }
             }
 
         ],
@@ -114,6 +115,38 @@ const caseSheetSchema = new mongoose.Schema({
         ],
         default: [],
     },
+
+    treatmentData: { type: String, default: null },
+    treatmentData2: {
+        type: [
+            {
+                tooth: { type: String, default: null },
+                service: {
+                    type: [
+                        {
+                            service: {
+                                serviceName: { type: String },
+                            },
+                            procedure: {
+                                type: [
+                                    {
+                                        procedureName: { type: String },
+                                        finished: { type: Boolean, default: false },
+                                        updatedAt: { type: Date, default: null, index: true }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+
+                total : {type : Number, default: 0},
+                completed : {type : Number, default: 0},
+            }
+        ]
+
+    },
+
     otherAttachment: {
         type: [
             {

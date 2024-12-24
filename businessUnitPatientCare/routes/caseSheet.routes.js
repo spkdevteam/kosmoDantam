@@ -144,8 +144,9 @@ router.get('/getAllCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("
 
 // ------- Treatment plan routes starts starts here -------
 
-router.get('/getTreatmentPlan/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getTreatmentPlan)
-router.put('/updateTreatmentProcedure',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatmentProcedure)
+router.get('/getTreatmentPlan/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getTreatmentPlan);
+router.put('/updateTreatment',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatment);
+router.put('/updateTreatmentProcedure',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatmentProcedure);
 
 
 

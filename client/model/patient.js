@@ -6,12 +6,12 @@ const ObjectId = Schema.ObjectId;
 
 const clinetPatientSchema = new Schema(
     {
-        displayId:{type:String,unique:true},
+        displayId: { type: String, unique: true },
         branch: { type: ObjectId, ref: "branch", default: null, index: true },
         businessUnit: { type: ObjectId, ref: "businessUnit", default: null, index: true },
         mainPatientLinkedid: { type: ObjectId, ref: "clientUsers", default: null, index: true },
         isChainedWithMainPatient: { type: Boolean, default: false },
-        relation: { type: String, default : null },
+        relation: { type: String, default: null },
         firstName: { type: String, required: true },
         lastName: { type: String },
         profileImage: { type: String, default: null },
@@ -77,6 +77,19 @@ const clinetPatientSchema = new Schema(
             trim: true,
         },
         isActive: { type: Boolean, default: true },
+
+        medicalHistory: {
+            type: [
+                {
+                    name: { type: String, default: null },
+                    note: { type: String, default: null },
+                    positive: { type: Boolean, default: false },
+                    negative: { type: Boolean, default: false },
+                    unknown: { type: Boolean, default: false },
+                }
+            ]
+        },
+
 
         // caseSheets : [{ type :  ObjectId}]
 

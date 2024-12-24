@@ -1,4 +1,6 @@
 // services/chairService.js
+const { v4: uuidv4 } = require('uuid');
+
 const { getClientDatabaseConnection } = require("../../db/connection");
 const clinetUserSchema = require("../../client/model/user");
 const clinetPatientSchema = require("../../client/model/patient");
@@ -25,12 +27,12 @@ const checkOngoing = async (clientId, patientId) => {
         const Complaint = clientConnection.model('complaint', complaintSchema);
 
         const existing = await CaseSheet.find({
-            patientId: patientId, 
+            patientId: patientId,
             status: { $in: ['Proposed', 'In Progress'] },
         });
 
         return existing;
-       
+
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
@@ -712,18 +714,167 @@ const updateTreatmentProcedure = async (clientId, caseSheetId, procedureId) => {
 };
 
 
+const updateTreatment = async (clientId, caseSheetId, treatmentData) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const Medical = clientConnection.model('medical', medicalSchema);
+        const Department = clientConnection.model('department', departmentSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
+        const existing = await CaseSheet.findById(caseSheetId).populate({
+            path: 'cheifComplaints.complaints.compId',
+            model: Complaint,
+            select: 'complaintName _id'
+        }).populate({
+            path: 'clinicalFindings.findings.findId',
+            model: Finding,
+            select: 'findingsName _id'
+        }).populate({
+            path: 'medicalHistory.medicals.medId',
+            model: Medical,
+            select: 'caseName _id'
+        }).populate({
+            path: 'services.department.deptId',
+            model: Department,
+            select: 'deptName _id'
+        }).populate({
+            path: 'services.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        }).populate({
+            path: 'procedures.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'procedures.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        });
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        existing.treatmentData2 = treatmentData
+        return await existing.save();
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error in updating treatment procedure: ${error.message}`);
+    }
+};
+
+
+
+// old
+function transformArr(arr1) {
+    const filteredData = arr1.map((item) => {
+        const service = {
+            serviceName: item?.service?.servId?.serviceName,
+            // _id: item?.service?.servId?._id
+        };
+        const procedure = item?.procedure?.map((item) => {
+
+            return {
+                procedureName: item?.procedId?.procedureName,
+                // _id: item?.procedId?._id,
+                // id: item?._id,
+                // finished: false,
+                // uniqueId : count++,
+
+            }
+        });
+        return {
+            tooth: item?.tooth,
+            service: service,
+            procedure: procedure,
+            
+        }
+
+    });
+
+    console.log("filteredData string", JSON.stringify(filteredData));
+
+
+    const toothMap = new Map();
+
+    filteredData.forEach(({ tooth, service, procedure }) => {
+        tooth.forEach((t) => {
+            if (!toothMap.has(t)) {
+                toothMap.set(t, { tooth: t, service: [] });
+            }
+
+            toothMap.get(t).service.push({
+                service,
+                procedure: procedure,
+            });
+        });
+    });
+
+    return Array.from(toothMap.values())
+}
+
+// new
+// function transformArr(arr1) {
+//     let count = 1; // Initialize the counter outside the map scope
+
+//     const filteredData = arr1.map((item) => {
+//         const service = {
+//             serviceName: item?.service?.servId?.serviceName,
+//             _id: item?.service?.servId?._id,
+//         };
+
+//         const procedure = item?.procedure?.map((item) => {
+//             return {
+//                 procedureName: item?.procedId?.procedureName,
+//                 _id: item?.procedId?._id,
+//                 id: item?._id,
+//                 finished: false,
+//                 uniqueId: count++, // Increment the counter for each procedure
+//             };
+//         });
+
+//         return {
+//             tooth: item?.tooth,
+//             service: service,
+//             procedure: procedure,
+//         };
+//     });
+
+//     return filteredData;
+// }
+
+
 
 
 const updateDraft = async (clientId, caseSheetId, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
 
-        const existing = await CaseSheet.findById(caseSheetId);
+        const existing = await CaseSheet.findById(caseSheetId).populate({
+            path: 'procedures.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'procedures.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        });
+        ;
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
+
+        if (existing?.procedures && existing?.procedures?.length > 0) {
+            const transformedData = transformArr(existing?.procedures);
+
+            existing.treatmentData = JSON.stringify(transformedData);
+            existing.treatmentData2 = transformedData;
+        }
+
+
         Object.assign(existing, data);
         return await existing.save();
 
@@ -809,6 +960,7 @@ module.exports = {
     updateTreatmentProcedure,
     listDrafted,
     updateDraft,
+    updateTreatment,
 
     listAllCases
 };

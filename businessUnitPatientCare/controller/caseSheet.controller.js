@@ -12,6 +12,7 @@ const clinetBusinessUnitSchema = require("../../client/model/businessUnit")
 const caseSheetService = require("../services/caseSheet.service");
 
 const CustomError = require("../../utils/customeError");
+const { update } = require("../../businessUnitAdministration/controller/service.controller");
 
 
 
@@ -844,6 +845,37 @@ exports.updateTreatmentProcedure = async (req, res, next) => {
         return res.status(statusCode.OK).send({
             message: message.lblProcedureUpdatedSuccess,
             data: { caseSheetId: updated._id },
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+
+// update treatment
+exports.updateTreatment = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId, treatmentData, } = req.body;
+        const mainUser = req.user;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        if (!caseSheetId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblCaseSheetIdIdRequired,
+            });
+        }
+        if (!treatmentData) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const updated = await caseSheetService.updateTreatment(clientId, caseSheetId, treatmentData);
+        return res.status(statusCode.OK).send({
+            message: message.lblProcedureUpdatedSuccess,
+            data: { caseSheets: updated },
         });
     } catch (error) {
         next(error)
