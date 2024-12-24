@@ -16,6 +16,30 @@ const CustomError = require("../../utils/customeError");
 
 
 
+// check already ongoing case sheet
+exports.checkAlreadyOngoingCaseSheet = async (req, res, next) => {
+    try {
+        const { clientId, patientId } = req.body;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        if (!patientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblPatientIdRequired,
+            });
+        }
+        const cases = await caseSheetService.checkOngoing(clientId, patientId);
+        return res.status(statusCode.OK).send({
+            message: message.lblCaseSheetFoundSucessfully,
+            data: { cases: cases, ongoing : cases?.length > 0 ? true : false }
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
 
 // create cheif complaints by business unit
 exports.createCheifComplaints = async (req, res, next) => {
@@ -251,8 +275,8 @@ exports.createInvestigation = async (req, res, next) => {
             });
         }
         let dataObject = {
-            fileType : fileType,
-            remark : remark,
+            fileType: fileType,
+            remark: remark,
         }
         if (req.file?.filename) {
             dataObject.file = req.file.filename;
@@ -273,17 +297,17 @@ exports.createInvestigation = async (req, res, next) => {
 // update investigation by busines unit
 exports.updateInvestigation = async (req, res, next) => {
     try {
-        const { clientId, caseSheetId, patientId, branchId, businessUnitId,  fileType, remark , } = req.body;
+        const { clientId, caseSheetId, patientId, branchId, businessUnitId, fileType, remark, } = req.body;
         const mainUser = req.user;
         await commonCheck(clientId, patientId, branchId, businessUnitId);
-        if (!fileType || !remark ) {
+        if (!fileType || !remark) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
         let dataObject = {
-            fileType : fileType,
-            remark : remark,
+            fileType: fileType,
+            remark: remark,
         }
         if (req.file?.filename) {
             dataObject.file = req.file.filename;

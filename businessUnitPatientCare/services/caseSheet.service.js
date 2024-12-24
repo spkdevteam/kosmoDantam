@@ -18,6 +18,24 @@ const medicalSchema = require("../../client/model/medical");
 const procedureSchema = require("../../client/model/procedure");
 const clinetBranchSchema = require("../../client/model/branch");
 
+const checkOngoing = async (clientId, patientId) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+
+        const existing = await CaseSheet.find({
+            patientId: patientId, 
+            status: { $in: ['Proposed', 'In Progress'] },
+        });
+
+        return existing;
+       
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
 const create = async (clientId, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
@@ -750,6 +768,8 @@ const listAllCases = async (clientId, filters = {}) => {
 };
 
 module.exports = {
+
+    checkOngoing,
 
     create,
     update,

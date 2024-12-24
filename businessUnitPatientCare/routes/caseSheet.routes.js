@@ -21,6 +21,9 @@ const {
 // -------- case sheet routes starts here ----------
 
 
+// check alrady ongoing case sheet
+router.post('/checkAlreadyOngoingCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.checkAlreadyOngoingCaseSheet);
+
 // cheif complain part
 router.post('/createCheifComplaints', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createCheifComplaints);
 router.put('/updateCheifComplaints', entityAuth.authorizeEntity("Patient", "Case Sheet", "update"), caseSheetController.updateCheifComplaints);
