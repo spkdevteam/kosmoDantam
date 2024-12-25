@@ -19,7 +19,7 @@ const clinetPatientSchema = new Schema(
             type: String,
             lowercase: true,
             trim: true,
-            required: true
+           
         },
         phone: {
             type: String,

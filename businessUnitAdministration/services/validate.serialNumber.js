@@ -32,6 +32,7 @@ exports.validateObjectId = async ({clientid='',objectId='',collectionName=''})=>
         const leaveRegister =await db.model('leaveRegister',leaveRegisterSchema )
         const chair = db.model('chair', clinetChairSchema);
         const patientregister = db.model('patient', clinetPatientSchema);
+        
         switch (collectionName) {
             case 'appointment':
                 return await appointments.findOne({ _id: objectId, deletedAt: null }) ? true : false;

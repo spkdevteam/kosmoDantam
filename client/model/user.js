@@ -15,7 +15,7 @@ const clinetUserSchema = new Schema(
         lastName: { type: String },
         email: { type: String, unique: true, lowecase: true, trim: true, sparse: true, index: true },
         phone: { type: String, unique: true, sparse: true, trim: true, index: true },
-        password: { type: String, required: true },
+        password: { type: String },
         tc: { type: Boolean, required: true },
         isUserVerified: { type: Boolean, default: false },
         isActive: { type: Boolean, default: true },

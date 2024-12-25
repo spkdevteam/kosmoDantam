@@ -8,7 +8,6 @@ const { createToken } = require("../services/token.services")
 exports.postcreateBooking = async (req, res, next) => {
     try {
         const data = await sanitizeBody(req.body)
-        console.log(data,'appointment data')
         const result = await appointmentServices.creatAppointment(data)
         res.status(result?.statusCode).json(result)
     } catch (error) {
@@ -106,6 +105,17 @@ exports.createToken = async (req, res, next)=>{
         const data = await sanitizeBody(req.query)
         console.log(data)
         const result = await createToken(data)
+        res.status(200).json(result)
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.getdailyBookingWithPagination = async (req,res,next)=>{
+    try {
+        const data = await sanitizeBody(req.query)
+       
+        const result = await appointmentServices.dailyBookingWithPagination(data)
         res.status(200).json(result)
     } catch (error) {
         next(error)

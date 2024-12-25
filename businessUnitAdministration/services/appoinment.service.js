@@ -10,11 +10,10 @@ const { listEmployeeByRole } = require("./clientUser.service");
 const mongoose = require('mongoose');
 const getAvailableSlots = require("../../helper/getAvailableSlots");
 const { getchairList } = require("./chairs.service");
-const mongoose = require('mongoose');
-const { getchairList } = require("./chairs.service");
 
 exports.creatAppointment = async (input) => {
     try {
+       console.log(input,'input')
         //handling missing credential  
         if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
         if (!input?.branchId) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
@@ -58,7 +57,7 @@ exports.creatAppointment = async (input) => {
             createdUser: input?.createdUser,
         }
 
-        
+
         if (!input?._id) {
             const result = await appointments.findOneAndUpdate({ displayId: input?.displayId }, { $set: newData }, { upsert: true, returnDocument: 'after', new: true })
             console.log(result)
@@ -92,7 +91,7 @@ exports.getDateWiseBookidDetails = async (input) => {
             buId: input?.buId,
             branchId: input?.branchId,
             isActive: true,
-            deletedAt:null,
+            deletedAt: null,
             date: new Date(input?.bookingDate + 'T00:00:00.000Z')
         })
             .populate('dutyDoctorId', 'firstName')
@@ -159,10 +158,10 @@ exports.getBookingChart = async (input) => {
         //console.log(daystatus,'daystatus')
         const doctors = await listEmployeeByRole(input);
         const chairs = await getchairList(input);
-        console.log(chairs,'chairschairs')
+        console.log(chairs, 'chairschairs')
         let data = [];
-         
-        if(input.prepareBy != 'chair'){
+
+        if (input.prepareBy != 'chair') {
             for (let i = 0; i <= timeSlots?.length; i++) {
                 if (!data[i]) data[i] = [];
                 for (let j = 0; j <= doctors?.length; j++) {
@@ -348,18 +347,52 @@ exports.delete = async (input) => {
         if (!input?.buId) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(input?.clientId)
         const appointments = await db.model('appointment', appointmentSchema)
-        const result = await appointments.findOneAndUpdate({_id:input.appointmentid},{$set:{deletedAt:new Date()}},{ returnDocument: 'after', new: true })
-       console.log(result.deletedAt)
-        if(result.deletedAt){
-            return {status:true,message:message.lblAppointmentDeleted,data:result}
+        const result = await appointments.findOneAndUpdate({ _id: input.appointmentid }, { $set: { deletedAt: new Date() } }, { returnDocument: 'after', new: true })
+        console.log(result.deletedAt)
+        if (result.deletedAt) {
+            return { status: true, message: message.lblAppointmentDeleted, data: result }
         }
-        else return {status:false,message:message.lblAppointmentDoesNotExist}
-        return 
-         
+        else return { status: false, message: message.lblAppointmentDoesNotExist }
+        return
+
     } catch (error) {
         console.error('Error in getBookingChart:', error);
         throw error;
     }
 };
+
+exports.dailyBookingWithPagination = async (input) => {
+    try {
+        // clientId, buId, bookingDate, page, perPage, branchId======>>>>>  input 
+          console.log(input, 'input')
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
+       
+        const db = await getClientDatabaseConnection(input?.clientId)
+        const appointment = await db.model('appointment', appointmentSchema)
+        const query = { isActive: true, deletedAt: null };
+
+        if (input?.bookingDate) {
+            query.date = new Date(input.bookingDate + 'T00:00:00.000Z');
+            console.log(new Date(input.bookingDate+ 'T00:00:00.000Z' ),'bookingDate');
+        } 
+        const out = await appointment.find({
+            isActive: true,
+            deletedAt: null,
+            date: new Date(input.bookingDate + 'T00:00:00.000Z'),
+        })
+        .populate('patientId', 'firstName lastName email phone profileImage displayId gender bloodGroup age')
+        .populate('dutyDoctorId', '_id firstName lastName')
+        .populate('dentalAssistant','_id firstName lastName' )
+        .populate('chairId', '_id chairNumber' )
+        .skip((input?.page - 1) * input?.perPage)
+        .limit(input?.perPage);
+
+
+        return { status:true,message:'Success',data:out }
+    } catch (error) {
+
+    }
+}
 
 

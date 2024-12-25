@@ -10,5 +10,6 @@ bookingRoutes
        .get('/getAvailability',appointment.getAvailability)
        .delete('/delete',appointment.delete)
        .get('/createToken',appointment.createToken)
+       .get('/getdailyBookingWithPagination',appointment.getdailyBookingWithPagination)
 
 module.exports = bookingRoutes

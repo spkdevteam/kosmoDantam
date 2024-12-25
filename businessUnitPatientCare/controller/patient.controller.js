@@ -24,7 +24,6 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
     try {
         const { clientId, branchId, roleId, businessUnit, firstName, lastName, email, phone, gender, age, bloodGroup, patientGroup, referedBy, city, state, country, ZipCode, address, password } = req.body;
         const mainUser = req.user;
-
         await commonIdCheck({ clientId, branchId, businessUnit });
         if (!firstName || !lastName || !email || !phone || !roleId || !city || !state || !country || !ZipCode || !address) {
             return res.status(statusCode.BadRequest).send({
@@ -384,6 +383,75 @@ const commonIdCheck = async (data) => {
     }
 }
 
+exports.createMinimalPatient =async (req, res, next) => {
+    try {
+        const { clientId, branchId, roleId, businessUnit,email, firstName, lastName,  phone, gender, age, bloodGroup, patientGroup, referedBy } = req.body;
+        const mainUser = req.user;
+        await commonIdCheck({ clientId, branchId, businessUnit });
+        if (!firstName || !lastName ||  !phone || !roleId ) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Role = clientConnection.model('clientRoles', clientRoleSchema);
+        const role = await Role.findById(roleId);
+        if (!role) {
+            throw new CustomError(statusCode.Conflict, message.lblRoleNotFound);
+        }
+        
+        const displayId = await getserialNumber('patient', clientId, '', businessUnit);
+        let profileUpdates = {
+            displayId: displayId,
+            firstName,
+            lastName,
+            phone,
+            gender, age, bloodGroup, patientGroup, referedBy,
+            branch: branchId,
+            role: roleId,
+            roleId: role.id,
+            email,
+            businessUnit: businessUnit,
+            tc: true,
+            isUserVerified: true,
+           
+        }
+// ------------------------------
 
+  
+    const User = clientConnection.model('clientUsers', clinetUserSchema);
+    const existing = await User.findOne({
+        $or: [  { phone: profileUpdates?.phone } ],
+    });
+    console.log(existing,'existingexistingexistingexisting')
+    let newPatient=null;
+    if(!existing){
+        newPatient=  await User.create(profileUpdates);
+    }
+    else {
+        newPatient= existing
+        const Patient = clientConnection.model('patient', clinetPatientSchema);
+        let profileUpdates2 = {
+            displayId: displayId,
+            firstName,
+            lastName,
+            phone,email,
+            gender, age, bloodGroup, patientGroup, referedBy,
+            branch: branchId,
+            mainPatientLinkedid: newPatient?._id,
+            businessUnit: businessUnit,
+            
+        }
+        const newPatientInstance = await Patient.create({ ...profileUpdates2 })
+        return res.status(statusCode.OK).send({
+            message: message.lblPatientCreatedSuccess,
+            status:true,
+             data: { patientId: newPatientInstance._id },
+        });
+    }  
+    } catch (error) {
+        next(error)
+    }
+};
 
 
