@@ -34,7 +34,33 @@ exports.checkAlreadyOngoingCaseSheet = async (req, res, next) => {
         const cases = await caseSheetService.checkOngoing(clientId, patientId);
         return res.status(statusCode.OK).send({
             message: message.lblCaseSheetFoundSucessfully,
-            data: { cases: cases, ongoing : cases?.length > 0 ? true : false }
+            data: { cases: cases, ongoing : cases?.length > 0 ? true : false, totalOngoingCases : cases.length }
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+// marked as completed
+exports.markedAsCompletedCaseSheet = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId } = req.body;
+        const mainUser = req.user;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        if (!caseSheetId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblCaseSheetIdIdRequired,
+            });
+        }
+       
+        const updated = await caseSheetService.markedCompleted(clientId, caseSheetId);
+        return res.status(statusCode.OK).send({
+            message: "Last case sheet completed successfully",
+            data: { caseSheets: updated._id },
         });
     } catch (error) {
         next(error)
@@ -743,7 +769,7 @@ exports.getAllDrafted = async (req, res, next) => {
         const filters = {
             deletedAt: null,
             patientId: patientId,
-            status: "Proposed"
+            status: { $in: ['Proposed', 'In Progress', 'Completed'] },
         };
         const result = await caseSheetService.listDrafted(clientId, filters);
         return res.status(statusCode.OK).send({

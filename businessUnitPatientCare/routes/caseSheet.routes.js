@@ -23,6 +23,7 @@ const {
 
 // check alrady ongoing case sheet
 router.post('/checkAlreadyOngoingCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.checkAlreadyOngoingCaseSheet);
+router.post('/markAsCompletedCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.markedAsCompletedCaseSheet);
 
 // cheif complain part
 router.post('/createCheifComplaints', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createCheifComplaints);
