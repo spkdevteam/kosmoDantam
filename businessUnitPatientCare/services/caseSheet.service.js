@@ -809,6 +809,7 @@ const markedCompleted = async (clientId, caseSheetId) => {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
         existing.status = "Completed";
+        existing.drafted = false;
         return await existing.save();
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error in updating treatment procedure: ${error.message}`);
