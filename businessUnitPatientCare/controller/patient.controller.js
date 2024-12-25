@@ -421,7 +421,7 @@ exports.createMinimalPatient =async (req, res, next) => {
   
     const User = clientConnection.model('clientUsers', clinetUserSchema);
     const existing = await User.findOne({
-        $or: [  { phone: profileUpdates?.phone } ],
+        $or: [  { phone: phone },{email:email} ],
     });
     console.log(existing,'existingexistingexistingexisting')
     let newPatient=null;

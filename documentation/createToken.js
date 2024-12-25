@@ -3,7 +3,7 @@
  * /api/client/bu/booking/createToken:
  *   get:
  *     summary: Create a token for an appointment
- *     description: Generates a token for a specific appointment based on client, branch, and business unit information.
+ *     description: Generates a token for a specific appointment based on client, branch, business unit information, and the date.
  *     tags:
  *       - Appointments
  *     parameters:
@@ -35,6 +35,14 @@
  *         required: true
  *         description: Unique identifier for the appointment.
  *         example: "676231f899aa09502e811dab"
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: true
+ *         description: Date of the appointment in YYYY-MM-DD format.
+ *         example: "2024-12-24"
  *     responses:
  *       200:
  *         description: Token generated successfully.
