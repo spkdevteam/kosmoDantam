@@ -3,7 +3,7 @@ const sanitizeBody = require("../../utils/sanitizeBody")
 const  appointmentServices = require("../services/appoinment.service")
 const { getchairList } = require("../services/chairs.service")
 const { listEmployeeByRole } = require("../services/clientUser.service")
-const { createToken } = require("../services/token.services")
+const { createToken } = require("../services/token.service")
 
 exports.postcreateBooking = async (req, res, next) => {
     try {
@@ -51,6 +51,7 @@ exports.getAvailability = async (req, res, next) => {
         // taking the engaged list of doctors , chairs ,dental Assistant 
         const result = await appointmentServices.generateAvailabiltyChart(data)
         const {bookedDoctors, bookedChairs, bookedAssistants,bookedSpecialist,absentees } = result;
+        console.log(chairList,'***********------------->>bookedChairs')
         //console.log(bookedDoctors, bookedChairs, bookedAssistants,bookedSpecialist,'bookedDoctors, bookedChairs, bookedAssistants ' )
         
         //comparing the enagaed one with all details and return available list 
@@ -103,9 +104,14 @@ exports.delete = async (req, res, next)=>{
 exports.createToken = async (req, res, next)=>{
     try {
         const data = await sanitizeBody(req.query)
-        console.log(data)
         const result = await createToken(data)
-        res.status(200).json(result)
+        if(result){
+            const updateAdmissionWithToken = await appointmentServices.updateBookingWithToken({...data,tokenNumber:result?.tokenNumber})
+        res.status(200).json(updateAdmissionWithToken)
+        }
+        else  res.status(200).json(result) 
+        
+        
     } catch (error) {
         next(error)
     }
@@ -114,9 +120,19 @@ exports.createToken = async (req, res, next)=>{
 exports.getdailyBookingWithPagination = async (req,res,next)=>{
     try {
         const data = await sanitizeBody(req.query)
-       
+        console.log(data,'-------->>>>>>>>>>>>>>')
         const result = await appointmentServices.dailyBookingWithPagination(data)
         res.status(200).json(result)
+    } catch (error) {
+        next(error)
+    }
+}
+exports.changeBookingStatus = async (req, res, next)=>{
+    try {
+        const data = await sanitizeBody(req.body)
+        const result = await appointmentServices.changeBookingStatus(data)
+        res.status(200).json(result)
+        
     } catch (error) {
         next(error)
     }
