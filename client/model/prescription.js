@@ -7,7 +7,7 @@ const ObjectId = Schema.ObjectId;
 const prescriptionSchema = new Schema(
     {
 
-        displayId: { type: String, unique: true, required: true },
+        displayId: { type: String, unique: true },
         branchId: { type: mongoose.Schema.ObjectId, ref: 'branch', required: true },
         buId: { type: mongoose.Schema.ObjectId, ref: "businessUnit", default: null, index: true },
         patientId: { type: mongoose.Schema.ObjectId, ref: 'patient', required: true },
@@ -17,6 +17,7 @@ const prescriptionSchema = new Schema(
         drugArray: {
             type: [
                 {
+                    drugName: { type: String, required: true, index: true },
                     drug: { type: String, required: true, index: true },
                     dosage: { type: String, index: true },
                     frequesncy: { type: String, index: true },
@@ -27,10 +28,8 @@ const prescriptionSchema = new Schema(
             default: []
         },
         additionalAdvice: { type: String, default : null},
-
-        // handlign created by
-        createdBy: { type: ObjectId, ref: "clientUsers", default: null, index: true }, // Index for admin/user relationships
-        deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality
+        createdBy: { type: ObjectId, ref: "clientUsers", default: null, index: true },  
+        deletedAt: { type: Date, default: null, index: true }, 
     },
 
     { timestamps: true }

@@ -13,6 +13,7 @@ const { getchairList } = require("./chairs.service");
 
 exports.creatAppointment = async (input) => {
     try {
+       console.log(input,'input')
         //handling missing credential  
         if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
         if (!input?.branchId) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
@@ -29,12 +30,11 @@ exports.creatAppointment = async (input) => {
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.dutyDoctorId, collectionName: 'clientuser' })) return { status: false, message: 'doctor detail is invalid ', statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.dentalAssistant, collectionName: 'clientuser' })) return { status: false, message: 'dental assistant is invalid  ', statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.chairId, collectionName: 'chair' })) return { status: false, message: 'chair details is inValid ', statusCode: httpStatusCode.Unauthorized }
-        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.patientId, collectionName: 'clientuser' })) return { status: false, message: 'patient id is not valid ', statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.patientId, collectionName: 'patient' })) return { status: false, message: 'patient id is not valid ', statusCode: httpStatusCode.Unauthorized }
 
         const db = await getClientDatabaseConnection(input?.clientId)
         const appointments = await db.model('appointment', appointmentSchema)
         if (!input?.displayId) {
-            console.log('sdsdsds')
             input.displayId = await getserialNumber('appointment', input?.clientId, input?.branchId, input?.buId)
         }
 
@@ -47,8 +47,8 @@ exports.creatAppointment = async (input) => {
             caseId: input?.caseId || null,
             dutyDoctorId: input?.dutyDoctorId,
             dentalAssistant: input?.dentalAssistant,
-            slotFrom: input?.date ? new Date(input.date.includes('T') ? input.date.split('T')[0] + `T${input.slotFrom}:00.000Z` : input.date + `T${input.slotFrom}:00.000Z`) : null,
-            slotTo: input?.date ? new Date(input.date.includes('T') ? input.date.split('T')[0] + `T${input.slotTo}:00.000Z` : input.date + `T${input.slotTo}:00.000Z`) : null,
+            slotFrom: input?.slotFrom,
+            slotTo: input?.slotTo,
             chairId: input?.chairId,
             patientId: input?.patientId,
             status: input?.status,
@@ -57,11 +57,19 @@ exports.creatAppointment = async (input) => {
             createdUser: input?.createdUser,
         }
 
-        console.log(newData, 'newDatanewData')
-        const result = await appointments.findOneAndUpdate({ displayId: input?.displayId }, { $set: newData }, { upsert: true, returnDocument: 'after', new: true })
-        console.log(result)
-        if (result?._doc) return { status: true, message: message.lblAppointmentCreated, statusCode: httpStatusCode.OK, data: result?._doc }
-        else return { status: false, message: message.lblCredentialMissing, statusCode: httpStatusCode.Unauthorized }
+
+        if (!input?._id) {
+            const result = await appointments.findOneAndUpdate({ displayId: input?.displayId }, { $set: newData }, { upsert: true, returnDocument: 'after', new: true })
+            console.log(result)
+            if (result?._doc) return { status: true, message: message.lblAppointmentCreated, statusCode: httpStatusCode.OK, data: result?._doc }
+            else return { status: false, message: message.lblCredentialMissing, statusCode: httpStatusCode.Unauthorized }
+        }
+        else {
+            const result = await appointments.findOneAndUpdate({ _id: input?._id }, { $set: newData }, { returnDocument: 'after', new: true })
+            console.log(result)
+            if (result?._doc) return { status: true, message: message.lblAppointmentEdited, statusCode: httpStatusCode.OK, data: result?._doc }
+            else return { status: false, message: message.lblCredentialMissing, statusCode: httpStatusCode.Unauthorized }
+        }
     } catch (error) {
         return { status: false, message: error.message, statusCode: httpStatusCode.InternalServerError }
     }
@@ -83,14 +91,17 @@ exports.getDateWiseBookidDetails = async (input) => {
             buId: input?.buId,
             branchId: input?.branchId,
             isActive: true,
+            deletedAt: null,
             date: new Date(input?.bookingDate + 'T00:00:00.000Z')
         })
             .populate('dutyDoctorId', 'firstName')
             .populate('dentalAssistant', 'firstName')
-            .populate('patientId', 'firstName')
+            .populate('patientId', 'firstName age email lastName phone mainPatientLinkedid displayId')
             .populate('buId', 'name')
             .populate('branchId', 'incorporationName')
             .populate('chairId', 'chairNumber chairLocation')
+
+        console.log(bookingdetails, 'bookingdetails')
 
         const bookings = bookingdetails?.map((item) => {
 
@@ -111,17 +122,14 @@ exports.getDateWiseBookidDetails = async (input) => {
                     _id: item?.branchId?._id
                 },
                 doctor: {
-                    name: item?.dutyDoctorId.firstName,
-                    _id: item?.dutyDoctorId._id
+                    name: item?.dutyDoctorId?.firstName,
+                    _id: item?.dutyDoctorId?._id
                 },
                 dentalAssistant: {
-                    name: item?.dentalAssistant.firstName,
-                    _id: item?.dentalAssistant._id
+                    name: item?.dentalAssistant?.firstName,
+                    _id: item?.dentalAssistant?._id
                 },
-                patient: {
-                    name: item?.patientId.firstName,
-                    _id: item?.patientId._id
-                },
+                patient: item?.patientId,
                 chair: {
                     _id: item?.chairId?._id,
                     location: item?.chairId?.chairLocation,
@@ -132,7 +140,7 @@ exports.getDateWiseBookidDetails = async (input) => {
 
             }
         })
-        return { status: true, message: 'appointmentFetched', data: bookings }
+        return { status: true, message: 'appointmentFetched', data: bookings || [] }
     } catch (error) {
         return { status: false, message: 'appointment Fetch failed ' }
     }
@@ -142,88 +150,116 @@ exports.getBookingChart = async (input) => {
     try {
         console.log(input);
         input.roleId = 3;
-        input.prepareBy='chair'
-        const absentees = await getDateWiseLeaVeDetails(input);
-        const booking = await this.getDateWiseBookidDetails(input);
-        const daystatus = [...absentees?.data, ...booking?.data];
+        //  input.prepareBy='chair'
+        const absentees = await getDateWiseLeaVeDetails(input) || [];
+        const booking = await this.getDateWiseBookidDetails(input) || [];
+        console.log(booking, 'booking?.data')
+        const daystatus = [...absentees?.data, ...booking.data];
         //console.log(daystatus,'daystatus')
         const doctors = await listEmployeeByRole(input);
-        const chairs = await getchairList(input)
+        const chairs = await getchairList(input);
+        console.log(chairs, 'chairschairs')
         let data = [];
-        if(input.prepareBy != 'chair'){
+
+        if (input.prepareBy != 'chair') {
             for (let i = 0; i <= timeSlots?.length; i++) {
                 if (!data[i]) data[i] = [];
                 for (let j = 0; j <= doctors?.length; j++) {
                     if (i == 0 && j != 0) {
-                        data[i][j] = doctors[j - 1]?.firstName
+                        data[i][j] = {
+                            name: doctors[j - 1]?.firstName,
+                            _id: doctors[j - 1]?._id,
+                        }
+
                         continue
                     }
                     else if (j == 0 && i != 0) {
                         data[i][j] = timeSlots[i - 1]
                         continue
                     }
-                    else if (i && j ) {
+                    else if (i && j) {
                         doc_And_Time = { ...doctors[j - 1], ...timeSlots[i - 1] }
                         const record = daystatus.filter((record) => {
-                            console.log(doc_And_Time?._doc?._id.toString() == record?.doctor?._id.toString(),'recordrecord')
+                            console.log(doc_And_Time?._doc?._id.toString() == record?.doctor?._id.toString(), 'recordrecord')
                             return new Date(input?.bookingDate + 'T' + doc_And_Time.end + ':00.000Z') > record.slotFrom &&
                                 new Date(input?.bookingDate + 'T' + doc_And_Time.start + ':00.000Z') < record.slotTo &&
-                                doc_And_Time?._doc?._id.toString() == record?.doctor?._id.toString() 
+                                doc_And_Time?._doc?._id.toString() == record?.doctor?._id.toString()
                         });
                         const bookedSlots = record.map((item) => {
                             //console.log(item?.slotFrom?.toISOString().split('T')[1].slice(0,5))
-                            return { slotFrom: item?.slotFrom?.toISOString().split('T')[1].slice(0,5), slotTo: item?.slotTo?.toISOString().split('T')[1].slice(0,5) }
+                            return { slotFrom: item?.slotFrom?.toISOString().split('T')[1].slice(0, 5), slotTo: item?.slotTo?.toISOString().split('T')[1].slice(0, 5) }
                         })
                         const hourStart = data[i][0]?.start;
                         const hourEnd = data[i][0]?.end;
-                       // console.log(data[i][0],hourStart,hourEnd ,bookedSlots)
-                        const availabilitySlot = getAvailableSlots({ hourStart: hourStart, hourEnd: hourEnd, bookedSlots: bookedSlots })?.map((vacantSlot)=> {return {bookingType:'vacant',slotFrom:new Date(input?.bookingDate + 'T' + vacantSlot?.slotFrom + ':00.000Z'),slotTo:new Date(input?.bookingDate + 'T' + vacantSlot?.slotTo + ':00.000Z')}})
-                        data[i][j] = [...record,...availabilitySlot]?.sort((a, b) => new Date(a.slotFrom) - new Date(b.slotFrom))  || []
-                      //  data[i][j].length > 1 ? console.log(data[i][j],'data[i][j]'):''
-    
-                    } 
+                        // console.log(data[i][0],hourStart,hourEnd ,bookedSlots)
+                        const availabilitySlot = getAvailableSlots({ hourStart: hourStart, hourEnd: hourEnd, bookedSlots: bookedSlots })?.map((vacantSlot) => { return { bookingType: 'vacant', slotFrom: new Date(input?.bookingDate + 'T' + vacantSlot?.slotFrom + ':00.000Z'), slotTo: new Date(input?.bookingDate + 'T' + vacantSlot?.slotTo + ':00.000Z') } })
+                        data[i][j] = [...record, ...availabilitySlot]?.sort((a, b) => new Date(a.slotFrom) - new Date(b.slotFrom)) || []
+                        //  data[i][j].length > 1 ? console.log(data[i][j],'data[i][j]'):''
+
+                    }
                 }
-            } 
+            }
         }
-        else{
+        else {
             for (let i = 0; i <= timeSlots?.length; i++) {
                 if (!data[i]) data[i] = [];
                 for (let j = 0; j <= chairs?.length; j++) {
                     if (i == 0 && j != 0) {
-                        console.log(chairs[j - 1],'test here eeeee')
-                        data[i][j] = 'Chair '+ chairs[j - 1]?.chairNumber
+                        console.log(chairs[j - 1], 'test here eeeee')
+                        data[i][j] = {
+                            name: 'Chair ' + chairs[j - 1]?.chairNumber,
+                            _id: chairs[j - 1]?._id,
+                        }
                         continue
                     }
                     else if (j == 0 && i != 0) {
                         data[i][j] = timeSlots[i - 1]
                         continue
                     }
-                    else if (i && j ) {
+                    else if (i && j) {
                         doc_And_Time = { ...chairs[j - 1], ...timeSlots[i - 1] }
                         const record = daystatus.filter((record) => {
-                            console.log(doc_And_Time?._doc?._id.toString() == record?.doctor?._id.toString(),'recordrecord')
+                            console.log(doc_And_Time?._doc?._id.toString() == record?.doctor?._id.toString(), 'recordrecord')
                             return new Date(input?.bookingDate + 'T' + doc_And_Time.end + ':00.000Z') > record.slotFrom &&
                                 new Date(input?.bookingDate + 'T' + doc_And_Time.start + ':00.000Z') < record.slotTo &&
-                                doc_And_Time?._doc?._id.toString() == record?.chair?._id.toString() 
+                                doc_And_Time?._doc?._id.toString() == record?.chair?._id.toString()
                         });
                         const bookedSlots = record.map((item) => {
                             //console.log(item?.slotFrom?.toISOString().split('T')[1].slice(0,5))
-                            return { slotFrom: item?.slotFrom?.toISOString().split('T')[1].slice(0,5), slotTo: item?.slotTo?.toISOString().split('T')[1].slice(0,5) }
+                            return { slotFrom: item?.slotFrom?.toISOString().split('T')[1].slice(0, 5), slotTo: item?.slotTo?.toISOString().split('T')[1].slice(0, 5) }
                         })
                         const hourStart = data[i][0]?.start;
                         const hourEnd = data[i][0]?.end;
-                       // console.log(data[i][0],hourStart,hourEnd ,bookedSlots)
-                        const availabilitySlot = getAvailableSlots({ hourStart: hourStart, hourEnd: hourEnd, bookedSlots: bookedSlots })?.map((vacantSlot)=> {return {bookingType:'vacant',slotFrom:new Date(input?.bookingDate + 'T' + vacantSlot?.slotFrom + ':00.000Z'),slotTo:new Date(input?.bookingDate + 'T' + vacantSlot?.slotTo + ':00.000Z')}})
-                        data[i][j] = [...record,...availabilitySlot]?.sort((a, b) => new Date(a.slotFrom) - new Date(b.slotFrom))  || []
-                      //  data[i][j].length > 1 ? console.log(data[i][j],'data[i][j]'):''
-    
-                    } 
+                        // console.log(data[i][0],hourStart,hourEnd ,bookedSlots)
+                        const availabilitySlot = getAvailableSlots({ hourStart: hourStart, hourEnd: hourEnd, bookedSlots: bookedSlots })?.map((vacantSlot) => { return { bookingType: 'vacant', slotFrom: new Date(input?.bookingDate + 'T' + vacantSlot?.slotFrom + ':00.000Z'), slotTo: new Date(input?.bookingDate + 'T' + vacantSlot?.slotTo + ':00.000Z') } })
+                        data[i][j] = [...record, ...availabilitySlot]?.sort((a, b) => new Date(a.slotFrom) - new Date(b.slotFrom)) || []
+                        //  data[i][j].length > 1 ? console.log(data[i][j],'data[i][j]'):''
+
+                    }
                 }
             }
         }
-       
+
         console.table(data);
         return { data };
+    } catch (error) {
+        console.error('Error in getBookingChart:', error);
+        throw error;
+    }
+};
+
+
+exports.getBookingChartNonTabular = async (input) => {
+    try {
+        console.log(input);
+        const absentees = await getDateWiseLeaVeDetails(input) || [];
+        const booking = await this.getDateWiseBookidDetails(input) || [];
+        const daystatus = [...absentees?.data, ...booking.data];
+        const doctors = await listEmployeeByRole({ ...input, roleId: 3 });
+        const chairs = await getchairList(input)
+        const assistant = await listEmployeeByRole({ ...input, roleId: 4 })
+
+        return { chairs, doctors, daystatus, assistant, timeSlots };
     } catch (error) {
         console.error('Error in getBookingChart:', error);
         throw error;
@@ -245,60 +281,47 @@ const filterAppointment = async (input) => {
             query.date = new Date(input.bookingDate + 'T00:00:00.000Z');
             console.log(new Date(input.bookingDate + 'T00:00:00.000Z'));
         }
+        console.log(new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z'))
+        console.log(input.endTime, '------------------------')
         const orConditions = [];
         if (input?.startTime) query.slotFrom = { $gte: new Date(input.bookingDate + 'T' + input.startTime + ':00.000Z'), $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z') };
-        if (input?.endTime) query.slotTo = { $gte: new Date(input.bookingDate + 'T' + input.startTime + ':00.000Z'), $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z') };
+        if (input?.endTime) query.slotTo = { $gte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z'), $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z') };
         if (input?.chairId) orConditions.push({ chairId: input.chairId });
         if (input?.doctorId) orConditions.push({ dutyDoctorId: input.doctorId });
         if (input?.dentalAssistantId) orConditions.push({ dentalAssistant: input.dentalAssistantId });
         if (orConditions.length > 0) {
             query.$or = orConditions;
         }
+
         const out = await appointment.aggregate([
             {
                 $match: {
                     isActive: true,
                     deletedAt: null,
                     date: new Date(input.bookingDate + 'T00:00:00.000Z'),
-
                     $or: [
                         {
                             slotFrom: {
-                                $gte: new Date(input.bookingDate + 'T' + input.startTime + ':00.000Z'),
-                                $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z')
-                            }
-                        },
-                        {
+                                $lte: new Date(input.endTime),
+                            },
                             slotTo: {
-                                $gte: new Date(input.bookingDate + 'T' + input.startTime + ':00.000Z'),
-                                $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z')
+                                $gte: new Date(input.startTime),
                             }
                         }
-                    ],
-
-
-                }
-            },
-            {
-                $match:
-                {
-                    $or: [
-                        { chairId: new mongoose.Types.ObjectId(input.chairId) },
-                        { dutyDoctorId: new mongoose.Types.ObjectId(input.doctorId) },
-                        { dentalAssistant: new mongoose.Types.ObjectId(input.dentalAssistantId) },
-                        //  { specialistDoctorId:new mongoose.Types.ObjectId(input.specialistDoctorId) }
                     ]
                 }
             }
         ]);
+
+
         const bookedDoctors = new Set()
         const bookedChairs = new Set()
         const bookedAssistants = new Set()
         const bookedSpecialist = new Set()
         out?.map((item) => {
-            bookedDoctors.add(JSON.stringify(item.dutyDoctorId).slice(1, JSON.stringify(item.dutyDoctorId)?.length - 1))
-            bookedChairs.add(JSON.stringify(item.chairId).slice(1, JSON.stringify(item.chairId)?.length - 1))
-            bookedAssistants.add(JSON.stringify(item.dentalAssistant).slice(1, JSON.stringify(item.dentalAssistant)?.length - 1))
+            bookedDoctors.add(item.dutyDoctorId.toString())
+            bookedChairs.add(item.chairId.toString())
+            bookedAssistants.add(item.dentalAssistant.toString())
             //  bookedSpecialist.add(JSON.stringify(item.specialistDoctorId).slice(1,JSON.stringify( item.specialistDoctorId)?.length-1)) 
         })
         return { bookedDoctors, bookedChairs, bookedAssistants, bookedSpecialist }
@@ -310,8 +333,66 @@ const filterAppointment = async (input) => {
 exports.generateAvailabiltyChart = async (input) => {
     const absentees = await filterLeaveApplication(input);
     const booking = await filterAppointment(input);
+    console.log(booking, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
     const daystatus = { ...booking, absentees };
     return daystatus
+}
+
+
+exports.delete = async (input) => {
+    try {
+        console.log(input);
+        if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
+        if (!input?.branchId) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (!input?.buId) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
+        const db = await getClientDatabaseConnection(input?.clientId)
+        const appointments = await db.model('appointment', appointmentSchema)
+        const result = await appointments.findOneAndUpdate({ _id: input.appointmentid }, { $set: { deletedAt: new Date() } }, { returnDocument: 'after', new: true })
+        console.log(result.deletedAt)
+        if (result.deletedAt) {
+            return { status: true, message: message.lblAppointmentDeleted, data: result }
+        }
+        else return { status: false, message: message.lblAppointmentDoesNotExist }
+        return
+
+    } catch (error) {
+        console.error('Error in getBookingChart:', error);
+        throw error;
+    }
+};
+
+exports.dailyBookingWithPagination = async (input) => {
+    try {
+        // clientId, buId, bookingDate, page, perPage, branchId======>>>>>  input 
+          console.log(input, 'input')
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
+       
+        const db = await getClientDatabaseConnection(input?.clientId)
+        const appointment = await db.model('appointment', appointmentSchema)
+        const query = { isActive: true, deletedAt: null };
+
+        if (input?.bookingDate) {
+            query.date = new Date(input.bookingDate + 'T00:00:00.000Z');
+            console.log(new Date(input.bookingDate+ 'T00:00:00.000Z' ),'bookingDate');
+        } 
+        const out = await appointment.find({
+            isActive: true,
+            deletedAt: null,
+            date: new Date(input.bookingDate + 'T00:00:00.000Z'),
+        })
+        .populate('patientId', 'firstName lastName email phone profileImage displayId gender bloodGroup age')
+        .populate('dutyDoctorId', '_id firstName lastName')
+        .populate('dentalAssistant','_id firstName lastName' )
+        .populate('chairId', '_id chairNumber' )
+        .skip((input?.page - 1) * input?.perPage)
+        .limit(input?.perPage);
+
+
+        return { status:true,message:'Success',data:out }
+    } catch (error) {
+
+    }
 }
 
 

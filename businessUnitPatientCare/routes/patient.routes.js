@@ -78,6 +78,7 @@ router.get('/getPatientRoleId/:clientId',  businessUnitPatientContrller.getPatie
 
 router.get('/searchPatient',businessUnitPatientContrller.searchPatients)
 
+router.post('/createPatientWhileBooking',businessUnitPatientContrller.createMinimalPatient)
 // # create, update, view, list, activate/inactive, delete Patient by business unit routes ends here
 
 
