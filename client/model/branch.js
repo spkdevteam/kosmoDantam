@@ -17,6 +17,7 @@ const clinetBranchSchema = new Schema(
         gstNumber:  { type: String },
         branchPrefix:  { type: String },
         branchId:{type:String},
+        branchLogo : {type: String, default : null},
         emailContact: {
             type: String,
             unique: true,
