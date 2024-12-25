@@ -969,6 +969,36 @@ const listAllCases = async (clientId, filters = {}) => {
     }
 };
 
+
+const getPatientMedicalHistory = async (clientId, patientId) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Patient = clientConnection.model('patient', clinetPatientSchema);
+        const patient = await Patient.findById(patientId);
+        if(!patient){
+            throw new CustomError(statusCode.NotFound, message.lblPatientNotFound);
+        }
+        return patient
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
+    }
+};
+
+const updatePatientMedicalHistory = async (clientId, patientId, medicalHistoryData) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Patient = clientConnection.model('patient', clinetPatientSchema);
+        const patient = await Patient.findById(patientId);
+        if(!patient){
+            throw new CustomError(statusCode.NotFound, message.lblPatientNotFound);
+        }
+        patient.medicalHistory = medicalHistoryData;
+        return await patient.save()
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
+    }
+};
+
 module.exports = {
 
     checkOngoing,
@@ -1015,5 +1045,10 @@ module.exports = {
 
     markedCompleted,
 
-    listAllCases
+    listAllCases,
+
+
+    getPatientMedicalHistory,
+    updatePatientMedicalHistory
+
 };

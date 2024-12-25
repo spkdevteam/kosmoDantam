@@ -150,8 +150,12 @@ router.put('/updateTreatment',entityAuth.authorizeEntity("Patient", "Case Sheet"
 router.put('/updateTreatmentProcedure',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatmentProcedure);
 
 
-
 // ------- Treatment plan routes starts starts here -------
+
+
+// ------- Medical History routes starts here-------
+router.get('/getPatientMedicalHistory/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getPatientMedicalHistory);
+router.put('/updatePatientMedicalHistory', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updatePatientMedicalHistory);
 
 
 

@@ -34,7 +34,7 @@ exports.checkAlreadyOngoingCaseSheet = async (req, res, next) => {
         const cases = await caseSheetService.checkOngoing(clientId, patientId);
         return res.status(statusCode.OK).send({
             message: message.lblCaseSheetFoundSucessfully,
-            data: { cases: cases, ongoing : cases?.length > 0 ? true : false, totalOngoingCases : cases.length }
+            data: { cases: cases, ongoing: cases?.length > 0 ? true : false, totalOngoingCases: cases.length }
         });
     } catch (error) {
         next(error)
@@ -56,7 +56,7 @@ exports.markedAsCompletedCaseSheet = async (req, res, next) => {
                 message: message.lblCaseSheetIdIdRequired,
             });
         }
-       
+
         const updated = await caseSheetService.markedCompleted(clientId, caseSheetId);
         return res.status(statusCode.OK).send({
             message: "Last case sheet completed successfully",
@@ -908,6 +908,49 @@ exports.updateTreatment = async (req, res, next) => {
     }
 };
 
+
+
+// get patient medical history
+exports.getPatientMedicalHistory = async (req, res, next) => {
+    try {
+        const { clientId, patientId } = req.params;
+        if (!clientId || !patientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const result = await caseSheetService.getPatientMedicalHistory(clientId, patientId);
+        return res.status(statusCode.OK).send({
+            message: message.lblMedCaseDoesFoundSuccess,
+            data: { patientId: result._id, medicalHistory: result.medicalHistory },
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.updatePatientMedicalHistory = async (req, res, next) => {
+    try {
+        const { clientId, patientId, medicalHistoryData } = req.body;
+        if (!clientId || !patientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        if (!medicalHistoryData) {
+            return res.status(statusCode.BadRequest).send({
+                message: message?.lblRequiredFieldMissing
+            })
+        }
+        const result = await caseSheetService.updatePatientMedicalHistory(clientId, patientId, medicalHistoryData);
+        return res.status(statusCode.OK).send({
+            message: message.lblMedCaseDoesFoundSuccess,
+            data: { patientId: result._id, medicalHistory: result.medicalHistory },
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 
 
 
