@@ -13,7 +13,7 @@ const { getchairList } = require("./chairs.service");
 
 exports.creatAppointment = async (input) => {
     try {
-       console.log(input,'input')
+        console.log(input, 'input')
         //handling missing credential  
         if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
         if (!input?.branchId) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
@@ -361,65 +361,71 @@ exports.delete = async (input) => {
 exports.dailyBookingWithPagination = async (input) => {
     try {
         // clientId, buId, bookingDate, page, perPage, branchId======>>>>>  input 
-          console.log(input, 'input')
+        console.log(input, 'input')
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
-       
+
         const db = await getClientDatabaseConnection(input?.clientId)
         const appointment = await db.model('appointment', appointmentSchema)
         const query = { isActive: true, deletedAt: null };
 
         if (input?.bookingDate) {
             query.date = new Date(input.bookingDate + 'T00:00:00.000Z');
-            console.log(new Date(input.bookingDate+ 'T00:00:00.000Z' ),'bookingDate');
-        } 
+            console.log(new Date(input.bookingDate + 'T00:00:00.000Z'), 'bookingDate');
+        }
         const out = await appointment.find({
             isActive: true,
             deletedAt: null,
             date: new Date(input.bookingDate + 'T00:00:00.000Z'),
         })
-        .populate('patientId', 'firstName lastName email phone profileImage displayId gender bloodGroup age')
-        .populate('dutyDoctorId', '_id firstName lastName')
-        .populate('dentalAssistant','_id firstName lastName' )
-        .populate('chairId', '_id chairNumber' )
-        .skip((input?.page - 1) * input?.perPage)
-        .limit(input?.perPage);
+            .populate('patientId', 'firstName lastName email phone profileImage displayId gender bloodGroup age')
+            .populate('dutyDoctorId', '_id firstName lastName')
+            .populate('dentalAssistant', '_id firstName lastName')
+            .populate('chairId', '_id chairNumber')
+            .skip((input?.page - 1) * input?.perPage)
+            .limit(input?.perPage);
 
-        console.log(out,'outoutout')
-        return { status:true,message:'Success',data:out }
+        console.log(out, 'outoutout')
+        return { status: true, message: 'Success', data: out }
     } catch (error) {
 
     }
 }
 
 
-exports.updateBookingWithToken=async ({tokenNumber,appointmentid,buId,branchId,clientId})=>{
+exports.updateBookingWithToken = async ({ tokenNumber, appointmentid, buId, branchId, clientId }) => {
     try {
-        console.log({tokenNumber:tokenNumber,appointmentId:appointmentid,buId:buId,branchId:branchId,clientId:clientId})
+        console.log({ tokenNumber: tokenNumber, appointmentId: appointmentid, buId: buId, branchId: branchId, clientId: clientId })
         if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(clientId)
         const appointment = await db.model('appointment', appointmentSchema)
-        console.log('sandeep')
-        const result = await appointment.findOneAndUpdate({_id:appointmentid,branchId:branchId,isActive:true,deletedAt:null},{$set:{token:tokenNumber}},{returnDocument: 'after', new: true})
-        if(result){
-            return {status:true,message:'Token Updated',statusCode:httpStatusCode.OK,data:result?._doc }    
+        const isexist = await appointment.findOne({ _id: appointmentid, deletedAt: null, isActive: true })
+        if (isexist.token) {
+            return { status: true, message: 'Token Updated', statusCode: httpStatusCode.OK, data: isexist }
         }
         else {
-            return {status:false,message:'no appointment found on this id ',statusCode:501,}
+            const result = await appointment.findOneAndUpdate({ _id: appointmentid, branchId: branchId, isActive: true, deletedAt: null }, { $set: { token: tokenNumber } }, { returnDocument: 'after', new: true })
+            if (result) {
+                return { status: true, message: 'Token Updated', statusCode: httpStatusCode.OK, data: result?._doc }
+            }
+            else {
+                return { status: false, message: 'no appointment found on this id ', statusCode: 501, }
+            }
+
         }
-        
-        
+
+
     } catch (error) {
-        return {status:false,message:error.message,statusCode:501,}
+        return { status: false, message: error.message, statusCode: 501, }
     }
 }
 
 
-exports.changeBookingStatus = async ({date,clientId,branchId,buId,appointmentId,status})=>{
+exports.changeBookingStatus = async ({ date, clientId, branchId, buId, appointmentId, status }) => {
     try {
-        console.log({appointmentId:appointmentId,buId:buId,branchId:branchId,clientId:clientId,status:status})
+        console.log({ appointmentId: appointmentId, buId: buId, branchId: branchId, clientId: clientId, status: status })
         if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
@@ -427,19 +433,19 @@ exports.changeBookingStatus = async ({date,clientId,branchId,buId,appointmentId,
         const appointment = await db.model('appointment', appointmentSchema)
         const result = await appointment.
             findOneAndUpdate(
-                {_id:appointmentId,branchId:branchId,isActive:true,deletedAt:null},
-                {$set:{status:status}},
-                {returnDocument: 'after', new: true})
-                if(result){
-            return {status:true,message:'status Updated',statusCode:httpStatusCode.OK,data:result?._doc }    
+                { _id: appointmentId, branchId: branchId, isActive: true, deletedAt: null },
+                { $set: { status: status } },
+                { returnDocument: 'after', new: true })
+        if (result) {
+            return { status: true, message: 'status Updated', statusCode: httpStatusCode.OK, data: result?._doc }
         }
         else {
-            return {status:false,message:'no appointment found on this id ',statusCode:501,}
+            return { status: false, message: 'no appointment found on this id ', statusCode: 501, }
         }
-        
-        
+
+
     } catch (error) {
-        return {status:false,message:error.message,statusCode:501,}
+        return { status: false, message: error.message, statusCode: 501, }
     }
 }
 
