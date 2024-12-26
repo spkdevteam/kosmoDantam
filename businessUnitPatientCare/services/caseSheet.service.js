@@ -595,13 +595,30 @@ const list = async (clientId, filters = {}, options = { page: 1, limit: 10 }) =>
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Patient = clientConnection.model('patient', clinetPatientSchema);
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const User = clientConnection.model('clientUsers', clinetUserSchema);
+
+
         const { page, limit } = options;
         const skip = (page - 1) * limit;
-        const [patients, total] = await Promise.all([
-            CaseSheet.find(filters).skip(skip).limit(limit).sort({ _id: -1 }),
+        const [caseSheets, total] = await Promise.all([
+            CaseSheet.find(filters).skip(skip).limit(limit).sort({ _id: -1 }).populate({
+                path: 'patientId',
+                model: Patient,
+                select: 'firstName lastName _id displayId'
+            }).populate({
+                path: 'branchId',
+                model: Branch,
+                select: 'name _id'
+            }).populate({
+                path: 'createdBy',
+                model: User,
+                select: 'firstName lastName _id'
+            }),
             CaseSheet.countDocuments(filters),
         ]);
-        return { count: total, patients };
+        return { count: total, caseSheets };
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
     }
@@ -685,6 +702,31 @@ const getById = async (clientId, caseSheetId) => {
         throw new CustomError(error.statusCode || 500, `Error getting case sheet: ${error.message}`);
     }
 };
+
+const deleteCaseSheet = async (clientId, caseSheetId, softDelete = false) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+
+        const caseSheet = await CaseSheet.findById(caseSheetId);
+        if (!caseSheet) {
+            throw new Error('Case sheet not found');
+        }
+
+        if (softDelete) {
+            caseSheet.deletedAt = new Date();
+            await caseSheet.save();
+        } else {
+            await caseSheet.deleteOne(); // Avoid using `remove()` as it's deprecated
+        }
+
+        return true;
+    } catch (error) {
+        console.error(`Error deleting case sheet for client ${clientId}:`, error.message);
+        throw new Error(`Failed to delete case sheet: ${error.message}`);
+    }
+};
+
 
 const updateTreatmentProcedure = async (clientId, caseSheetId, procedureId) => {
     try {
@@ -839,7 +881,7 @@ function transformArr(arr1) {
             tooth: item?.tooth,
             service: service,
             procedure: procedure,
-            
+
         }
 
     });
@@ -976,7 +1018,7 @@ const getPatientMedicalHistory = async (clientId, patientId) => {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const patient = await Patient.findById(patientId);
-        if(!patient){
+        if (!patient) {
             throw new CustomError(statusCode.NotFound, message.lblPatientNotFound);
         }
         return patient
@@ -990,7 +1032,7 @@ const updatePatientMedicalHistory = async (clientId, patientId, medicalHistoryDa
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const patient = await Patient.findById(patientId);
-        if(!patient){
+        if (!patient) {
             throw new CustomError(statusCode.NotFound, message.lblPatientNotFound);
         }
         patient.medicalHistory = medicalHistoryData;
@@ -1047,6 +1089,7 @@ module.exports = {
     markedCompleted,
 
     listAllCases,
+    deleteCaseSheet,
 
 
     getPatientMedicalHistory,

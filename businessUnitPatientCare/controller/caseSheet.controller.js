@@ -738,14 +738,11 @@ exports.listCaseSheet = async (req, res, next) => {
         }
         const filters = {
             deletedAt: null,
-            // ...(keyword && {
-            //     $or: [
-            //         { firstName: { $regex: keyword.trim(), $options: "i" } },
-            //         { lastName: { $regex: keyword.trim(), $options: "i" } },
-            //         { email: { $regex: keyword.trim(), $options: "i" } },
-            //         { phone: { $regex: keyword.trim(), $options: "i" } },
-            //     ],
-            // }),
+            ...(keyword && {
+                $or: [
+                    { displayId: { $regex: keyword.trim(), $options: "i" } },
+                ],
+            }),
         };
         const result = await caseSheetService.list(clientId, filters, { page, limit: perPage });
         return res.status(statusCode.OK).send({
@@ -817,6 +814,25 @@ exports.getParticularCaseSheet = async (req, res, next) => {
             });
         }
         const caseSheet = await caseSheetService.getById(clientId, caseSheetId);
+        return res.status(200).send({
+            message: message.lblCaseSheetFoundSucessfully,
+            data: caseSheet,
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+
+exports.deleteCaseSheet = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId } = req.params;
+        if (!clientId || !caseSheetId) {
+            return res.status(400).send({
+                message: message.lblCaseSheetIdIdAndClientIdRequired,
+            });
+        }
+        const caseSheet = await caseSheetService.deleteCaseSheet(clientId, caseSheetId);
         return res.status(200).send({
             message: message.lblCaseSheetFoundSucessfully,
             data: caseSheet,

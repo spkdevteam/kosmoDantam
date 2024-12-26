@@ -21,6 +21,7 @@ const {
 // -------- case sheet routes starts here ----------
 
 
+
 // check alrady ongoing case sheet
 router.post('/checkAlreadyOngoingCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.checkAlreadyOngoingCaseSheet);
 router.post('/markAsCompletedCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.markedAsCompletedCaseSheet);
@@ -140,6 +141,7 @@ router.get('/listCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet",
 router.get('/getCaseSheet/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getParticularCaseSheet)
 router.get('/getAllDraftedCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllDrafted);
 router.get('/getAllCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllCaseSheet);
+router.delete('/deleteCaseSheet/:clientId/:caseSheetId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.deleteCaseSheet);
 
 // ------- case sheet details routes ends here ------
 
