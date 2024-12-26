@@ -17,8 +17,8 @@ const appointmentSchema = new mongoose.Schema({
     patientId: { type: mongoose.Schema.ObjectId, ref: 'patient', required: true,index:true },
     status: { 
         type: String, 
-        enum: [ 'booked','arrived', 'chairReady', 'inProgress', 'Completed', 'Cancelled', 'Rescheduled'], 
-        default: 'booked' 
+        
+        default: 'Scheduled' 
     }, 
     isActive: { type: Boolean, default: true }, 
     deletedAt: { type: Date, default: null }, 
