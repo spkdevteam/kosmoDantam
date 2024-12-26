@@ -68,6 +68,7 @@ router.put('/updatePatient',entityAuth.authorizeEntity("Patient", "Patient", "up
 router.get('/patient/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Patient", "view"), businessUnitPatientContrller.getParticularPatientByBusinessUnit);
 
 router.get('/listPatient', entityAuth.authorizeEntity("Patient", "Patient", "view"), businessUnitPatientContrller.listPatient);
+router.get('/listPatientWithSearch', entityAuth.authorizeEntity("Patient", "Patient", "view"), businessUnitPatientContrller.getPatientByNameEmailAndPhone);
 
 router.post("/activeInactivePatient", entityAuth.authorizeEntity("Patient", "Patient", "update"), businessUnitPatientContrller.activeinactivePatientByBusinessUnit);
 

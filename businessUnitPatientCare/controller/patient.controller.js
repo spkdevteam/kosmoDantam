@@ -228,6 +228,45 @@ exports.listPatient = async (req, res, next) => {
     }
 };
 
+// get patient by name, email, and phone
+exports.getPatientByNameEmailAndPhone = async (req, res, next) => {
+    try {
+        const { clientId, keyword = '', } = req.query;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        const filters = {
+            deletedAt: null,
+            ...(keyword && {
+                $or: [
+                    { firstName: { $regex: keyword.trim(), $options: "i" } },
+                    { lastName: { $regex: keyword.trim(), $options: "i" } },
+                    { email: { $regex: keyword.trim(), $options: "i" } },
+                    { phone: { $regex: keyword.trim(), $options: "i" } },
+                    {
+                        $expr: {
+                            $regexMatch: {
+                                input: { $concat: ["$firstName", " ", "$lastName"] },
+                                regex: keyword.trim(),
+                                options: "i",
+                            },
+                        },
+                    },
+                ],
+            }),
+        };
+        const result = await patientService.listWithSearch(clientId, filters);
+        return res.status(statusCode.OK).send({
+            message: message.lblPatientFoundSucessfully,
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.searchPatients = async (req, res, next) => {
     try {
         const { clientId, name = '',contactNumber='',email='', page = 1, perPage = 10, } = req.query;

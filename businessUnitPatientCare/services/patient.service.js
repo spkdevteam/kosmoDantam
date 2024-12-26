@@ -95,6 +95,25 @@ const list = async (clientId, filters = {}, options = { page: 1, limit: 10 }) =>
     }
 };
 
+const listWithSearch = async (clientId, filters = {}) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Patient = clientConnection.model('patient', clinetPatientSchema);
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const [patients, total] = await Promise.all([
+            Patient.find(filters).sort({ _id: -1 }).populate({
+                path: 'branch',
+                model: Branch,
+                select: 'displayId name _id'
+            }),
+            Patient.countDocuments(filters),
+        ]);
+        return { count: total, patients };
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
+    }
+};
+
 const activeInactive = async (clientId, email, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
@@ -130,6 +149,7 @@ module.exports = {
     update,
     getById,
     list,
+    listWithSearch,
     activeInactive,
     deleteOne
 };
