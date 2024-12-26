@@ -423,13 +423,13 @@ exports.createMinimalPatient =async (req, res, next) => {
     const existing = await User.findOne({
         $or: [  { phone: phone },{email:email} ],
     });
-    console.log(existing,'existingexistingexistingexisting')
+    //console.log(existing,'existingexistingexistingexisting')
     let newPatient=null;
-    if(!existing){
-        newPatient=  await User.create(profileUpdates);
-    }
-    else {
-        newPatient= existing
+    // if(!existing){
+    //     newPatient=  await User.create(profileUpdates);
+    // }
+   // else {
+        //newPatient= existing
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         let profileUpdates2 = {
             displayId: displayId,
@@ -438,7 +438,7 @@ exports.createMinimalPatient =async (req, res, next) => {
             phone,email,
             gender, age, bloodGroup, patientGroup, referedBy,
             branch: branchId,
-            mainPatientLinkedid: newPatient?._id,
+           // mainPatientLinkedid: newPatient?._id,
             businessUnit: businessUnit,
             
         }
@@ -448,7 +448,7 @@ exports.createMinimalPatient =async (req, res, next) => {
             status:true,
              data: { patientId: newPatientInstance._id },
         });
-    }  
+   // }  
     } catch (error) {
         next(error)
     }
