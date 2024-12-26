@@ -373,19 +373,97 @@ exports.dailyBookingWithPagination = async (input) => {
             query.date = new Date(input.bookingDate + 'T00:00:00.000Z');
             console.log(new Date(input.bookingDate + 'T00:00:00.000Z'), 'bookingDate');
         }
-        const out = await appointment.find({
-            isActive: true,
-            deletedAt: null,
-            date: new Date(input.bookingDate + 'T00:00:00.000Z'),
-        })
-            .populate('patientId', 'firstName lastName email phone profileImage displayId gender bloodGroup age')
-            .populate('dutyDoctorId', '_id firstName lastName')
-            .populate('dentalAssistant', '_id firstName lastName')
-            .populate('chairId', '_id chairNumber')
-            .skip((input?.page - 1) * input?.perPage)
-            .limit(input?.perPage);
+        const out = await appointment.aggregate([
+            // Match the base fields in the `appointment` collection
+            {
+                $match: {
+                    isActive: true,
+                    deletedAt: null,
+                    date: new Date(input.bookingDate + 'T00:00:00.000Z')
+                }
+            },
+            {
+                $lookup: {
+                    from: 'chairs', // Name of the collection storing doctor data
+                    localField: 'chairId',
+                    foreignField: '_id',
+                    as: 'chairId'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$chairId',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            // Lookup for the `patientId` field
+            {
+                $lookup: {
+                    from: 'patients', // Name of the collection storing patient data
+                    localField: 'patientId',
+                    foreignField: '_id',
+                    as: 'patientId'
+                }
+            },
+            // Unwind the `patientDetails` array to access individual documents
+            {
+                $unwind: {
+                    path: '$patientId',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            
+            // Lookup for the `dutyDoctorId` field
+            {
+                $lookup: {
+                    from: 'clientusers', // Name of the collection storing doctor data
+                    localField: 'dutyDoctorId',
+                    foreignField: '_id',
+                    as: 'dutyDoctorId'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$dutyDoctorId',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: 'clientusers',  
+                    localField: 'dentalAssistant',
+                    foreignField: '_id',
+                    as: 'dentalAssistant'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$dentalAssistant',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $match: {
+                    $or: [
+                        { 'patientId.firstName': { $regex: input?.keyword, $options: 'i' } },
+                        { 'patientId.lastName': { $regex: input?.keyword, $options: 'i' } },
+                        { 'patientId.email': { $regex: input?.keyword, $options: 'i' } },
+                        { 'patientId.phone': { $regex: input?.keyword, $options: 'i' } },
+                        { 'dutyDoctorId.firstName': { $regex: input?.keyword, $options: 'i' } }
+                    ]
+                }
+            },
+            
+            {
+                $skip: (parseInt( input?.page) - 1) *parseInt( input?.perPage)
+            },
+            {
+                $limit: parseInt( input?.perPage)
+            }
+        ]);
+        
 
-        console.log(out, 'outoutout')
+        console.log(out,(parseInt( input?.page) - 1) * parseInt( input?.perPage),parseInt( input?.perPage) ,'outoutout')
         return { status: true, message: 'Success', data: out }
     } catch (error) {
 
