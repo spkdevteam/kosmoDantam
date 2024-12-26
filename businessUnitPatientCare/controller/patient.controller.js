@@ -192,13 +192,16 @@ exports.getParticularPatientByBusinessUnit = async (req, res, next) => {
 // list Patient by business unit
 exports.listPatient = async (req, res, next) => {
     try {
-        const { clientId, keyword = '', page = 1, perPage = 10, } = req.query;
+        const { clientId, keyword = '', page = 1, perPage = 10, isAdmin = true, branchId } = req.query;
+        
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
             });
         }
-        const filters = {
+
+        
+        let filters = {
             deletedAt: null,
             ...(keyword && {
                 $or: [
@@ -218,6 +221,14 @@ exports.listPatient = async (req, res, next) => {
                 ],
             }),
         };
+
+        if(isAdmin == "false" && branchId ){
+            filters = {
+                ...filters,
+                branch : branchId
+            }
+        }
+
         const result = await patientService.list(clientId, filters, { page, limit: perPage });
         return res.status(statusCode.OK).send({
             message: message.lblPatientFoundSucessfully,
