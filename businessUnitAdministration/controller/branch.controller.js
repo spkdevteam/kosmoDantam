@@ -16,13 +16,15 @@ const getserialNumber = require("../../model/services/getserialNumber");
 // create branch by business unit
 exports.createBranchByBusinessUnit = async (req, res) => {
     try {
-        const { clientId, name, emailContact,branchPrefix, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit, branchHeadId } = req.body;
+        // asd
+        const { clientId, name, emailContact, branchPrefix, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit, branchHeadId } = req.body;
+        
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
             });
         }
-        if (!name || !incorporationName || !emailContact || !contactNumber ) {
+        if (!name || !incorporationName || !emailContact || !contactNumber) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
@@ -44,11 +46,19 @@ exports.createBranchByBusinessUnit = async (req, res) => {
         //     });
         // }
         const displayId = await getserialNumber('branch', clientId, "", businessUnit);
+
+        const dataObject = {
+            displayId: displayId, branchPrefix: branchPrefix, clientId, name, emailContact, contactNumber, country, state, city : city[0], ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId
+        }
+
+        if (req.file?.filename) {
+            dataObject.branchLogo = req.file.filename;
+        }
+
         const newBranch = await Branch.create(
             [
                 {
-                    displayId: displayId,branchPrefix:branchPrefix, clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId
- 
+                    ...dataObject
                 },
             ],
         );
@@ -130,12 +140,15 @@ exports.updateBranchByBusinessUnit = async (req, res) => {
         branch.contactNumber = contactNumber;
         branch.country = country;
         branch.state = state;
-        branch.city = city;
+        branch.city = city[0];
         branch.ZipCode = ZipCode;
         branch.address = address;
         branch.incorporationName = incorporationName;
         branch.cinNumber = cinNumber;
         branch.gstNumber = gstNumber;
+        if (req.file?.filename) {
+            branch.branchLogo = req.file.filename;
+        }
         // branchPrefix ? branch.branchPrefix = branchPrefix:'';
 
         // Save the updated branch

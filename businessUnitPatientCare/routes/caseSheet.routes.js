@@ -21,6 +21,10 @@ const {
 // -------- case sheet routes starts here ----------
 
 
+// check alrady ongoing case sheet
+router.post('/checkAlreadyOngoingCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.checkAlreadyOngoingCaseSheet);
+router.post('/markAsCompletedCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.markedAsCompletedCaseSheet);
+
 // cheif complain part
 router.post('/createCheifComplaints', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createCheifComplaints);
 router.put('/updateCheifComplaints', entityAuth.authorizeEntity("Patient", "Case Sheet", "update"), caseSheetController.updateCheifComplaints);
@@ -123,7 +127,7 @@ router.post('/deleteServices', entityAuth.authorizeEntity("Patient", "Case Sheet
 // procedures
 router.post('/createProcedure', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createProcedure);
 router.put('/updateProcedure', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.updateProcedure);
-router.delete('/deleteProcedure', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteProcedure);
+router.post('/deleteProcedure', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteProcedure);
 
 // remove from draft
 router.post('/removeAsDraft',entityAuth.authorizeEntity("Patient", "Case Sheet", "create"),caseSheetController.removeAsDraft)
@@ -135,17 +139,23 @@ router.post('/removeAsDraft',entityAuth.authorizeEntity("Patient", "Case Sheet",
 router.get('/listCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.listCaseSheet);
 router.get('/getCaseSheet/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getParticularCaseSheet)
 router.get('/getAllDraftedCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllDrafted);
+router.get('/getAllCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllCaseSheet);
 
 // ------- case sheet details routes ends here ------
 
 // ------- Treatment plan routes starts starts here -------
 
-router.get('/getTreatmentPlan/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getTreatmentPlan)
-router.put('/updateTreatmentProcedure',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatmentProcedure)
-
+router.get('/getTreatmentPlan/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getTreatmentPlan);
+router.put('/updateTreatment',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatment);
+router.put('/updateTreatmentProcedure',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatmentProcedure);
 
 
 // ------- Treatment plan routes starts starts here -------
+
+
+// ------- Medical History routes starts here-------
+router.get('/getPatientMedicalHistory/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getPatientMedicalHistory);
+router.put('/updatePatientMedicalHistory', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updatePatientMedicalHistory);
 
 
 

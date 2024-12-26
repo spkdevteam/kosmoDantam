@@ -12,9 +12,60 @@ const clinetBusinessUnitSchema = require("../../client/model/businessUnit")
 const caseSheetService = require("../services/caseSheet.service");
 
 const CustomError = require("../../utils/customeError");
+const { update } = require("../../businessUnitAdministration/controller/service.controller");
 
 
 
+
+// check already ongoing case sheet
+exports.checkAlreadyOngoingCaseSheet = async (req, res, next) => {
+    try {
+        const { clientId, patientId } = req.body;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        if (!patientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblPatientIdRequired,
+            });
+        }
+        const cases = await caseSheetService.checkOngoing(clientId, patientId);
+        return res.status(statusCode.OK).send({
+            message: message.lblCaseSheetFoundSucessfully,
+            data: { cases: cases, ongoing: cases?.length > 0 ? true : false, totalOngoingCases: cases.length }
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+// marked as completed
+exports.markedAsCompletedCaseSheet = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId } = req.body;
+        const mainUser = req.user;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        if (!caseSheetId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblCaseSheetIdIdRequired,
+            });
+        }
+
+        const updated = await caseSheetService.markedCompleted(clientId, caseSheetId);
+        return res.status(statusCode.OK).send({
+            message: "Last case sheet completed successfully",
+            data: { caseSheets: updated._id },
+        });
+    } catch (error) {
+        next(error)
+    }
+};
 
 
 // create cheif complaints by business unit
@@ -251,8 +302,8 @@ exports.createInvestigation = async (req, res, next) => {
             });
         }
         let dataObject = {
-            fileType : fileType,
-            remark : remark,
+            fileType: fileType,
+            remark: remark,
         }
         if (req.file?.filename) {
             dataObject.file = req.file.filename;
@@ -273,17 +324,17 @@ exports.createInvestigation = async (req, res, next) => {
 // update investigation by busines unit
 exports.updateInvestigation = async (req, res, next) => {
     try {
-        const { clientId, caseSheetId, patientId, branchId, businessUnitId,  fileType, remark , } = req.body;
+        const { clientId, caseSheetId, patientId, branchId, businessUnitId, fileType, remark, } = req.body;
         const mainUser = req.user;
         await commonCheck(clientId, patientId, branchId, businessUnitId);
-        if (!fileType || !remark ) {
+        if (!fileType || !remark) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
         let dataObject = {
-            fileType : fileType,
-            remark : remark,
+            fileType: fileType,
+            remark: remark,
         }
         if (req.file?.filename) {
             dataObject.file = req.file.filename;
@@ -610,12 +661,12 @@ exports.updateProcedure = async (req, res, next) => {
                 message: message.lblRequiredFieldMissing,
             });
         }
-        const newCheifComplaint = await caseSheetService.update(clientId, caseSheetId, {
+        const newCheifComplaint = await caseSheetService.updateProcedure(clientId, caseSheetId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, procedures,
         });
         return res.status(statusCode.OK).send({
             message: message.lblProcedureUpdatedSuccess,
-            data: { caseSheetId: newCheifComplaint._id },
+            data: { procedures: newCheifComplaint.procedures, _id: newCheifComplaint._id }
         });
     } catch (error) {
         next(error)
@@ -639,7 +690,7 @@ exports.deleteProcedure = async (req, res, next) => {
         const deleted = await caseSheetService.deleteProcedure(clientId, caseSheetId, procedureId);
         return res.status(statusCode.OK).send({
             message: message.lblProcedureDeletedSuccess,
-            data: { caseSheetId: deleted?._id }
+            data: { procedures: deleted.procedures, _id: deleted._id }
         });
     } catch (error) {
         next(error)
@@ -658,10 +709,10 @@ exports.removeAsDraft = async (req, res, next) => {
         }
         if (!caseSheetId) {
             return res.status(statusCode.BadRequest).send({
-                message: message.lblProlblCaseSheetIdIdRequiredcedureIdRequired,
+                message: message.lblCaseSheetIdIdRequired,
             });
         }
-        const update = await caseSheetService.update(clientId, caseSheetId, {
+        const update = await caseSheetService.updateDraft(clientId, caseSheetId, {
             drafted: false
         });
         return res.status(statusCode.OK).send({
@@ -718,9 +769,33 @@ exports.getAllDrafted = async (req, res, next) => {
         const filters = {
             deletedAt: null,
             patientId: patientId,
-            status: "In Progress"
+            status: { $in: ['Proposed', 'In Progress', 'Completed'] },
         };
         const result = await caseSheetService.listDrafted(clientId, filters);
+        return res.status(statusCode.OK).send({
+            message: message.lblCaseSheetFoundSucessfully,
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+// get all case sheet of particular patient
+exports.getAllCaseSheet = async (req, res, next) => {
+    try {
+        const { clientId, patientId } = req.params;
+        if (!clientId || !patientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const filters = {
+            deletedAt: null,
+            patientId: patientId,
+        };
+        const result = await caseSheetService.listAllCases(clientId, filters);
         return res.status(statusCode.OK).send({
             message: message.lblCaseSheetFoundSucessfully,
             data: result,
@@ -802,6 +877,80 @@ exports.updateTreatmentProcedure = async (req, res, next) => {
     }
 };
 
+
+// update treatment
+exports.updateTreatment = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId, treatmentData, } = req.body;
+        const mainUser = req.user;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        if (!caseSheetId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblCaseSheetIdIdRequired,
+            });
+        }
+        if (!treatmentData) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const updated = await caseSheetService.updateTreatment(clientId, caseSheetId, treatmentData);
+        return res.status(statusCode.OK).send({
+            message: message.lblProcedureUpdatedSuccess,
+            data: { caseSheets: updated },
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+
+
+// get patient medical history
+exports.getPatientMedicalHistory = async (req, res, next) => {
+    try {
+        const { clientId, patientId } = req.params;
+        if (!clientId || !patientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const result = await caseSheetService.getPatientMedicalHistory(clientId, patientId);
+        return res.status(statusCode.OK).send({
+            message: message.lblMedCaseDoesFoundSuccess,
+            data: { patientId: result._id, medicalHistory: result.medicalHistory },
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.updatePatientMedicalHistory = async (req, res, next) => {
+    try {
+        const { clientId, patientId, medicalHistoryData } = req.body;
+        if (!clientId || !patientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        if (!medicalHistoryData) {
+            return res.status(statusCode.BadRequest).send({
+                message: message?.lblRequiredFieldMissing
+            })
+        }
+        const result = await caseSheetService.updatePatientMedicalHistory(clientId, patientId, medicalHistoryData);
+        return res.status(statusCode.OK).send({
+            message: message.lblMedCaseDoesFoundSuccess,
+            data: { patientId: result._id, medicalHistory: result.medicalHistory },
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 
 
 

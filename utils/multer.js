@@ -26,6 +26,12 @@ if(!fs.existsSync('./public/patient')){
 }
 
 
+if(!fs.existsSync('./public/branch')){
+    fs.mkdirSync('./public/branch')
+}
+
+
+
 
 
 // image filter
@@ -112,7 +118,31 @@ const uploadInvestigation = multer({
     fileFilter: imageFilter
 });
 
+// upload patient image
+const branchStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './public/branch');
+    },
+    filename: async (req, file, cb) => {
+        cb(null, `${Date.now()}_${file.originalname.toLowerCase().replaceAll(' ', '')}`);
+    },
+});
+
+
+
+const uploadBranch = multer({
+    storage: branchStorage,
+    limits: {
+        fileSize: 1024 * 1024,
+        files: 1
+    },
+    fileFilter: imageFilter
+});
+
+
+
 
 exports.uploadProfile = uploadProfile;
 exports.uploadPatient = uploadPatient;
 exports.uploadInvestigation = uploadInvestigation;
+exports.uploadBranch = uploadBranch;

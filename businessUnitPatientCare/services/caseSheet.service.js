@@ -1,4 +1,6 @@
 // services/chairService.js
+const { v4: uuidv4 } = require('uuid');
+
 const { getClientDatabaseConnection } = require("../../db/connection");
 const clinetUserSchema = require("../../client/model/user");
 const clinetPatientSchema = require("../../client/model/patient");
@@ -15,6 +17,26 @@ const complaintSchema = require("../../client/model/complaint");
 const { path } = require("../../model/patient");
 const patientFindingsSchema = require("../../client/model/finding");
 const medicalSchema = require("../../client/model/medical");
+const procedureSchema = require("../../client/model/procedure");
+const clinetBranchSchema = require("../../client/model/branch");
+
+const checkOngoing = async (clientId, patientId) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+
+        const existing = await CaseSheet.find({
+            patientId: patientId,
+            status: { $in: ['Proposed', 'In Progress'] },
+        });
+
+        return existing;
+
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
+    }
+};
 
 const create = async (clientId, data) => {
     try {
@@ -468,6 +490,8 @@ const updateService = async (clientId, caseSheetId, data) => {
     }
 };
 
+
+
 const deleteServices = async (clientId, caseSheetId, serviceId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
@@ -500,10 +524,47 @@ const deleteServices = async (clientId, caseSheetId, serviceId) => {
     }
 };
 
+const updateProcedure = async (clientId, caseSheetId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Department = clientConnection.model('department', departmentSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
+
+
+        const existing = await CaseSheet.findById(caseSheetId);
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        Object.assign(existing, data);
+
+        await existing.save();
+
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'procedures.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'procedures.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        })
+
+        return populatedCaseSheet
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
 const deleteProcedure = async (clientId, caseSheetId, procedureId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema);
+
         const existing = await CaseSheet.findById(caseSheetId);
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
@@ -514,7 +575,17 @@ const deleteProcedure = async (clientId, caseSheetId, procedureId) => {
             return !item._id.equals(mongObjId)
         });
         existing.procedures = newArray;
-        return await existing.save();
+        await existing.save();
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'procedures.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'procedures.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        })
+        return populatedCaseSheet
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
     }
@@ -573,6 +644,8 @@ const getById = async (clientId, caseSheetId) => {
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);
         const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
+
 
         const caseSheet = await CaseSheet.findById(caseSheetId).populate({
             path: 'cheifComplaints.complaints.compId',
@@ -592,6 +665,14 @@ const getById = async (clientId, caseSheetId) => {
             select: 'deptName _id'
         }).populate({
             path: 'services.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        }).populate({
+            path: 'procedures.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'procedures.service.servId',
             model: Service,
             select: 'serviceName _id'
         });
@@ -632,7 +713,296 @@ const updateTreatmentProcedure = async (clientId, caseSheetId, procedureId) => {
     }
 };
 
+
+const updateTreatment = async (clientId, caseSheetId, treatmentData) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const Medical = clientConnection.model('medical', medicalSchema);
+        const Department = clientConnection.model('department', departmentSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
+        const existing = await CaseSheet.findById(caseSheetId).populate({
+            path: 'cheifComplaints.complaints.compId',
+            model: Complaint,
+            select: 'complaintName _id'
+        }).populate({
+            path: 'clinicalFindings.findings.findId',
+            model: Finding,
+            select: 'findingsName _id'
+        }).populate({
+            path: 'medicalHistory.medicals.medId',
+            model: Medical,
+            select: 'caseName _id'
+        }).populate({
+            path: 'services.department.deptId',
+            model: Department,
+            select: 'deptName _id'
+        }).populate({
+            path: 'services.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        }).populate({
+            path: 'procedures.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'procedures.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        });
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        existing.treatmentData2 = treatmentData;
+        existing.status = "In Progress";
+        return await existing.save();
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error in updating treatment procedure: ${error.message}`);
+    }
+};
+
+
+
+const markedCompleted = async (clientId, caseSheetId) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const Medical = clientConnection.model('medical', medicalSchema);
+        const Department = clientConnection.model('department', departmentSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
+        const existing = await CaseSheet.findById(caseSheetId).populate({
+            path: 'cheifComplaints.complaints.compId',
+            model: Complaint,
+            select: 'complaintName _id'
+        }).populate({
+            path: 'clinicalFindings.findings.findId',
+            model: Finding,
+            select: 'findingsName _id'
+        }).populate({
+            path: 'medicalHistory.medicals.medId',
+            model: Medical,
+            select: 'caseName _id'
+        }).populate({
+            path: 'services.department.deptId',
+            model: Department,
+            select: 'deptName _id'
+        }).populate({
+            path: 'services.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        }).populate({
+            path: 'procedures.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'procedures.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        });
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        existing.status = "Completed";
+        existing.drafted = false;
+        return await existing.save();
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error in updating treatment procedure: ${error.message}`);
+    }
+};
+
+
+// old
+function transformArr(arr1) {
+    const filteredData = arr1.map((item) => {
+        const service = {
+            serviceName: item?.service?.servId?.serviceName,
+            // _id: item?.service?.servId?._id
+        };
+        const procedure = item?.procedure?.map((item) => {
+
+            return {
+                procedureName: item?.procedId?.procedureName,
+                // _id: item?.procedId?._id,
+                // id: item?._id,
+                // finished: false,
+                // uniqueId : count++,
+
+            }
+        });
+        return {
+            tooth: item?.tooth,
+            service: service,
+            procedure: procedure,
+            
+        }
+
+    });
+
+    console.log("filteredData string", JSON.stringify(filteredData));
+
+
+    const toothMap = new Map();
+
+    filteredData.forEach(({ tooth, service, procedure }) => {
+        tooth.forEach((t) => {
+            if (!toothMap.has(t)) {
+                toothMap.set(t, { tooth: t, service: [] });
+            }
+
+            toothMap.get(t).service.push({
+                service,
+                procedure: procedure,
+            });
+        });
+    });
+
+    return Array.from(toothMap.values())
+}
+
+// new
+// function transformArr(arr1) {
+//     let count = 1; // Initialize the counter outside the map scope
+
+//     const filteredData = arr1.map((item) => {
+//         const service = {
+//             serviceName: item?.service?.servId?.serviceName,
+//             _id: item?.service?.servId?._id,
+//         };
+
+//         const procedure = item?.procedure?.map((item) => {
+//             return {
+//                 procedureName: item?.procedId?.procedureName,
+//                 _id: item?.procedId?._id,
+//                 id: item?._id,
+//                 finished: false,
+//                 uniqueId: count++, // Increment the counter for each procedure
+//             };
+//         });
+
+//         return {
+//             tooth: item?.tooth,
+//             service: service,
+//             procedure: procedure,
+//         };
+//     });
+
+//     return filteredData;
+// }
+
+
+
+
+const updateDraft = async (clientId, caseSheetId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
+
+        const existing = await CaseSheet.findById(caseSheetId).populate({
+            path: 'procedures.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'procedures.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        });
+        ;
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+
+        if (existing?.procedures && existing?.procedures?.length > 0) {
+            const transformedData = transformArr(existing?.procedures);
+
+            existing.treatmentData = JSON.stringify(transformedData);
+            existing.treatmentData2 = transformedData;
+        }
+
+
+        Object.assign(existing, data);
+        return await existing.save();
+
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
+const listAllCases = async (clientId, filters = {}) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Patient = clientConnection.model('patient', clinetPatientSchema);
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const User = clientConnection.model('clientUsers', clinetUserSchema);
+
+
+        const [caseSheets] = await Promise.all([
+            CaseSheet.find(filters).sort({ _id: -1 }).populate({
+                path: 'cheifComplaints.complaints.compId',
+                model: Complaint,
+                select: 'complaintName _id'
+            }).populate({
+                path: 'patientId',
+                model: Patient,
+                select: 'firstName lastName patientGroup displayId'
+            }).populate({
+                path: 'branchId',
+                model: Branch,
+                select: 'name displayId _id'
+            }).populate({
+                path: 'createdBy',
+                model: User,
+                select: 'firstName lastName _id'
+            }),
+        ]);
+        return { caseSheets };
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
+    }
+};
+
+
+const getPatientMedicalHistory = async (clientId, patientId) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Patient = clientConnection.model('patient', clinetPatientSchema);
+        const patient = await Patient.findById(patientId);
+        if(!patient){
+            throw new CustomError(statusCode.NotFound, message.lblPatientNotFound);
+        }
+        return patient
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
+    }
+};
+
+const updatePatientMedicalHistory = async (clientId, patientId, medicalHistoryData) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Patient = clientConnection.model('patient', clinetPatientSchema);
+        const patient = await Patient.findById(patientId);
+        if(!patient){
+            throw new CustomError(statusCode.NotFound, message.lblPatientNotFound);
+        }
+        patient.medicalHistory = medicalHistoryData;
+        return await patient.save()
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
+    }
+};
+
 module.exports = {
+
+    checkOngoing,
 
     create,
     update,
@@ -662,12 +1032,24 @@ module.exports = {
 
     createService,
     updateService,
-
-
     deleteServices,
+
+    updateProcedure,
     deleteProcedure,
+
     list,
     getById,
     updateTreatmentProcedure,
-    listDrafted
+    listDrafted,
+    updateDraft,
+    updateTreatment,
+
+    markedCompleted,
+
+    listAllCases,
+
+
+    getPatientMedicalHistory,
+    updatePatientMedicalHistory
+
 };

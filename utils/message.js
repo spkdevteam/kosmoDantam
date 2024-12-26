@@ -161,6 +161,7 @@ module.exports = {
   lblMedCaseNoChanges: "The medical case details are already up to date.",
   lblMedCaseDependencies: "Please resolve linked issues before proceeding with this action.",
   lblMedCaseDoesNotExist: "The specified medical case does not exist in the system.",
+  lblMedCaseDoesFoundSuccess: "Medical History found successfully.",
 
   // employee
   lblEmployeeAlreadyExists: "Employee already exists with email or phone!",
