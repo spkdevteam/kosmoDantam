@@ -542,4 +542,71 @@ exports.changeBookingStatus = async ({ date, clientId, branchId, buId, appointme
     }
 }
 
+exports.activeBooking = async ({ clientId, branchId, buId, patientId})=>{
+    try {
+        console.log({ patientId:patientId, buId: buId, branchId: branchId, clientId: clientId },'zazaz')
+        if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: clientId, objectId: patientId, collectionName: 'patient' })) return { status: false, message: message.lblPatientNotFound, statusCode: httpStatusCode.Unauthorized }
+        const db = await getClientDatabaseConnection(clientId)
+        const appointment = await db.model('appointment', appointmentSchema)
+        const result = await appointment?.findOne({
+            patientId: patientId,
+            branchId: branchId,
+             isActive: true,
+             deletedAt: null,
+             status: { $in: ['Arrived', 'ChairReady', 'In-Progress'] } ,
+        });
+                
+        if (result) {
+            return { status: true, message: 'status Updated', statusCode: httpStatusCode.OK, data: result?._doc }
+        }
+        else {
+            return { status: false, message: 'no appointment found on this id ', statusCode: 501, }
+        }
+
+
+    } catch (error) {
+        return { status: false, message: error.message, statusCode: 501, }
+    }
+}
+
+exports.readAllAppointmentbyPatient = async ({ clientId, branchId, buId, patientId})=>{
+    try {
+        console.log({ patientId:patientId, buId: buId, branchId: branchId, clientId: clientId },'zaasaasazaz')
+        if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: clientId, objectId: patientId, collectionName: 'patient' })) return { status: false, message: message.lblPatientNotFound, statusCode: httpStatusCode.Unauthorized }
+        const db = await getClientDatabaseConnection(clientId)
+        const appointment = await db.model('appointment', appointmentSchema)
+        const result = await appointment?.find({
+            patientId: patientId,
+            branchId: branchId,
+             isActive: true,
+             deletedAt: null,
+              
+        })
+        
+        .populate('dutyDoctorId', 'firstName lastName phone ')
+        .populate('dentalAssistant','firstName lastName phone ')
+        .populate('chairId' , 'chairNumber chairLocation ')
+        .populate('patientId', 'firstName lastName displayId ')
+        
+        
+        if (result) {
+            console.log(result,'result')     
+            return { status: true, message: 'status Updated', statusCode: httpStatusCode.OK, data: result }
+        }
+        else {
+            return { status: false, message: 'no appointment found on this id ', statusCode: 501, }
+        }
+
+
+    } catch (error) {
+        return { status: false, message: error.message, statusCode: 501, }
+    }
+}
+
 

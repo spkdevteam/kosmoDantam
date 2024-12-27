@@ -12,5 +12,7 @@ bookingRoutes
        .get('/createToken',appointment.createToken)
        .post('/changeAppointmentStatus',appointment.changeBookingStatus)
        .get('/getdailyBookingWithPagination',appointment.getdailyBookingWithPagination)
+       .get('/getActiveAppointment',appointment.getActiveBooking)
+       .get('/getAllbookingBypatient',appointment.getAllbookingBypatient)
 
 module.exports = bookingRoutes

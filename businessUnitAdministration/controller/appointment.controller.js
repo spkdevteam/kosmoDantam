@@ -137,3 +137,26 @@ exports.changeBookingStatus = async (req, res, next)=>{
         next(error)
     }
 }
+
+
+exports.getActiveBooking =  async (req, res, next)=>{
+    try {
+        const data = await sanitizeBody(req.query)
+        const result = await appointmentServices.activeBooking(data)
+        res.status(200).json(result)
+        
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.getAllbookingBypatient =  async (req, res, next)=>{
+    try {
+        const data = await sanitizeBody(req.query)
+        const result = await appointmentServices.readAllAppointmentbyPatient(data)
+        res.status(200).json(result)
+    } catch (error) {
+        next(error)
+    }
+}
+
