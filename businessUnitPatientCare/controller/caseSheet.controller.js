@@ -725,6 +725,33 @@ exports.removeAsDraft = async (req, res, next) => {
 };
 
 
+// update case sheet
+exports.updateCaseSheet = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId } = req.body;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        if (!caseSheetId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblCaseSheetIdIdRequired,
+            });
+        }
+        const update = await caseSheetService.updateCaseSheet(clientId, caseSheetId, {
+            drafted: false
+        });
+        return res.status(statusCode.OK).send({
+            message: message.lblCaseSheetCreatedSuccess,
+            data: { update: JSON.stringify(update)  }
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+
 
 
 // list case sheet

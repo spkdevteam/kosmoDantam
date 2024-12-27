@@ -886,8 +886,6 @@ function transformArr(arr1) {
 
     });
 
-    console.log("filteredData string", JSON.stringify(filteredData));
-
 
     const toothMap = new Map();
 
@@ -974,6 +972,170 @@ const updateDraft = async (clientId, caseSheetId, data) => {
 
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
+
+
+function mergeToothData(array1, array2) {
+    // Helper function to merge procedures
+    const mergeProcedures = (existingProcedures, newProcedures) => {
+        const procedureMap = new Map();
+
+        console.log("existingProcedures", existingProcedures);
+        console.log("newProcedures", newProcedures);
+
+
+        // Add existing procedures
+        existingProcedures.forEach(proc => {
+            procedureMap.set(proc.procedureName, proc);
+        });
+
+        // Add or update with new procedures
+        newProcedures.forEach(proc => {
+            // if (!procedureMap.has(proc.procedureName)) {
+            //     procedureMap.set(proc.procedureName, {
+            //         procedureName: proc.procedureName,
+            //         finished: false,
+            //         updatedAt: null
+            //     });
+            // }
+
+            procedureMap.set(proc.procedureName, ({
+                procedureName: proc.procedureName,
+                finished: false,
+                updatedAt: null
+            }));
+
+
+        });
+
+        console.log("procedureMap aaa",procedureMap);
+        
+
+        return Array.from(procedureMap.values());
+    };
+
+    // Helper function to merge services
+    const mergeServices = (existingServices, newServices) => {
+        const serviceMap = new Map();
+
+        // console.log("existingServices", existingServices);
+        // console.log("newServices", newServices);
+
+
+        // Add existing services
+        existingServices.forEach(service => {
+            serviceMap.set(service.service?.serviceName, service);
+        });
+
+        // console.log("serviceMap",serviceMap);
+
+
+
+
+        // Add or update with new services
+        newServices.forEach(newService => {
+            const serviceName = newService.service?.serviceName;
+            if (serviceMap.has(serviceName)) {
+                // console.log("coming");
+
+                const existingService = serviceMap.get(newService.service?.serviceName);
+                // console.log("existingService",existingService);
+
+                existingService.procedure = mergeProcedures(
+                    existingService.procedure,
+                    newService.procedure
+                );
+            } else {
+                // console.log("vvv");
+
+                serviceMap.set(newService.service, newService);
+                // console.log("serviceMap",serviceMap);
+            }
+        });
+
+        // return Array.from(serviceMap.values());
+    };
+
+    // Merge the arrays
+    const toothMap = new Map();
+
+    // Add existing teeth
+    array1.forEach(tooth => {
+        toothMap.set(tooth.tooth, tooth);
+    });
+
+    // console.log("toothMap",toothMap);
+
+
+    // Add or update with new teeth
+    array2.forEach(newTooth => {
+        if (toothMap.has(newTooth.tooth)) {
+            const existingTooth = toothMap.get(newTooth.tooth);
+            // console.log("existingTooth",existingTooth);
+
+            existingTooth.service = mergeServices(
+                existingTooth.service,
+                newTooth.service
+            );
+            // existingTooth.total += newTooth.total;
+        } else {
+            toothMap.set(newTooth.tooth, newTooth);
+        }
+    });
+
+    console.log("tooth", Array.from(toothMap.values()));
+
+    return Array.from(toothMap.values())
+
+}
+
+const updateCaseSheet = async (clientId, caseSheetId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
+
+        const existing = await CaseSheet.findById(caseSheetId).populate({
+            path: 'procedures.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'procedures.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        });
+        ;
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+
+        let transformedData = [];
+        let result = []
+        if (existing?.procedures && existing?.procedures?.length > 0) {
+            transformedData = transformArr(existing?.procedures);
+
+            result = mergeToothData(existing?.treatmentData2, transformedData)
+
+            //  console.log("transformedData", JSON.stringify(transformedData));
+            //  console.log("existing?.treatmentData2", JSON.stringify(existing?.treatmentData2) );
+
+
+
+            // existing.treatmentData = JSON.stringify(transformedData);
+            // existing.treatmentData2 = transformedData;
+        }
+
+        return result
+
+
+        // Object.assign(existing, data);
+
+
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating updating case sheet: ${error.message}`);
     }
 };
 
@@ -1084,6 +1246,7 @@ module.exports = {
     updateTreatmentProcedure,
     listDrafted,
     updateDraft,
+    updateCaseSheet,
     updateTreatment,
 
     markedCompleted,

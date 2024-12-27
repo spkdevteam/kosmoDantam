@@ -132,6 +132,7 @@ router.post('/deleteProcedure', entityAuth.authorizeEntity("Patient", "Case Shee
 
 // remove from draft
 router.post('/removeAsDraft',entityAuth.authorizeEntity("Patient", "Case Sheet", "create"),caseSheetController.removeAsDraft)
+router.post('/updateCaseSheet',entityAuth.authorizeEntity("Patient", "Case Sheet", "create"),caseSheetController.updateCaseSheet)
 
 // -------- case sheet routes ends here ----------
 
