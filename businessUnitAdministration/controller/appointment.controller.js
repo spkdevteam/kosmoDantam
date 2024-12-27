@@ -120,7 +120,6 @@ exports.createToken = async (req, res, next)=>{
 exports.getdailyBookingWithPagination = async (req,res,next)=>{
     try {
         const data = await sanitizeBody(req.query)
-        console.log(data,'-------->>>>>>>>>>>>>>')
         const result = await appointmentServices.dailyBookingWithPagination(data)
         res.status(200).json(result)
     } catch (error) {
