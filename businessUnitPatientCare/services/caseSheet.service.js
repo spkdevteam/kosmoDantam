@@ -524,6 +524,9 @@ const deleteServices = async (clientId, caseSheetId, serviceId) => {
     }
 };
 
+
+
+
 const updateProcedure = async (clientId, caseSheetId, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
@@ -550,13 +553,261 @@ const updateProcedure = async (clientId, caseSheetId, data) => {
             path: 'procedures.service.servId',
             model: Service,
             select: 'serviceName _id'
-        })
+        });
+
+        const existingTreatmentData = populatedCaseSheet.treatmentData2 || [];
+        const result = transformArr2(existingTreatmentData, populatedCaseSheet.procedures);
+
+        populatedCaseSheet.treatmentData2 = result;
+        await populatedCaseSheet.save();
+
 
         return populatedCaseSheet
     } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+        throw new CustomError(error.statusCode || 500, `Error updating procedure of case sheet: ${error.message}`);
     }
 };
+
+
+// 1
+// Optimized transformArr2 function
+// function transformArr2(existingData, newProcedures) {
+//     const toothMap = new Map();
+
+//     console.log("existingData",existingData);
+//     console.log("newProcedures",newProcedures);
+
+
+
+//     // Populate the map with existing treatmentData2
+//     existingData.forEach(({ tooth, service }) => {
+
+//             if (!toothMap.has(tooth)) {
+//                 toothMap.set(tooth, { tooth: tooth, service: [] });
+//             }
+//             service.forEach((s) => {
+//                 const existingService = toothMap.get(tooth).service.find(
+//                     (sv) => sv.service.serviceName === s.service.serviceName
+//                 );
+//                 if (existingService) {
+//                     existingService.procedure.push(...s.procedure);
+//                 } else {
+//                     toothMap.get(tooth).service.push(s);
+//                 }
+//             });
+
+//     });
+
+//     // Add new data from newProcedures
+//     newProcedures.forEach((item) => {
+//         const { tooth, service, procedure } = {
+//             tooth: item.tooth,
+//             service: {
+//                 serviceName: item.service.servId?.serviceName,
+//             },
+//             procedure: item.procedure?.map((p) => ({
+//                 procedureName: p.procedId?.procedureName,
+//             })),
+//         };
+
+//         tooth.forEach((t) => {
+//             if (!toothMap.has(t)) {
+//                 toothMap.set(t, { tooth: t, service: [] });
+//             }
+
+//             const existingService = toothMap.get(t).service.find(
+//                 (sv) => sv.service.serviceName === service.serviceName
+//             );
+
+//             if (existingService) {
+//                 const existingProcedures = existingService.procedure.map((p) => p.procedureName);
+//                 procedure.forEach((p) => {
+//                     if (!existingProcedures.includes(p.procedureName)) {
+//                         existingService.procedure.push(p);
+//                     }
+//                 });
+//             } else {
+//                 toothMap.get(t).service.push({
+//                     service,
+//                     procedure,
+//                 });
+//             }
+//         });
+//     });
+
+//     console.log("addda", JSON.stringify( Array.from(toothMap.values())));
+
+
+//     return Array.from(toothMap.values());
+// }
+
+
+// 2
+function transformArr2(existingData, newProcedures) {
+    const toothMap = new Map();
+
+    // Populate the map with existing treatmentData2
+    existingData.forEach(({ tooth, service, total, completed }) => {
+        if (!toothMap.has(tooth)) {
+            toothMap.set(tooth, { tooth: tooth, service: [], total, completed });
+        }
+        service.forEach((s) => {
+            const existingService = toothMap.get(tooth).service.find(
+                (sv) => sv.service.serviceName === s.service.serviceName
+            );
+            if (existingService) {
+                existingService.procedure.push(...s.procedure);
+            } else {
+                toothMap.get(tooth).service.push(s);
+            }
+        });
+    });
+
+    // Add new data from newProcedures
+    newProcedures.forEach((item) => {
+        const { tooth, service, procedure } = {
+            tooth: item.tooth,
+            service: {
+                serviceName: item.service.servId?.serviceName,
+            },
+            procedure: item.procedure?.map((p) => ({
+                procedureName: p.procedId?.procedureName,
+            })),
+        };
+
+        tooth.forEach((t) => {
+            if (!toothMap.has(t)) {
+                toothMap.set(t, { tooth: t, service: [], total: 0, completed: 0 });
+            }
+
+            const toothEntry = toothMap.get(t);
+            const existingService = toothEntry.service.find(
+                (sv) => sv.service.serviceName === service.serviceName
+            );
+
+            if (existingService) {
+                const existingProcedures = existingService.procedure.map((p) => p.procedureName);
+                procedure.forEach((p) => {
+                    if (!existingProcedures.includes(p.procedureName)) {
+                        existingService.procedure.push(p);
+                        toothEntry.total += 1; // Increment total for new procedures
+                    }
+                });
+            } else {
+                toothEntry.service.push({
+                    service,
+                    procedure,
+                });
+                toothEntry.total += 1; // Increment total for a new service
+            }
+        });
+    });
+
+    return Array.from(toothMap.values());
+}
+
+// 3
+// function transformArr2(existingData, newProcedures) {
+//     const toothMap = new Map();
+
+//     // Populate the map with existing treatmentData2
+//     existingData.forEach(({ tooth, service, total, completed }) => {
+//         if (!toothMap.has(tooth)) {
+//             toothMap.set(tooth, { tooth: tooth, service: [], total, completed });
+//         }
+//         service.forEach((s) => {
+//             const existingService = toothMap.get(tooth).service.find(
+//                 (sv) => sv.service.serviceName === s.service.serviceName
+//             );
+//             if (existingService) {
+//                 existingService.procedure.push(...s.procedure);
+//             } else {
+//                 toothMap.get(tooth).service.push(s);
+//             }
+//         });
+//     });
+
+//     // Add new data from newProcedures
+//     newProcedures.forEach((item) => {
+//         const { tooth, service, procedure, prposedTime } = {
+//             tooth: item.tooth,
+//             service: {
+//                 serviceName: item.service.servId?.serviceName,
+//             },
+//             procedure: item.procedure?.map((p) => ({
+//                 procedureName: p.procedId?.procedureName,
+//                 prposedTime: p.prposedTime || null,
+//                 finished: p.finished || false,
+//             })),
+//         };
+
+//         tooth.forEach((t) => {
+//             if (!toothMap.has(t)) {
+//                 toothMap.set(t, { tooth: t, service: [], total: 0, completed: 0 });
+//             }
+
+//             const toothEntry = toothMap.get(t);
+//             const existingService = toothEntry.service.find(
+//                 (sv) => sv.service.serviceName === service.serviceName
+//             );
+
+//             if (existingService) {
+//                 procedure.forEach((p) => {
+//                     const existingProcedure = existingService.procedure.find(
+//                         (ep) => ep.procedureName === p.procedureName && ep.prposedTime?.toISOString() === p.prposedTime?.toISOString()
+//                     );
+
+//                     if (!existingProcedure) {
+//                         existingService.procedure.push(p);
+//                         toothEntry.total += 1; // Increment total for new procedures
+//                     }
+//                 });
+//             } else {
+//                 toothEntry.service.push({
+//                     service,
+//                     procedure,
+//                 });
+//                 toothEntry.total += procedure.length; // Increment total for new service and its procedures
+//             }
+//         });
+//     });
+
+//     return Array.from(toothMap.values());
+// }
+
+
+
+// function transformArr2(arr1) {
+//     const filteredData = arr1.map((item) => {
+//         const service = {
+//             serviceName: item?.service?.servId?.serviceName,
+//         };
+//         const procedure = item?.procedure?.map((item) => {
+//             return {
+//                 procedureName: item?.procedId?.procedureName,
+//             }
+//         });
+//         return {
+//             tooth: item?.tooth,
+//             service: service,
+//             procedure: procedure,
+//         }
+
+//     });
+//     const toothMap = new Map();
+//     filteredData.forEach(({ tooth, service, procedure }) => {
+//         tooth.forEach((t) => {
+//             if (!toothMap.has(t)) {
+//                 toothMap.set(t, { tooth: t, service: [] });
+//             }
+//             toothMap.get(t).service.push({
+//                 service,
+//                 procedure: procedure,
+//             });
+//         });
+//     });
+//     return Array.from(toothMap.values())
+// }
 
 const deleteProcedure = async (clientId, caseSheetId, procedureId) => {
     try {
@@ -954,17 +1205,17 @@ const updateDraft = async (clientId, caseSheetId, data) => {
             model: Service,
             select: 'serviceName _id'
         });
-        ;
+
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
 
-        if (existing?.procedures && existing?.procedures?.length > 0) {
-            const transformedData = transformArr(existing?.procedures);
+        // if (existing?.procedures && existing?.procedures?.length > 0) {
+        //     const transformedData = transformArr(existing?.procedures);
 
-            existing.treatmentData = JSON.stringify(transformedData);
-            existing.treatmentData2 = transformedData;
-        }
+        //     existing.treatmentData = JSON.stringify(transformedData);
+        //     existing.treatmentData2 = transformedData;
+        // }
 
 
         Object.assign(existing, data);
@@ -1010,8 +1261,8 @@ function mergeToothData(array1, array2) {
 
         });
 
-        console.log("procedureMap aaa",procedureMap);
-        
+        console.log("procedureMap aaa", procedureMap);
+
 
         return Array.from(procedureMap.values());
     };
