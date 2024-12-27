@@ -110,6 +110,7 @@ const caseSheetSchema = new mongoose.Schema({
                         { procedId: { type: mongoose.Schema.ObjectId, ref: "procedure" } }
                     ]
                 },
+                prposedTime: { type: Date, default: null },
                 finished: { type: Boolean, default: false }
             },
         ],
