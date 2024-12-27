@@ -424,7 +424,8 @@ const commonIdCheck = async (data) => {
 
 exports.createMinimalPatient =async (req, res, next) => {
     try {
-        const { clientId, branchId, roleId, businessUnit,email, firstName, lastName,  phone, gender, age, bloodGroup, patientGroup, referedBy } = req.body;
+         
+        console.log(clientId, branchId, roleId, businessUnit,email, firstName, lastName,  phone, gender, age, bloodGroup, patientGroup, referedBy)
         const mainUser = req.user;
         await commonIdCheck({ clientId, branchId, businessUnit });
         if (!firstName || !phone || !roleId ) {
