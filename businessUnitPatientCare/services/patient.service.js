@@ -101,11 +101,13 @@ const listWithSearch = async (clientId, filters = {}) => {
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
         const [patients, total] = await Promise.all([
-            Patient.find(filters).sort({ _id: -1 }).populate({
-                path: 'branch',
-                model: Branch,
-                select: 'displayId name _id'
-            }),
+            Patient.find(filters).sort({ _id: -1 })
+            // .populate({
+            //     path: 'branch',
+            //     model: Branch,
+            //     select: 'displayId name _id'
+            // })
+            ,
             Patient.countDocuments(filters),
         ]);
         return { count: total, patients };

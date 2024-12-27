@@ -242,13 +242,13 @@ exports.listPatient = async (req, res, next) => {
 // get patient by name, email, and phone
 exports.getPatientByNameEmailAndPhone = async (req, res, next) => {
     try {
-        const { clientId, keyword = '', } = req.query;
+        const { clientId, keyword = '',  isAdmin = true, branchId } = req.query;
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
             });
         }
-        const filters = {
+        let filters = {
             deletedAt: null,
             ...(keyword && {
                 $or: [
@@ -268,6 +268,15 @@ exports.getPatientByNameEmailAndPhone = async (req, res, next) => {
                 ],
             }),
         };
+
+        if(isAdmin == "false" && branchId ){
+            filters = {
+                ...filters,
+                branch : branchId
+            }
+        }
+
+
         const result = await patientService.listWithSearch(clientId, filters);
         return res.status(statusCode.OK).send({
             message: message.lblPatientFoundSucessfully,
