@@ -12,7 +12,8 @@ const clinetBusinessUnitSchema = require("../../client/model/businessUnit")
 
 
 
-const chairService = require("../../client/service/chair.services")
+const chairService = require("../../client/service/chair.services");
+const getserialNumber = require("../../model/services/getserialNumber");
 
 
 
@@ -183,7 +184,7 @@ exports.getParticularChairByBusinessUnit = async (req, res, next) => {
 // };
 exports.listChair = async (req, res, next) => {
     try {
-        const { clientId, keyword = '', page = 1, perPage = 10 } = req.query;
+        const { clientId, keyword = '', page = 1, perPage = 10, isAdmin = true, branchId  } = req.query;
 
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
@@ -191,7 +192,7 @@ exports.listChair = async (req, res, next) => {
             });
         }
 
-        const filters = {
+        let filters = {
             deletedAt: null,
             ...(keyword && {
                 $or: [
@@ -200,6 +201,13 @@ exports.listChair = async (req, res, next) => {
                 ],
             }),
         };
+
+        if(isAdmin == "false" && branchId ){
+            filters = {
+                ...filters,
+                branch : branchId
+            }
+        }
 
         const result = await chairService.listChairs(clientId, filters, { page, limit: perPage });
 

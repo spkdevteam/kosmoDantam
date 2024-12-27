@@ -5,7 +5,8 @@ const clinetChairSchema = require("../../client/model/chair");
 const message = require("../../utils/message");
 const statusCode = require("../../utils/http-status-code");
 
-const CustomError = require("../../utils/customeError")
+const CustomError = require("../../utils/customeError");
+const clinetBranchSchema = require("../model/branch");
 
 
 const createChair = async (clientId, chairData) => {
@@ -102,12 +103,18 @@ const listChairs = async (clientId, filters = {}, options = { page: 1, limit: 10
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Chair = clientConnection.model('chair', clinetChairSchema);
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+
 
         const { page, limit } = options;
         const skip = (page - 1) * limit;
 
         const [chairs, total] = await Promise.all([
-            Chair.find(filters).skip(skip).limit(limit).sort({ _id: -1 }),
+            Chair.find(filters).skip(skip).limit(limit).sort({ _id: -1 }).populate({
+                path: 'branch',
+                model: Branch,
+                select: 'displayId name _id'
+            }),
             Chair.countDocuments(filters),
         ]);
 
