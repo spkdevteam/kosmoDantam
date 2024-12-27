@@ -427,7 +427,7 @@ exports.createMinimalPatient =async (req, res, next) => {
         const { clientId, branchId, roleId, businessUnit,email, firstName, lastName,  phone, gender, age, bloodGroup, patientGroup, referedBy } = req.body;
         const mainUser = req.user;
         await commonIdCheck({ clientId, branchId, businessUnit });
-        if (!firstName || !lastName ||  !phone || !roleId ) {
+        if (!firstName || !phone || !roleId ) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });

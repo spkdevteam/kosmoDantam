@@ -396,6 +396,21 @@ exports.dailyBookingWithPagination = async (input) => {
                     preserveNullAndEmptyArrays: true
                 }
             },
+            {
+                $lookup: {
+                    from: 'branches', // Name of the collection storing patient data
+                    localField: 'branchId',
+                    foreignField: '_id',
+                    as: 'branchId'
+                }
+            },
+            // Unwind the `patientDetails` array to access individual documents
+            {
+                $unwind: {
+                    path: '$branchId',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
             // Lookup for the `patientId` field
             {
                 $lookup: {
