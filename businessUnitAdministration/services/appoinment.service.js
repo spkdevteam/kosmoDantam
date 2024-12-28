@@ -11,6 +11,7 @@ const mongoose = require('mongoose');
 const getAvailableSlots = require("../../helper/getAvailableSlots");
 const { getchairList } = require("./chairs.service");
 
+
 exports.creatAppointment = async (input) => {
     try {
         console.log(input, 'input')
@@ -31,13 +32,13 @@ exports.creatAppointment = async (input) => {
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.dentalAssistant, collectionName: 'clientuser' })) return { status: false, message: 'dental assistant is invalid  ', statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.chairId, collectionName: 'chair' })) return { status: false, message: 'chair details is inValid ', statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.patientId, collectionName: 'patient' })) return { status: false, message: 'patient id is not valid ', statusCode: httpStatusCode.Unauthorized }
-
+        
         const db = await getClientDatabaseConnection(input?.clientId)
         const appointments = await db.model('appointment', appointmentSchema)
         if (!input?.displayId) {
             input.displayId = await getserialNumber('appointment', input?.clientId, input?.branchId, input?.buId)
         }
-
+        console.log(input,input.displayId ,'---------------VVVVVVVVVVVVVVV<<<<<<<<<<<<<')
         const newData = {
             displayId: input?.displayId,
             branchId: input?.branchId,
@@ -109,6 +110,7 @@ exports.getDateWiseBookidDetails = async (input) => {
                 _id: item?._id,
                 bookingType: 'appointment',
                 bookingId: item?.displayId,
+                status: item?.status,
                 date: new Date(input?.bookingDate),
                 slotFrom: item?.slotFrom,
                 slotTo: item?.slotTo,
@@ -265,7 +267,7 @@ exports.getBookingChartNonTabular = async (input) => {
 
 const filterAppointment = async (input) => {
     try {
-        console.log(input, 'input')
+        
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
@@ -279,7 +281,6 @@ const filterAppointment = async (input) => {
             console.log(new Date(input.bookingDate + 'T00:00:00.000Z'));
         }
         console.log(new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z'))
-        console.log(input.endTime, '------------------------')
         const orConditions = [];
         if (input?.startTime) query.slotFrom = { $gte: new Date(input.bookingDate + 'T' + input.startTime + ':00.000Z'), $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z') };
         if (input?.endTime) query.slotTo = { $gte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z'), $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z') };
@@ -330,7 +331,6 @@ const filterAppointment = async (input) => {
 exports.generateAvailabiltyChart = async (input) => {
     const absentees = await filterLeaveApplication(input);
     const booking = await filterAppointment(input);
-    console.log(booking, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
     const daystatus = { ...booking, absentees };
     return daystatus
 }
