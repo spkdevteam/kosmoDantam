@@ -189,7 +189,7 @@ exports.getReadActiveServicesbyPage = async (req, res, next) => {
 
 exports.listServices = async (req, res, next) => {
     try {
-        const { clientId, keyword = '', page = 1, perPage = 10 } = req.query;
+        const { clientId, keyword = '', page = 1, perPage = 10,branchId } = req.query;
         if (!clientId) {
             return res.status(httpStatusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
@@ -204,6 +204,8 @@ exports.listServices = async (req, res, next) => {
                 ],
             }),
         };
+        branchId?.length ? filters.branchId=branchId:''
+
         const result = await list(clientId, filters, { page, limit: perPage });
         return res.status(httpStatusCode.OK).send({
             message: message.lblServicesFoundSucessfully,

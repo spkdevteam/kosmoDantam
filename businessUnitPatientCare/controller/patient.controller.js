@@ -454,11 +454,10 @@ exports.createMinimalPatient =async (req, res, next) => {
         }
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Role = clientConnection.model('clientRoles', clientRoleSchema);
-        const role = await Role.findById(roleId);
+        const role = await Role.findOne({ id: 17});
         if (!role) {
             throw new CustomError(statusCode.Conflict, message.lblRoleNotFound);
         }
-        
         const displayId = await getserialNumber('patient', clientId, '', businessUnit);
         let profileUpdates = {
             displayId: displayId,
@@ -476,8 +475,6 @@ exports.createMinimalPatient =async (req, res, next) => {
            
         }
 // ------------------------------
-
-  
     const User = clientConnection.model('clientUsers', clinetUserSchema);
     const existing = await User.findOne({
         $or: [  { phone: phone },{email:email} ],

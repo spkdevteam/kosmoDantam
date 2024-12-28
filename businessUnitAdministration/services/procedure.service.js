@@ -178,7 +178,7 @@ const procedureUnderService = async (input) => {
 }
 const getAllProceduresByPage = async (input) => {
     try {
-        !input?.keyword === undefined || !input?.keyWord === undefined || !input?.keyWord.length || !input?.keyword.length ? input.keyWord = '' : ''
+        !input?.keyword === undefined || !input?.keyWord === undefined || !input?.keyWord?.length || !input?.keyword?.length ? input.keyWord = '' : ''
         !input?.page ? input.page = 0 : input.page = parseInt(input.page)
         !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
         const orArray = input?.keyWord?.length ? {$or:[
@@ -190,7 +190,9 @@ const getAllProceduresByPage = async (input) => {
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(input.clientId)
         const procedures = await db.model('procedure', procedureSchema)
-        const result = await procedures.find({ deletedAt: null,...orArray})
+        const filters ={ deletedAt: null}
+        if(input?.branchId?.length) filters.branchId = input.branchId
+        const result = await procedures.find({ ...filters,...orArray})
         .populate('branchId','name')
         .skip((input.page-1) *  input.perPage )
         .limit(input.page * input.perPage)

@@ -3,7 +3,7 @@
  * /api/client/bu/department/allDepartmentsByPage:
  *   get:
  *     summary: Get all departments by page
- *     description: Fetches a paginated list of departments for a specific client with optional keyword filtering.
+ *     description: Fetches a paginated list of departments for a specific client with optional keyword and branch filtering.
  *     tags:
  *       - Department
  *     parameters:
@@ -14,6 +14,12 @@
  *         required: true
  *         example: "6735e64c5c58f271b1ce1678"
  *         description: Unique identifier of the client.
+ *       - in: query
+ *         name: branchId
+ *         schema:
+ *           type: string
+ *           example: "8974f63b4d52a341b3g92z78"
+ *         description: Unique identifier of the branch.
  *       - in: query
  *         name: keyWord
  *         schema:
