@@ -244,6 +244,9 @@ exports.getRolesList = async (req, res) => {
             if (roleId === 2) {
                 return roles.filter(role => role.id !== 1 && role.id !== 2);
             }
+            // if(roleId !== 2 || roleId !== 1){
+            //     return roles.filter(role => role.id !== 1 && role.id !== 2 && role.id !== roleId);
+            // }
             return roles.filter(role => role.id !== 1 && role.id !== 2);
         };
         const rolesList = filterRoles(roles, roleIdOfCurrentUser);
