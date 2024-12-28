@@ -108,7 +108,7 @@ const defaultPersmissionsList = [
         ]
     },
     {
-        name: "Patients",
+        name: "Patient",
         access: false,
         menu: [
             {
