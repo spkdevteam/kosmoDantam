@@ -81,7 +81,7 @@ exports.getDateWiseBookidDetails = async (input) => {
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
         if (input?.bookingDate.length > 10) input?.bookingDate.splice(0, 10)
-        console.log(input?.bookingDate)
+        
         const db = await getClientDatabaseConnection(input?.clientId)
         const appointment = await db.model('appointment', appointmentSchema)
         const startOfDay = new Date(input?.bookingDate + 'T00:00:00.000Z');
