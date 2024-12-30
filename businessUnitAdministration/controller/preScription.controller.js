@@ -15,33 +15,25 @@ const create = async (req,res,next) =>  {
 
 
 
-deletePreScription = (req, res, next) => {
+const deletePreScription = (req, res, next) => {
     try {
 
     } catch (error) {
         next(error)
     }
 }
-editPrescription = (req, res, next) => {
+const editPrescription = (req, res, next) => {
     try {
 
     } catch (error) {
         next(error)
     }
 }
-togglePrescription = (req, res, next) => {
+const togglePrescription = (req, res, next) => {
     try {
 
     } catch (error) {
         next(error)
     }
 }
-readPrescription = (req, res, next) => {
-    try {
-
-    } catch (error) {
-        next(error)
-    }
-}
-
-module.exports = {create,deletePreScription,editPrescription, togglePrescription ,readPrescription}
+module.exports = {create,deletePreScription,editPrescription, togglePrescription }

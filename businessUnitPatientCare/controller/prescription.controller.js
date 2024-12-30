@@ -20,6 +20,7 @@ const RoleModel = require("../../model/role");
 const MasterUser = require("../../model/user")
 
 const prescriptionService = require("../services/prescription.service")
+const {list} = require('../services/prescription.service')
 
 // create prescription by business unit
 exports.createPrescription = async (req, res, next) => {
@@ -117,31 +118,36 @@ exports.pataintPrescriptionList = async (req, res, next) => {
 // list prescription by business unit
 exports.listPrescription = async (req, res, next) => {
     try {
-        const { clientId, keyword = '', page = 1, perPage = 10, } = req.query;
-        if (!clientId) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblClinetIdIsRequired,
-            });
-        }
+        const data = await sanitizeBody(req.query)
+        console.log(data,'sasasa')
+        const {clientId, keyword,  page,patientId, perPage,branchId,buId} = data
         const filters = {
             deletedAt: null,
-            ...(keyword && {
-                $or: [
-                ],
-            }),
+           
         };
-        const result = await prescriptionService.list(clientId, filters, { page, limit: perPage });
-        return res.status(statusCode.OK).send({
-            message: message.lblPrescriptionFoundSucessfully,
-            data: result,
-        });
+
+        // ...(keyword && {
+        //     $or: [{}
+        //     ],
+        // }),
+
+         const result = await prescriptionService.readPrescription({clientId,buId,patientId,keyword, filters,branchId, page, perPage})
+            return res.status(statusCode.OK).send(result);
     } catch (error) {
         next(error);
     }
 };
 
+ 
+
+
+
+
+
+
 
 const CustomError = require("../../utils/customeError");
+const sanitizeBody = require("../../utils/sanitizeBody");
 
 
 const commonIdCheck = async (data) => {
@@ -171,6 +177,7 @@ const commonIdCheck = async (data) => {
         const User = clientConnection.model('clientUsers', clinetUserSchema);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
         const branch = await Branch.findById(data.branchId);
+       
         if (!branch) {
             throw new CustomError(statusCode.BadRequest, message.lblBranchNotFound);
         }
