@@ -25,7 +25,7 @@ const {list} = require('../services/prescription.service')
 // create prescription by business unit
 exports.createPrescription = async (req, res, next) => {
     try {
-        console.log(req.body,'<<<<<<<<<<-----------------')
+        
         const data =await sanitizeBody(req.body)
         const result = await prescriptionService.create(data)
         res.json(result)
