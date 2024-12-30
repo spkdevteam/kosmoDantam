@@ -15,7 +15,7 @@ const entityAuth = require("../../middleware/authorization/commonEntityAuthoriza
 // # create, update, view, list, activate/inactive, delete Prescription by business unit routes starts here
 
 
-priscriptionRouter.post('/createPrescription', entityAuth.authorizeEntity("Pataints", "Prescription", "create"), prescriptionContrller.createPrescription);
+priscriptionRouter.post('/createPrescription',  prescriptionContrller.createPrescription);//entityAuth.authorizeEntity("Pataints", "Prescription", "create"),
 
 priscriptionRouter.put('/updatePrescription', entityAuth.authorizeEntity("Pataints", "Prescription", "update"), prescriptionContrller.updatePrescription);
 

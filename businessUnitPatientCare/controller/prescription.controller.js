@@ -25,23 +25,12 @@ const {list} = require('../services/prescription.service')
 // create prescription by business unit
 exports.createPrescription = async (req, res, next) => {
     try {
-        const { clientId, branchId, buId, patientId, doctorId, caseSheetId, drugArray } = req.body;
-        const mainUser = req.user;
-        await commonIdCheck({ clientId, branchId, buId, patientId, doctorId, caseSheetId });
-        if (!drugArray) {
-            return res.status(statusCode.BadRequest).send({
-                message: message.lblRequiredFieldMissing,
-            });
-        }
-        const created = await prescriptionService.create(clientId, {
-            drugArray,
-            createdBy: mainUser._id,
-
-        });
-        return res.status(statusCode.OK).send({
-            message: message.lblPrescriptionCreatedSuccess,
-            data: { prescriptionId: created._id },
-        });
+        console.log(req.body,'<<<<<<<<<<-----------------')
+        const data =await sanitizeBody(req.body)
+        const result = await prescriptionService.create(data)
+        res.json(result)
+         
+      
     } catch (error) {
         next(error)
     }
@@ -119,7 +108,7 @@ exports.pataintPrescriptionList = async (req, res, next) => {
 exports.listPrescription = async (req, res, next) => {
     try {
         const data = await sanitizeBody(req.query)
-        console.log(data,'sasasa')
+        console.log(data,'<<<<<<<<<<<<<<<<<<<<<<<<sasasa>>>>>>>>>>>>>>>>>>>>>>>>')
         const {clientId, keyword,  page,patientId, perPage,branchId,buId} = data
         const filters = {
             deletedAt: null,
