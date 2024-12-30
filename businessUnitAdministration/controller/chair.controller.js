@@ -301,12 +301,15 @@ exports.softDeleteChairByBusinesssUnit = async (req, res, next) => {
 
     try {
 
-        const { keyword, page, perPage, chairId, clientId } = req.body;
+        const { keyword, page, perPage, chairId, clientId, isAdmin = true, branchId  } = req.body;
 
         req.query.keyword = keyword;
         req.query.page = page;
         req.query.perPage = perPage;
         req.query.clientId = clientId;
+        req.query.isAdmin = isAdmin;
+        req.query.branchId = branchId;
+        
 
 
         // Validate inputs

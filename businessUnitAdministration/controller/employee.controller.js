@@ -253,7 +253,7 @@ exports.getParticularEmployee = async (req, res, next) => {
 // list employee 
 exports.listEmployee = async (req, res, next) => {
     try {
-        const { clientId, keyword = '', page = 1, perPage = 10, roleId = 4 } = req.query;
+        const { clientId, keyword = '', page = 1, perPage = 10, roleId = 4,  isAdmin = true, branchId  } = req.query;
 
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
@@ -261,7 +261,7 @@ exports.listEmployee = async (req, res, next) => {
             });
         }
 
-        const filters = {
+        let filters = {
             deletedAt: null,
             roleId: { $gt: 2, $ne: 17 },
             ...(keyword && {
@@ -282,6 +282,13 @@ exports.listEmployee = async (req, res, next) => {
                 ],
             }),
         };
+
+        if(isAdmin == "false" && branchId ){
+            filters = {
+                ...filters,
+                branch : branchId
+            }
+        }
 
         const result = await employeeService.listEmployee(clientId, filters, { page, limit: perPage });
 

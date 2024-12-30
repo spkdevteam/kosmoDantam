@@ -193,7 +193,7 @@ exports.getParticularPatientByBusinessUnit = async (req, res, next) => {
 exports.listPatient = async (req, res, next) => {
     try {
         const { clientId, keyword = '', page = 1, perPage = 10, isAdmin = true, branchId } = req.query;
-        
+
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
@@ -357,11 +357,15 @@ exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
 
 exports.softDeletePatient = async (req, res) => {
     try {
-        const { keyword, page, perPage, patientId, clientId } = req.body;
+        const { keyword, page, perPage, patientId, clientId , isAdmin = true, branchId} = req.body;
         req.query.keyword = keyword;
         req.query.page = page;
         req.query.perPage = perPage;
         req.query.clientId = clientId;
+        req.query.isAdmin = String(isAdmin);
+        req.query.branchId = branchId;
+
+        
         if (!clientId || !patientId) {
             return res.status(400).send({
                 message: message.lblPatientIdIdAndClientIdRequired,
