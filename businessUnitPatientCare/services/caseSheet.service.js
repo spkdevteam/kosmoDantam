@@ -1231,9 +1231,10 @@ const updateDraft = async (clientId, caseSheetId, data) => {
             status: { $nin: ['Scheduled', 'Cancelled'] }, 
         }).sort({ createdAt: -1 }).exec();
 
-        latestAppointment.caseSheetId = existing._id;
-        await latestAppointment.save();
-        
+        if(latestAppointment){
+            latestAppointment.caseSheetId = existing._id;
+            await latestAppointment.save();
+        }
         return await existing.save();
 
     } catch (error) {
