@@ -173,7 +173,7 @@ const toggleDepartment = async (input) => {
 const allDepartmentsByPage = async (input) => {
     try {
         console.log(input,'input-------------')
-        !input?.keyWord ? input.keyWord = "" : ''
+        !input?.keyword ? input.keyword = "" : ''
         !input?.page ? input.page = 0 : input.page = parseInt(input.page)
         !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
         if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
@@ -184,10 +184,12 @@ const allDepartmentsByPage = async (input) => {
             {
                 $or:
                 [
-                    {deptName: { $regex: input?.keyWord || '', $options: 'i' }},
-                    {description: { $regex: input?.keyWord || '', $options: 'i' }}
+                    {displayId: { $regex: input?.keyword || '', $options: 'i' }},
+                    {deptName: { $regex: input?.keyword || '', $options: 'i' }},
+                    {description: { $regex: input?.keyword || '', $options: 'i' }}
                 ], 
-                deletedAt: null, isActive: true
+                deletedAt: null, isActive: true,
+                ...(input?.branchId ? {branchId:input?.branchId}:{})
             })
             .populate('branchId','name')
             .skip((input?.page - 1) * input?.perPage)

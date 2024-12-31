@@ -32,7 +32,14 @@ const create = async (data) => {
             const newData = {
                 ...data
             }
-            const result = await prescription.findOneAndUpdate({displayId:data.displayId},{$set:newData},{upsert:true,returnDocument:'after',new: true,})
+            const result = await prescription
+            .findOneAndUpdate({displayId:data.displayId},{$set:newData},{upsert:true,returnDocument:'after',new: true,})
+            .populate('branchId')
+            .populate('caseSheetId')
+            .populate('patientId') 
+            .populate('doctorId')
+            .populate('createdBy')
+            
             if(result){
                 return{status:true,message:message.lblPrescriptionCreatedSuccess,data:result?._doc}
             }
