@@ -1399,9 +1399,9 @@ const listAllCases = async (clientId, filters = {}) => {
         const Branch = clientConnection.model('branch', clinetBranchSchema);
         const User = clientConnection.model('clientUsers', clinetUserSchema);
 
-
+console.log(filters,'filters')
         const [caseSheets] = await Promise.all([
-            CaseSheet.find(filters).sort({ _id: -1 }).populate({
+            CaseSheet.find({...filters}).sort({ _id: -1 }).populate({
                 path: 'cheifComplaints.complaints.compId',
                 model: Complaint,
                 select: 'complaintName _id'
@@ -1419,6 +1419,9 @@ const listAllCases = async (clientId, filters = {}) => {
                 select: 'firstName lastName _id'
             }),
         ]);
+
+console.log(caseSheets,caseSheets?.length ,'caseSheetscaseSheets')
+
         return { caseSheets };
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);

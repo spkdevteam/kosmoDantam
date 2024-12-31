@@ -12,6 +12,7 @@ bookingRoutes
        .get('/createToken',appointment.createToken)
        .post('/changeAppointmentStatus',appointment.changeBookingStatus)
        .get('/getdailyBookingWithPagination',appointment.getdailyBookingWithPagination)
+       .get('/filterBookingDetails',appointment.filterBookingDetails)
        .get('/getActiveAppointment',appointment.getActiveBooking)
        .get('/getAllbookingBypatient',appointment.getAllbookingBypatient)
 

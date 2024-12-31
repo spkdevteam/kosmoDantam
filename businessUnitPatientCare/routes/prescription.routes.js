@@ -1,7 +1,7 @@
 
 
 const express = require("express");
-let router = express.Router();
+let priscriptionRouter = express.Router();
 
 // const auth = require("../../middleware/authorization/PrescriptionAuthorization/PrescriptionAuthorization")
 
@@ -15,15 +15,15 @@ const entityAuth = require("../../middleware/authorization/commonEntityAuthoriza
 // # create, update, view, list, activate/inactive, delete Prescription by business unit routes starts here
 
 
-router.post('/createPrescription', entityAuth.authorizeEntity("Pataints", "Prescription", "create"), prescriptionContrller.createPrescription);
+priscriptionRouter.post('/createPrescription',  prescriptionContrller.createPrescription);//entityAuth.authorizeEntity("Pataints", "Prescription", "create"),
 
-router.put('/updatePrescription', entityAuth.authorizeEntity("Pataints", "Prescription", "update"), prescriptionContrller.updatePrescription);
+priscriptionRouter.put('/updatePrescription', entityAuth.authorizeEntity("Pataints", "Prescription", "update"), prescriptionContrller.updatePrescription);
 
-router.get('/prescription/:clientId/:prescriptionId', entityAuth.authorizeEntity("Pataints", "Prescription", "view"), prescriptionContrller.getParticularPrescription);
+priscriptionRouter.get('/prescription/:clientId/:prescriptionId', entityAuth.authorizeEntity("Pataints", "Prescription", "view"), prescriptionContrller.getParticularPrescription);
 
-router.get('/pataintPrescription', entityAuth.authorizeEntity("Pataints", "Prescription", "view"), prescriptionContrller.pataintPrescriptionList);
+priscriptionRouter.get('/pataintPrescription', entityAuth.authorizeEntity("Pataints", "Prescription", "view"), prescriptionContrller.pataintPrescriptionList);
 
-router.get('/listPrescription', entityAuth.authorizeEntity("Pataints", "Prescription", "list"), prescriptionContrller.listPrescription);
+priscriptionRouter.get('/listPrescription',  prescriptionContrller.listPrescription); //entityAuth.authorizeEntity("Pataints", "Prescription", "list"),
 
 
 
@@ -34,4 +34,4 @@ router.get('/listPrescription', entityAuth.authorizeEntity("Pataints", "Prescrip
 
 
 
-exports.router = router;
+module.exports  = priscriptionRouter;

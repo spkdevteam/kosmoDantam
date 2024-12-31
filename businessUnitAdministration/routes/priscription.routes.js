@@ -7,7 +7,7 @@ preScriptionRouter
     .delete('/delete',prescriptionController.deletePreScription)
     .patch('/edit',prescriptionController.editPrescription)
     .patch('/toggle',prescriptionController.togglePrescription)
-    .get('/readPrescription',prescriptionController.readPrescription)
+    //.get('/readPrescriptionwithPagination',prescriptionController.readPrescription)
 
 
 module.exports = preScriptionRouter

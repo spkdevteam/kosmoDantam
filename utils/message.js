@@ -144,6 +144,7 @@ module.exports = {
   lblProcedureUnauthorized: "You are not authorized to perform this operation on the procedure.",
   lblProcedureNoChanges: "The procedure details are already up to date.",
   lblProcedureDoesNotExist: "The specified procedure does not exist in the system.",
+  lblprocedureListNotFound:'not procedure found on the submitted details',
 
 
   //Medical case 
@@ -174,7 +175,7 @@ module.exports = {
 
   // patient
   lblPatientAlreadyExists: "Patient already exists with email or phone!",
-  lblPatientCreatedSuccess: "Patient created successfully!",
+  lblPatientCreatedSuccess: "Patient registered successfully!",
   lblPatientUpdatedSuccess: "Patient updated successfully!",
   lblPatientIdIdAndClientIdRequired: "Patient Id and Client Id are required!",
   lblPatientNotFound: "Patient not found!",

@@ -125,6 +125,18 @@ exports.getdailyBookingWithPagination = async (req,res,next)=>{
         next(error)
     }
 }
+
+exports.filterBookingDetails = async (req,res,next)=>{
+    try {
+        const data = await sanitizeBody(req.query)
+        console.log(data,'---------------------------------')
+        const result = await appointmentServices.filterBookingWithfromToDateAndKeyWord(data)
+        res.status(200).json(result)
+    } catch (error) {
+        next(error)
+    }
+}
+
 exports.changeBookingStatus = async (req, res, next)=>{
     try {
         const data = await sanitizeBody(req.body)

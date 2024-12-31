@@ -12,8 +12,7 @@ const prescriptionSchema = new Schema(
         buId: { type: mongoose.Schema.ObjectId, ref: "businessUnit", default: null, index: true },
         patientId: { type: mongoose.Schema.ObjectId, ref: 'patient', required: true },
         doctorId: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', required: true },
-        caseSheetId: { type: mongoose.Schema.ObjectId, ref: 'caseSheet', required: true },
-
+        caseSheetId: { type: mongoose.Schema.ObjectId, ref: 'casesheets', required: true },
         drugArray: {
             type: [
                 {
@@ -28,8 +27,11 @@ const prescriptionSchema = new Schema(
             default: []
         },
         additionalAdvice: { type: String, default : null},
-        createdBy: { type: ObjectId, ref: "clientUsers", default: null, index: true },  
+        createdBy: { type:  mongoose.Schema.ObjectId, ref: "clientUsers", default: null, index: true },  
         deletedAt: { type: Date, default: null, index: true }, 
+        createdAt:{ type: Date, default: null, index: true }, 
+        nextVisitDate : { type: Date, default: null, index: true }, 
+        nextVisitDiscription:{ type: String, default : null},
     },
 
     { timestamps: true }

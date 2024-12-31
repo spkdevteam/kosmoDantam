@@ -13,6 +13,7 @@ const caseSheetService = require("../services/caseSheet.service");
 
 const CustomError = require("../../utils/customeError");
 const { update } = require("../../businessUnitAdministration/controller/service.controller");
+const { default: mongoose } = require("mongoose");
 
 
 
@@ -822,10 +823,12 @@ exports.getAllCaseSheet = async (req, res, next) => {
                 message: message.lblRequiredFieldMissing,
             });
         }
+        console.log(clientId, patientId,'clientId, patientId')
         const filters = {
             deletedAt: null,
-            patientId: patientId,
+            patientId: new mongoose.Types.ObjectId(patientId) ,
         };
+        console.log(filters)
         const result = await caseSheetService.listAllCases(clientId, filters);
         return res.status(statusCode.OK).send({
             message: message.lblCaseSheetFoundSucessfully,
