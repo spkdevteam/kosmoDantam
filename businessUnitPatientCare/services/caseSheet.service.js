@@ -19,6 +19,7 @@ const patientFindingsSchema = require("../../client/model/finding");
 const medicalSchema = require("../../client/model/medical");
 const procedureSchema = require("../../client/model/procedure");
 const clinetBranchSchema = require("../../client/model/branch");
+const appointmentSchema = require('../../client/model/appointments');
 
 const checkOngoing = async (clientId, patientId) => {
     try {
@@ -1219,6 +1220,20 @@ const updateDraft = async (clientId, caseSheetId, data) => {
 
 
         Object.assign(existing, data);
+        const patientId = existing?.patientId;
+
+
+        const Appointment = await clientConnection.model('appointment', appointmentSchema)
+        const latestAppointment = await Appointment.findOne({
+            patientId,
+            isActive: true,
+            deletedAt: null,
+            status: { $nin: ['Scheduled', 'Cancelled'] }, 
+        }).sort({ createdAt: -1 }).exec();
+
+        latestAppointment.caseSheetId = existing._id;
+        await latestAppointment.save();
+        
         return await existing.save();
 
     } catch (error) {
@@ -1399,9 +1414,9 @@ const listAllCases = async (clientId, filters = {}) => {
         const Branch = clientConnection.model('branch', clinetBranchSchema);
         const User = clientConnection.model('clientUsers', clinetUserSchema);
 
-console.log(filters,'filters')
+        console.log(filters, 'filters')
         const [caseSheets] = await Promise.all([
-            CaseSheet.find({...filters}).sort({ _id: -1 }).populate({
+            CaseSheet.find({ ...filters }).sort({ _id: -1 }).populate({
                 path: 'cheifComplaints.complaints.compId',
                 model: Complaint,
                 select: 'complaintName _id'
@@ -1420,7 +1435,7 @@ console.log(filters,'filters')
             }),
         ]);
 
-console.log(caseSheets,caseSheets?.length ,'caseSheetscaseSheets')
+        console.log(caseSheets, caseSheets?.length, 'caseSheetscaseSheets')
 
         return { caseSheets };
     } catch (error) {

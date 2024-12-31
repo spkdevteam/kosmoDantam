@@ -10,6 +10,7 @@ const { listEmployeeByRole } = require("./clientUser.service");
 const mongoose = require('mongoose');
 const getAvailableSlots = require("../../helper/getAvailableSlots");
 const { getchairList } = require("./chairs.service");
+const caseSheetSchema = require("../../client/model/caseSheet");
 
 
 exports.creatAppointment = async (input) => {
@@ -727,12 +728,18 @@ exports.readAllAppointmentbyPatient = async ({ clientId, branchId, buId, patient
         if (! await validateObjectId({ clientid: clientId, objectId: patientId, collectionName: 'patient' })) return { status: false, message: message.lblPatientNotFound, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(clientId)
         const appointment = await db.model('appointment', appointmentSchema)
+        const CaseSheet = db.model('caseSheet', caseSheetSchema);
+
         const result = await appointment?.find({
             patientId: patientId,
             branchId: branchId,
              isActive: true,
              deletedAt: null,
               
+        }).populate({
+            path: 'caseSheetId',
+            model: CaseSheet,
+            select: '+createdAt'
         })
         
         .populate('dutyDoctorId', 'firstName lastName phone ')

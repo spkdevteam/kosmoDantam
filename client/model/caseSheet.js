@@ -177,7 +177,7 @@ const caseSheetSchema = new mongoose.Schema({
     },
 
 
-});
+},{ timestamps: true });
 
 
 module.exports = caseSheetSchema;
