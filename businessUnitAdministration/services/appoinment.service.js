@@ -486,6 +486,152 @@ exports.dailyBookingWithPagination = async (input) => {
 }
 
 
+
+exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
+    try {
+        // clientId, buId, bookingDate, page, perPage, branchId======>>>>>  input 
+        console.log(input, 'input')
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
+
+        const db = await getClientDatabaseConnection(input?.clientId)
+        const appointment = await db.model('appointment', appointmentSchema)
+        const query = { isActive: true, deletedAt: null };
+
+        console.log(input, {
+            isActive: true,
+            deletedAt: null,
+            // date: 
+            // {
+            //     $gte:new Date(input.fromDate + 'T00:00:00.000Z'),
+            //     $lte:new Date(input.toDate + 'T00:00:00.000Z')
+            // },
+             ...(input?.branchId?{branchId:new mongoose.Schema.ObjectId( input?.branchId)}:{})
+            
+        },'mer++++++++++++++++++')
+        const out = await appointment.aggregate([
+            // Match the base fields in the `appointment` collection
+            {
+                $match: {
+                    isActive: true,
+                    deletedAt: null,
+                    date: 
+                    {
+                        $gte:new Date(input.fromDate + 'T00:00:00.000Z'),
+                        $lte:new Date(input.toDate + 'T00:00:00.000Z')
+                    },
+                     ...(input?.branchId?{branchId:new mongoose.Types.ObjectId( input?.branchId)}:{})
+                    
+                }
+            },
+            {
+                $lookup: {
+                    from: 'chairs', // Name of the collection storing doctor data
+                    localField: 'chairId',
+                    foreignField: '_id',
+                    as: 'chairId'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$chairId',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: 'branches', // Name of the collection storing patient data
+                    localField: 'branchId',
+                    foreignField: '_id',
+                    as: 'branchId'
+                }
+            },
+            // Unwind the `patientDetails` array to access individual documents
+            {
+                $unwind: {
+                    path: '$branchId',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            // Lookup for the `patientId` field
+            {
+                $lookup: {
+                    from: 'patients', // Name of the collection storing patient data
+                    localField: 'patientId',
+                    foreignField: '_id',
+                    as: 'patientId'
+                }
+            },
+            // Unwind the `patientDetails` array to access individual documents
+            {
+                $unwind: {
+                    path: '$patientId',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            
+            // Lookup for the `dutyDoctorId` field
+            {
+                $lookup: {
+                    from: 'clientusers', // Name of the collection storing doctor data
+                    localField: 'dutyDoctorId',
+                    foreignField: '_id',
+                    as: 'dutyDoctorId'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$dutyDoctorId',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: 'clientusers',  
+                    localField: 'dentalAssistant',
+                    foreignField: '_id',
+                    as: 'dentalAssistant'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$dentalAssistant',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $match: {
+                    $or: [
+                        { 'patientId.firstName': { $regex: input?.keyword||'', $options: 'i' } },
+                        { 'patientId.lastName': { $regex: input?.keyword||'', $options: 'i' } },
+                        { 'patientId.email': { $regex: input?.keyword||'', $options: 'i' } },
+                        { 'patientId.phone': { $regex: input?.keyword||'', $options: 'i' } },
+                        { 'dutyDoctorId.firstName': { $regex: input?.keyword||'', $options: 'i' } }
+                    ]
+                }
+            },
+            
+            {
+                $skip: (parseInt( input?.page) - 1) *parseInt( input?.perPage)
+            },
+            {
+                $limit: parseInt( input?.perPage)
+            }
+        ]);
+        
+
+        console.log(out,(parseInt( input?.page) - 1) * parseInt( input?.perPage),parseInt( input?.perPage) ,'outoutout')
+        return { status: true, message: 'Success', data: out }
+    } catch (error) {
+
+    }
+}
+
+
+
+
+
+
 exports.updateBookingWithToken = async ({ tokenNumber, appointmentid, buId, branchId, clientId }) => {
     try {
         console.log({ tokenNumber: tokenNumber, appointmentId: appointmentid, buId: buId, branchId: branchId, clientId: clientId })
