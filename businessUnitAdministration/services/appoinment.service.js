@@ -626,12 +626,6 @@ exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
 
     }
 }
-
-
-
-
-
-
 exports.updateBookingWithToken = async ({ tokenNumber, appointmentid, buId, branchId, clientId }) => {
     try {
         console.log({ tokenNumber: tokenNumber, appointmentId: appointmentid, buId: buId, branchId: branchId, clientId: clientId })
@@ -652,9 +646,7 @@ exports.updateBookingWithToken = async ({ tokenNumber, appointmentid, buId, bran
             else {
                 return { status: false, message: 'no appointment found on this id ', statusCode: 501, }
             }
-
         }
-
 
     } catch (error) {
         return { status: false, message: error.message, statusCode: 501, }
