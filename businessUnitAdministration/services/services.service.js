@@ -198,7 +198,8 @@ const serviceUnderDepartment  = async (input) => {
 }
 const readActiveServicesbyPage = async (input) => {
     try {
-        !input?.keyWord ? input.keyWord = "" : ''
+        console.log(input,'asasaasasasasasas')
+        !input?.keyword ? input.keyWord = "" : ''
         !input?.page ? input.page = 0 : input.page = parseInt(input.page)
         !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
         
@@ -208,13 +209,14 @@ const readActiveServicesbyPage = async (input) => {
         const services = await db.model('services', serviceSchema);
         const data = await services.find({
             $or:[
-                {serviceName:{$regex:input?.keyWord,$options:'i'}},
-                {displayId:{$regex:input?.keyWord,$options:'i'}},
-                {description:{$regex:input?.keyWord,$options:'i'}},
+                {serviceName:{$regex:input?.keyword,$options:'i'}},
+                {displayId:{$regex:input?.keyword,$options:'i'}},
+                {description:{$regex:input?.keyword,$options:'i'}},
             ],
             deletedAt:null})
         .skip((input?.page-1)*input.perPage )
         .limit(input.page*input.perpage)
+        .populate('branchId')
         console.log(data, 'dey data fetched ')
 
         if (data) {

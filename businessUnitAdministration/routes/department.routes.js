@@ -12,7 +12,7 @@ deptRouter
     .delete('/deleteDepartment', deptController.deleteDepartment)
     .post('/softDeleteDepartment', deptController.softDeleteDepartment)
     .get('/activeDepartments', deptController.getAllActiveDepartment)
-    .get('/allDepartmentsByPage', entityAuth.authorizeEntity("Administration", "Department", "view"), deptController.listDepartment)
+    .get('/allDepartmentsByPage', entityAuth.authorizeEntity("Administration", "Department", "view"), deptController.getallDepartmentsByPage)
     // .patch('/toggleDepartment', deptController.toggleDepartments)
     .patch('/activeInactiveDepartment', entityAuth.authorizeEntity("Administration", "Department", "update"), deptController.activeinactiveDepartment)
     .put('/revokeDepartment', deptController.revokeDepartment)
