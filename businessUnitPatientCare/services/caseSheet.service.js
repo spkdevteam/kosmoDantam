@@ -857,7 +857,7 @@ const list = async (clientId, filters = {}, options = { page: 1, limit: 10 }) =>
             CaseSheet.find(filters).skip(skip).limit(limit).sort({ _id: -1 }).populate({
                 path: 'patientId',
                 model: Patient,
-                select: 'firstName lastName _id displayId'
+                select: 'firstName lastName patientGroup _id displayId'
             }).populate({
                 path: 'branchId',
                 model: Branch,

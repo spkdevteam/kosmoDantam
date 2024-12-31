@@ -5,7 +5,8 @@ const clinetUserSchema = require("../../client/model/user");
 const message = require("../../utils/message");
 const statusCode = require("../../utils/http-status-code");
 
-const CustomError = require("../../utils/customeError")
+const CustomError = require("../../utils/customeError");
+const clientRoleSchema = require("../model/role");
 
 
 const createEmployee = async (clientId, employeedata) => {
@@ -45,9 +46,9 @@ const updateEmployee = async (clientId, employeeId, updateData) => {
             $and: [
                 { _id: { $ne: employeeId } },
                 {
-                    $or:[{ email: updateData.email },
-                        { phone: updateData?.phone }
-                        ],
+                    $or: [{ email: updateData.email },
+                    { phone: updateData?.phone }
+                    ],
                 },
             ],
         });
@@ -90,12 +91,18 @@ const listEmployee = async (clientId, filters = {}, options = { page: 1, limit: 
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const User = clientConnection.model('clientUsers', clinetUserSchema);
+        const Role = clientConnection.model('clientRoles', clientRoleSchema);
+
 
         const { page, limit } = options;
         const skip = (page - 1) * limit;
 
         const [employees, total] = await Promise.all([
-            User.find(filters).skip(skip).limit(limit).sort({ _id: -1 }),
+            User.find(filters).skip(skip).limit(limit).sort({ _id: -1 }).populate({
+                path: 'role',
+                model: Role,
+                select: 'id name _id'
+            }),
             User.countDocuments(filters),
         ]);
 
