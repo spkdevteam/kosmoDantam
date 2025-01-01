@@ -197,6 +197,7 @@ const getAllProceduresByPage = async (input) => {
         .populate('branchId','name')
         .skip((input.page-1) *  input.perPage )
         .limit(input.page * input.perPage)
+        .sort({_id:-1})
 
         const totalRows = await procedures.find({ ...filters,...orArray,...(input?.branchId?{branchId:input?.branchId}:{})})
         

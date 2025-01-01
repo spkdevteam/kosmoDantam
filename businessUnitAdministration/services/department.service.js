@@ -193,7 +193,8 @@ const allDepartmentsByPage = async (input) => {
             })
             .populate('branchId','name')
             .skip((input?.page - 1) * input?.perPage)
-            .limit(input?.page * input?.perPage);
+            .limit(input?.page * input?.perPage)
+            .sort({_id:-1});
             const totalData = await departments.find(
                 {
                     $or:
