@@ -188,13 +188,26 @@ const allDepartmentsByPage = async (input) => {
                     {deptName: { $regex: input?.keyword || '', $options: 'i' }},
                     {description: { $regex: input?.keyword || '', $options: 'i' }}
                 ], 
-                deletedAt: null, isActive: true,
+                deletedAt: null,  
                 ...(input?.branchId ? {branchId:input?.branchId}:{})
             })
             .populate('branchId','name')
             .skip((input?.page - 1) * input?.perPage)
             .limit(input?.page * input?.perPage);
-        if (result) return { status: true, message: 'success', result: result, statusCode: 200 }
+            const totalData = await departments.find(
+                {
+                    $or:
+                    [
+                        {displayId: { $regex: input?.keyword || '', $options: 'i' }},
+                        {deptName: { $regex: input?.keyword || '', $options: 'i' }},
+                        {description: { $regex: input?.keyword || '', $options: 'i' }}
+                    ], 
+                    deletedAt: null, isActive: true,
+                    ...(input?.branchId ? {branchId:input?.branchId}:{})
+                }) 
+
+
+        if (result) return { status: true, message: 'success', result: result,count:totalData.length, statusCode: 200 }
         else return { status: false, message: 'unKnown error ', statusCode: 500 }
     } catch (error) {
         return { status: false, message: error.message }

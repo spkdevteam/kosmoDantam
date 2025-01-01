@@ -214,14 +214,23 @@ const readActiveServicesbyPage = async (input) => {
                 {description:{$regex:input?.keyword,$options:'i'}},
             ],
             deletedAt:null})
-        .skip((input?.page-1)*input.perPage )
-        .limit(input.page*input.perpage)
+        .skip((parseInt( input?.page)-1)* parseInt(input.perPage) )
+        .limit(parseInt(input.perPage))
         .populate('branchId')
-        console.log(data, 'dey data fetched ')
+        const totalCount = await services.find({
+            $or:[
+                {serviceName:{$regex:input?.keyword,$options:'i'}},
+                {displayId:{$regex:input?.keyword,$options:'i'}},
+                {description:{$regex:input?.keyword,$options:'i'}},
+            ],
+            deletedAt:null}) 
+
+            
+        console.log( parseInt(input?.page),parseInt(input?.perPade) ,totalCount , 'dey data fetched ')
 
         if (data) {
             return {
-                status: true, statusCode: 200, message: message.lblSuccess, services: data, count : data.lenght }
+                status: true, statusCode: 200, message: message.lblSuccess, services: data, count : totalCount.length }
         } else {
             return {
                 status: false, statusCode: 404, message: message.lblFailed, } 

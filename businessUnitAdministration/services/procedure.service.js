@@ -197,7 +197,10 @@ const getAllProceduresByPage = async (input) => {
         .populate('branchId','name')
         .skip((input.page-1) *  input.perPage )
         .limit(input.page * input.perPage)
-        return { status: true, statusCode: 200, result: result, message: message.lblProcedureFetched }
+
+        const totalRows = await procedures.find({ ...filters,...orArray,...(input?.branchId?{branchId:input?.branchId}:{})})
+        
+        return { status: true, statusCode: 200,count:totalRows?.length, result: result, message: message.lblProcedureFetched }
     } catch (error) {
         return { status: false, message: error.message, statusCode: 500 }
     }
