@@ -23,9 +23,11 @@ const patientService = require("../services/patient.service")
 exports.createMainPatientByBusinessUnit = async (req, res, next) => {
     try {
         const { clientId, branchId, roleId, businessUnit, firstName, lastName, email, phone, gender, age, bloodGroup, patientGroup, referedBy, city, state, country, ZipCode, address, password } = req.body;
+        // console.log("req.body", req.body);
+        
         const mainUser = req.user;
         await commonIdCheck({ clientId, branchId, businessUnit });
-        if (!firstName || !lastName || !email || !phone || !roleId || !city || !state || !country || !ZipCode || !address) {
+        if (!firstName || !lastName || !email || !phone || !roleId ) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
@@ -44,7 +46,7 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
             lastName,
             email,
             phone, city, state, country, ZipCode, address,
-            gender, age, bloodGroup, patientGroup, referedBy,
+             age, bloodGroup, patientGroup, referedBy,
             password: hashedPassword,
             branch: branchId,
             role: roleId,
@@ -54,6 +56,14 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
             isUserVerified: true,
             createdBy: mainUser._id,
         }
+
+        if(gender !== ""){
+            profileUpdates = {
+                ...profileUpdates,
+                gender : gender
+            }
+        }
+
         if (req.file?.filename) {
             profileUpdates.profileImage = req.file.filename;
         }
@@ -69,6 +79,13 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
             branch: branchId,
             businessUnit: businessUnit,
             createdBy: mainUser._id,
+        }
+
+        if(gender !== ""){
+            profileUpdates2 = {
+                ...profileUpdates2,
+                gender : gender
+            }
         }
         if (req.file?.filename) {
             profileUpdates2.profileImage = req.file.filename;
@@ -149,9 +166,16 @@ exports.updatePatientByBusinessUnit = async (req, res, next) => {
             lastName,
             email,
             phone, city, state, country, ZipCode, address,
-            gender, age, bloodGroup, patientGroup, referedBy,
+            gender, bloodGroup, patientGroup, referedBy,
             branch: branchId,
             businessUnit: businessUnit,
+        }
+
+        if(age){
+            dataObject = {
+                ...dataObject,
+                age : age
+            }
         }
 
         if (req.file?.filename) {
