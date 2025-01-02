@@ -1232,13 +1232,15 @@ const updateDraft = async (clientId, caseSheetId, data) => {
         }).sort({ createdAt: -1 }).exec();
 
         if(latestAppointment){
+            
             latestAppointment.caseSheetId = existing._id;
             await latestAppointment.save();
         }
+
         return await existing.save();
 
     } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+        throw new CustomError(error.statusCode || 500, `Error in updatin as draft: ${error.message}`);
     }
 };
 
