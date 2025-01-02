@@ -172,7 +172,7 @@ exports.updateBranchByBusinessUnit = async (req, res) => {
 exports.getParticularBranchByBusinessUnit = async (req, res) => {
     try {
         const { clientId, branchId } = req.params; // Extract clientId and branchId from request params
-
+        console.log(req.params,'saaasasasasasasa')
         // Validate inputs
         if (!clientId || !branchId) {
             return res.status(400).send({

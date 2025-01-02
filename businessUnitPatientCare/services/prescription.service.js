@@ -15,48 +15,81 @@ const getserialNumber = require("../../model/services/getserialNumber");
 
 const create = async (data) => {
     try {
-        const {_id, displayId, branchId, buId, patientId, doctorId, caseSheetId, drugArray, additionalAdvice, clientId  } = data
-        console.log(clientId,{ clientid: clientId, objectId: clientId, collectionName: 'clientId' },'clientIdclientIdclientIdclientIdclientId')
+        const { _id, displayId, branchId, buId, patientId, doctorId, caseSheetId, drugArray, additionalAdvice, clientId } = data
+        console.log(clientId, { clientid: clientId, objectId: clientId, collectionName: 'clientId' }, 'clientIdclientIdclientIdclientIdclientId')
         if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: patientId, collectionName: 'patient' })) return { status: false, message: message.lblPatientNotFound, statusCode: httpStatusCode.Unauthorized }
-       // if (! await validateObjectId({ clientid: clientId, objectId: doctorId, collectionName: 'clientuser' })) return { status: false, message: message.lblDoctorNotFound, statusCode: httpStatusCode.Unauthorized }
+        // if (! await validateObjectId({ clientid: clientId, objectId: doctorId, collectionName: 'clientuser' })) return { status: false, message: message.lblDoctorNotFound, statusCode: httpStatusCode.Unauthorized }
         //if (! await validateObjectId({ clientid: clientId, objectId: caseSheetId, collectionName: 'caseSheet' })) return { status: false, message: message.lblCaseSheetNotFound, statusCode: httpStatusCode.Unauthorized }
-        const db =await  getClientDatabaseConnection(clientId)
+        const db = await getClientDatabaseConnection(clientId)
         const prescription = await db.model('prescription', prescriptionSchema)
-        if(!_id){
-            if(!displayId){
-                data.displayId = await getserialNumber('prescription', clientId, branchId,buId)
+        if (!_id) {
+            if (!displayId) {
+                data.displayId = await getserialNumber('prescription', clientId, branchId, buId)
             }
             const newData = {
                 ...data
             }
             if (!newData.caseSheetId) delete newData.caseSheetId
             const result = await prescription
-            .findOneAndUpdate({displayId:data.displayId},{$set:newData},{upsert:true,returnDocument:'after',new: true,})
-            .populate('branchId')
-            .populate('caseSheetId')
-            .populate('patientId') 
-            .populate('doctorId')
-            .populate('createdBy')
-            
-            if(result){
-                return{status:true,message:message.lblPrescriptionCreatedSuccess,data:result?._doc}
+                .findOneAndUpdate(
+                    { displayId: data.displayId },
+                    { $set: newData },
+                    { upsert: true, returnDocument: 'after', new: true }
+                )
+                .populate('branchId')
+                .populate('patientId')
+                .populate('doctorId') // Assuming doctorId is part of prescription schema
+                .populate('createdBy')
+                .populate({
+                    path: 'caseSheetId', // Populate caseSheetId first
+                    populate: [
+                        {
+                            path: 'cheifComplaints.complaints.compId',
+                            model: 'CheifComplaint',
+                        },
+                        {
+                            path: 'clinicalFindings.findings.findId',
+                            model: 'finding',
+                        },
+                        
+                        {
+                            path: 'services.department.deptId',
+                            model: 'department',
+                        },
+                        {
+                            path: 'services.service.servId',
+                            model: 'services',
+                        },
+                        {
+                            path: 'procedures.service.servId',
+                            model: 'services',
+                        },
+                        {
+                            path: 'procedures.procedure.procedId',
+                            model: 'procedure',
+                        },
+                    ],
+                });
+
+            if (result) {
+                return { status: true, message: message.lblPrescriptionCreatedSuccess, data: result?._doc }
             }
             else {
-                return {status:false,message:'creation failed'}
+                return { status: false, message: 'creation failed' }
             }
         }
         else {
             const newData = {
                 ...data
             }
-            const result = await prescription.findOneAndUpdate({displayId:data.displayId},{$set:newData},{returnDocument:'after',new: true,})
-            return {status:true,message:message.lblPrescriptionUpdatedSuccess,data:result?._doc}
+            const result = await prescription.findOneAndUpdate({ displayId: data.displayId }, { $set: newData }, { returnDocument: 'after', new: true, })
+            return { status: true, message: message.lblPrescriptionUpdatedSuccess, data: result?._doc }
         }
-        
-       
+
+
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error creating prescription: ${error.message}`);
     }
@@ -108,7 +141,7 @@ const list = async (clientId, filters = {}, options = { page: 1, limit: 10 }) =>
 };
 
 
-const readPrescription = async ({clientId,buId,patientId,keyword, filters,branchId, page, perPage}) => {
+const readPrescription = async ({ clientId, buId, patientId, keyword, filters, branchId, page, perPage }) => {
     try {
         console.log(patientId)
         //const { keyWord, page, perPage, clientId, buId, branchId, patientId } = input
@@ -131,25 +164,17 @@ const readPrescription = async ({clientId,buId,patientId,keyword, filters,branch
         const db = await getClientDatabaseConnection(clientId)
         const prescription = await db.model('prescription', prescriptionSchema)
         const casesheet = await db.model('casesheets', caseSheetSchema)
-        
-        const result = await prescription.find({patientId:patientId})//.skip(page * perPage).limit(perPage)
-        .populate({
-            path: 'caseSheetId', // Populate the caseSheetId
-            populate: {
-              path: 'cheifComplaints',
-              populate:{
-                path:'complaints.compId'
-              }
-            },
-          })
-        .populate('doctorId', 'firstName lastName ')
-        .populate('createdBy', 'firstName lastName ') 
-        .populate('branchId');
-        
-        
-                console.log(result)
+
+        const result = await prescription.find({ patientId: patientId })//.skip(page * perPage).limit(perPage)
+            .populate('caseSheetId' , 'displayId')
+            .populate('doctorId', 'firstName lastName ')
+            .populate('createdBy', 'firstName lastName ')
+            .populate('branchId');
+
+
+        console.log(result)
         if (result) {
-            return { status: true,  message: message.lblPrescriptionFoundSucessfully, statusCode: httpStatusCode.OK, data: result }
+            return { status: true, message: message.lblPrescriptionFoundSucessfully, statusCode: httpStatusCode.OK, data: result }
         }
         else {
             return { status: true, message: message.lblprocedureListNotFound, statusCode: httpStatusCode.NoContent, }

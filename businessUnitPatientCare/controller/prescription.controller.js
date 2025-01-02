@@ -108,7 +108,6 @@ exports.pataintPrescriptionList = async (req, res, next) => {
 exports.listPrescription = async (req, res, next) => {
     try {
         const data = await sanitizeBody(req.query)
-        console.log(data,'<<<<<<<<<<<<<<<<<<<<<<<<sasasa>>>>>>>>>>>>>>>>>>>>>>>>')
         const {clientId, keyword,  page,patientId, perPage,branchId,buId} = data
         const filters = {
             deletedAt: null,
