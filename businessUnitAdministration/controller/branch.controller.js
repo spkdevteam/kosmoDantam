@@ -239,6 +239,8 @@ exports.listBranch = async (req, res) => {
                 { incorporationName: { $regex: searchText, $options: "i" } },
                 { emailContact: { $regex: searchText, $options: "i" } },
                 { contactNumber: { $regex: searchText, $options: "i" } },
+                { city: { $regex: searchText, $options: "i" } },
+                { address: { $regex: searchText, $options: "i" } },
             ];
         }
 
