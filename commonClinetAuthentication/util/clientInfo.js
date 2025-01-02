@@ -21,7 +21,7 @@ exports.clientInfo = async (clientId, email) => {
 
         // Check if clinet exists
         if (!client) {
-            throw new CustomError(statusCode.NotFound, message.lblUserNotFound);
+            throw new CustomError(statusCode.NotFound, "User is not registered as Admin ");
         }
         return client
 
