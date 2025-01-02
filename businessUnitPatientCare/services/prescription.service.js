@@ -22,7 +22,7 @@ const create = async (data) => {
         if (! await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: patientId, collectionName: 'patient' })) return { status: false, message: message.lblPatientNotFound, statusCode: httpStatusCode.Unauthorized }
        // if (! await validateObjectId({ clientid: clientId, objectId: doctorId, collectionName: 'clientuser' })) return { status: false, message: message.lblDoctorNotFound, statusCode: httpStatusCode.Unauthorized }
-        if (! await validateObjectId({ clientid: clientId, objectId: caseSheetId, collectionName: 'caseSheet' })) return { status: false, message: message.lblCaseSheetNotFound, statusCode: httpStatusCode.Unauthorized }
+        //if (! await validateObjectId({ clientid: clientId, objectId: caseSheetId, collectionName: 'caseSheet' })) return { status: false, message: message.lblCaseSheetNotFound, statusCode: httpStatusCode.Unauthorized }
         const db =await  getClientDatabaseConnection(clientId)
         const prescription = await db.model('prescription', prescriptionSchema)
         if(!_id){
