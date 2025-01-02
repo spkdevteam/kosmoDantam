@@ -200,7 +200,7 @@ exports.listPatient = async (req, res, next) => {
             });
         }
 
-        
+
         let filters = {
             deletedAt: null,
             ...(keyword && {
@@ -222,10 +222,10 @@ exports.listPatient = async (req, res, next) => {
             }),
         };
 
-        if(isAdmin == "false" && branchId ){
+        if (isAdmin == "false" && branchId) {
             filters = {
                 ...filters,
-                branch : branchId
+                branch: branchId
             }
         }
 
@@ -242,7 +242,7 @@ exports.listPatient = async (req, res, next) => {
 // get patient by name, email, and phone
 exports.getPatientByNameEmailAndPhone = async (req, res, next) => {
     try {
-        const { clientId, keyword = '',  isAdmin = true, branchId } = req.query;
+        const { clientId, keyword = '', isAdmin = true, branchId } = req.query;
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
@@ -269,10 +269,10 @@ exports.getPatientByNameEmailAndPhone = async (req, res, next) => {
             }),
         };
 
-        if(isAdmin == "false" && branchId ){
+        if (isAdmin == "false" && branchId) {
             filters = {
                 ...filters,
-                branch : branchId
+                branch: branchId
             }
         }
 
@@ -289,7 +289,8 @@ exports.getPatientByNameEmailAndPhone = async (req, res, next) => {
 
 exports.searchPatients = async (req, res, next) => {
     try {
-        const { clientId, name = '',contactNumber='',email='', page = 1, perPage = 10, } = req.query;
+        console.log(req.query, 'request query ')
+        const { clientId, name = '', contactNumber = '', email = '', page = 1, perPage = 10, branchId } = req.query;
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
@@ -297,14 +298,14 @@ exports.searchPatients = async (req, res, next) => {
         }
         const filters = {
             deletedAt: null,
-            ...({
-                $and: [
-                    //{ firstName: { $regex: name.trim(), $options: "i" } },
-                    { firstName: { $regex: name.trim(), $options: "i" } },
-                    { email: { $regex: email.trim(), $options: "i" } },
-                    { phone: { $regex: contactNumber.trim(), $options: "i" } },
-                ],
-            }),
+            ...(branchId?.trim() && mongoose.Types.ObjectId.isValid(branchId.trim())
+                ? { branch: new mongoose.Types.ObjectId(branchId.trim()) }
+                : {}),
+            $and: [
+                ...(name?.trim() ? [{ firstName: { $regex: name.trim(), $options: "i" } }] : []),
+                ...(email?.trim() ? [{ email: { $regex: email.trim(), $options: "i" } }] : []),
+                ...(contactNumber?.trim() ? [{ phone: { $regex: contactNumber.trim(), $options: "i" } }] : []),
+            ],
         };
         const result = await patientService.list(clientId, filters, { page, limit: perPage });
         return res.status(statusCode.OK).send({
@@ -357,7 +358,7 @@ exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
 
 exports.softDeletePatient = async (req, res) => {
     try {
-        const { keyword, page, perPage, patientId, clientId , isAdmin = true, branchId} = req.body;
+        const { keyword, page, perPage, patientId, clientId, isAdmin = true, branchId } = req.body;
         req.query.keyword = keyword;
         req.query.page = page;
         req.query.perPage = perPage;
@@ -365,7 +366,7 @@ exports.softDeletePatient = async (req, res) => {
         req.query.isAdmin = String(isAdmin);
         req.query.branchId = branchId;
 
-        
+
         if (!clientId || !patientId) {
             return res.status(400).send({
                 message: message.lblPatientIdIdAndClientIdRequired,
@@ -417,6 +418,7 @@ exports.getPatientRoleId = async (req, res, next) => {
 
 const CustomError = require("../../utils/customeError");
 const getserialNumber = require("../../model/services/getserialNumber");
+const { default: mongoose } = require("mongoose");
 
 
 const commonIdCheck = async (data) => {
@@ -446,19 +448,19 @@ const commonIdCheck = async (data) => {
     }
 }
 
-exports.createMinimalPatient =async (req, res, next) => {
+exports.createMinimalPatient = async (req, res, next) => {
     try {
-        const { clientId, branchId, roleId, businessUnit,email, firstName, lastName,  phone, gender, age, bloodGroup, patientGroup, referedBy } = req.body;
+        const { clientId, branchId, roleId, businessUnit, email, firstName, lastName, phone, gender, age, bloodGroup, patientGroup, referedBy } = req.body;
         const mainUser = req.user;
         await commonIdCheck({ clientId, branchId, businessUnit });
-        if (!firstName || !phone || !roleId ) {
+        if (!firstName || !phone || !roleId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Role = clientConnection.model('clientRoles', clientRoleSchema);
-        const role = await Role.findOne({ id: 17});
+        const role = await Role.findOne({ id: 17 });
         if (!role) {
             throw new CustomError(statusCode.Conflict, message.lblRoleNotFound);
         }
@@ -476,39 +478,39 @@ exports.createMinimalPatient =async (req, res, next) => {
             businessUnit: businessUnit,
             tc: true,
             isUserVerified: true,
-           
+
         }
-// ------------------------------
-    const User = clientConnection.model('clientUsers', clinetUserSchema);
-    const existing = await User.findOne({
-        $or: [  { phone: phone },{email:email} ],
-    });
-    //console.log(existing,'existingexistingexistingexisting')
-    let newPatient=null;
-    // if(!existing){
-    //     newPatient=  await User.create(profileUpdates);
-    // }
-   // else {
+        // ------------------------------
+        const User = clientConnection.model('clientUsers', clinetUserSchema);
+        const existing = await User.findOne({
+            $or: [{ phone: phone }, { email: email }],
+        });
+        //console.log(existing,'existingexistingexistingexisting')
+        let newPatient = null;
+        // if(!existing){
+        //     newPatient=  await User.create(profileUpdates);
+        // }
+        // else {
         //newPatient= existing
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         let profileUpdates2 = {
             displayId: displayId,
             firstName,
             lastName,
-            phone,email,
+            phone, email,
             gender, age, bloodGroup, patientGroup, referedBy,
             branch: branchId,
-           // mainPatientLinkedid: newPatient?._id,
+            // mainPatientLinkedid: newPatient?._id,
             businessUnit: businessUnit,
-            
+
         }
         const newPatientInstance = await Patient.create({ ...profileUpdates2 })
         return res.status(statusCode.OK).send({
             message: message.lblPatientCreatedSuccess,
-            status:true,
-             data: { patientId: newPatientInstance._id },
+            status: true,
+            data: { patientId: newPatientInstance._id },
         });
-   // }  
+        // }  
     } catch (error) {
         next(error)
     }
