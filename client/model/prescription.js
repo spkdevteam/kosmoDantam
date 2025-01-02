@@ -12,7 +12,7 @@ const prescriptionSchema = new Schema(
         buId: { type: mongoose.Schema.ObjectId, ref: "businessUnit", default: null, index: true },
         patientId: { type: mongoose.Schema.ObjectId, ref: 'patient', required: true },
         doctorId: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', required: true },
-        caseSheetId: { type: mongoose.Schema.ObjectId, ref: 'casesheets', required: true },
+        caseSheetId: { type: mongoose.Schema.ObjectId, ref: 'casesheets'},
         drugArray: {
             type: [
                 {

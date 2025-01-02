@@ -32,6 +32,7 @@ const create = async (data) => {
             const newData = {
                 ...data
             }
+            if (!newData.caseSheetId) delete newData.caseSheetId
             const result = await prescription
             .findOneAndUpdate({displayId:data.displayId},{$set:newData},{upsert:true,returnDocument:'after',new: true,})
             .populate('branchId')
