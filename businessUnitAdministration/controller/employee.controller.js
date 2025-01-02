@@ -64,13 +64,12 @@ exports.createEmployee = async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const displayId = await getserialNumber('employee', clientId, '', businessUnit);
         console.log("displayId",displayId);
-        
-        // create new employee with service
-        const newEmployee = await employeeService.createEmployee(clientId, {
+
+        let dataObject = {
             displayId : displayId,
             firstName,
             lastName,
-            email,gender, city, state, country, ZipCode, address, panNumber, adharNumber : aadharNumber, emergencyPhone, bloodGroup,
+            email, city , state, country, ZipCode, address, panNumber, adharNumber : aadharNumber, bloodGroup,
             phone,   password: hashedPassword,
             branch: branchId,
             role: roleId,
@@ -80,7 +79,25 @@ exports.createEmployee = async (req, res, next) => {
             isUserVerified: true,
             createdBy: mainUser._id,
 
-        });
+        }
+
+        if(emergencyPhone){
+            dataObject = {
+                ...dataObject,
+                emergencyPhone : emergencyPhone
+            }
+        }
+
+        if(gender){
+            dataObject = {
+                ...dataObject,
+                gender : gender
+            }
+        }
+        
+        
+        // create new employee with service
+        const newEmployee = await employeeService.createEmployee(clientId, {...dataObject});
         // create employee in main database 
         const masterRole = await RoleModel.findOne({ id: 5 });
         const existingStaff = await MasterUser.findOne({

@@ -7,6 +7,7 @@ const statusCode = require("../../utils/http-status-code");
 
 const CustomError = require("../../utils/customeError");
 const clientRoleSchema = require("../model/role");
+const clinetBranchSchema = require("../model/branch");
 
 
 const createEmployee = async (clientId, employeedata) => {
@@ -92,6 +93,7 @@ const listEmployee = async (clientId, filters = {}, options = { page: 1, limit: 
         const clientConnection = await getClientDatabaseConnection(clientId);
         const User = clientConnection.model('clientUsers', clinetUserSchema);
         const Role = clientConnection.model('clientRoles', clientRoleSchema);
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
 
 
         const { page, limit } = options;
@@ -102,6 +104,10 @@ const listEmployee = async (clientId, filters = {}, options = { page: 1, limit: 
                 path: 'role',
                 model: Role,
                 select: 'id name _id'
+            }).populate({
+                path: 'branch',
+                model: Branch,
+                select: 'name _id'
             }),
             User.countDocuments(filters),
         ]);
