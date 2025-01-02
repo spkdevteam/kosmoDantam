@@ -23,7 +23,7 @@ const appointmentSchema = new mongoose.Schema({
     }, 
     isActive: { type: Boolean, default: true }, 
     deletedAt: { type: Date, default: null }, 
-    createdUser: { type: String, required: true }
+    // createdUser: { type: String, required: true }
 }, { timestamps: true }); // Automatically adds createdAt and updatedAt timestamps
 
 
