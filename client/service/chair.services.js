@@ -16,7 +16,7 @@ const createChair = async (clientId, chairData) => {
 
         const existingChair = await Chair.findOne({
             $or: [{ chairNumber: chairData.chairNumber },
-            { chairLocation: chairData?.chairLocation }
+            // { chairLocation: chairData?.chairLocation }
             ],
         });
 
@@ -45,7 +45,7 @@ const updateChair = async (clientId, chairId, updateData) => {
                 { _id: { $ne: chairId } },
                 {
                     $or: [
-                        { chairLocation: updateData?.chairLocation },
+                        // { chairLocation: updateData?.chairLocation },
                         { chairNumber: updateData?.chairNumber },
                     ],
                 },
