@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const procedureSchema = new mongoose.Schema({
   deptId: {type: mongoose.Schema.ObjectId,ref:'department',  required: true  },
-  services: {type: [String] },
+  services: {type: [{type: mongoose.Schema.ObjectId,ref:'services',  required: true  }] },
   procedureName: {type: String,  required: true  },
   displayId: {type: String,  default: null  },
   buId:{ type: mongoose.Schema.ObjectId, ref: "businessUnit", default:null, index: true  },
