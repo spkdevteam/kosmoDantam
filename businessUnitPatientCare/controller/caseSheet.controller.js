@@ -860,6 +860,21 @@ exports.getParticularCaseSheet = async (req, res, next) => {
     }
 };
 
+// get particular case sheet
+exports.getParticularCaseSheetbyPatient = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId } = req.params;
+        if (!clientId || !caseSheetId) {
+            return res.status(400).send({
+                message: message.lblCaseSheetIdIdAndClientIdRequired,
+            });
+        }
+        const caseSheet = await caseSheetService.getByPatientId(clientId, caseSheetId);
+        return res.status(200).send(caseSheet);
+    } catch (error) {
+        next(error)
+    }
+};
 
 exports.deleteCaseSheet = async (req, res, next) => {
     try {

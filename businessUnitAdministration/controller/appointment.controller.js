@@ -4,6 +4,9 @@ const  appointmentServices = require("../services/appoinment.service")
 const { getchairList } = require("../services/chairs.service")
 const { listEmployeeByRole } = require("../services/clientUser.service")
 const { createToken } = require("../services/token.service")
+const httpStatusCode = require("../../utils/http-status-code")
+const message = require("../../utils/message")
+const { validateObjectId } = require("../services/validate.serialNumber")
 
 exports.postcreateBooking = async (req, res, next) => {
     try {
@@ -42,7 +45,9 @@ exports.getAvailability = async (req, res, next) => {
     try {
         const data = await sanitizeBody(req.query)
         console.log(data,'ata backend ')
+         if (! await validateObjectId({ clientid: data?.clientId, objectId: data?.branchId, collectionName: 'branch' })) res.json( { status: false, message: message.lblTryWithValidBranch, statusCode: httpStatusCode.Unauthorized })
         //taking the full list of chairs ,assistant,chairliist from client db 
+        else {
         const doctorsList = await listEmployeeByRole({ roleId:3, clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[]
         const assistantList   =   await listEmployeeByRole({ roleId:4, clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[]
         const chairList = await getchairList({roleId:3, clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[]
@@ -83,7 +88,8 @@ exports.getAvailability = async (req, res, next) => {
         const specialistAvailable =  specialist?.filter((doc)=> !bookedSpecialist?.has( doc._id.toString()) && !absentees.has( doc._id.toString()))||[]
       
         res.status(200).json({message:'available slots fetched ',data:{doctorsAvailable,chairAvailable,assistantAvailable,specialistAvailable},status:true})
-       // res.json(data)
+       // res.json(data) 
+    }
     } catch (error) {
         next(error)
     }

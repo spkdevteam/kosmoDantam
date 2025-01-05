@@ -88,6 +88,8 @@ module.exports = {
   lblBranchUpdatedSuccess: "Business unit updated successfully!",
   lblBranchIdAndClientIdRequired: " Brach Id and Client Id are required!",
   lblBranchIRequired: " Brach Id is required!",
+  lblTryWithValidBranch: " please verify the selected branch is valid" ,
+
   lblBranchNotFound: "Branch not found!",
   lblBranchFoundSucessfully: "Branch found successfully!",
   lblBranchIdInvalid:"invalid Branch Id",

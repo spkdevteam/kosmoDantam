@@ -8,10 +8,10 @@ const appointmentSchema = new mongoose.Schema({
     caseSheetId: { type: mongoose.Schema.ObjectId, ref: 'caseSheet', required: true,index:true },
     token: { type: String, default: null  }, 
     date: { type: Date, required: true }, 
-    caseId: { type: mongoose.Schema.ObjectId, ref: 'medicalcase', index:true },
+    caseId: { type: mongoose.Schema.ObjectId, ref: 'caseSheet', index:true },
     dutyDoctorId: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', required: true,index:true },
     specialistDoctorId: { type: mongoose.Schema.ObjectId, ref: 'clientUsers',index:true },
-    dentalAssistant: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', required: true,index:true }, 
+    dentalAssistant: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', index:true }, 
     slotFrom: { type: Date  }, 
     slotTo: { type: Date }, 
     chairId: { type: mongoose.Schema.ObjectId, ref: 'chair', required: true,index:true },  
@@ -21,6 +21,7 @@ const appointmentSchema = new mongoose.Schema({
         
         default: 'Scheduled' 
     }, 
+    chiefComplaint:{type:String},
     isActive: { type: Boolean, default: true }, 
     deletedAt: { type: Date, default: null }, 
     // createdUser: { type: String, required: true }
