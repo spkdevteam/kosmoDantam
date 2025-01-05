@@ -21,7 +21,7 @@ exports.creatAppointment = async (input) => {
         if (!input?.branchId) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (!input?.buId) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
         if (!input?.dutyDoctorId) return { status: false, message: 'doctor detail is missing ', statusCode: httpStatusCode.Unauthorized }
-        if (!input?.dentalAssistant) return { status: false, message: 'dental assistant is missing  ', statusCode: httpStatusCode.Unauthorized }
+       // if (!input?.dentalAssistant) return { status: false, message: 'dental assistant is missing  ', statusCode: httpStatusCode.Unauthorized }
         if (!input?.chairId) return { status: false, message: 'chair details is missing ', statusCode: httpStatusCode.Unauthorized }
         if (!input?.patientId) return { status: false, message: 'patient id is missing ', statusCode: httpStatusCode.Unauthorized }
 
@@ -30,7 +30,7 @@ exports.creatAppointment = async (input) => {
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.dutyDoctorId, collectionName: 'clientuser' })) return { status: false, message: 'doctor detail is invalid ', statusCode: httpStatusCode.Unauthorized }
-        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.dentalAssistant, collectionName: 'clientuser' })) return { status: false, message: 'dental assistant is invalid  ', statusCode: httpStatusCode.Unauthorized }
+      //  if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.dentalAssistant, collectionName: 'clientuser' })) return { status: false, message: 'dental assistant is invalid  ', statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.chairId, collectionName: 'chair' })) return { status: false, message: 'chair details is inValid ', statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.patientId, collectionName: 'patient' })) return { status: false, message: 'patient id is not valid ', statusCode: httpStatusCode.Unauthorized }
         
@@ -39,7 +39,7 @@ exports.creatAppointment = async (input) => {
         if (!input?.displayId) {
             input.displayId = await getserialNumber('appointment', input?.clientId, input?.branchId, input?.buId)
         }
-        console.log(input,input.displayId ,'---------------VVVVVVVVVVVVVVV<<<<<<<<<<<<<')
+        
         const newData = {
             displayId: input?.displayId,
             branchId: input?.branchId,
@@ -49,6 +49,7 @@ exports.creatAppointment = async (input) => {
             caseId: input?.caseId || null,
             dutyDoctorId: input?.dutyDoctorId,
             dentalAssistant: input?.dentalAssistant,
+            chiefComplaint:input?.chiefComplaint,
             slotFrom: input?.slotFrom,
             slotTo: input?.slotTo,
             chairId: input?.chairId,
