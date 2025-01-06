@@ -215,10 +215,14 @@ exports.updateEmployee = async (req, res, next) => {
             businessUnit: businessUnit,
         }
 
+        let newPassword = "";
+
         if (password) {
+
+            newPassword = await bcrypt.hash(password, 10)
             dataObject = {
                 ...dataObject,
-                password: await bcrypt.hash(password, 10)
+                password: newPassword
             }
         }
 
@@ -230,6 +234,7 @@ exports.updateEmployee = async (req, res, next) => {
 
         existingStaff.email = email;
         existingStaff.phone = phone;
+        existingStaff.password = newPassword;
 
         await existingStaff.save();
 
