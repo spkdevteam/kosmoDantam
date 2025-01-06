@@ -143,6 +143,7 @@ router.get('/getCaseSheet/:clientId/:caseSheetId',entityAuth.authorizeEntity("Pa
 router.get('/getAllDraftedCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllDrafted);
 router.get('/getAllCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllCaseSheet);
 router.delete('/deleteCaseSheet/:clientId/:caseSheetId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.deleteCaseSheet);
+router.get('/getCaseDetail/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getCaseDetail)
 
 // ------- case sheet details routes ends here ------
 
