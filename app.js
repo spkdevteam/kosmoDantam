@@ -144,6 +144,7 @@ const roles = [
     { id: 2, name: 'superAdminEmployee' },
     { id: 3, name: 'partner' },
     { id: 4, name: 'businessUnit' },
+    { id: 5, name: "clientStaff" }
 ];
 
 async function insertRole() {
