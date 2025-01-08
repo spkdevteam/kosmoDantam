@@ -46,7 +46,7 @@ exports.creatAppointment = async (input) => {
             buId: input?.buId,
             token: input?.token || null,
             date: input?.date ? new Date(input.date.includes('T') ? input.date.split('T')[0] + 'T00:00:00.000Z' : input.date + 'T00:00:00.000Z') : null,
-            caseId: input?.caseId || null,
+            caseSheetId: input?.caseId || null,
             dutyDoctorId: input?.dutyDoctorId,
             dentalAssistant: input?.dentalAssistant,
             chiefComplaint:input?.chiefComplaint,

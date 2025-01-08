@@ -878,6 +878,24 @@ exports.getCaseDetail = async (req, res, next) => {
     }
 };
 
+exports.getCaseDetail = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId } = req.params;
+        if (!clientId || !caseSheetId) {
+            return res.status(400).send({
+                message: message.lblCaseSheetIdIdAndClientIdRequired,
+            });
+        }
+        const caseSheet = await caseSheetService.getCaseDetail(clientId, caseSheetId);
+        return res.status(200).send({
+            message: message.lblCaseSheetFoundSucessfully,
+            data: caseSheet,
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
 // get particular case sheet
 exports.getParticularCaseSheetbyPatient = async (req, res, next) => {
     try {
@@ -1039,7 +1057,22 @@ exports.updatePatientMedicalHistory = async (req, res, next) => {
 };
 
 
-
+// get all case sheet of particular patient
+exports.getCaseSheetOverViewByPatient = async (req, res, next) => {
+    try {
+        
+        const { clientId, patientId } = req.params;
+        if (!clientId || !patientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const result = await caseSheetService.caseSheetOverView({clientId, patientId});
+        return res.status(statusCode.OK).send(result);
+    } catch (error) {
+        next(error);
+    }
+};
 
 
 

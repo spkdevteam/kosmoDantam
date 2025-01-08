@@ -20,6 +20,8 @@ const medicalSchema = require("../../client/model/medical");
 const procedureSchema = require("../../client/model/procedure");
 const clinetBranchSchema = require("../../client/model/branch");
 const appointmentSchema = require('../../client/model/appointments');
+const { validateObjectId } = require('../../businessUnitAdministration/services/validate.serialNumber');
+const clinetChairSchema = require('../../client/model/chair');
 
 const checkOngoing = async (clientId, patientId) => {
     try {
@@ -1564,6 +1566,97 @@ const getByPatientId = async ({clientId,patientId})=>{
     }
 }
 
+const caseSheetOverView = async ({ clientId, patientId }) => {
+    try {
+    const db = await getClientDatabaseConnection(clientId)
+    const appointment = await db.model('appointment', appointmentSchema)
+    const CaseSheet = db.model('caseSheet', caseSheetSchema);  
+    const chair = db.model('chair', clinetChairSchema);
+    const User =await db.model('clientUsers', clinetUserSchema);
+    const patientregister = db.model('patient', clinetPatientSchema);
+    const result = await CaseSheet.findOne({
+        patientId: new mongoose.Types.ObjectId(patientId),
+        status: 'In Progress',
+        isActive: true,
+        deletedAt: null,
+      });
+  
+      console.log(result, 'CaseSheet Result');
+  
+      const latestAppointment = await appointment.find({
+        patientId: new mongoose.Types.ObjectId(patientId),
+        isActive: true,
+        deletedAt: null,
+        caseSheetId: result?._id,
+      })
+         .populate('dutyDoctorId','firstName lastName phone')
+         .populate('dentalAssistant', 'firstName lastName phone')
+         .populate('chairId')
+         .populate('patientId', 'firstName lastName displayId')
+         .populate('caseSheetId')
+        .sort({ createdAt: -1 })
+        .exec();
+  
+      console.log(latestAppointment, 'Appointments with Populated Data');
+  
+      return {
+        status: true,
+        message: message.lblCaseOverViewListed,
+        data: latestAppointment,
+      };
+    } catch (error) {
+      console.error(error);
+      return { status: false, message: 'Error fetching case sheet overview.' };
+    }
+  };
+
+
+  
+// // const caseSheetOverView = async ({ clientId, branchId, buId, patientId})=>{
+//     try {
+//         console.log({ patientId:patientId, buId: buId, branchId: branchId, clientId: clientId },'zaadddddddddddddddsaasazaz')
+        //  if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+//         // if (! await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
+//         // if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
+//         if (! await validateObjectId({ clientid: clientId, objectId: patientId, collectionName: 'patient' })) return { status: false, message: message.lblPatientNotFound, statusCode: httpStatusCode.Unauthorized }
+//         const db = await getClientDatabaseConnection(clientId)
+        // const appointment = await db.model('appointment', appointmentSchema)
+//         const CaseSheet = db.model('caseSheet', caseSheetSchema);
+        
+//         const result = await appointment?.find({
+//             patientId: patientId,
+//          //   branchId: branchId,
+//              isActive: true,
+//              deletedAt: null,
+              
+//         }).populate({
+//             path: 'caseSheetId',
+//             model: CaseSheet,
+//             select: 'createdAt'
+//         })
+        
+//         .populate('dutyDoctorId', 'firstName lastName phone ')
+//         .populate('dentalAssistant','firstName lastName phone ')
+//         .populate('chairId' , 'chairNumber chairLocation ')
+//         .populate('patientId', 'firstName lastName displayId ')
+        
+        
+//         if (result) {
+//             console.log(result,'result')     
+//             return { status: true, message: 'status Updated', statusCode: httpStatusCode.OK, data: result }
+//         }
+//         else {
+//             return { status: false, message: 'no appointment found on this id ', statusCode: 501, }
+//         }
+
+
+//     } catch (error) {
+//         return { status: false, message: error.message, statusCode: 501, }
+//     }
+// }
+
+  
+
 
 
 
@@ -1633,6 +1726,7 @@ module.exports = {
     getByPatientId,
 
 
-    getCaseDetail
+    getCaseDetail,
+    caseSheetOverView
 
 };
