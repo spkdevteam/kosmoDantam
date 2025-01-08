@@ -451,7 +451,7 @@ const commonIdCheck = async (data) => {
             throw new CustomError(statusCode.BadRequest, message.lblClinetIdIsRequired);
         }
         if (!data.branchId) {
-            throw new CustomError(statusCode.BadRequest, message.lblBranchIRequired);
+            throw new CustomError(statusCode.BadRequest, message.lblTryWithValidBranch);
         }
         if (!data.businessUnit) {
             throw new CustomError(statusCode.BadRequest, message.lblBusinessUnitIdIsRequired);

@@ -904,6 +904,12 @@ const listDrafted = async (clientId, filters = {}) => {
     }
 };
 
+
+
+
+
+
+
 const getById = async (clientId, caseSheetId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
@@ -1543,6 +1549,34 @@ const updatePatientMedicalHistory = async (clientId, patientId, medicalHistoryDa
     }
 };
 
+const getByPatientId = async ({clientId,patientId})=>{
+    try {
+        const db = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const result  = await CaseSheet.findOne({patientId:patientId});
+        if (!result) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+         
+        return  {status:true,message:'success ',data:result}
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module.exports = {
 
     checkOngoing,
@@ -1596,6 +1630,7 @@ module.exports = {
 
     getPatientMedicalHistory,
     updatePatientMedicalHistory,
+    getByPatientId,
 
 
     getCaseDetail
