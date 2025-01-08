@@ -18,7 +18,6 @@ const appointmentSchema = new mongoose.Schema({
     patientId: { type: mongoose.Schema.ObjectId, ref: 'patient', required: true,index:true },
     status: { 
         type: String, 
-        
         default: 'Scheduled' 
     }, 
     chiefComplaint:{type:String},

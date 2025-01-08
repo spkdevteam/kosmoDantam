@@ -1057,7 +1057,22 @@ exports.updatePatientMedicalHistory = async (req, res, next) => {
 };
 
 
-
+// get all case sheet of particular patient
+exports.getCaseSheetOverViewByPatient = async (req, res, next) => {
+    try {
+        
+        const { clientId, patientId } = req.params;
+        if (!clientId || !patientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const result = await caseSheetService.caseSheetOverView({clientId, patientId});
+        return res.status(statusCode.OK).send(result);
+    } catch (error) {
+        next(error);
+    }
+};
 
 
 

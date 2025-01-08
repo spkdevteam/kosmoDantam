@@ -300,6 +300,7 @@ module.exports = {
   lblCaseSheetNotFound: "CaseSheet not found!",
   lblCaseSheetFoundSucessfully: "CaseSheet found successfully!",
   lblCaseSheetIdIdRequired: "CaseSheet Id is required!",
+  lblCaseOverViewListed :'Case sheet overview received ',
 
 
 
