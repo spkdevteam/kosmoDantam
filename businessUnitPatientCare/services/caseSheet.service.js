@@ -1576,13 +1576,10 @@ const caseSheetOverView = async ({ clientId, patientId }) => {
     const patientregister = db.model('patient', clinetPatientSchema);
     const result = await CaseSheet.findOne({
         patientId: new mongoose.Types.ObjectId(patientId),
-        status: 'In Progress',
+        status:{$in:[ 'In Progress','Proposed']},
         isActive: true,
         deletedAt: null,
       });
-  
-      console.log(result, 'CaseSheet Result');
-  
       const latestAppointment = await appointment.find({
         patientId: new mongoose.Types.ObjectId(patientId),
         isActive: true,
