@@ -19,7 +19,7 @@ const clinetPatientSchema = require("../../client/model/patient");
 const create = async (data) => {
     try {
         const { _id, displayId, branchId, buId, patientId, doctorId, caseSheetId, drugArray, additionalAdvice, clientId } = data
-        console.log(clientId, { clientid: clientId, objectId: clientId, collectionName: 'clientId' }, 'clientIdclientIdclientIdclientIdclientId')
+        console.log( data, 'clientIdclientIdclientIdclientIdclientId')
         if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }

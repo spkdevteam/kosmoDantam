@@ -32,7 +32,7 @@ const prescriptionSchema = new Schema(
       deletedAt: { type: Date, default: null, index: true },
       createdAt: { type: Date, default: null, index: true },
       nextVisitDate: { type: Date, default: null, index: true },
-      nextVisitDescription: { type: String, default: null }, // Fixed spelling
+      nextVisitDiscription: { type: String, default: null }, // Fixed spelling
     },
     { timestamps: true }
   );
