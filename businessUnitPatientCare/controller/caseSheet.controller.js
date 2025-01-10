@@ -1012,6 +1012,62 @@ exports.updateTreatment = async (req, res, next) => {
     }
 };
 
+// update treatment and close case sheet
+exports.updateTreatmentAndCloseCaseSheet = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId, treatmentData, } = req.body;
+        const mainUser = req.user;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        if (!caseSheetId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblCaseSheetIdIdRequired,
+            });
+        }
+        if (!treatmentData) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const updated = await caseSheetService.updateTreatmentAndCloseCase(clientId, caseSheetId, treatmentData);
+        return res.status(statusCode.OK).send({
+            message: message.lblProcedureUpdatedSuccess,
+            data: { caseSheets: updated },
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+
+// close case sheet
+exports.closeCaseSheet = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId, } = req.body;
+        const mainUser = req.user;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        if (!caseSheetId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblCaseSheetIdIdRequired,
+            });
+        }
+        const updated = await caseSheetService.closeCase(clientId, caseSheetId);
+        return res.status(statusCode.OK).send({
+            message: message.lblProcedureUpdatedSuccess,
+            data: { caseSheets: updated },
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
 
 
 // get patient medical history

@@ -151,6 +151,8 @@ router.get('/getCaseDetail/:clientId/:caseSheetId',entityAuth.authorizeEntity("P
 
 router.get('/getTreatmentPlan/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getTreatmentPlan);
 router.put('/updateTreatment',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatment);
+router.put('/updateTreatmentAndCloseCaseSheet',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatmentAndCloseCaseSheet);
+router.put('/closeCaseSheet',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.closeCaseSheet);
 router.put('/updateTreatmentProcedure',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatmentProcedure);
 router.get('/getActiveCaseSheetOverView/:clientId/:patientId', caseSheetController.getCaseSheetOverViewByPatient);
 

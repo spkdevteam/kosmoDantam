@@ -1133,6 +1133,106 @@ const updateTreatment = async (clientId, caseSheetId, treatmentData) => {
     }
 };
 
+const updateTreatmentAndCloseCase = async (clientId, caseSheetId, treatmentData) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const Medical = clientConnection.model('medical', medicalSchema);
+        const Department = clientConnection.model('department', departmentSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
+        const existing = await CaseSheet.findById(caseSheetId).populate({
+            path: 'cheifComplaints.complaints.compId',
+            model: Complaint,
+            select: 'complaintName _id'
+        }).populate({
+            path: 'clinicalFindings.findings.findId',
+            model: Finding,
+            select: 'findingsName _id'
+        }).populate({
+            path: 'medicalHistory.medicals.medId',
+            model: Medical,
+            select: 'caseName _id'
+        }).populate({
+            path: 'services.department.deptId',
+            model: Department,
+            select: 'deptName _id'
+        }).populate({
+            path: 'services.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        }).populate({
+            path: 'procedures.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'procedures.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        });
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        existing.treatmentData2 = treatmentData;
+        existing.status = "Completed";
+        return await existing.save();
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error in updating treatment procedure: ${error.message}`);
+    }
+};
+
+const closeCase = async (clientId, caseSheetId) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const Medical = clientConnection.model('medical', medicalSchema);
+        const Department = clientConnection.model('department', departmentSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
+        const existing = await CaseSheet.findById(caseSheetId).populate({
+            path: 'cheifComplaints.complaints.compId',
+            model: Complaint,
+            select: 'complaintName _id'
+        }).populate({
+            path: 'clinicalFindings.findings.findId',
+            model: Finding,
+            select: 'findingsName _id'
+        }).populate({
+            path: 'medicalHistory.medicals.medId',
+            model: Medical,
+            select: 'caseName _id'
+        }).populate({
+            path: 'services.department.deptId',
+            model: Department,
+            select: 'deptName _id'
+        }).populate({
+            path: 'services.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        }).populate({
+            path: 'procedures.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'procedures.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        });
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        existing.status = "Completed";
+        return await existing.save();
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error in updating treatment procedure: ${error.message}`);
+    }
+};
+
+
 
 
 const markedCompleted = async (clientId, caseSheetId) => {
@@ -1714,6 +1814,8 @@ module.exports = {
     updateDraft,
     updateCaseSheet,
     updateTreatment,
+    updateTreatmentAndCloseCase,
+    closeCase,
 
     markedCompleted,
 
