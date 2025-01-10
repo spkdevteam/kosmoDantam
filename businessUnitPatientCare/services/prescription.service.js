@@ -11,12 +11,15 @@ const httpStatusCode = require("../../utils/http-status-code");
 const { validateObjectId } = require("../../businessUnitAdministration/services/validate.serialNumber");
 const caseSheetSchema = require("../../client/model/caseSheet");
 const getserialNumber = require("../../model/services/getserialNumber");
+const clinetChairSchema = require("../../client/model/chair");
+const clinetUserSchema = require("../../client/model/user");
+const clinetPatientSchema = require("../../client/model/patient");
 
 
 const create = async (data) => {
     try {
         const { _id, displayId, branchId, buId, patientId, doctorId, caseSheetId, drugArray, additionalAdvice, clientId } = data
-        console.log(clientId, { clientid: clientId, objectId: clientId, collectionName: 'clientId' }, 'clientIdclientIdclientIdclientIdclientId')
+        console.log( data, 'clientIdclientIdclientIdclientIdclientId')
         if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
@@ -25,6 +28,10 @@ const create = async (data) => {
         //if (! await validateObjectId({ clientid: clientId, objectId: caseSheetId, collectionName: 'caseSheet' })) return { status: false, message: message.lblCaseSheetNotFound, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(clientId)
         const prescription = await db.model('prescription', prescriptionSchema)
+        const caseSheet = await db.model('caseSheet', caseSheetSchema)
+        const chair = db.model('chair', clinetChairSchema);
+        const User =await db.model('clientUsers', clinetUserSchema);
+        const patientregister = db.model('patient', clinetPatientSchema);
         if (!_id) {
             if (!displayId) {
                 data.displayId = await getserialNumber('prescription', clientId, branchId, buId)
@@ -32,6 +39,11 @@ const create = async (data) => {
             const newData = {
                 ...data
             }
+            
+            
+
+
+            console.log(newData,'backend Code ')
             if (!newData.caseSheetId) delete newData.caseSheetId
             const result = await prescription
                 .findOneAndUpdate(
@@ -85,7 +97,7 @@ const create = async (data) => {
             const newData = {
                 ...data
             }
-            const result = await prescription.findOneAndUpdate({ displayId: data.displayId }, { $set: newData }, { returnDocument: 'after', new: true, })
+            const result = await prescription.findOneAndUpdate({ _id: data._id }, { $set: newData }, { returnDocument: 'after', new: true, })
             return { status: true, message: message.lblPrescriptionUpdatedSuccess, data: result?._doc }
         }
 
