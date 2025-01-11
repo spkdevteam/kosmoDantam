@@ -63,7 +63,6 @@ const getById = async (clientId, patientId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Patient = clientConnection.model('patient', clinetPatientSchema);
-
         const patient = await Patient.findById(patientId);
         if (!patient) {
             throw new CustomError(statusCode.NotFound, message.lblPatientNotFound);

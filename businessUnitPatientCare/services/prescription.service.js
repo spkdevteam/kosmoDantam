@@ -66,7 +66,6 @@ const create = async (data) => {
                             path: 'clinicalFindings.findings.findId',
                             model: 'finding',
                         },
-                        
                         {
                             path: 'services.department.deptId',
                             model: 'department',
@@ -126,7 +125,11 @@ const getById = async (clientId, prescriptionId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Prescription = clientConnection.model('prescription', prescriptionSchema);
-        const prescription = await Prescription.findById(prescriptionId);
+        const User =await clientConnection.model('clientUsers', clinetUserSchema);
+                
+        const prescription = await Prescription.findById(prescriptionId)
+        .populate('doctorId') 
+         
         if (!prescription) {
             throw new CustomError(statusCode.NotFound, message.lblPrescriptionNotFound);
         }
