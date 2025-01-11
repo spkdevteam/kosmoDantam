@@ -203,7 +203,7 @@ const allDepartmentsByPage = async (input) => {
                         {deptName: { $regex: input?.keyword || '', $options: 'i' }},
                         {description: { $regex: input?.keyword || '', $options: 'i' }}
                     ], 
-                    deletedAt: null, isActive: true,
+                    deletedAt: null, 
                     ...(input?.branchId ? {branchId:input?.branchId}:{})
                 }) 
 

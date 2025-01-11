@@ -17,7 +17,7 @@ const prescriptionSchema = new Schema(
             drugName: { type: String, required: true, index: true },
             drug: { type: String, default: "", index: true },
             dosage: { type: String, index: true },
-            frequency: { type: String, index: true },  
+            freequency: { type: String, index: true },  
             duration: { type: String, index: true },
             instruction: { type: String, default: "" }, 
             note: { type: String, index: true },
