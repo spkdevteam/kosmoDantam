@@ -19,7 +19,7 @@ priscriptionRouter.post('/createPrescription',  prescriptionContrller.createPres
 
 priscriptionRouter.put('/updatePrescription', entityAuth.authorizeEntity("Pataints", "Prescription", "update"), prescriptionContrller.updatePrescription);
 
-priscriptionRouter.get('/prescription/:clientId/:prescriptionId', entityAuth.authorizeEntity("Pataints", "Prescription", "view"), prescriptionContrller.getParticularPrescription);
+priscriptionRouter.get('/prescription/:clientId/:prescriptionId',   prescriptionContrller.getParticularPrescription); //entityAuth.authorizeEntity("Pataints", "Prescription", "view")
 
 priscriptionRouter.get('/pataintPrescription', entityAuth.authorizeEntity("Pataints", "Prescription", "view"), prescriptionContrller.pataintPrescriptionList);
 

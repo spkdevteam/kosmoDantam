@@ -20,6 +20,7 @@ const employeeService = require("../../client/service/employee.service");
 const getserialNumber = require("../../model/services/getserialNumber");
 const CustomError = require("../../utils/customeError");
 const clinetUserSchema = require("../../client/model/user");
+const sanitizeBody = require("../../utils/sanitizeBody");
 
 // create Employee 
 exports.createEmployee = async (req, res, next) => {
@@ -389,7 +390,28 @@ exports.softDeleteEmployee = async (req, res) => {
 
 
 
+exports.listEmployeebyBranchId = async (req, res, next) => {
+    try {
+        const data = await sanitizeBody(req.params)
+        console.log(data,'**********------------------**************')
+        const { clientId, keyword = '', page = 1, perPage = 10, roleId = 4,  isAdmin = true, branchId  } = data;
 
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        const result = await employeeService.listEmployeebyBranchId(data);
+
+        return res.status(statusCode.OK).send({
+            message: message.lblEmployeeFoundSucessfully,
+            data: result,
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
 
 
 

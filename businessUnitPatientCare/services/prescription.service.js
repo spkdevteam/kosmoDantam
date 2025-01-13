@@ -19,7 +19,8 @@ const clinetPatientSchema = require("../../client/model/patient");
 const create = async (data) => {
     try {
         const { _id, displayId, branchId, buId, patientId, doctorId, caseSheetId, drugArray, additionalAdvice, clientId } = data
-        console.log( data, 'clientIdclientIdclientIdclientIdclientId')
+        
+        console.log( data, '{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{clientIdclientIdclientIdclientIdclientId}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}')
         if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
@@ -43,7 +44,7 @@ const create = async (data) => {
             
 
 
-            console.log(newData,'backend Code ')
+             
             if (!newData.caseSheetId) delete newData.caseSheetId
             const result = await prescription
                 .findOneAndUpdate(
@@ -66,7 +67,6 @@ const create = async (data) => {
                             path: 'clinicalFindings.findings.findId',
                             model: 'finding',
                         },
-                        
                         {
                             path: 'services.department.deptId',
                             model: 'department',
@@ -126,7 +126,11 @@ const getById = async (clientId, prescriptionId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Prescription = clientConnection.model('prescription', prescriptionSchema);
-        const prescription = await Prescription.findById(prescriptionId);
+        const User =await clientConnection.model('clientUsers', clinetUserSchema);
+                
+        const prescription = await Prescription.findById(prescriptionId)
+        .populate('doctorId') 
+         
         if (!prescription) {
             throw new CustomError(statusCode.NotFound, message.lblPrescriptionNotFound);
         }
@@ -161,9 +165,9 @@ const readPrescription = async ({ clientId, buId, patientId, keyword, filters, b
             return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized };
         }
 
-        if (!await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) {
-            return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized };
-        }
+        // if (!await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) {
+        //     return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized };
+        // }
 
         if (!await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) {
             return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized };
@@ -176,8 +180,16 @@ const readPrescription = async ({ clientId, buId, patientId, keyword, filters, b
         const db = await getClientDatabaseConnection(clientId)
         const prescription = await db.model('prescription', prescriptionSchema)
         const casesheet = await db.model('casesheets', caseSheetSchema)
-
-        const result = await prescription.find({ patientId: patientId })//.skip(page * perPage).limit(perPage)
+        const filter = {
+            deletedAt:null,
+           
+        }
+        if(patientId) filter.patientId = patientId;
+        if(buId) filter.buId = buId;
+        if(branchId?.length) filter.branchId = branchId
+        
+        console.log(filter,'filter is no look like this ')
+        const result = await prescription.find(filter)//.skip(page * perPage).limit(perPage)
             .populate('caseSheetId' , 'displayId')
             .populate('doctorId', 'firstName lastName ')
             .populate('createdBy', 'firstName lastName ')

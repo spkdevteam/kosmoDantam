@@ -217,6 +217,7 @@ const readActiveServicesbyPage = async (input) => {
         .skip((parseInt( input?.page)-1)* parseInt(input.perPage) )
         .limit(parseInt(input.perPage))
         .populate('branchId')
+        .populate('departmentId')
         const totalCount = await services.find({
             $or:[
                 {serviceName:{$regex:input?.keyword,$options:'i'}},

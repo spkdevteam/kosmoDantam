@@ -124,7 +124,6 @@ app.use("/api/client/bu/caseSheet", clientCaseSheetRouter.router);
 app.use("/api/client/bu/complaint", clientComplaintRouter.router);
 app.use("/api/client/bu/patientFinding", clientPatientFindingRouter.router);
 app.use("/api/client/bu/medical", clientMedicalRouter.router);
-
 app.use("/api/client/bu/department", clientDepartment);
 app.use("/api/client/bu/services", clientservicesRouter);
 app.use("/api/client/bu/procedures", clientProcedureRouter);
