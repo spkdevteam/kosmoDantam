@@ -104,11 +104,8 @@ const listChairs = async (clientId, filters = {}, options = { page: 1, limit: 10
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Chair = clientConnection.model('chair', clinetChairSchema);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
-
-
         const { page, limit } = options;
         const skip = (page - 1) * limit;
-
         const [chairs, total] = await Promise.all([
             Chair.find(filters).skip(skip).limit(limit).sort({ _id: -1 }).populate({
                 path: 'branch',
@@ -117,7 +114,6 @@ const listChairs = async (clientId, filters = {}, options = { page: 1, limit: 10
             }),
             Chair.countDocuments(filters),
         ]);
-
         return { count: total, chairs };
 
     } catch (error) {

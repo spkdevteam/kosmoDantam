@@ -164,9 +164,9 @@ const readPrescription = async ({ clientId, buId, patientId, keyword, filters, b
             return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized };
         }
 
-        if (!await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) {
-            return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized };
-        }
+        // if (!await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) {
+        //     return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized };
+        // }
 
         if (!await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) {
             return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized };
@@ -179,8 +179,16 @@ const readPrescription = async ({ clientId, buId, patientId, keyword, filters, b
         const db = await getClientDatabaseConnection(clientId)
         const prescription = await db.model('prescription', prescriptionSchema)
         const casesheet = await db.model('casesheets', caseSheetSchema)
-
-        const result = await prescription.find({ patientId: patientId })//.skip(page * perPage).limit(perPage)
+        const filter = {
+            deletedAt:null,
+           
+        }
+        if(patientId) filter.patientId = patientId;
+        if(buId) filter.buId = buId;
+        if(branchId?.length) filter.branchId = branchId
+        
+        console.log(filter,'filter is no look like this ')
+        const result = await prescription.find(filter)//.skip(page * perPage).limit(perPage)
             .populate('caseSheetId' , 'displayId')
             .populate('doctorId', 'firstName lastName ')
             .populate('createdBy', 'firstName lastName ')

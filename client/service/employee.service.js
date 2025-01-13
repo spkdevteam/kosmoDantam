@@ -141,10 +141,43 @@ const activeInactiveEmployee = async (clientId, employeeId, updateData) => {
 };
 
 
+const listEmployeebyBranchId = async (data) => {
+    try {
+
+        const { clientId,role,branchId,options = { page: 1, limit: 10 }} = data
+        const db = await getClientDatabaseConnection(clientId);
+        const User = db.model('clientUsers', clinetUserSchema);
+        const Role = db.model('clientRoles', clientRoleSchema);
+        const Branch = db.model('branch', clinetBranchSchema);
+
+        const { page, limit } = options;
+        const skip = (page - 1) * limit;
+        const filters = {branch:branchId,deletedAt:null,roleId:role}
+        const [employees, total] = await Promise.all([
+            User.find(filters).skip(skip).limit(limit).sort({ _id: -1 }).populate({
+                path: 'role',
+                model: Role,
+                select: 'id name _id'
+            }).populate({
+                path: 'branch',
+                model: Branch,
+                select: 'name _id'
+            }),
+            User.countDocuments(filters),
+        ]);
+
+        return { count: total, employees };
+
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error listing employee: ${error.message}`);
+    }
+};
+
 module.exports = {
     createEmployee,
     updateEmployee,
     getEmployeeById,
     listEmployee,
     activeInactiveEmployee,
+    listEmployeebyBranchId
 };
