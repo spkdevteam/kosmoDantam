@@ -192,6 +192,7 @@ const allDepartmentsByPage = async (input) => {
                 ...(input?.branchId ? {branchId:input?.branchId}:{})
             })
             .populate('branchId','name')
+             
             .skip((input?.page - 1) * input?.perPage)
             .limit(input?.page * input?.perPage)
             .sort({_id:-1});
