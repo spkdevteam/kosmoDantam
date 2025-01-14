@@ -129,7 +129,13 @@ const getById = async (clientId, prescriptionId) => {
         const User =await clientConnection.model('clientUsers', clinetUserSchema);
                 
         const prescription = await Prescription.findById(prescriptionId)
-        .populate('doctorId') 
+        .populate({
+            path:'doctorId',
+            populate:{
+                path:'role',
+                select:'name'
+            }
+        }) 
          
         if (!prescription) {
             throw new CustomError(statusCode.NotFound, message.lblPrescriptionNotFound);

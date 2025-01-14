@@ -29,20 +29,20 @@ const createProcedure = async (input) => {
         if (!input.procedureId) {
             const isExist = await procedures.findOne({ procedureName: input?.procedureName })
             if (isExist) return { status: false, message: message.lblProcedureAlreadyExists, statusCode: httpStatusCode.Conflict }
-            input.procedureId = await getserialNumber('procedure', input?.clientId, input?.branchId, input?.buId)
+            input.displayId = await getserialNumber('procedure', input?.clientId, input?.branchId, input?.buId)
         }
         const newRecord = {
             deptId: input?.deptId,
             services: input?.services || [],
             procedureName: input?.procedureName,
-            displayId: input?.procedureId,
+            displayId: input?.displayId,
             description: input?.description,
             branchId: input?.branchId,
             deletedAt: null,
             isActive: true,
             buId: input?.buId,
         }
-        const result = await procedures.updateOne({ displayId: input?.procedureId }, { $set: newRecord }, { upsert: true })
+        const result = await procedures.updateOne({ displayId: input?.displayId }, { $set: newRecord }, { upsert: true })
         if (result.modifiedCount) return { status: true, message: message.lblProcedureModified, statusCode: 200, ...newRecord }
         else if (result.upsertedCount) return { status: true, message: message.lblProcedureCreated, statusCode: 201, ...newRecord }
         else return { status: false, message: message.lblProcedureNotModified, statusCode: 304 }
