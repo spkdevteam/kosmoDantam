@@ -36,6 +36,12 @@ router.post('/createClinicalFinding', entityAuth.authorizeEntity("Patient", "Cas
 router.put('/updateClinicalFinding', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.updateClinicalFinding);
 router.post('/deleteClinicalFinding', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteClinicalFinding);
 
+// Diagnosis
+router.post('/createDiagnosis', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createDiagnosis);
+router.put('/updateDiagnosis', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.updateDiagnosis);
+router.post('/deleteDiagnosis', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteDiagnosis);
+
+
 // medical history
 router.post('/createMedicalHistory', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createMedicalHistory);
 router.put('/updateMedicalHistory', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.updateMedicalHistory);

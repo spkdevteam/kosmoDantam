@@ -216,6 +216,79 @@ exports.deleteClinicalFinding = async (req, res, next) => {
 };
 
 
+// create diagnosis
+exports.createDiagnosis = async (req, res, next) => {
+    try {
+        const { clientId, patientId, branchId, businessUnitId, diagnosis, } = req.body;
+        const mainUser = req.user;
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
+        if (!diagnosis) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const serialNumber = await getserialNumber('caseSheet', clientId, "", businessUnitId)
+        const newCheifComplaint = await caseSheetService.createDiagnosis(clientId, {
+            patientId, branchId, businessUnitId, createdBy: mainUser?._id, diagnosis, displayId: serialNumber,
+        });
+        return res.status(statusCode.OK).send({
+            message: message.lblDiagnosisCreatedSuccess,
+            data: { diagnosis: newCheifComplaint.diagnosis, _id: newCheifComplaint._id, caseSheets: newCheifComplaint },
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+// update 
+exports.updateDiagnosis = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId, patientId, branchId, businessUnitId, diagnosis, } = req.body;
+        const mainUser = req.user;
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
+        if (!diagnosis) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const newCheifComplaint = await caseSheetService.updateDiagnosis(clientId, caseSheetId, {
+            patientId, branchId, businessUnitId, createdBy: mainUser?._id, diagnosis,
+        });
+        return res.status(statusCode.OK).send({
+            message: message.lblDiagnosisUpdatedSuccess,
+            data: { diagnosis: newCheifComplaint.diagnosis, _id: newCheifComplaint._id }
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+
+// delete
+exports.deleteDiagnosis = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId, diagnosisId } = req.body;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        if (!diagnosisId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblDiagnosisIdRequired,
+            });
+        }
+        const deleted = await caseSheetService.deleteDiagnosis(clientId, caseSheetId, diagnosisId);
+        return res.status(statusCode.OK).send({
+            message: message.lblDiagnosisDeletedSuccess,
+            data: { diagnosis: deleted.diagnosis, _id: deleted._id }
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+
 
 
 

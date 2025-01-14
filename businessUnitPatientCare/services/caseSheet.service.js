@@ -184,6 +184,74 @@ const deleteClinicalFinding = async (clientId, caseSheetId, clinicalFindingId) =
     }
 };
 
+const createDiagnosis = async (clientId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const newCheifComplaint = await CaseSheet.create(data);
+        const populatedCaseSheet = await CaseSheet.findById(newCheifComplaint._id).populate({
+            path: 'diagnosis.findings.findId',
+            model: Finding,
+            select: 'findingsName _id'
+        })
+        return populatedCaseSheet
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
+
+const updateDiagnosis = async (clientId, caseSheetId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const existing = await CaseSheet.findById(caseSheetId);
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        Object.assign(existing, data);
+        await existing.save();
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'diagnosis.findings.findId',
+            model: Finding,
+            select: 'findingsName _id'
+        })
+        return populatedCaseSheet
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
+
+const deleteDiagnosis = async (clientId, caseSheetId, diagnosisId) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const existing = await CaseSheet.findById(caseSheetId);
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        const diagnosisArray = existing?.diagnosis;
+        const mongObjId = new mongoose.Types.ObjectId(diagnosisId);
+        const newArray = diagnosisArray.filter((item) => {
+            return !item._id.equals(mongObjId)
+        });
+        existing.diagnosis = newArray;
+        await existing.save();
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'diagnosis.findings.findId',
+            model: Finding,
+            select: 'findingsName _id'
+        })
+        return populatedCaseSheet
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error deleting diagnosis of case sheet: ${error.message}`);
+    }
+};
+
 
 const createMedicalHistory = async (clientId, data) => {
     try {
@@ -930,6 +998,10 @@ const getById = async (clientId, caseSheetId) => {
             select: 'complaintName _id'
         }).populate({
             path: 'clinicalFindings.findings.findId',
+            model: Finding,
+            select: 'findingsName _id'
+        }).populate({
+            path: 'diagnosis.findings.findId',
             model: Finding,
             select: 'findingsName _id'
         }).populate({
@@ -1778,6 +1850,10 @@ module.exports = {
     createClinicalFinding,
     updateClinicalFinding,
     deleteClinicalFinding,
+
+    createDiagnosis,
+    updateDiagnosis,
+    deleteDiagnosis,
 
     createMedicalHistory,
     updateMedicalHistory,

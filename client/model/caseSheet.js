@@ -46,18 +46,35 @@ const caseSheetSchema = new mongoose.Schema({
         ],
         default: [],
     },
+    diagnosis: {
+        type: [
+            {
+                tooth: {
+                    type: [],
+                    default: [],
+                },
+                findings: {
+                    type: [
+                        {
+                            findId: { type: mongoose.Schema.ObjectId, ref: "patientFinding" }
+                        }
+                    ]
+                }
+            },
+        ],
+        default: [],
+    },
     medicalHistory: {
         type: [
             {
                 medicals: {
                     type: [
                         {
-                            medId: { type: mongoose.Schema.ObjectId, ref: "medicalCase" }
-                        }
+                            medId: { type: mongoose.Schema.ObjectId, ref: "medicalCase" },
+                        },
                     ],
-
-                }
-
+                },
+                reading: {type: String, default : null}
             }
         ],
         default: [],
