@@ -1317,7 +1317,7 @@ const updateTreatmentAndCloseCase = async (clientId, caseSheetId, treatmentData)
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
-        existing.treatmentData2 = treatmentData;
+        existing.treatmentData3 = treatmentData;
         existing.status = "Completed";
         return await existing.save();
     } catch (error) {
