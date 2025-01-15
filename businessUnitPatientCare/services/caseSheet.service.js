@@ -626,10 +626,16 @@ const updateProcedure = async (clientId, caseSheetId, data) => {
             select: 'serviceName _id'
         });
 
-        const existingTreatmentData = populatedCaseSheet.treatmentData2 || [];
-        const result = transformArr2(existingTreatmentData, populatedCaseSheet.procedures);
+        // old code
+        // const existingTreatmentData = populatedCaseSheet.treatmentData2 || [];
+        // const result = transformArr2(existingTreatmentData, populatedCaseSheet.procedures);
 
-        populatedCaseSheet.treatmentData2 = result;
+        // new code
+        const existingTreatmentData = populatedCaseSheet.treatmentData3 || [];
+        const result = transformArr2(existingTreatmentData, populatedCaseSheet.procedures);
+        
+
+        populatedCaseSheet.treatmentData3 = result;
         await populatedCaseSheet.save();
 
 
@@ -713,7 +719,71 @@ const updateProcedure = async (clientId, caseSheetId, data) => {
 // }
 
 
-// 2
+// 2 old
+// function transformArr2(existingData, newProcedures) {
+//     const toothMap = new Map();
+
+//     // Populate the map with existing treatmentData2
+//     existingData.forEach(({ tooth, service, total, completed }) => {
+//         if (!toothMap.has(tooth)) {
+//             toothMap.set(tooth, { tooth: tooth, service: [], total, completed });
+//         }
+//         service.forEach((s) => {
+//             const existingService = toothMap.get(tooth).service.find(
+//                 (sv) => sv.service.serviceName === s.service.serviceName
+//             );
+//             if (existingService) {
+//                 existingService.procedure.push(...s.procedure);
+//             } else {
+//                 toothMap.get(tooth).service.push(s);
+//             }
+//         });
+//     });
+
+//     // Add new data from newProcedures
+//     newProcedures.forEach((item) => {
+//         const { tooth, service, procedure } = {
+//             tooth: item.tooth,
+//             service: {
+//                 serviceName: item.service.servId?.serviceName,
+//             },
+//             procedure: item.procedure?.map((p) => ({
+//                 procedureName: p.procedId?.procedureName,
+//             })),
+//         };
+
+//         tooth.forEach((t) => {
+//             if (!toothMap.has(t)) {
+//                 toothMap.set(t, { tooth: t, service: [], total: 0, completed: 0 });
+//             }
+
+//             const toothEntry = toothMap.get(t);
+//             const existingService = toothEntry.service.find(
+//                 (sv) => sv.service.serviceName === service.serviceName
+//             );
+
+//             if (existingService) {
+//                 const existingProcedures = existingService.procedure.map((p) => p.procedureName);
+//                 procedure.forEach((p) => {
+//                     if (!existingProcedures.includes(p.procedureName)) {
+//                         existingService.procedure.push(p);
+//                         toothEntry.total += 1; // Increment total for new procedures
+//                     }
+//                 });
+//             } else {
+//                 toothEntry.service.push({
+//                     service,
+//                     procedure,
+//                 });
+//                 toothEntry.total += 1; // Increment total for a new service
+//             }
+//         });
+//     });
+
+//     return Array.from(toothMap.values());
+// }
+
+// 2 new
 function transformArr2(existingData, newProcedures) {
     const toothMap = new Map();
 
@@ -1197,7 +1267,7 @@ const updateTreatment = async (clientId, caseSheetId, treatmentData) => {
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
-        existing.treatmentData2 = treatmentData;
+        existing.treatmentData3 = treatmentData;
         existing.status = "In Progress";
         return await existing.save();
     } catch (error) {

@@ -164,6 +164,40 @@ const caseSheetSchema = new mongoose.Schema({
         ]
 
     },
+    treatmentData3: {
+        type: [
+            {
+                tooth: { type: String, default: null },
+                service: {
+                    type: [
+                        {
+                            service: {
+                                serviceName: { type: String },
+                            },
+                            procedure: {
+                                type: [
+                                    {
+                                        procedureName: { type: String },
+                                        finished: {
+                                            type: String,
+                                            enum: ['In Progress', 'Cancelled', 'Completed'],
+                                            default: 'In Progress',
+                                            trim: true,
+                                        },
+                                        updatedAt: { type: Date, default: null, index: true }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+
+                total : {type : Number, default: 0},
+                completed : {type : Number, default: 0},
+            }
+        ]
+
+    },
 
     otherAttachment: {
         type: [
