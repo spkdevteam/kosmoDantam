@@ -48,7 +48,7 @@ exports.creatAppointment = async (input) => {
             date: input?.date ? new Date(input.date.includes('T') ? input.date.split('T')[0] + 'T00:00:00.000Z' : input.date + 'T00:00:00.000Z') : null,
             caseSheetId: input?.caseId || null,
             dutyDoctorId: input?.dutyDoctorId,
-            dentalAssistant: input?.dentalAssistant,
+            dentalAssistant: input?.dentalAssistant && mongoose.isValidObjectId(input.dentalAssistant)  ? input.dentalAssistant  : null, 
             chiefComplaint:input?.chiefComplaint,
             slotFrom: input?.slotFrom,
             slotTo: input?.slotTo,
@@ -753,6 +753,36 @@ exports.readAllAppointmentbyPatient = async ({ clientId, branchId, buId, patient
     } catch (error) {
         return { status: false, message: error.message, statusCode: 501, }
     }
+}
+
+exports.bookingSummarybyPeriod = async ({clientId,branchId,fromDate,toDate})=>{
+    try {
+        console.log(clientId,branchId,fromDate,toDate,'clientId,branchId,fromDate,toDate')
+        if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        const db =await getClientDatabaseConnection(clientId)
+        const appointment =await db.model('appointment',appointmentSchema)
+        const result = await appointment.aggregate([
+            {
+                $matches:{
+                    branchId:branchId,
+                    date:{
+                        $gte:new Date( `${fromDate}T:00:00:00.000Z` ),
+                        $lte:new Date( `${toDate}T:00:00:00.000Z` )
+                    }
+                }
+            }
+        ])
+
+        console.log(result,'this one is rpitinh ')
+
+        return {status:true,message:message.lblAppointmentFetched,data:result}
+        
+        
+
+    } catch (error) {
+        
+    } 
 }
 
 
