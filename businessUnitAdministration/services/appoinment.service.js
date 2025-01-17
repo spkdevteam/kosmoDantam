@@ -773,9 +773,6 @@ exports.bookingSummarybyPeriod = async ({clientId,branchId,fromDate,toDate})=>{
                 }
             }
         ])
-
-        console.log(result,'this one is rpitinh ')
-
         return {status:true,message:message.lblAppointmentFetched,data:result}
         
         
