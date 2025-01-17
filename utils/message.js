@@ -241,6 +241,17 @@ module.exports = {
   lblClinicalFindingNotFound: "ClinicalFinding not found!",
   lblClinicalFindingFoundSucessfully: "ClinicalFinding found successfully!",
 
+
+  // diagnosis
+  lblDiagnosishAlreadyExists: "Diagnosis already exists!",
+  lblDiagnosisCreatedSuccess: "Diagnosis created successfully!",
+  lblDiagnosisUpdatedSuccess: "Diagnosis updated successfully!",
+  lblDiagnosisDeletedSuccess: "Diagnosis deleted successfully!",
+  lblDiagnosisIdIdAndClientIdRequired: "Diagnosis Id and Client Id are required!",
+  lblDiagnosisIdRequired: "Diagnosis Id is required!",
+  lblDiagnosisNotFound: "Diagnosis not found!",
+  lblDiagnosisFoundSucessfully: "Diagnosis found successfully!",
+
   
   // medical history
   lblMedicalHistoryhAlreadyExists: "MedicalHistory already exists!",

@@ -184,6 +184,74 @@ const deleteClinicalFinding = async (clientId, caseSheetId, clinicalFindingId) =
     }
 };
 
+const createDiagnosis = async (clientId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const newCheifComplaint = await CaseSheet.create(data);
+        const populatedCaseSheet = await CaseSheet.findById(newCheifComplaint._id).populate({
+            path: 'diagnosis.findings.findId',
+            model: Finding,
+            select: 'findingsName _id'
+        })
+        return populatedCaseSheet
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
+
+const updateDiagnosis = async (clientId, caseSheetId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const existing = await CaseSheet.findById(caseSheetId);
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        Object.assign(existing, data);
+        await existing.save();
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'diagnosis.findings.findId',
+            model: Finding,
+            select: 'findingsName _id'
+        })
+        return populatedCaseSheet
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
+
+const deleteDiagnosis = async (clientId, caseSheetId, diagnosisId) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+        const existing = await CaseSheet.findById(caseSheetId);
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        const diagnosisArray = existing?.diagnosis;
+        const mongObjId = new mongoose.Types.ObjectId(diagnosisId);
+        const newArray = diagnosisArray.filter((item) => {
+            return !item._id.equals(mongObjId)
+        });
+        existing.diagnosis = newArray;
+        await existing.save();
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'diagnosis.findings.findId',
+            model: Finding,
+            select: 'findingsName _id'
+        })
+        return populatedCaseSheet
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error deleting diagnosis of case sheet: ${error.message}`);
+    }
+};
+
 
 const createMedicalHistory = async (clientId, data) => {
     try {
@@ -558,10 +626,16 @@ const updateProcedure = async (clientId, caseSheetId, data) => {
             select: 'serviceName _id'
         });
 
-        const existingTreatmentData = populatedCaseSheet.treatmentData2 || [];
-        const result = transformArr2(existingTreatmentData, populatedCaseSheet.procedures);
+        // old code
+        // const existingTreatmentData = populatedCaseSheet.treatmentData2 || [];
+        // const result = transformArr2(existingTreatmentData, populatedCaseSheet.procedures);
 
-        populatedCaseSheet.treatmentData2 = result;
+        // new code
+        const existingTreatmentData = populatedCaseSheet.treatmentData3 || [];
+        const result = transformArr2(existingTreatmentData, populatedCaseSheet.procedures);
+        
+
+        populatedCaseSheet.treatmentData3 = result;
         await populatedCaseSheet.save();
 
 
@@ -645,7 +719,71 @@ const updateProcedure = async (clientId, caseSheetId, data) => {
 // }
 
 
-// 2
+// 2 old
+// function transformArr2(existingData, newProcedures) {
+//     const toothMap = new Map();
+
+//     // Populate the map with existing treatmentData2
+//     existingData.forEach(({ tooth, service, total, completed }) => {
+//         if (!toothMap.has(tooth)) {
+//             toothMap.set(tooth, { tooth: tooth, service: [], total, completed });
+//         }
+//         service.forEach((s) => {
+//             const existingService = toothMap.get(tooth).service.find(
+//                 (sv) => sv.service.serviceName === s.service.serviceName
+//             );
+//             if (existingService) {
+//                 existingService.procedure.push(...s.procedure);
+//             } else {
+//                 toothMap.get(tooth).service.push(s);
+//             }
+//         });
+//     });
+
+//     // Add new data from newProcedures
+//     newProcedures.forEach((item) => {
+//         const { tooth, service, procedure } = {
+//             tooth: item.tooth,
+//             service: {
+//                 serviceName: item.service.servId?.serviceName,
+//             },
+//             procedure: item.procedure?.map((p) => ({
+//                 procedureName: p.procedId?.procedureName,
+//             })),
+//         };
+
+//         tooth.forEach((t) => {
+//             if (!toothMap.has(t)) {
+//                 toothMap.set(t, { tooth: t, service: [], total: 0, completed: 0 });
+//             }
+
+//             const toothEntry = toothMap.get(t);
+//             const existingService = toothEntry.service.find(
+//                 (sv) => sv.service.serviceName === service.serviceName
+//             );
+
+//             if (existingService) {
+//                 const existingProcedures = existingService.procedure.map((p) => p.procedureName);
+//                 procedure.forEach((p) => {
+//                     if (!existingProcedures.includes(p.procedureName)) {
+//                         existingService.procedure.push(p);
+//                         toothEntry.total += 1; // Increment total for new procedures
+//                     }
+//                 });
+//             } else {
+//                 toothEntry.service.push({
+//                     service,
+//                     procedure,
+//                 });
+//                 toothEntry.total += 1; // Increment total for a new service
+//             }
+//         });
+//     });
+
+//     return Array.from(toothMap.values());
+// }
+
+// 2 new
 function transformArr2(existingData, newProcedures) {
     const toothMap = new Map();
 
@@ -933,6 +1071,10 @@ const getById = async (clientId, caseSheetId) => {
             model: Finding,
             select: 'findingsName _id'
         }).populate({
+            path: 'diagnosis.findings.findId',
+            model: Finding,
+            select: 'findingsName _id'
+        }).populate({
             path: 'medicalHistory.medicals.medId',
             model: Medical,
             select: 'caseName _id'
@@ -1125,7 +1267,7 @@ const updateTreatment = async (clientId, caseSheetId, treatmentData) => {
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
-        existing.treatmentData2 = treatmentData;
+        existing.treatmentData3 = treatmentData;
         existing.status = "In Progress";
         return await existing.save();
     } catch (error) {
@@ -1175,7 +1317,7 @@ const updateTreatmentAndCloseCase = async (clientId, caseSheetId, treatmentData)
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
-        existing.treatmentData2 = treatmentData;
+        existing.treatmentData3 = treatmentData;
         existing.status = "Completed";
         return await existing.save();
     } catch (error) {
@@ -1778,6 +1920,10 @@ module.exports = {
     createClinicalFinding,
     updateClinicalFinding,
     deleteClinicalFinding,
+
+    createDiagnosis,
+    updateDiagnosis,
+    deleteDiagnosis,
 
     createMedicalHistory,
     updateMedicalHistory,

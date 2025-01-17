@@ -46,18 +46,35 @@ const caseSheetSchema = new mongoose.Schema({
         ],
         default: [],
     },
+    diagnosis: {
+        type: [
+            {
+                tooth: {
+                    type: [],
+                    default: [],
+                },
+                findings: {
+                    type: [
+                        {
+                            findId: { type: mongoose.Schema.ObjectId, ref: "patientFinding" }
+                        }
+                    ]
+                }
+            },
+        ],
+        default: [],
+    },
     medicalHistory: {
         type: [
             {
                 medicals: {
                     type: [
                         {
-                            medId: { type: mongoose.Schema.ObjectId, ref: "medicalCase" }
-                        }
+                            medId: { type: mongoose.Schema.ObjectId, ref: "medicalCase" },
+                        },
                     ],
-
-                }
-
+                },
+                reading: {type: String, default : null}
             }
         ],
         default: [],
@@ -133,6 +150,40 @@ const caseSheetSchema = new mongoose.Schema({
                                     {
                                         procedureName: { type: String },
                                         finished: { type: Boolean, default: false },
+                                        updatedAt: { type: Date, default: null, index: true }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+
+                total : {type : Number, default: 0},
+                completed : {type : Number, default: 0},
+            }
+        ]
+
+    },
+    treatmentData3: {
+        type: [
+            {
+                tooth: { type: String, default: null },
+                service: {
+                    type: [
+                        {
+                            service: {
+                                serviceName: { type: String },
+                            },
+                            procedure: {
+                                type: [
+                                    {
+                                        procedureName: { type: String },
+                                        finished: {
+                                            type: String,
+                                            enum: ['In Progress', 'Cancelled', 'Completed'],
+                                            default: 'In Progress',
+                                            trim: true,
+                                        },
                                         updatedAt: { type: Date, default: null, index: true }
                                     }
                                 ]
