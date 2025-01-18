@@ -35,7 +35,7 @@ exports.validateObjectId = async ({clientid='',objectId='',collectionName=''})=>
         const chair = db.model('chair', clinetChairSchema);
         const patientregister = db.model('patient', clinetPatientSchema);
         const caseSheetId = db.model('caseSheet', caseSheetSchema)
-        console.log(clientid,'----------->>')
+        
         switch (collectionName) {
             case 'appointment':
                 return await appointments.findOne({ _id: objectId, deletedAt: null }) ? true : false;
@@ -64,8 +64,7 @@ exports.validateObjectId = async ({clientid='',objectId='',collectionName=''})=>
             case 'leaveRegister':
                 return await leaveRegister.findOne({ _id: objectId, deletedAt: null }) ? true : false;
             case 'clientId':
-                console.log(clientid,objectId,collectionName,'clientid,objectId,collectionName')
-                console.log('*******', await userModel.findOne({ _id: objectId, deletedAt: null }))
+                
                 return await userModel.findOne({ _id: objectId, deletedAt: null }) ? true : false;
             case 'patient':
                 //console.log('*******', await userModel.findOne({ _id: objectId, deletedAt: null }))
