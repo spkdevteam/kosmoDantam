@@ -178,10 +178,21 @@ exports.getAllbookingBypatient =  async (req, res, next)=>{
 
 exports.getBookingSummaryByPeriod = async (req,res,next)=>{
     try {
-        console.log('helloooooooooooooooooo')
+        
         console.log(req.query)
         const data =await sanitizeBody(req.query)
         const result = await appointmentServices.bookingSummarybyPeriod(data)
+        res.json(result)
+    } catch (error) {
+        
+    }
+}
+exports.getDatewiseBookingSummaryByPeriod = async (req,res,next)=>{
+    try {
+        console.log('helloooooooooooooooooo')
+        console.log(req.query)
+        const data =await sanitizeBody(req.query)
+        const result = await appointmentServices.DatewiseBookingSummaryByPeriod(data)
         res.json(result)
     } catch (error) {
         

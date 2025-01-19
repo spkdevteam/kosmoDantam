@@ -844,3 +844,49 @@ exports.bookingSummarybyPeriod = async ({ clientId, branchId, fromDate, toDate }
 };
  
 
+
+exports.DatewiseBookingSummaryByPeriod = async ({ clientId, branchId, fromDate, toDate }) => {
+    try {
+      if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+      if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
+      const db =await getClientDatabaseConnection(clientId)
+      const Appointment =await db.model('appointment',appointmentSchema)
+      const bookings = await Appointment.aggregate([
+          {
+            $match: {
+              branchId:new mongoose.Types.ObjectId(branchId), // Match the branchId
+              date: {
+                $gte: new Date(fromDate), // Greater than or equal to fromDate
+                $lte: new Date(toDate) // Less than or equal to toDate
+              },
+              isActive: true // Optional: Only include active bookings
+            }
+          },
+          {
+            $group: {
+              _id: {
+                date: { $dateToString: { format: "%Y-%m-%d", date: "$date" } }, // Group by date
+              },
+              count: { $sum: 1 } // Count the number of bookings for each hour
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              date: "$_id.date",
+              count: 1,
+            }
+          },
+          {
+            $sort: { date: 1, hour: 1 } // Sort by date and hour ascending
+          }
+        ])
+  
+      return {status:true,message:message.lblAppointmentFetched, data:bookings}; // Returns an array of objects with date and count
+    } catch (error) {
+      console.error("Error fetching booking summary:", error);
+      throw error; // Rethrow the error for further handling
+    }
+  };
+   
+
