@@ -633,7 +633,7 @@ const updateProcedure = async (clientId, caseSheetId, data) => {
         // new code
         const existingTreatmentData = populatedCaseSheet.treatmentData3 || [];
         const result = transformArr2(existingTreatmentData, populatedCaseSheet.procedures);
-        
+
 
         populatedCaseSheet.treatmentData3 = result;
         await populatedCaseSheet.save();
@@ -1118,7 +1118,7 @@ const getCaseDetail = async (clientId, caseSheetId) => {
         const User = clientConnection.model('clientUsers', clinetUserSchema);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
         const Patient = clientConnection.model('patient', clinetPatientSchema);
-        
+
 
 
         const caseSheet = await CaseSheet.findById(caseSheetId).populate({
@@ -1545,11 +1545,11 @@ const updateDraft = async (clientId, caseSheetId, data) => {
             patientId,
             isActive: true,
             deletedAt: null,
-            status: { $nin: ['Scheduled', 'Cancelled'] }, 
+            status: { $nin: ['Scheduled', 'Cancelled'] },
         }).sort({ createdAt: -1 }).exec();
 
-        if(latestAppointment){
-            
+        if (latestAppointment) {
+
             latestAppointment.caseSheetId = existing._id;
             await latestAppointment.save();
         }
@@ -1725,18 +1725,58 @@ const updateCaseSheet = async (clientId, caseSheetId, data) => {
     }
 };
 
-const listAllCases = async (clientId, filters = {}) => {
+
+// old
+// const listAllCases = async (clientId, filters = {}) => {
+    // try {
+    //     const clientConnection = await getClientDatabaseConnection(clientId);
+    //     const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+    //     const Complaint = clientConnection.model('complaint', complaintSchema);
+    //     const Patient = clientConnection.model('patient', clinetPatientSchema);
+    //     const Branch = clientConnection.model('branch', clinetBranchSchema);
+    //     const User = clientConnection.model('clientUsers', clinetUserSchema);
+
+    //     console.log(filters, 'filters')
+    //     const [caseSheets] = await Promise.all([
+    //         CaseSheet.find({ ...filters }).sort({ _id: -1 }).populate({
+    //             path: 'cheifComplaints.complaints.compId',
+    //             model: Complaint,
+    //             select: 'complaintName _id'
+    //         }).populate({
+    //             path: 'patientId',
+    //             model: Patient,
+    //             select: 'firstName lastName patientGroup displayId'
+    //         }).populate({
+    //             path: 'branchId',
+    //             model: Branch,
+    //             select: 'name displayId _id'
+    //         }).populate({
+    //             path: 'createdBy',
+    //             model: User,
+    //             select: 'firstName lastName _id'
+    //         }),
+    //     ]);
+
+    //     console.log(caseSheets, caseSheets?.length, 'caseSheetscaseSheets')
+
+    //     return { caseSheets };
+    // } catch (error) {
+    //     throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
+    // }
+// };
+
+// new
+const listAllCases = async (clientId, filters = {}, options = { page: 1, limit: 10 }) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
         const User = clientConnection.model('clientUsers', clinetUserSchema);
-
-        console.log(filters, 'filters')
-        const [caseSheets] = await Promise.all([
-            CaseSheet.find({ ...filters }).sort({ _id: -1 }).populate({
+        const { page, limit } = options;
+        const skip = (page - 1) * limit;
+        const [caseSheets, total] = await Promise.all([
+            CaseSheet.find({ ...filters }).skip(skip).limit(limit).sort({ _id: -1 }).populate({
                 path: 'cheifComplaints.complaints.compId',
                 model: Complaint,
                 select: 'complaintName _id'
@@ -1753,13 +1793,11 @@ const listAllCases = async (clientId, filters = {}) => {
                 model: User,
                 select: 'firstName lastName _id'
             }),
+            CaseSheet.countDocuments(filters),
         ]);
-
-        console.log(caseSheets, caseSheets?.length, 'caseSheetscaseSheets')
-
-        return { caseSheets };
+        return { count: total, caseSheets };
     } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
+        throw new CustomError(error.statusCode || 500, `Error listing case sheet: ${error.message}`);
     }
 };
 
@@ -1793,16 +1831,16 @@ const updatePatientMedicalHistory = async (clientId, patientId, medicalHistoryDa
     }
 };
 
-const getByPatientId = async ({clientId,patientId})=>{
+const getByPatientId = async ({ clientId, patientId }) => {
     try {
         const db = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const result  = await CaseSheet.findOne({patientId:patientId});
+        const result = await CaseSheet.findOne({ patientId: patientId });
         if (!result) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
-         
-        return  {status:true,message:'success ',data:result}
+
+        return { status: true, message: 'success ', data: result }
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
     }
@@ -1810,76 +1848,76 @@ const getByPatientId = async ({clientId,patientId})=>{
 
 const caseSheetOverView = async ({ clientId, patientId }) => {
     try {
-    const db = await getClientDatabaseConnection(clientId)
-    const appointment = await db.model('appointment', appointmentSchema)
-    const CaseSheet = db.model('caseSheet', caseSheetSchema);  
-    const chair = db.model('chair', clinetChairSchema);
-    const User =await db.model('clientUsers', clinetUserSchema);
-    const patientregister = db.model('patient', clinetPatientSchema);
-    const result = await CaseSheet.findOne({
-        patientId: new mongoose.Types.ObjectId(patientId),
-        status:{$in:[ 'In Progress','Proposed']},
-        isActive: true,
-        deletedAt: null,
-      });
-      const latestAppointment = await appointment.find({
-        patientId: new mongoose.Types.ObjectId(patientId),
-        isActive: true,
-        deletedAt: null,
-        caseSheetId: result?._id,
-      })
-         .populate('dutyDoctorId','firstName lastName phone')
-         .populate('dentalAssistant', 'firstName lastName phone')
-         .populate('chairId')
-         .populate('patientId', 'firstName lastName displayId')
-         .populate('caseSheetId')
-        .sort({ createdAt: -1 })
-        .exec();
-  
-      console.log(latestAppointment, 'Appointments with Populated Data');
-  
-      return {
-        status: true,
-        message: message.lblCaseOverViewListed,
-        data: latestAppointment,
-      };
+        const db = await getClientDatabaseConnection(clientId)
+        const appointment = await db.model('appointment', appointmentSchema)
+        const CaseSheet = db.model('caseSheet', caseSheetSchema);
+        const chair = db.model('chair', clinetChairSchema);
+        const User = await db.model('clientUsers', clinetUserSchema);
+        const patientregister = db.model('patient', clinetPatientSchema);
+        const result = await CaseSheet.findOne({
+            patientId: new mongoose.Types.ObjectId(patientId),
+            status: { $in: ['In Progress', 'Proposed'] },
+            isActive: true,
+            deletedAt: null,
+        });
+        const latestAppointment = await appointment.find({
+            patientId: new mongoose.Types.ObjectId(patientId),
+            isActive: true,
+            deletedAt: null,
+            caseSheetId: result?._id,
+        })
+            .populate('dutyDoctorId', 'firstName lastName phone')
+            .populate('dentalAssistant', 'firstName lastName phone')
+            .populate('chairId')
+            .populate('patientId', 'firstName lastName displayId')
+            .populate('caseSheetId')
+            .sort({ createdAt: -1 })
+            .exec();
+
+        console.log(latestAppointment, 'Appointments with Populated Data');
+
+        return {
+            status: true,
+            message: message.lblCaseOverViewListed,
+            data: latestAppointment,
+        };
     } catch (error) {
-      console.error(error);
-      return { status: false, message: 'Error fetching case sheet overview.' };
+        console.error(error);
+        return { status: false, message: 'Error fetching case sheet overview.' };
     }
-  };
+};
 
 
-  
+
 // // const caseSheetOverView = async ({ clientId, branchId, buId, patientId})=>{
 //     try {
 //         console.log({ patientId:patientId, buId: buId, branchId: branchId, clientId: clientId },'zaadddddddddddddddsaasazaz')
-        //  if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+//  if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
 //         // if (! await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
 //         // if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
 //         if (! await validateObjectId({ clientid: clientId, objectId: patientId, collectionName: 'patient' })) return { status: false, message: message.lblPatientNotFound, statusCode: httpStatusCode.Unauthorized }
 //         const db = await getClientDatabaseConnection(clientId)
-        // const appointment = await db.model('appointment', appointmentSchema)
+// const appointment = await db.model('appointment', appointmentSchema)
 //         const CaseSheet = db.model('caseSheet', caseSheetSchema);
-        
+
 //         const result = await appointment?.find({
 //             patientId: patientId,
 //          //   branchId: branchId,
 //              isActive: true,
 //              deletedAt: null,
-              
+
 //         }).populate({
 //             path: 'caseSheetId',
 //             model: CaseSheet,
 //             select: 'createdAt'
 //         })
-        
+
 //         .populate('dutyDoctorId', 'firstName lastName phone ')
 //         .populate('dentalAssistant','firstName lastName phone ')
 //         .populate('chairId' , 'chairNumber chairLocation ')
 //         .populate('patientId', 'firstName lastName displayId ')
-        
-        
+
+
 //         if (result) {
 //             console.log(result,'result')     
 //             return { status: true, message: 'status Updated', statusCode: httpStatusCode.OK, data: result }
@@ -1894,7 +1932,7 @@ const caseSheetOverView = async ({ clientId, patientId }) => {
 //     }
 // }
 
-  
+
 
 
 

@@ -818,7 +818,7 @@ exports.updateCaseSheet = async (req, res, next) => {
         });
         return res.status(statusCode.OK).send({
             message: message.lblCaseSheetCreatedSuccess,
-            data: { update: JSON.stringify(update)  }
+            data: { update: JSON.stringify(update) }
         });
     } catch (error) {
         next(error)
@@ -846,10 +846,10 @@ exports.listCaseSheet = async (req, res, next) => {
             }),
         };
 
-        if(isAdmin == "false" && branchId ){
+        if (isAdmin == "false" && branchId) {
             filters = {
                 ...filters,
-                branchId : branchId
+                branchId: branchId
             }
         }
         const result = await caseSheetService.list(clientId, filters, { page, limit: perPage });
@@ -888,21 +888,51 @@ exports.getAllDrafted = async (req, res, next) => {
 
 
 // get all case sheet of particular patient
+// old
+// exports.getAllCaseSheet = async (req, res, next) => {
+//     try {
+//         const { clientId, patientId } = req.params;
+//         if (!clientId || !patientId) {
+//             return res.status(statusCode.BadRequest).send({
+//                 message: message.lblRequiredFieldMissing,
+//             });
+//         }
+//         console.log(clientId, patientId,'clientId, patientId')
+//         const filters = {
+//             deletedAt: null,
+//             patientId: new mongoose.Types.ObjectId(patientId) ,
+//         };
+//         console.log(filters)
+//         const result = await caseSheetService.listAllCases(clientId, filters);
+//         return res.status(statusCode.OK).send({
+//             message: message.lblCaseSheetFoundSucessfully,
+//             data: result,
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
+
+
+// new
 exports.getAllCaseSheet = async (req, res, next) => {
     try {
-        const { clientId, patientId } = req.params;
+        const { clientId, patientId, keyword = '', page = 1, perPage = 10 } = req.query;
         if (!clientId || !patientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
-        console.log(clientId, patientId,'clientId, patientId')
-        const filters = {
+        let filters = {
             deletedAt: null,
             patientId: new mongoose.Types.ObjectId(patientId) ,
+            ...(keyword && {
+                $or: [
+                    { displayId: { $regex: keyword.trim(), $options: "i" } },
+                ],
+            }),
         };
-        console.log(filters)
-        const result = await caseSheetService.listAllCases(clientId, filters);
+        const result = await caseSheetService.listAllCases(clientId, filters, { page, limit: perPage });
         return res.status(statusCode.OK).send({
             message: message.lblCaseSheetFoundSucessfully,
             data: result,
@@ -1189,14 +1219,14 @@ exports.updatePatientMedicalHistory = async (req, res, next) => {
 // get all case sheet of particular patient
 exports.getCaseSheetOverViewByPatient = async (req, res, next) => {
     try {
-        
+
         const { clientId, patientId } = req.params;
         if (!clientId || !patientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
-        const result = await caseSheetService.caseSheetOverView({clientId, patientId});
+        const result = await caseSheetService.caseSheetOverView({ clientId, patientId });
         return res.status(statusCode.OK).send(result);
     } catch (error) {
         next(error);
