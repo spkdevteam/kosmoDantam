@@ -888,34 +888,33 @@ exports.getAllDrafted = async (req, res, next) => {
 
 
 // get all case sheet of particular patient
-// old
-// exports.getAllCaseSheet = async (req, res, next) => {
-//     try {
-//         const { clientId, patientId } = req.params;
-//         if (!clientId || !patientId) {
-//             return res.status(statusCode.BadRequest).send({
-//                 message: message.lblRequiredFieldMissing,
-//             });
-//         }
-//         console.log(clientId, patientId,'clientId, patientId')
-//         const filters = {
-//             deletedAt: null,
-//             patientId: new mongoose.Types.ObjectId(patientId) ,
-//         };
-//         console.log(filters)
-//         const result = await caseSheetService.listAllCases(clientId, filters);
-//         return res.status(statusCode.OK).send({
-//             message: message.lblCaseSheetFoundSucessfully,
-//             data: result,
-//         });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
+exports.getAllCaseSheet = async (req, res, next) => {
+    try {
+        const { clientId, patientId } = req.params;
+        if (!clientId || !patientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        console.log(clientId, patientId,'clientId, patientId')
+        const filters = {
+            deletedAt: null,
+            patientId: new mongoose.Types.ObjectId(patientId) ,
+        };
+        console.log(filters)
+        const result = await caseSheetService.listAllCases(clientId, filters);
+        return res.status(statusCode.OK).send({
+            message: message.lblCaseSheetFoundSucessfully,
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 
 
 // new
-exports.getAllCaseSheet = async (req, res, next) => {
+exports.getAllCaseSheetOfPatient = async (req, res, next) => {
     try {
         const { clientId, patientId, keyword = '', page = 1, perPage = 10 } = req.query;
         if (!clientId || !patientId) {
@@ -932,7 +931,7 @@ exports.getAllCaseSheet = async (req, res, next) => {
                 ],
             }),
         };
-        const result = await caseSheetService.listAllCases(clientId, filters, { page, limit: perPage });
+        const result = await caseSheetService.listAllCasesOfPatient(clientId, filters, { page, limit: perPage });
         return res.status(statusCode.OK).send({
             message: message.lblCaseSheetFoundSucessfully,
             data: result,

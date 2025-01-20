@@ -1726,47 +1726,46 @@ const updateCaseSheet = async (clientId, caseSheetId, data) => {
 };
 
 
-// old
-// const listAllCases = async (clientId, filters = {}) => {
-    // try {
-    //     const clientConnection = await getClientDatabaseConnection(clientId);
-    //     const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-    //     const Complaint = clientConnection.model('complaint', complaintSchema);
-    //     const Patient = clientConnection.model('patient', clinetPatientSchema);
-    //     const Branch = clientConnection.model('branch', clinetBranchSchema);
-    //     const User = clientConnection.model('clientUsers', clinetUserSchema);
+const listAllCases = async (clientId, filters = {}) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Patient = clientConnection.model('patient', clinetPatientSchema);
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const User = clientConnection.model('clientUsers', clinetUserSchema);
 
-    //     console.log(filters, 'filters')
-    //     const [caseSheets] = await Promise.all([
-    //         CaseSheet.find({ ...filters }).sort({ _id: -1 }).populate({
-    //             path: 'cheifComplaints.complaints.compId',
-    //             model: Complaint,
-    //             select: 'complaintName _id'
-    //         }).populate({
-    //             path: 'patientId',
-    //             model: Patient,
-    //             select: 'firstName lastName patientGroup displayId'
-    //         }).populate({
-    //             path: 'branchId',
-    //             model: Branch,
-    //             select: 'name displayId _id'
-    //         }).populate({
-    //             path: 'createdBy',
-    //             model: User,
-    //             select: 'firstName lastName _id'
-    //         }),
-    //     ]);
+        console.log(filters, 'filters')
+        const [caseSheets] = await Promise.all([
+            CaseSheet.find({ ...filters }).sort({ _id: -1 }).populate({
+                path: 'cheifComplaints.complaints.compId',
+                model: Complaint,
+                select: 'complaintName _id'
+            }).populate({
+                path: 'patientId',
+                model: Patient,
+                select: 'firstName lastName patientGroup displayId'
+            }).populate({
+                path: 'branchId',
+                model: Branch,
+                select: 'name displayId _id'
+            }).populate({
+                path: 'createdBy',
+                model: User,
+                select: 'firstName lastName _id'
+            }),
+        ]);
 
-    //     console.log(caseSheets, caseSheets?.length, 'caseSheetscaseSheets')
+        console.log(caseSheets, caseSheets?.length, 'caseSheetscaseSheets')
 
-    //     return { caseSheets };
-    // } catch (error) {
-    //     throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
-    // }
-// };
+        return { caseSheets };
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error listing patient: ${error.message}`);
+    }
+};
 
 // new
-const listAllCases = async (clientId, filters = {}, options = { page: 1, limit: 10 }) => {
+const listAllCasesOfPatient = async (clientId, filters = {}, options = { page: 1, limit: 10 }) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
@@ -2002,6 +2001,7 @@ module.exports = {
     markedCompleted,
 
     listAllCases,
+    listAllCasesOfPatient,
     deleteCaseSheet,
 
 

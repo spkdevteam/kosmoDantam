@@ -147,7 +147,8 @@ router.post('/updateCaseSheet',entityAuth.authorizeEntity("Patient", "Case Sheet
 router.get('/listCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.listCaseSheet);
 router.get('/getCaseSheet/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getParticularCaseSheet)
 router.get('/getAllDraftedCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllDrafted);
-router.get('/getAllCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllCaseSheet);
+router.get('/getAllCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllCaseSheet);
+router.get('/getAllCaseSheetOfPatient', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllCaseSheetOfPatient);
 router.delete('/deleteCaseSheet/:clientId/:caseSheetId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.deleteCaseSheet);
 router.get('/getCaseDetail/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getCaseDetail)
 
