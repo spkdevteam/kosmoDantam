@@ -1772,6 +1772,7 @@ const listAllCases = async (clientId, filters = {}, options = { page: 1, limit: 
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
         const User = clientConnection.model('clientUsers', clinetUserSchema);
         const { page, limit } = options;
         const skip = (page - 1) * limit;
