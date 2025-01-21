@@ -48,7 +48,7 @@ exports.creatAppointment = async (input) => {
             date: input?.date ? new Date(input.date.includes('T') ? input.date.split('T')[0] + 'T00:00:00.000Z' : input.date + 'T00:00:00.000Z') : null,
             caseSheetId: input?.caseId || null,
             dutyDoctorId: input?.dutyDoctorId,
-            dentalAssistant: input?.dentalAssistant,
+            dentalAssistant: input?.dentalAssistant && mongoose.isValidObjectId(input.dentalAssistant)  ? input.dentalAssistant  : null, 
             chiefComplaint:input?.chiefComplaint,
             slotFrom: input?.slotFrom,
             slotTo: input?.slotTo,
@@ -755,4 +755,138 @@ exports.readAllAppointmentbyPatient = async ({ clientId, branchId, buId, patient
     }
 }
 
+// exports.bookingSummarybyPeriod = async ({clientId,branchId,fromDate,toDate})=>{
+//     try {
+//         console.log(clientId,branchId,fromDate,toDate,'clientId,branchId,fromDate,toDate')
+//         if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+//         if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
+//         const db =await getClientDatabaseConnection(clientId)
+//         const appointment =await db.model('appointment',appointmentSchema)
+//          const result = await appointment.aggregate()
+//         console.log(result,'result')
+//         return {status:true,message:message.lblAppointmentFetched,data:result}
+        
+        
+
+//     } catch (error) {
+        
+//     } 
+// }
+
+ 
+exports.bookingSummarybyPeriod = async ({ clientId, branchId, fromDate, toDate }) => {
+  try {
+    if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+    if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
+    const db =await getClientDatabaseConnection(clientId)
+    const Appointment =await db.model('appointment',appointmentSchema)
+    const bookings = await Appointment.aggregate([
+        {
+          $match: {
+            branchId:new mongoose.Types.ObjectId(branchId), // Match the branchId
+            date: {
+              $gte: new Date(fromDate), // Greater than or equal to fromDate
+              $lte: new Date(toDate) // Less than or equal to toDate
+            },
+            isActive: true // Optional: Only include active bookings
+          }
+        },
+        {
+          $group: {
+            _id: {
+              date: { $dateToString: { format: "%Y-%m-%d", date: "$date" } }, // Group by date
+              hour: { $hour: "$date" } // Group by hour
+            },
+            count: { $sum: 1 } // Count the number of bookings for each hour
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            date: "$_id.date",
+            hour: "$_id.hour",
+            count: 1,
+            slotFrom: {
+              $dateToString: {
+               
+                date: {
+                  $dateAdd: {
+                    startDate: { $dateFromString: { dateString: "$_id.date" } },
+                    unit: "hour",
+                    amount: "$_id.hour"
+                  }
+                }
+              }
+            },
+            slotTo: {
+              $dateToString: {
+                date: {
+                  $dateAdd: {
+                    startDate: { $dateFromString: { dateString: "$_id.date" } },
+                    unit: "hour",
+                    amount: { $add: ["$_id.hour", 1] } // Add 1 hour for slotTo
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          $sort: { date: 1, hour: 1 } // Sort by date and hour ascending
+        }
+      ])
+
+    return {status:true,message:message.lblAppointmentFetched, data:bookings}; // Returns an array of objects with date and count
+  } catch (error) {
+    console.error("Error fetching booking summary:", error);
+    throw error; // Rethrow the error for further handling
+  }
+};
+ 
+
+
+exports.DatewiseBookingSummaryByPeriod = async ({ clientId, branchId, fromDate, toDate }) => {
+    try {
+      if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+      if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
+      const db =await getClientDatabaseConnection(clientId)
+      const Appointment =await db.model('appointment',appointmentSchema)
+      const bookings = await Appointment.aggregate([
+          {
+            $match: {
+              branchId:new mongoose.Types.ObjectId(branchId), // Match the branchId
+              date: {
+                $gte: new Date(fromDate), // Greater than or equal to fromDate
+                $lte: new Date(toDate) // Less than or equal to toDate
+              },
+              isActive: true // Optional: Only include active bookings
+            }
+          },
+          {
+            $group: {
+              _id: {
+                date: { $dateToString: { format: "%Y-%m-%d", date: "$date" } }, // Group by date
+              },
+              count: { $sum: 1 } // Count the number of bookings for each hour
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              date: "$_id.date",
+              count: 1,
+            }
+          },
+          {
+            $sort: { date: 1, hour: 1 } // Sort by date and hour ascending
+          }
+        ])
+  
+      return {status:true,message:message.lblAppointmentFetched, data:bookings}; // Returns an array of objects with date and count
+    } catch (error) {
+      console.error("Error fetching booking summary:", error);
+      throw error; // Rethrow the error for further handling
+    }
+  };
+   
 
