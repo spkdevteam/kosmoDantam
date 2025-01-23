@@ -118,6 +118,17 @@ const uploadInvestigation = multer({
     fileFilter: imageFilter
 });
 
+
+// upload attachment
+const uploadAttachment = multer({
+    storage: investigationStorage,
+    limits: {
+        fileSize: 10 * 1024 * 1024, 
+        files: 5
+    },
+    fileFilter: imageFilter
+});
+
 // upload patient image
 const branchStorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -145,4 +156,5 @@ const uploadBranch = multer({
 exports.uploadProfile = uploadProfile;
 exports.uploadPatient = uploadPatient;
 exports.uploadInvestigation = uploadInvestigation;
+exports.uploadAttachment = uploadAttachment;
 exports.uploadBranch = uploadBranch;
