@@ -7,7 +7,7 @@ const message = require("../../utils/message");
 
 const { getClientDatabaseConnection } = require("../../db/connection");
 const clientRoleSchema = require("../../client/model/role");
-const {defaultPersmissionsList} = require("../../utils/constant")
+const { defaultPersmissionsList } = require("../../utils/constant")
 
 
 
@@ -32,6 +32,21 @@ exports.createRolesAndPermissionByBusinessUnit = async (req, res) => {
         const RolesAndpermission = clientConnection.model('clientRoles', clientRoleSchema);
         const role = await RolesAndpermission.findOne({ name: name });
         const lastRole = await RolesAndpermission.findOne().sort({ _id: -1 });
+        const allRole = await RolesAndpermission.find();
+
+        let maxRoleId = 0;
+
+        for (let index = 0; index < allRole.length; index++) {
+            const element = allRole[index];
+
+            if (element.id > maxRoleId) {
+                maxRoleId = element.id
+            }
+
+        }
+
+
+
         if (role) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblBusinessUnitRoleAlreadyExists,
@@ -40,20 +55,20 @@ exports.createRolesAndPermissionByBusinessUnit = async (req, res) => {
         const newRole = await RolesAndpermission.create(
             [
                 {
-                    name, createdBy: superAdmin?._id, id : lastRole?.id + 1, capability : defaultPersmissionsList
+                    name, createdBy: superAdmin?._id, id: maxRoleId + 1, capability: defaultPersmissionsList
                 },
             ],
         );
         return res.status(statusCode.OK).send({
             message: message.lblBusinessUnitRoleCreatedSuccessfully,
-            data: { roleId: newRole[0]._id, roleName: newRole[0].name, capability : newRole[0].capability },
+            data: { roleId: newRole[0]._id, roleName: newRole[0].name, capability: newRole[0].capability },
         });
     } catch (error) {
         return res.status(statusCode.InternalServerError).send({
             message: message.lblInternalServerError,
-            error: error.message, 
+            error: error.message,
         });
-    } 
+    }
 };
 
 // update Roles and permission by business unit
@@ -111,7 +126,7 @@ exports.updateRoleAndPermissionByBusinessUnit = async (req, res) => {
 // // // get particular Role and permission by business unit
 exports.getParticularRoleAndPermissionByBusinessUnit = async (req, res) => {
     try {
-        const { clientId, roleId } = req.params; 
+        const { clientId, roleId } = req.params;
         if (!clientId || !roleId) {
             return res.status(400).send({
                 message: message.lblRoleIdIdAndClientIdRequired,
@@ -141,8 +156,8 @@ exports.getParticularRoleAndPermissionByBusinessUnit = async (req, res) => {
 exports.listRolesAndPermission = async (req, res) => {
     try {
         const admin = req.user;
-        console.log("admin",admin);
-        
+        console.log("admin", admin);
+
         const clientId = req.query.clientId;
         const keyword = req.query.keyword;
         let whereCondition = {
@@ -170,7 +185,7 @@ exports.listRolesAndPermission = async (req, res) => {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const RolesAndpermission = clientConnection.model('clientRoles', clientRoleSchema);
         const [roles] = await Promise.all([
-            RolesAndpermission.find(whereCondition).select("name id createdBy isActive").sort({_id : -1}),
+            RolesAndpermission.find(whereCondition).select("name id createdBy isActive").sort({ _id: -1 }),
         ]);
         return res.json({
             message: 'List of all roles!',
@@ -205,11 +220,11 @@ exports.softDeleteRolesAndPermissionByBusinesssUnit = async (req, res) => {
                 message: message.lblRoleNotFound,
             });
         }
-        if(softDelete == "1"){
+        if (softDelete == "1") {
             role.deletedAt = new Date();
             await role.save()
-        }else{
-           await RolesAndpermission.deleteOne({_id :  roleId});
+        } else {
+            await RolesAndpermission.deleteOne({ _id: roleId });
         }
         this.listRolesAndPermission(req, res);
     } catch (error) {
@@ -268,7 +283,7 @@ exports.getRolesList = async (req, res) => {
 exports.restoreRoleAndPermissionByBusinessUnit = async (req, res) => {
     try {
         const { roleId, clientId } = req.body;
-        req.query.clientId  = clientId;
+        req.query.clientId = clientId;
         if (!clientId || !roleId) {
             return res.status(400).send({
                 message: message.lblRoleIdIdAndClientIdRequired,

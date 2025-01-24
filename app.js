@@ -299,8 +299,8 @@ async function createNewRole(params) {
 
 async function createRoleInDatbaseInstance() {
     try {
-        const clientId = "67441b73cbc8975325e14a3f";
-        const data = { id: 17, name: "patienit", capability: defaultPersmissionsList };
+        const clientId = "6778e514b4f5258830c1c0e4";
+        const data = { id: 17, name: "patient", capability: defaultPersmissionsList };
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Role = clientConnection.model('clientRoles', clientRoleSchema);
         const existing = await Role.findOne({ id: 17 });
