@@ -235,7 +235,9 @@ exports.updateEmployee = async (req, res, next) => {
 
         existingStaff.email = email;
         existingStaff.phone = phone;
-        existingStaff.password = newPassword;
+        if(password){
+            existingStaff.password = newPassword;
+        }
 
         await existingStaff.save();
 

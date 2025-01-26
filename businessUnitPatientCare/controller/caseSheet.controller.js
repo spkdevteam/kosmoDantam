@@ -461,9 +461,20 @@ exports.createOtherAttachment = async (req, res, next) => {
         let dataObject = {
             remark: remark,
         }
-        if (req.file?.filename) {
-            dataObject.file = req.file.filename;
+
+        // if (req.file?.filename) {
+        //     dataObject.file = req.file.filename;
+        // }
+
+        let attachments = [];
+        if (req.files && req.files.length > 0) {
+            for (let index = 0; index < req.files.length; index++) {
+                const element = req.files[index];
+                attachments.push(element.filename)
+            }
+            dataObject.file = JSON.stringify(attachments);
         }
+
         const serialNumber = await getserialNumber('caseSheet', clientId, "", businessUnitId)
         const created = await caseSheetService.createOtherAttachment(clientId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, otherAttachment: [dataObject], displayId: serialNumber,
@@ -490,9 +501,18 @@ exports.updateOtherAttachment = async (req, res, next) => {
         let dataObject = {
             remark: remark,
         }
-        if (req.file?.filename) {
-            dataObject.file = req.file.filename;
+        // if (req.file?.filename) {
+        //     dataObject.file = req.file.filename;
+        // }
+        let attachments = [];
+        if (req.files && req.files.length > 0) {
+            for (let index = 0; index < req.files.length; index++) {
+                const element = req.files[index];
+                attachments.push(element.filename)
+            }
+            dataObject.file = JSON.stringify(attachments);
         }
+
         const updated = await caseSheetService.updateOtherAttachment(clientId, caseSheetId, dataObject);
         return res.status(statusCode.OK).send({
             message: message.lblOtherAttachmentUpdatedSuccess,
@@ -896,10 +916,10 @@ exports.getAllCaseSheet = async (req, res, next) => {
                 message: message.lblRequiredFieldMissing,
             });
         }
-        console.log(clientId, patientId,'clientId, patientId')
+        console.log(clientId, patientId, 'clientId, patientId')
         const filters = {
             deletedAt: null,
-            patientId: new mongoose.Types.ObjectId(patientId) ,
+            patientId: new mongoose.Types.ObjectId(patientId),
         };
         console.log(filters)
         const result = await caseSheetService.listAllCases(clientId, filters);
@@ -924,7 +944,7 @@ exports.getAllCaseSheetOfPatient = async (req, res, next) => {
         }
         let filters = {
             deletedAt: null,
-            patientId: new mongoose.Types.ObjectId(patientId) ,
+            patientId: new mongoose.Types.ObjectId(patientId),
             ...(keyword && {
                 $or: [
                     { displayId: { $regex: keyword.trim(), $options: "i" } },

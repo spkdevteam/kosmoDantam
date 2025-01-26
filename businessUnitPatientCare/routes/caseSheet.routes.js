@@ -1,6 +1,8 @@
 
 
 const express = require("express");
+const multer = require("multer");
+const statusCode = require("../../utils/http-status-code")
 let router = express.Router();
 
 
@@ -13,6 +15,7 @@ const caseSheetController = require("../controller/caseSheet.controller");
 
 const {
     uploadInvestigation,
+    uploadAttachment,
 } = require('../../utils/multer');
 
 
@@ -86,7 +89,7 @@ router.post('/deleteInvestigation', entityAuth.authorizeEntity("Patient", "Case 
 
 // other attachment
 router.post('/createOtherAttachment', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), (req, res, next) => {
-    uploadInvestigation.single("file")(req, res, (err) => {
+    uploadAttachment.array("file")(req, res, (err) => {
         if (err) {
             if (err instanceof multer.MulterError) {
                 return res.status(statusCode.BadRequest).send({
@@ -103,7 +106,7 @@ router.post('/createOtherAttachment', entityAuth.authorizeEntity("Patient", "Cas
     });
 }, caseSheetController.createOtherAttachment);
 router.post('/updateOtherAttachment', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), (req, res, next) => {
-    uploadInvestigation.single("file")(req, res, (err) => {
+    uploadAttachment.array("file")(req, res, (err) => {
         if (err) {
             if (err instanceof multer.MulterError) {
                 return res.status(statusCode.BadRequest).send({
