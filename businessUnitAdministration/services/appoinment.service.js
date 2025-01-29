@@ -628,6 +628,47 @@ exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
 
     }
 }
+
+
+
+exports.filterPatientBookingWithfromToDateAndKeyWord = async (input) => {
+    try {
+        console.log(input,'My input string ')
+        // clientId, buId, bookingDate, page, perPage, branchId======>>>>>  input 
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
+
+        const db = await getClientDatabaseConnection(input?.clientId)
+        const appointment = await db.model('appointment', appointmentSchema)
+        const query = { isActive: true, deletedAt: null };
+
+        console.log(input, 'mer++++++++dd++++++++++')
+
+        const out = await appointment.find({
+            patientId:new mongoose.Types.ObjectId( input?.patientId),
+            isActive: true,
+            deletedAt: null,
+            ...(input.fromDate && input.toDate &&{ date:
+            {
+                $gte: new Date(input.fromDate + 'T00:00:00.000Z'),
+                $lte: new Date(input.toDate + 'T00:00:00.000Z')
+            }}),
+            //...(input?.branchId ? { branchId: new mongoose.Types.ObjectId(input?.branchId) } : {})
+
+        })
+        .populate('dutyDoctorId')
+        .populate('chairId')
+        .populate('patientId')
+        .populate('branchId')
+        
+       // const out = []
+        console.log(input, 'input')
+        console.log(out,  'outoutout')
+        return { status: true, message: 'Success', data: out }
+    } catch (error) {
+
+    }
+}
 exports.updateBookingWithToken = async ({ tokenNumber, appointmentid, buId, branchId, clientId }) => {
     try {
         console.log({ tokenNumber: tokenNumber, appointmentId: appointmentid, buId: buId, branchId: branchId, clientId: clientId })
@@ -862,7 +903,7 @@ exports.DatewiseBookingSummaryByPeriod = async ({ clientId, branchId, fromDate, 
                     isActive: true // Optional: Only include active bookings
                 }
             },
-            { 
+            {
                 $group: {
                     _id: {
                         date: { $dateToString: { format: "%Y-%m-%d", date: "$date" } }, // Group by date

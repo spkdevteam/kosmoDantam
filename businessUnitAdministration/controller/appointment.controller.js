@@ -198,3 +198,14 @@ exports.getDatewiseBookingSummaryByPeriod = async (req,res,next)=>{
         
     }
 }
+
+exports.filterPatientBookingDetails = async (req,res,next)=>{
+    try {
+        const data = await sanitizeBody(req.query)
+        console.log(data,'-----------9*********-------xx---------------')
+        const result = await appointmentServices.filterPatientBookingWithfromToDateAndKeyWord(data)
+        res.status(200).json(result)
+    } catch (error) {
+        next(error)
+    }
+}

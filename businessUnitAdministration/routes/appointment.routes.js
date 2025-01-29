@@ -17,6 +17,7 @@ bookingRoutes
        .get('/getAllbookingBypatient',appointment.getAllbookingBypatient)
        .get('/getBookingSummaryByPeriod',appointment.getBookingSummaryByPeriod)
        .get('/getDatewiseBookingSummaryByPeriod',appointment.getDatewiseBookingSummaryByPeriod)
+       .get('/filterPatientBookingDetails',appointment.filterPatientBookingDetails)
        
 
 module.exports = bookingRoutes
