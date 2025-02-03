@@ -48,6 +48,7 @@ exports.creatAppointment = async (input) => {
             date: input?.date ? new Date(input.date.includes('T') ? input.date.split('T')[0] + 'T00:00:00.000Z' : input.date + 'T00:00:00.000Z') : null,
             caseSheetId: input?.caseId || null,
             dutyDoctorId: input?.dutyDoctorId,
+            specialistDoctorId:input?.specialistDoctorId,
             dentalAssistant: input?.dentalAssistant && mongoose.isValidObjectId(input.dentalAssistant) ? input.dentalAssistant : null,
             chiefComplaint: input?.chiefComplaint,
             slotFrom: input?.slotFrom,
@@ -103,8 +104,9 @@ exports.getDateWiseBookidDetails = async (input) => {
             .populate('buId', 'name')
             .populate('branchId', 'incorporationName')
             .populate('chairId', 'chairNumber chairLocation')
+            .populate('specialistDoctorId', 'firstName ')
 
-        console.log(bookingdetails, 'bookingdetails')
+        
 
         const bookings = bookingdetails?.map((item) => {
 
@@ -573,6 +575,20 @@ exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
             },
 
             // Lookup for the `dutyDoctorId` field
+            {
+                $lookup: {
+                    from: 'clientusers', // Name of the collection storing doctor data
+                    localField: 'specialistDoctorId',
+                    foreignField: '_id',
+                    as: 'specialistDoctorId'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$specialistDoctorId',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
             {
                 $lookup: {
                     from: 'clientusers', // Name of the collection storing doctor data

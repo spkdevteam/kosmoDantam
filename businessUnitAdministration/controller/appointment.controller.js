@@ -59,7 +59,7 @@ exports.getAvailability = async (req, res, next) => {
         //console.log(bookedDoctors, bookedChairs, bookedAssistants,bookedSpecialist,'bookedDoctors, bookedChairs, bookedAssistants ' )
         
         //comparing the enagaed one with all details and return available list 
-        const doctorsAvailable = doctorsList?.filter((doc) => {
+        const doctorsAvailable = [...doctorsList,...specialist]?.filter((doc) => {
             if (data?.doctorId) {
                 // Match specific doctor if doctorId is provided
                 return doc._id.toString() === data.doctorId;
