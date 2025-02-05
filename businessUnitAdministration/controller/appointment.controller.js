@@ -59,7 +59,7 @@ exports.getAvailability = async (req, res, next) => {
         //console.log(bookedDoctors, bookedChairs, bookedAssistants,bookedSpecialist,'bookedDoctors, bookedChairs, bookedAssistants ' )
         
         //comparing the enagaed one with all details and return available list 
-        const doctorsAvailable = doctorsList?.filter((doc) => {
+        const doctorsAvailable = [...doctorsList,...specialist]?.filter((doc) => {
             if (data?.doctorId) {
                 // Match specific doctor if doctorId is provided
                 return doc._id.toString() === data.doctorId;
@@ -176,3 +176,36 @@ exports.getAllbookingBypatient =  async (req, res, next)=>{
     }
 }
 
+exports.getBookingSummaryByPeriod = async (req,res,next)=>{
+    try {
+        
+        console.log(req.query)
+        const data =await sanitizeBody(req.query)
+        const result = await appointmentServices.bookingSummarybyPeriod(data)
+        res.json(result)
+    } catch (error) {
+        
+    }
+}
+exports.getDatewiseBookingSummaryByPeriod = async (req,res,next)=>{
+    try {
+        console.log('helloooooooooooooooooo')
+        console.log(req.query)
+        const data =await sanitizeBody(req.query)
+        const result = await appointmentServices.DatewiseBookingSummaryByPeriod(data)
+        res.json(result)
+    } catch (error) {
+        
+    }
+}
+
+exports.filterPatientBookingDetails = async (req,res,next)=>{
+    try {
+        const data = await sanitizeBody(req.query)
+        console.log(data,'-----------9*********-------xx---------------')
+        const result = await appointmentServices.filterPatientBookingWithfromToDateAndKeyWord(data)
+        res.status(200).json(result)
+    } catch (error) {
+        next(error)
+    }
+}

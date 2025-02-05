@@ -56,3 +56,41 @@ const commonCheckOfEntity = async (header, module, entityName) => {
         throw new Error(error.message || `Invalid token or verification failed for ${entityName}`);
     }
 };
+
+
+
+// common auth for valid toke 
+exports.commonAuthForValidToken = async (req, res, next) => {
+    let token;
+    const { authorization } = req.headers;
+    if (authorization && authorization.startsWith("Bearer")) {
+        try {
+            token = authorization.split(" ")[1];
+            const { id, email } = jwt.verify(token, PRIVATEKEY);
+            if (id) {
+                const clientConnection = await getClientDatabaseConnection(id);
+                const userModel = clientConnection.model('clientUsers', clinetUserSchema);
+                clientConnection.model('clientRoles', clientRoleSchema);
+
+                const user = await userModel.findOne({ email }).populate("role").lean();
+                if (user) {
+                    req.user = user;
+                    next();
+                } else {
+                    return res.send({
+                        message: message.lblUserNotFound,
+                    });
+                }
+            } else {
+                return res.status(statusCode.Unauthorized).send({
+                    message: message.lblUnauthorizeUser
+                })
+            }
+        } catch (error) {
+            console.log(error);
+            return res.status(statusCode.Unauthorized).send({ message: error.message });
+        }
+    } else {
+        return res.send({ status: message.lblNoToken });
+    }
+};

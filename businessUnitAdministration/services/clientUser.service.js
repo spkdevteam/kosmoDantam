@@ -14,7 +14,7 @@ try {
     if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(input?.clientId) 
         const employee =await db.model('clientUser',clinetUserSchema)
-        const emploeeList = await employee.find({roleId:input?.roleId,branch:input?.branchId ,deletedAt:null,isActive:true},{firstName:1,lastName:1,_id:1})
+        const emploeeList = await employee.find({roleId:input?.roleId,branch:input?.branchId ,deletedAt:null,isActive:true},{firstName:1,lastName:1,_id:1,roleId:1})
         return emploeeList
     } catch (error) {
     

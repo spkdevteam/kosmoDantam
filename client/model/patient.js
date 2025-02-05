@@ -14,7 +14,7 @@ const clinetPatientSchema = new Schema(
         relation: { type: String, default: null },
         firstName: { type: String, required: true },
         lastName: { type: String },
-        profileImage: { type: String, default: null },
+        profileImage: { type: String, default: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png' },
         email: {
             type: String,
             lowercase: true,

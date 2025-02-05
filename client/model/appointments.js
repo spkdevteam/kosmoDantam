@@ -11,7 +11,7 @@ const appointmentSchema = new mongoose.Schema({
     caseId: { type: mongoose.Schema.ObjectId, ref: 'caseSheet', index:true },
     dutyDoctorId: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', required: true,index:true },
     specialistDoctorId: { type: mongoose.Schema.ObjectId, ref: 'clientUsers',index:true },
-    dentalAssistant: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', index:true }, 
+    dentalAssistant: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', index:true,default:null }, 
     slotFrom: { type: Date  }, 
     slotTo: { type: Date }, 
     chairId: { type: mongoose.Schema.ObjectId, ref: 'chair', required: true,index:true },  
