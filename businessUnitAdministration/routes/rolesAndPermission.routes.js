@@ -22,7 +22,8 @@ router.get('/listRolesAndPermission', entityAuth.authorizeEntity("Administration
 
 router.post("/softDeleteRolesAndPermission", entityAuth.authorizeEntity("Administration", "Roles & Permissions", "softDelete"), rolesAndPermissionContrller.softDeleteRolesAndPermissionByBusinesssUnit);
 
-router.get('/getRolesList', entityAuth.authorizeEntity("Administration", "Roles & Permissions", "view"), rolesAndPermissionContrller.getRolesList);
+// router.get('/getRolesList', entityAuth.authorizeEntity("Administration", "Roles & Permissions", "view"), rolesAndPermissionContrller.getRolesList);
+router.get('/getRolesList', entityAuth.commonAuthForValidToken, rolesAndPermissionContrller.getRolesList);
 
 // router.post("/restoreRolesAndPermission", entityAuth.authorizeEntity("administration", "Roles & Permissions", "delete"), rolesAndPermissionContrller.restoreRoleAndPermissionByBusinessUnit);
 
