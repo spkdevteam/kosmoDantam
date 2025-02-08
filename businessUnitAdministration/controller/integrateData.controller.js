@@ -54,11 +54,11 @@ const integrateData = async (req, res) => {
         
                 if (missingData.length > 0) {
                     if (fieldName === 'department' || fieldName === 'procedure') {
-                         
+                         //console.log(missingData,'input missing data ')
                         res.write(`Processing: Assigning ${fieldName} to branches...\n`);
                         missingData = await Promise.all(missingData.flatMap(async (department) => {
                             return Promise.all(clientBranch.map(async (branch) => {
-                                 
+                                 console.log(branch.name)
                                 return {
                                     ...department.toObject(),
                                     old_Id: department._id,
@@ -71,6 +71,7 @@ const integrateData = async (req, res) => {
                                 };
                             }));
                         }));
+                         console.log(missingData,'department missingData')
                         missingData = missingData.flat();
                     }else if (fieldName === 'service'  ) {
                         res.write("Processing: Assigning services to departments under each branch...\n");
@@ -84,7 +85,7 @@ const integrateData = async (req, res) => {
                         missingData = await Promise.all(missingData.flatMap(async (service) => {
                             return Promise.all(tempDepartments.
                                 filter((dept)=>{ 
-                                    console.log(dept,dept.old_Id == service.departmentId,dept.old_Id , service.departmentId,'dept,dept.old_Id == service.departmentId,dept.old_Id , service.departmentId')
+                                  //  console.log(dept,dept.old_Id == service.departmentId,dept.old_Id , service.departmentId,'dept,dept.old_Id == service.departmentId,dept.old_Id , service.departmentId')
                                     return dept.old_Id == service.departmentId
                                  }).
                                 map(async (dept) => ({
@@ -195,7 +196,7 @@ const integrateData = async (req, res) => {
                 const departments = await ClientDepartmentCollection.find({}, { _id: 1, old_Id: 1,branchId:1 }); // Fetch new IDs and old IDs
                 const services = await ClientServices.find(); // Fetch all services
         
-                const departmentMap = new Map(departments.map(dept => [ `${dept.branchId}-${dept.old_Id.toString()}`, dept._id.toString()]));
+                const departmentMap = new Map(departments.map(dept => [ `${dept.branchId}-${dept.old_Id?.toString()}`, dept._id?.toString()]));
                  
                 for (const service of services) {
                     const newDepartmentId = departmentMap.get(`${service.branchId}-${service.departmentId?.toString()}`); // Get the new department ID
