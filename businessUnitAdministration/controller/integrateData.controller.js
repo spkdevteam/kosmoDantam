@@ -38,48 +38,107 @@ const integrateData = async (req, res) => {
         const ClientCheifComplaint = db.model("cheifcomplaints", complaintSchema);
         const ClientDepartmentCollection = db.model("department", departmentSchema);
         const ClientBranchCollection = db.model('branches', clinetBranchSchema);
-        const clientBranch = await ClientBranchCollection.find({ deletedAt: null });
+        const clientBranch = await ClientBranchCollection.find({});
 
         const syncData = async (serverModel, clientModel, fieldName) => {
             try {
-
                 res.write(`Processing: Fetching ${fieldName} from server...\n`);
                 const serverData = await serverModel.find({});
                 res.write(`Processing: ${serverData.length} ${fieldName} records on server...\n`);
                 const clientData = await clientModel.find({});
                 res.write(`Processing: ${clientData.length} ${fieldName} records on client...\n`);
-
+        
                 let missingData = serverData.filter(serverItem =>
                     !clientData.some(clientItem => clientItem.old_Id?.toString() === serverItem._id.toString())
                 );
-
+        
                 if (missingData.length > 0) {
-                    if (missingData.length > 0) {
-                        if (fieldName === 'department' || fieldName === 'procedure' || fieldName === 'service') {
-                            res.write(`Processing: Assigning ${fieldName} to branches...\n`);
-                            missingData = await Promise.all(missingData.flatMap(async (department) => {
-                                return Promise.all(clientBranch.map(async (branch) => {
-                                    const newId = new mongoose.Types.ObjectId();
-                                    return {
-                                        ...department.toObject(),
-                                        old_Id: department._id,
-                                        _id: newId,
-                                        branchId: branch._id,
-                                        displayId: await getserialNumber(
-                                            fieldName, data.clientId, branch._id, branch.businessUnit
-                                        )
-                                    };
-                                }));
+                    if (fieldName === 'department' || fieldName === 'procedure') {
+                         
+                        res.write(`Processing: Assigning ${fieldName} to branches...\n`);
+                        missingData = await Promise.all(missingData.flatMap(async (department) => {
+                            return Promise.all(clientBranch.map(async (branch) => {
+                                 
+                                return {
+                                    ...department.toObject(),
+                                    old_Id: department._id,
+                                    _id: new mongoose.Types.ObjectId(),
+                                    branchId: branch._id,
+                                    buId:branch.businessUnit,
+                                    displayId: await getserialNumber(
+                                        fieldName, data.clientId, branch._id, branch.businessUnit
+                                    )
+                                };
                             }));
-                            missingData = missingData.flat();
-                        }
-                        if(fieldName == 'findings')
-                        {
-                            console.log(missingData,'missing')
-                        }
-
+                        }));
+                        missingData = missingData.flat();
+                    }else if (fieldName === 'service'  ) {
+                        res.write("Processing: Assigning services to departments under each branch...\n");
+                    
+                        // Fetch all departments under branches
+                        const tempDepartments = await ClientDepartmentCollection.find(
+                            { deletedAt: null }, { _id: 1, branchId: 1, buId: 1 ,old_Id:1}
+                        );
+                    
+                        // Ensure async operations complete before assigning to missingData
+                        missingData = await Promise.all(missingData.flatMap(async (service) => {
+                            return Promise.all(tempDepartments.
+                                filter((dept)=>{ 
+                                    console.log(dept,dept.old_Id == service.departmentId,dept.old_Id , service.departmentId,'dept,dept.old_Id == service.departmentId,dept.old_Id , service.departmentId')
+                                    return dept.old_Id == service.departmentId
+                                 }).
+                                map(async (dept) => ({
+                                ...service.toObject(),
+                                old_Id: service._id,
+                                _id: new mongoose.Types.ObjectId(),
+                                departmentId: dept._id,
+                                branchId: dept.branchId,
+                                buId: dept.buId,
+                                displayId: await getserialNumber(
+                                    fieldName, data.clientId, dept.branchId, dept.buId
+                                )
+                            })));
+                        }));
+                    
+                        missingData = missingData.flat();
+                        console.log(missingData, 'missingData in services');
+                    }
+                    // else if (  fieldName === 'procedure') {
+                    //     res.write("Processing: Assigning services to departments under each branch...\n");
+                    
+                    //     // Fetch all departments under branches
+                    //     const tempDepartments = await ClientDepartmentCollection.find(
+                    //         { deletedAt: null }, { _id: 1, branchId: 1, buId: 1 ,old_Id:1}
+                    //     );
+                    
+                    //     // Ensure async operations complete before assigning to missingData
+                    //     missingData = await Promise.all(missingData.flatMap(async (service) => {
+                    //         return Promise.all(tempDepartments.
+                    //             filter((dept)=>{ 
+                    //                 console.log(dept,dept.old_Id == service.departmentId,dept.old_Id , service.departmentId,'dept,dept.old_Id == service.departmentId,dept.old_Id , service.departmentId')
+                    //                 return dept.old_Id == service.departmentId
+                    //              }).
+                    //             map(async (dept) => ({
+                    //             ...service.toObject(),
+                    //             old_Id: service._id,
+                    //             _id: new mongoose.Types.ObjectId(),
+                    //             departmentId: dept._id,
+                    //             branchId: dept.branchId,
+                    //             buId: dept.buId,
+                    //             displayId: await getserialNumber(
+                    //                 fieldName, data.clientId, dept.branchId, dept.buId
+                    //             )
+                    //         })));
+                    //     }));
+                    
+                    //     missingData = missingData.flat();
+                    //     console.log(missingData, 'missingData in services');
+                    // }
+                    
+        
+                    if (missingData.length > 0) {
                         console.log('------------------<<<<<<<<<>>>>>>>>>>>>>>>---------------------');
-                        const status = await clientModel.insertMany(missingData);
+                        await clientModel.insertMany(missingData);
                         res.write(`Processing: ${missingData.length} ${fieldName} added to client database\n`);
                     }
                 }
@@ -87,18 +146,32 @@ const integrateData = async (req, res) => {
                 res.write("Error: " + error.message + "\n");
             }
         };
+        
+        
+        
 
         const updateProcedureMaster = async () => {
             try {
-                res.write("Processing: validation for inserted recors on progress .\n");
-                const services = await ClientServices.find({}, { _id: 1, old_Id: 1 }); // Fetch new IDs and old IDs
-                const procedures = await ClientProcedures.find(); // Fetch all procedures
+                res.write("Processing: Validation for inserted records in progress.\n");
         
-                const serviceMap = new Map(services.map(service => [service.old_Id?.toString(), service._id?.toString()]));
+                // Fetch all services and procedures
+                const services = await ClientServices.find({}, { _id: 1, old_Id: 1, branchId: 1 });
+                const procedures = await ClientProcedures.find();
+        
+                // Create a Map with a unique key format: "branchId-old_Id"
+                const serviceMap = new Map();
+                services.forEach(service => {
+                    const key = `${service.branchId}-${service.old_Id}`;
+                    serviceMap.set(key, service._id.toString());
+                });
         
                 for (const procedure of procedures) {
+                    // Replace old service IDs with new ones, filtering by branchId
                     const updatedServices = procedure.services
-                        .map(serviceId => serviceMap.get(serviceId.toString())) // Replace old service IDs with new ones
+                        .map(serviceId => {
+                            
+                            return serviceMap.get(`${procedure.branchId}-${serviceId}`)
+                        }) // Fetch new ID using combined key
                         .filter(Boolean); // Remove undefined/null values
         
                     if (updatedServices.length > 0) {
@@ -106,9 +179,8 @@ const integrateData = async (req, res) => {
                             { _id: procedure._id },
                             { $set: { services: updatedServices } }
                         );
-                        console.log(`Updated procedure ${procedure._id} with new services`);
-                        res.write("Updated procedure ${procedure._id} with new services .\n");
-                
+                        // console.log(`Updated procedure ${procedure._id} with new services`);
+                        res.write(`Updated procedure ${procedure._id} with new services.\n`);
                     }
                 }
         
@@ -120,20 +192,20 @@ const integrateData = async (req, res) => {
 
         const updateServicesWithNewDepartment = async () => {
             try {
-                const departments = await ClientDepartmentCollection.find({}, { _id: 1, old_Id: 1 }); // Fetch new IDs and old IDs
+                const departments = await ClientDepartmentCollection.find({}, { _id: 1, old_Id: 1,branchId:1 }); // Fetch new IDs and old IDs
                 const services = await ClientServices.find(); // Fetch all services
         
-                const departmentMap = new Map(departments.map(dept => [dept.old_Id.toString(), dept._id.toString()]));
-        
+                const departmentMap = new Map(departments.map(dept => [ `${dept.branchId}-${dept.old_Id.toString()}`, dept._id.toString()]));
+                 
                 for (const service of services) {
-                    const newDepartmentId = departmentMap.get(service.departmentId?.toString()); // Get the new department ID
-        
+                    const newDepartmentId = departmentMap.get(`${service.branchId}-${service.departmentId?.toString()}`); // Get the new department ID
+                   
                     if (newDepartmentId) {
                         await ClientServices.updateOne(
                             { _id: service._id },
                             { $set: { departmentId: newDepartmentId } }
                         );
-                        console.log(`Updated service ${service._id} with new department ID: ${newDepartmentId}`);
+                      
                         res.write(`Updated service ${service._id} with new department ID: ${newDepartmentId}.\n` );
                 
                     }
@@ -151,8 +223,9 @@ const integrateData = async (req, res) => {
         await syncData(FindingMaster, ClientFindings, "findings");
         await syncData(InvestigationMaster, ClientInvestigations, "investigations");
         await syncData(ServiceMaster, ClientServices, "service");
-        await syncData(ProcedureMaster, ClientProcedures, "procedure");
         await updateServicesWithNewDepartment()
+        await syncData(ProcedureMaster, ClientProcedures, "procedure");
+        
         await updateProcedureMaster()
         res.write("Processing: Sync completed.\n");
         res.end(JSON.stringify({ success: true }));
