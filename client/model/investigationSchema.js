@@ -1,7 +1,7 @@
 
 const mongoose = require('mongoose')
 const investigationSchema = mongoose.Schema({
-    displayId:{type:String,unique:true},
+    displayId:{type:String},
     investigationName:{type:String},
     discription:{type:String},
     isActive:{type:Boolean,default:true},
