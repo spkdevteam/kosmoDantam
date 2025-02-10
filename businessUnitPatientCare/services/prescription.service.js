@@ -19,8 +19,8 @@ const clinetPatientSchema = require("../../client/model/patient");
 const create = async (data) => {
     try {
         const { _id, displayId, branchId, buId, patientId, doctorId, caseSheetId, drugArray, additionalAdvice, clientId } = data
-        
-        console.log( data, '{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{clientIdclientIdclientIdclientIdclientId}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}')
+
+        console.log(data, '{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{clientIdclientIdclientIdclientIdclientId}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}')
         if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
@@ -31,7 +31,7 @@ const create = async (data) => {
         const prescription = await db.model('prescription', prescriptionSchema)
         const caseSheet = await db.model('caseSheet', caseSheetSchema)
         const chair = db.model('chair', clinetChairSchema);
-        const User =await db.model('clientUsers', clinetUserSchema);
+        const User = await db.model('clientUsers', clinetUserSchema);
         const patientregister = db.model('patient', clinetPatientSchema);
         if (!_id) {
             if (!displayId) {
@@ -40,11 +40,11 @@ const create = async (data) => {
             const newData = {
                 ...data
             }
-            
-            
 
 
-             
+
+
+
             if (!newData.caseSheetId) delete newData.caseSheetId
             const result = await prescription
                 .findOneAndUpdate(
@@ -126,17 +126,17 @@ const getById = async (clientId, prescriptionId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Prescription = clientConnection.model('prescription', prescriptionSchema);
-        const User =await clientConnection.model('clientUsers', clinetUserSchema);
-                
+        const User = await clientConnection.model('clientUsers', clinetUserSchema);
+
         const prescription = await Prescription.findById(prescriptionId)
-        .populate({
-            path:'doctorId',
-            populate:{
-                path:'role',
-                select:'name'
-            }
-        }) 
-         
+            .populate({
+                path: 'doctorId',
+                populate: {
+                    path: 'role',
+                    select: 'name'
+                }
+            })
+
         if (!prescription) {
             throw new CustomError(statusCode.NotFound, message.lblPrescriptionNotFound);
         }
@@ -187,16 +187,16 @@ const readPrescription = async ({ clientId, buId, patientId, keyword, filters, b
         const prescription = await db.model('prescription', prescriptionSchema)
         const casesheet = await db.model('casesheets', caseSheetSchema)
         const filter = {
-            deletedAt:null,
-           
+            deletedAt: null,
+
         }
-        if(patientId) filter.patientId = patientId;
-        if(buId) filter.buId = buId;
-        if(branchId?.length) filter.branchId = branchId
-        
-        console.log(filter,'filter is no look like this ')
-        const result = await prescription.find(filter)//.skip(page * perPage).limit(perPage)
-            .populate('caseSheetId' , 'displayId')
+        if (patientId) filter.patientId = patientId;
+        if (buId) filter.buId = buId;
+        if (branchId?.length) filter.branchId = branchId
+
+        console.log(filter, 'filter is no look like this ')
+        const result = await prescription.find({ deletedAt: null })?.sort({ createdAt: -1 }).skip(page * perPage).limit(perPage)
+            .populate('caseSheetId', 'displayId')
             .populate('doctorId', 'firstName lastName ')
             .populate('createdBy', 'firstName lastName ')
             .populate('branchId');
@@ -217,6 +217,27 @@ const readPrescription = async ({ clientId, buId, patientId, keyword, filters, b
 
 }
 
+const deletePrescription = async (clientId, prescriptionId) => {
+    try {
+        console.log(clientId,'clientId')
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Prescription = await clientConnection.model('prescription', prescriptionSchema);
+        const result = await Prescription.updateOne({ _id: prescriptionId }, { $set: { deletedAt: Date.now() } })
+        if (result.modifiedCount) {
+            return { status: true, statusCode: 200, message: 'prescription has deleted ' }
+        }
+        else return { status: false, statusCode: 404, message: 'prescription deletion failed ' }
+
+    } catch (error) {
+        return { status: false, statusCode: 501, message:error.message }
+    }
+}
+
+
+
+ 
+
+
 
 
 
@@ -225,6 +246,7 @@ module.exports = {
     update,
     getById,
     list,
-    readPrescription
+    readPrescription,
+    deletePrescription
 
 };

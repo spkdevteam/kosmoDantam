@@ -64,7 +64,7 @@ exports.getParticularPrescription = async (req, res, next) => {
                 message: message.lblPrescriptionIdIdAndClientIdRequired,
             });
         }
-        const prescription = await prescriptionService.getById(clientId, prescriptionId);
+        const prescription = await prescriptionService.deletePrescription(clientId, prescriptionId);
         return res.status(200).send({
             message: message.lblPrescriptionFoundSucessfully,
             data: prescription,
@@ -73,6 +73,21 @@ exports.getParticularPrescription = async (req, res, next) => {
         next(error)
     }
 };
+
+
+exports.deletePrescription = async (req,res,next)=>{
+
+    try {
+        const { clientId, prescriptionId } = req.query;
+        console.log(req.params)
+        const result = await prescriptionService.deletePrescription(clientId, prescriptionId)
+        res.status(result.statusCode).json({status:result.status,message:result.message})
+    } catch (error) {
+        next(error)
+    }
+}
+
+
 
 // pataint prescription list
 exports.pataintPrescriptionList = async (req, res, next) => {
@@ -110,6 +125,7 @@ exports.listPrescription = async (req, res, next) => {
             deletedAt: null,
            
         };
+        console.log('hello am reached backend ')
 
         // ...(keyword && {
         //     $or: [{}

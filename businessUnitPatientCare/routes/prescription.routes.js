@@ -24,6 +24,7 @@ priscriptionRouter.get('/prescription/:clientId/:prescriptionId',   prescription
 priscriptionRouter.get('/pataintPrescription', entityAuth.authorizeEntity("Pataints", "Prescription", "view"), prescriptionContrller.pataintPrescriptionList);
 
 priscriptionRouter.get('/listPrescription',  prescriptionContrller.listPrescription); //entityAuth.authorizeEntity("Pataints", "Prescription", "list"),
+priscriptionRouter.delete('/deletePrescription',  prescriptionContrller.deletePrescription); //entityAuth.authorizeEntity("Pataints", "Prescription", "list"),
 
 
 
