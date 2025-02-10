@@ -80,16 +80,19 @@ const patientFindingsSchema = require("./client/model/finding.js");
 const medicalSchema = require("./client/model/medical.js");
 const preScriptionRouter = require("./businessUnitAdministration/routes/priscription.routes.js");
 const priscriptionRouter = require("./businessUnitPatientCare/routes/prescription.routes.js");
-
+const utilsRouter = require("./businessUnitAdministration/routes/utils.routes.js");
 
 const corsOptions = {
-    origin:true,
+    origin: '*',
     credentials: true,
-    methods: ['GET', 'PATCH', 'PUT', 'POST','DELETE'],
-    allowedHeaders: ['Origin','Access-Control-Allow-Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'x-refresh-token', 'x-user-role','x-verify-token'],
-    optionsSuccessStatus: 204,
-  }; 
-
+    methods: ['GET', 'PATCH', 'PUT', 'POST', 'DELETE'],
+    allowedHeaders: [
+        'Origin', 'Access-Control-Allow-Origin', 'X-Requested-With', 
+        'Content-Type', 'Accept', 'Authorization', 
+        'x-refresh-token', 'x-user-role', 'x-verify-token'
+    ],
+    optionsSuccessStatus: 204,
+}; 
 // middleware setup
 
 app.use(cors(corsOptions));
@@ -134,7 +137,7 @@ app.use("/api/client/bu/investigation", investigationRouter)
 app.use("/api/client/bu/booking", bookingRoutes)
 app.use("/api/client/bu/leave", leaveRouter)
 app.use("/api/client/bu/prescription", priscriptionRouter)
-
+app.use('/initialise',utilsRouter)
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 
 // insert role

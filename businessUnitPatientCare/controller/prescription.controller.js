@@ -64,7 +64,7 @@ exports.getParticularPrescription = async (req, res, next) => {
                 message: message.lblPrescriptionIdIdAndClientIdRequired,
             });
         }
-        const prescription = await prescriptionService.deletePrescription(clientId, prescriptionId);
+        const prescription = await prescriptionService.getById(clientId, prescriptionId);
         return res.status(200).send({
             message: message.lblPrescriptionFoundSucessfully,
             data: prescription,
