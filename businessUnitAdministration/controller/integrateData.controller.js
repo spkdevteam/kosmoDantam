@@ -15,6 +15,7 @@ const investigationSchema = require("../../client/model/investigationSchema");
 const clinetBranchSchema = require("../../client/model/branch");
 const getserialNumber = require("../../model/services/getserialNumber");
 const mongoose = require("mongoose");
+const patientFindingsSchema = require("../../client/model/finding");
 
 const integrateData = async (req, res) => {
     try {
@@ -31,11 +32,11 @@ const integrateData = async (req, res) => {
 
         res.write("Processing: Connecting to client database...\n");
         const db = await getClientDatabaseConnection(data.clientId);
-        const ClientFindings = db.model("findings", findingsSchema);
+        const ClientFindings = db.model("patientFinding", patientFindingsSchema);
         const ClientInvestigations = db.model("investigations", investigationSchema);
         const ClientServices = db.model("service", serviceSchema);
         const ClientProcedures = db.model("procedure", procedureSchema);
-        const ClientCheifComplaint = db.model("cheifcomplaints", complaintSchema);
+        const ClientCheifComplaint = db.model("complaint", complaintSchema);
         const ClientDepartmentCollection = db.model("department", departmentSchema);
         const ClientBranchCollection = db.model('branches', clinetBranchSchema);
         const clientBranch = await ClientBranchCollection.find({});
