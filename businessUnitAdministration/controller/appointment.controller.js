@@ -135,7 +135,6 @@ exports.getdailyBookingWithPagination = async (req,res,next)=>{
 exports.filterBookingDetails = async (req,res,next)=>{
     try {
         const data = await sanitizeBody(req.query)
-        console.log(data,'---------------------------------')
         const result = await appointmentServices.filterBookingWithfromToDateAndKeyWord(data)
         res.status(200).json(result)
     } catch (error) {
@@ -189,7 +188,7 @@ exports.getBookingSummaryByPeriod = async (req,res,next)=>{
 }
 exports.getDatewiseBookingSummaryByPeriod = async (req,res,next)=>{
     try {
-        console.log('helloooooooooooooooooo')
+         
         console.log(req.query)
         const data =await sanitizeBody(req.query)
         const result = await appointmentServices.DatewiseBookingSummaryByPeriod(data)

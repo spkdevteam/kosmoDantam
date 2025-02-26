@@ -15,8 +15,10 @@ const clinetChairSchema = new Schema(
         chairNumber:  { type: String, index: true },
 
         isActive: { type: Boolean, default: false },
-
-        // handlign created by
+        status:{type:String,default:'Ready'},
+        activePatientId:{type:ObjectId,ref: "patient", default:null, index: true},
+        activeAppointmentId:{type:ObjectId,ref: "appointments", default:null, index: true},
+       
         createdBy: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
 
         deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality

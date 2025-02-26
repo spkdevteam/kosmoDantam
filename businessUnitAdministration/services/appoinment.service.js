@@ -44,7 +44,7 @@ exports.creatAppointment = async (input) => {
             displayId: input?.displayId,
             branchId: input?.branchId,
             buId: input?.buId,
-            token: input?.token || null,
+            // token: input?.token || null,
             date: input?.date ? new Date(input.date.includes('T') ? input.date.split('T')[0] + 'T00:00:00.000Z' : input.date + 'T00:00:00.000Z') : null,
             caseSheetId: input?.caseId || null,
             dutyDoctorId: input?.dutyDoctorId,
@@ -492,27 +492,20 @@ exports.dailyBookingWithPagination = async (input) => {
 
 
 exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
-    try {
-        // clientId, buId, bookingDate, page, perPage, branchId======>>>>>  input 
-        console.log(input, 'input')
-        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
-        if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
 
-        const db = await getClientDatabaseConnection(input?.clientId)
+    try {
+    
+        const {clientId,fromDate,toDate,keyword='',page=1,perPage=1000} = input
+        // clientId, buId, bookingDate, page, perPage, branchId======>>>>>  input 
+       console.clear()
+        console.log(input, 'input')
+        if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
+        // if (! await validateObjectId({ clientid: clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
+
+        const db = await getClientDatabaseConnection(clientId)
         const appointment = await db.model('appointment', appointmentSchema)
         const query = { isActive: true, deletedAt: null };
-
-        console.log(input, {
-            isActive: true,
-            deletedAt: null,
-            // date: 
-            // {
-            //     $gte:new Date(input.fromDate + 'T00:00:00.000Z'),
-            //     $lte:new Date(input.toDate + 'T00:00:00.000Z')
-            // },
-            ...(input?.branchId ? { branchId: new mongoose.Schema.ObjectId(input?.branchId) } : {})
-
-        }, 'mer++++++++++++++++++')
+ 
         const out = await appointment.aggregate([
             // Match the base fields in the `appointment` collection
             {
@@ -521,10 +514,10 @@ exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
                     deletedAt: null,
                     date:
                     {
-                        $gte: new Date(input.fromDate + 'T00:00:00.000Z'),
-                        $lte: new Date(input.toDate + 'T00:00:00.000Z')
+                        $gte: new Date(fromDate + 'T00:00:00.000Z'),
+                        $lte: new Date(toDate + 'T00:00:00.000Z')
                     },
-                    ...(input?.branchId ? { branchId: new mongoose.Types.ObjectId(input?.branchId) } : {})
+                    // ...(input?.branchId ? { branchId: new mongoose.Types.ObjectId(input?.branchId) } : {})
 
                 }
             },
@@ -620,28 +613,26 @@ exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
             {
                 $match: {
                     $or: [
-                        { 'patientId.firstName': { $regex: input?.keyword || '', $options: 'i' } },
-                        { 'patientId.lastName': { $regex: input?.keyword || '', $options: 'i' } },
-                        { 'patientId.email': { $regex: input?.keyword || '', $options: 'i' } },
-                        { 'patientId.phone': { $regex: input?.keyword || '', $options: 'i' } },
-                        { 'dutyDoctorId.firstName': { $regex: input?.keyword || '', $options: 'i' } }
+                        { 'patientId.firstName': { $regex: keyword || '', $options: 'i' } },
+                        { 'patientId.lastName': { $regex: keyword || '', $options: 'i' } },
+                        { 'patientId.email': { $regex: keyword || '', $options: 'i' } },
+                        { 'patientId.phone': { $regex: keyword || '', $options: 'i' } },
+                        { 'dutyDoctorId.firstName': { $regex: keyword || '', $options: 'i' } }
                     ]
                 }
             },
 
             {
-                $skip: (parseInt(input?.page) - 1) * parseInt(input?.perPage)
+                $skip: (parseInt(page) - 1) * parseInt(perPage)
             },
             {
-                $limit: parseInt(input?.perPage)
+                $limit: parseInt(perPage)
             }
         ]);
-
-
-        console.log(out, (parseInt(input?.page) - 1) * parseInt(input?.perPage), parseInt(input?.perPage), 'outoutout')
+        console.log(out, (parseInt(page) - 1) * parseInt(perPage), parseInt(perPage), 'outoutout')
         return { status: true, message: 'Success', data: out }
     } catch (error) {
-
+        return { status: false, message: error.message}
     }
 }
 

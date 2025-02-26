@@ -29,6 +29,10 @@ router.post("/softDeleteChair", entityAuth.authorizeEntity("Administration", "Ch
 
 router.post("/restoreChair", entityAuth.authorizeEntity("Administration", "Chair", "update"), businessUnitChairContrller.restoreChairByBusinessUnit);
 
+router.patch('/updateChairStatusReady',businessUnitChairContrller?.updateChairStatusReady)
+router.patch('/updateChairStatusInProgress',businessUnitChairContrller?.updateChairStatusInprogress)
+router.patch('/updateChairCleared',businessUnitChairContrller?.updateChairCleared)  
+router.patch('/CancelChairReadyStatus',businessUnitChairContrller?.CancelChairReadyStatus) 
 
 // # create, update, view, list, activate/inactive, delete Chair by business unit routes ends here
 
