@@ -512,6 +512,7 @@ const createService = async (clientId, data) => {
         const Service = clientConnection.model('services', serviceSchema);
 
         const newCheifComplaint = await CaseSheet.create(data);
+
         const populatedCaseSheet = await CaseSheet.findById(newCheifComplaint._id).populate({
             path: 'services.department.deptId',
             model: Department,
@@ -522,12 +523,201 @@ const createService = async (clientId, data) => {
             select: 'serviceName _id'
         })
 
+
+        let existingTreatmentData3 = populatedCaseSheet.treatmentData3 || [];
+        let newServices = populatedCaseSheet.services;
+
+        // Map existing treatmentData3 for quick lookup
+        let treatmentMap = new Map();
+        existingTreatmentData3.forEach(item => {
+            treatmentMap.set(item.tooth, item);
+        });
+
+        newServices.forEach(serviceItem => {
+            let { tooth, service } = serviceItem;
+            tooth.forEach(t => {
+                if (treatmentMap.has(t)) {
+                    // Update existing tooth services
+                    let existingToothData = treatmentMap.get(t);
+                    let serviceExists = existingToothData.service.some(s => s.service.serviceName === service.servId.serviceName);
+
+                    if (!serviceExists) {
+                        existingToothData.service.push({
+                            service: { serviceName: service.servId.serviceName },
+                            finished: "In Progress",
+                            updatedAt: new Date(),
+                        });
+                    }
+                } else {
+                    // Add new tooth entry
+                    treatmentMap.set(t, {
+                        tooth: t,
+                        service: [
+                            {
+                                service: { serviceName: service.servId.serviceName },
+                                finished: "In Progress",
+                                updatedAt: new Date(),
+                            }
+                        ],
+                        total: 1,
+                        completed: 0,
+                    });
+                }
+            });
+        });
+
+        // Convert map back to array
+        populatedCaseSheet.treatmentData3 = Array.from(treatmentMap.values());
+        await populatedCaseSheet.save();
+
+
+
+
         return populatedCaseSheet
         // return await CaseSheet.create(data);
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
     }
 };
+
+
+// new 1
+const createService1 = async (clientId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+
+        // Fetch existing case sheet
+        let existingCaseSheet = await CaseSheet.findOne({ patientId: data.patientId, branchId: data.branchId });
+
+        if (!existingCaseSheet) {
+            existingCaseSheet = await CaseSheet.create(data);
+        } else {
+            // Extract existing treatmentData3
+            let existingTreatmentData3 = existingCaseSheet.treatmentData3 || [];
+            let newServices = data.services;
+
+            // Map existing treatmentData3 for quick lookup
+            let treatmentMap = new Map();
+            existingTreatmentData3.forEach(item => {
+                treatmentMap.set(item.tooth, item);
+            });
+
+            newServices.forEach(serviceItem => {
+                let { tooth, service } = serviceItem;
+                tooth.forEach(t => {
+                    if (treatmentMap.has(t)) {
+                        // Update existing tooth services
+                        let existingToothData = treatmentMap.get(t);
+                        let serviceExists = existingToothData.service.some(s => s.service.serviceName === service.servId);
+
+                        if (!serviceExists) {
+                            existingToothData.service.push({
+                                service: { serviceName: service.servId },
+                                finished: "In Progress",
+                                updatedAt: new Date(),
+                            });
+                        }
+                    } else {
+                        // Add new tooth entry
+                        treatmentMap.set(t, {
+                            tooth: t,
+                            service: [
+                                {
+                                    service: { serviceName: service.servId },
+                                    finished: "In Progress",
+                                    updatedAt: new Date(),
+                                }
+                            ],
+                            total: 1,
+                            completed: 0,
+                        });
+                    }
+                });
+            });
+
+            // Convert map back to array
+            existingCaseSheet.treatmentData3 = Array.from(treatmentMap.values());
+            Object.assign(existingCaseSheet, data);
+            await existingCaseSheet.save();
+        }
+
+        const populatedCaseSheet = await CaseSheet.findById(existingCaseSheet._id).populate({
+            path: 'services.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        });
+
+        return populatedCaseSheet;
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error creating/updating service in case sheet: ${error.message}`);
+    }
+};
+
+
+function transformServiceToTreatment(existingData, newProcedures) {
+    const toothMap = new Map();
+
+    // Populate the map with existing treatmentData2
+    existingData.forEach(({ tooth, service, total, completed }) => {
+        if (!toothMap.has(tooth)) {
+            toothMap.set(tooth, { tooth: tooth, service: [], total, completed });
+        }
+        service.forEach((s) => {
+            const existingService = toothMap.get(tooth).service.find(
+                (sv) => sv.service.serviceName === s.service.serviceName
+            );
+            if (existingService) {
+                existingService.procedure.push(...s.procedure);
+            } else {
+                toothMap.get(tooth).service.push(s);
+            }
+        });
+    });
+
+    // Add new data from newProcedures
+    newProcedures.forEach((item) => {
+        const { tooth, service, procedure } = {
+            tooth: item.tooth,
+            service: {
+                serviceName: item.service.servId?.serviceName,
+            },
+            procedure: item.procedure?.map((p) => ({
+                procedureName: p.procedId?.procedureName,
+            })),
+        };
+
+        tooth.forEach((t) => {
+            if (!toothMap.has(t)) {
+                toothMap.set(t, { tooth: t, service: [], total: 0, completed: 0 });
+            }
+
+            const toothEntry = toothMap.get(t);
+            const existingService = toothEntry.service.find(
+                (sv) => sv.service.serviceName === service.serviceName
+            );
+
+            if (existingService) {
+                const existingProcedures = existingService.procedure.map((p) => p.procedureName);
+                procedure.forEach((p) => {
+                    if (!existingProcedures.includes(p.procedureName)) {
+                        existingService.procedure.push(p);
+                        toothEntry.total += 1; // Increment total for new procedures
+                    }
+                });
+            } else {
+                toothEntry.service.push({
+                    service,
+                    procedure,
+                });
+                toothEntry.total += 1; // Increment total for a new service
+            }
+        });
+    });
+
+    return Array.from(toothMap.values());
+}
 
 const updateService = async (clientId, caseSheetId, data) => {
     try {
@@ -541,6 +731,24 @@ const updateService = async (clientId, caseSheetId, data) => {
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
+
+
+        // const treatmentData3 = data.services.map(service => ({
+        //     tooth: service.tooth || null,
+        //     service: [{
+        //         service: {
+        //             serviceName: service.serviceName || null,
+        //             finished: 'In Progress',
+        //             updatedAt: new Date()
+        //         },
+        //         procedure: [] // Empty procedure array as required
+        //     }],
+        //     total: service.quaintity || 0,
+        //     completed: 0
+        // }));
+
+
+
         Object.assign(existing, data);
 
         await existing.save();
@@ -554,6 +762,53 @@ const updateService = async (clientId, caseSheetId, data) => {
             model: Service,
             select: 'serviceName _id'
         })
+
+        let existingTreatmentData3 = populatedCaseSheet.treatmentData3 || [];
+        let newServices = populatedCaseSheet.services;
+
+        // Map existing treatmentData3 for quick lookup
+        let treatmentMap = new Map();
+        existingTreatmentData3.forEach(item => {
+            treatmentMap.set(item.tooth, item);
+        });
+
+        newServices.forEach(serviceItem => {
+            let { tooth, service } = serviceItem;
+            tooth.forEach(t => {
+                if (treatmentMap.has(t)) {
+                    // Update existing tooth services
+                    let existingToothData = treatmentMap.get(t);
+                    let serviceExists = existingToothData.service.some(s => s.service.serviceName === service.servId.serviceName);
+
+                    if (!serviceExists) {
+                        existingToothData.service.push({
+                            service: { serviceName: service.servId.serviceName },
+                            finished: "In Progress",
+                            updatedAt: new Date(),
+                        });
+                    }
+                } else {
+                    // Add new tooth entry
+                    treatmentMap.set(t, {
+                        tooth: t,
+                        service: [
+                            {
+                                service: { serviceName: service.servId.serviceName },
+                                finished: "In Progress",
+                                updatedAt: new Date(),
+                            }
+                        ],
+                        total: 1,
+                        completed: 0,
+                    });
+                }
+            });
+        });
+
+        // Convert map back to array
+        populatedCaseSheet.treatmentData3 = Array.from(treatmentMap.values());
+        await populatedCaseSheet.save();
+
 
         return populatedCaseSheet
     } catch (error) {
@@ -783,7 +1038,73 @@ const updateProcedure = async (clientId, caseSheetId, data) => {
 //     return Array.from(toothMap.values());
 // }
 
-// 2 new
+// 2 new working code
+// function transformArr2(existingData, newProcedures) {
+//     const toothMap = new Map();
+
+//     // Populate the map with existing treatmentData2
+//     existingData.forEach(({ tooth, service, total, completed }) => {
+//         if (!toothMap.has(tooth)) {
+//             toothMap.set(tooth, { tooth: tooth, service: [], total, completed });
+//         }
+//         service.forEach((s) => {
+//             const existingService = toothMap.get(tooth).service.find(
+//                 (sv) => sv.service.serviceName === s.service.serviceName
+//             );
+//             if (existingService) {
+//                 existingService.procedure.push(...s.procedure);
+//             } else {
+//                 toothMap.get(tooth).service.push(s);
+//             }
+//         });
+//     });
+
+//     // Add new data from newProcedures
+//     newProcedures.forEach((item) => {
+//         const { tooth, service, procedure } = {
+//             tooth: item.tooth,
+//             service: {
+//                 serviceName: item.service.servId?.serviceName,
+//             },
+//             procedure: item.procedure?.map((p) => ({
+//                 procedureName: p.procedId?.procedureName,
+//             })),
+//         };
+
+//         tooth.forEach((t) => {
+//             if (!toothMap.has(t)) {
+//                 toothMap.set(t, { tooth: t, service: [], total: 0, completed: 0 });
+//             }
+
+//             const toothEntry = toothMap.get(t);
+//             const existingService = toothEntry.service.find(
+//                 (sv) => sv.service.serviceName === service.serviceName
+//             );
+
+//             if (existingService) {
+//                 const existingProcedures = existingService.procedure.map((p) => p.procedureName);
+
+//                 procedure.forEach((p) => {
+//                     if (!existingProcedures.includes(p.procedureName)) {
+//                         existingService.procedure.push(p);
+//                         toothEntry.total += 1; // Increment total for new procedures
+//                     }
+//                 });
+
+//             } else {
+//                 toothEntry.service.push({
+//                     service,
+//                     procedure,
+//                 });
+//                 toothEntry.total += 1; // Increment total for a new service
+//             }
+//         });
+//     });
+
+//     return Array.from(toothMap.values());
+// }
+
+// 3 new experiment code
 function transformArr2(existingData, newProcedures) {
     const toothMap = new Map();
 
@@ -828,6 +1149,364 @@ function transformArr2(existingData, newProcedures) {
 
             if (existingService) {
                 const existingProcedures = existingService.procedure.map((p) => p.procedureName);
+                let newProcedureAdded = false;
+
+                procedure.forEach((p) => {
+                    if (!existingProcedures.includes(p.procedureName)) {
+                        existingService.procedure.push(p);
+                        toothEntry.total += 1; // Increment total for new procedures
+                        newProcedureAdded = true;
+                    }
+                });
+
+                console.log("existingService", existingService);
+
+
+                if (newProcedureAdded) {
+                    existingService.service.finished = "Proposed"
+                    // toothEntry.service = toothEntry.service.map((sv) => {
+                    //     if (sv.service.serviceName === service.serviceName) {
+                    //         return { 
+                    //             ...sv, 
+                    //             finished: "Proposed"  // Update the status
+                    //         };
+                    //     }
+                    //     return sv;
+                    // });
+                }
+
+            } else {
+                toothEntry.service.push({
+                    service,
+                    procedure,
+                });
+                toothEntry.total += 1; // Increment total for a new service
+            }
+        });
+    });
+
+    return Array.from(toothMap.values());
+}
+
+
+
+// 3 new
+// function transformArr2(existingData, newProcedures) {
+//     const toothMap = new Map();
+
+//     // Populate the map with existing treatmentData2
+//     existingData.forEach(({ tooth, service, total, completed }) => {
+//         if (!toothMap.has(tooth)) {
+//             toothMap.set(tooth, { tooth: tooth, service: [], total, completed });
+//         }
+//         service.forEach((s) => {
+//             const existingService = toothMap.get(tooth).service.find(
+//                 (sv) => sv.service.serviceName === s.service.serviceName
+//             );
+//             if (existingService) {
+//                 existingService.procedure.push(...s.procedure);
+//                 existingService.finished = s.finished || "Completed"; // Preserve existing status
+//             } else {
+//                 toothMap.get(tooth).service.push({ ...s, finished: s.finished || "Completed" });
+//             }
+//         });
+//     });
+
+//     // Add new data from newProcedures
+//     newProcedures.forEach((item) => {
+//         const { tooth, service, procedure } = {
+//             tooth: item.tooth,
+//             service: {
+//                 serviceName: item.service.servId?.serviceName,
+//             },
+//             procedure: item.procedure?.map((p) => ({
+//                 procedureName: p.procedId?.procedureName,
+//             })),
+//         };
+
+//         tooth.forEach((t) => {
+//             if (!toothMap.has(t)) {
+//                 toothMap.set(t, { tooth: t, service: [], total: 0, completed: 0 });
+//             }
+
+//             const toothEntry = toothMap.get(t);
+//             const existingService = toothEntry.service.find(
+//                 (sv) => sv.service.serviceName === service.serviceName
+//             );
+
+//             if (existingService) {
+//                 const existingProcedures = existingService.procedure.map((p) => p.procedureName);
+//                 let newProcedureAdded = false;
+
+//                 procedure.forEach((p) => {
+//                     if (!existingProcedures.includes(p.procedureName)) {
+//                         existingService.procedure.push(p);
+//                         toothEntry.total += 1; // Increment total for new procedures
+//                         newProcedureAdded = true;
+//                     }
+//                 });
+
+//                 // If a new procedure is added, update the service status to "Proposed"
+//                 if (newProcedureAdded) {
+//                     existingService.finished = "Proposed";
+//                 }
+//             } else {
+//                 toothEntry.service.push({
+//                     service,
+//                     procedure,
+//                     finished: "Proposed", // New service should be "Proposed"
+//                 });
+//                 toothEntry.total += 1; // Increment total for a new service
+//             }
+//         });
+//     });
+
+//     return Array.from(toothMap.values());
+// }
+
+
+// new 2
+// function transformArr2(existingData, newProcedures) {
+//     const toothMap = new Map();
+
+//     // Populate the map with existing treatmentData3
+//     existingData.forEach(({ tooth, service, total, completed }) => {
+//         if (!toothMap.has(tooth)) {
+//             toothMap.set(tooth, { tooth: tooth, service: [], total, completed });
+//         }
+//         service.forEach((s) => {
+//             const existingService = toothMap.get(tooth).service.find(
+//                 (sv) => sv.service.serviceName === s.service.serviceName
+//             );
+//             if (existingService) {
+//                 existingService.procedure.push(...s.procedure);
+//             } else {
+//                 toothMap.get(tooth).service.push(s);
+//             }
+//         });
+//     });
+
+//     // Add new data from newProcedures
+//     newProcedures.forEach((item) => {
+//         const { tooth, service, procedure } = {
+//             tooth: item.tooth,
+//             service: {
+//                 serviceName: item.service.servId?.serviceName,
+//             },
+//             procedure: item.procedure?.map((p) => ({
+//                 procedureName: p.procedId?.procedureName,
+//             })),
+//         };
+
+//         tooth.forEach((t) => {
+//             if (!toothMap.has(t)) {
+//                 toothMap.set(t, { tooth: t, service: [], total: 0, completed: 0 });
+//             }
+
+//             const toothEntry = toothMap.get(t);
+//             const existingService = toothEntry.service.find(
+//                 (sv) => sv.service.serviceName === service.serviceName
+//             );
+
+//             if (existingService) {
+//                 const existingProcedures = existingService.procedure.map((p) => p.procedureName);
+//                 procedure.forEach((p) => {
+//                     if (!existingProcedures.includes(p.procedureName)) {
+//                         existingService.procedure.push(p);
+//                         toothEntry.total += 1; // Increment total for new procedures
+//                     }
+//                 });
+//             } else {
+//                 toothEntry.service.push({
+//                     service,
+//                     procedure,
+//                 });
+//                 toothEntry.total += 1; // Increment total for a new service
+//             }
+//         });
+//     });
+
+//     // Filter out teeth that are not in newProcedures
+//     const newToothSet = new Set(newProcedures.flatMap((p) => p.tooth));
+//     const updatedToothMap = new Map();
+
+//     toothMap.forEach((value, key) => {
+//         // Remove services that have no procedures left
+//         value.service = value.service.filter((s) => s.procedure.length > 0);
+
+//         // If no services are left for a tooth, remove the tooth completely
+//         if (value.service.length > 0 && newToothSet.has(key)) {
+//             updatedToothMap.set(key, value);
+//         }
+//     });
+
+//     return Array.from(updatedToothMap.values());
+// }
+
+
+// new 5 *working code
+// function transformArr3(existingData, newProcedures) {
+//     const toothMap = new Map();
+
+//     // Extract the list of teeth present in newProcedures
+//     const newProcedureTeeth = new Set();
+//     newProcedures.forEach((item) => {
+//         item.tooth.forEach((t) => newProcedureTeeth.add(t));
+//     });
+
+//     // Populate the map with existing treatmentData2
+//     existingData.forEach(({ tooth, service, total, completed }) => {
+//         if (!toothMap.has(tooth)) {
+//             toothMap.set(tooth, { tooth: tooth, service: [], total, completed });
+//         }
+//         service.forEach((s) => {
+//             const existingService = toothMap.get(tooth).service.find(
+//                 (sv) => sv.service.serviceName === s.service.serviceName
+//             );
+//             if (existingService) {
+//                 existingService.procedure.push(...s.procedure);
+//             } else {
+//                 toothMap.get(tooth).service.push({
+//                     service: s.service,
+//                     procedure: newProcedureTeeth.has(tooth) ? [...s.procedure] : [] // Empty procedure if tooth is missing in newProcedures
+//                 });
+//             }
+//         });
+
+//         // If tooth is not in newProcedures, empty all procedure arrays under that tooth
+//         if (!newProcedureTeeth.has(tooth)) {
+//             toothMap.get(tooth).service.forEach((s) => (s.procedure = []));
+//         }
+//     });
+
+//     // Add new data from newProcedures
+//     newProcedures.forEach((item) => {
+//         const { tooth, service, procedure } = {
+//             tooth: item.tooth,
+//             service: {
+//                 serviceName: item.service.servId?.serviceName,
+//             },
+//             procedure: item.procedure?.map((p) => ({
+//                 procedureName: p.procedId?.procedureName,
+//             })),
+//         };
+
+//         tooth.forEach((t) => {
+//             if (!toothMap.has(t)) {
+//                 toothMap.set(t, { tooth: t, service: [], total: 0, completed: 0 });
+//             }
+
+//             const toothEntry = toothMap.get(t);
+//             const existingService = toothEntry.service.find(
+//                 (sv) => sv.service.serviceName === service.serviceName
+//             );
+
+//             if (existingService) {
+//                 const existingProcedures = existingService.procedure.map((p) => p.procedureName);
+//                 procedure.forEach((p) => {
+//                     if (!existingProcedures.includes(p.procedureName)) {
+//                         existingService.procedure.push(p);
+//                         toothEntry.total += 1; // Increment total for new procedures
+//                     }
+//                 });
+//             } else {
+//                 toothEntry.service.push({
+//                     service,
+//                     procedure,
+//                 });
+//                 toothEntry.total += 1; // Increment total for a new service
+//             }
+//         });
+//     });
+
+//     return Array.from(toothMap.values());
+// }
+
+
+// new 7 *experiment code
+function transformArr3(existingData, newProcedures) {
+    const toothMap = new Map();
+
+    // Extract the list of teeth and their services present in newProcedures
+    const newProcedureTeeth = new Set();
+    const newProcedureServices = new Map();
+
+    newProcedures.forEach((item) => {
+        item.tooth.forEach((t) => {
+            newProcedureTeeth.add(t);
+            if (!newProcedureServices.has(t)) {
+                newProcedureServices.set(t, new Set());
+            }
+            newProcedureServices.get(t).add(item.service.servId?.serviceName);
+        });
+    });
+
+    // Populate the map with existing treatmentData2
+    existingData.forEach(({ tooth, service, total, completed }) => {
+        if (!toothMap.has(tooth)) {
+            toothMap.set(tooth, { tooth: tooth, service: [], total, completed });
+        }
+
+        service.forEach((s) => {
+            const existingService = toothMap.get(tooth).service.find(
+                (sv) => sv.service.serviceName === s.service.serviceName
+            );
+
+            if (existingService) {
+                existingService.procedure.push(...s.procedure);
+            } else {
+                // Keep the service but remove procedures if the service is not in newProcedures
+                const shouldRemoveProcedures =
+                    newProcedureTeeth.has(tooth) &&
+                    !newProcedureServices.get(tooth)?.has(s.service.serviceName);
+
+                toothMap.get(tooth).service.push({
+                    service: s.service,
+                    procedure: shouldRemoveProcedures ? [] : [...s.procedure], // Empty procedures if not in newProcedures
+                });
+            }
+        });
+
+        // If the tooth is in newProcedures but missing some services, clear procedures only for missing services
+        if (newProcedureTeeth.has(tooth)) {
+            toothMap.get(tooth).service.forEach((s) => {
+                if (!newProcedureServices.get(tooth)?.has(s.service.serviceName)) {
+                    s.procedure = [];
+                }
+            });
+        }
+
+        // If tooth is not in newProcedures, empty all procedure arrays under that tooth
+        if (!newProcedureTeeth.has(tooth)) {
+            toothMap.get(tooth).service.forEach((s) => (s.procedure = []));
+        }
+
+    });
+
+    // Add new data from newProcedures
+    newProcedures.forEach((item) => {
+        const { tooth, service, procedure } = {
+            tooth: item.tooth,
+            service: {
+                serviceName: item.service.servId?.serviceName,
+            },
+            procedure: item.procedure?.map((p) => ({
+                procedureName: p.procedId?.procedureName,
+            })),
+        };
+
+        tooth.forEach((t) => {
+            if (!toothMap.has(t)) {
+                toothMap.set(t, { tooth: t, service: [], total: 0, completed: 0 });
+            }
+
+            const toothEntry = toothMap.get(t);
+            const existingService = toothEntry.service.find(
+                (sv) => sv.service.serviceName === service.serviceName
+            );
+
+            if (existingService) {
+                const existingProcedures = existingService.procedure.map((p) => p.procedureName);
                 procedure.forEach((p) => {
                     if (!existingProcedures.includes(p.procedureName)) {
                         existingService.procedure.push(p);
@@ -846,6 +1525,13 @@ function transformArr2(existingData, newProcedures) {
 
     return Array.from(toothMap.values());
 }
+
+
+
+
+
+
+
 
 // 3
 // function transformArr2(existingData, newProcedures) {
@@ -977,6 +1663,16 @@ const deleteProcedure = async (clientId, caseSheetId, procedureId) => {
             model: Service,
             select: 'serviceName _id'
         })
+
+
+        const existingTreatmentData = populatedCaseSheet.treatmentData3 || [];
+        const result = transformArr3(existingTreatmentData, populatedCaseSheet.procedures);
+        console.dir("result", result);
+
+
+        populatedCaseSheet.treatmentData3 = result;
+        await populatedCaseSheet.save();
+
         return populatedCaseSheet
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
@@ -1888,6 +2584,46 @@ const caseSheetOverView = async ({ clientId, patientId }) => {
 };
 
 
+const appointmentsWithCase = async ({ clientId, patientId, caseSheetId }) => {
+    try {
+        const db = await getClientDatabaseConnection(clientId)
+        const appointment = await db.model('appointment', appointmentSchema)
+        const CaseSheet = db.model('caseSheet', caseSheetSchema);
+        const chair = db.model('chair', clinetChairSchema);
+        const User = await db.model('clientUsers', clinetUserSchema);
+        const patientregister = db.model('patient', clinetPatientSchema);
+        const result = await CaseSheet.findOne({
+            patientId: new mongoose.Types.ObjectId(patientId),
+            status: { $in: ['In Progress', 'Proposed'] },
+            isActive: true,
+            deletedAt: null,
+        });
+        const appointmentWithCase = await appointment.find({
+            patientId: new mongoose.Types.ObjectId(patientId),
+            isActive: true,
+            deletedAt: null,
+            caseSheetId: caseSheetId,
+        })
+            .populate('dutyDoctorId', 'firstName lastName phone')
+            .populate('dentalAssistant', 'firstName lastName phone')
+            .populate('chairId')
+            .populate('patientId', 'firstName lastName displayId')
+            .populate('caseSheetId')
+            .sort({ createdAt: -1 })
+            .exec();
+
+        return {
+            status: true,
+            message: message.lblAppointmentWithCaseFoundSuccessfully,
+            data: appointmentWithCase,
+        };
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: 'Error fetching appointment by case.' };
+    }
+};
+
+
 
 // // const caseSheetOverView = async ({ clientId, branchId, buId, patientId})=>{
 //     try {
@@ -2011,6 +2747,7 @@ module.exports = {
 
 
     getCaseDetail,
-    caseSheetOverView
+    caseSheetOverView,
+    appointmentsWithCase
 
 };

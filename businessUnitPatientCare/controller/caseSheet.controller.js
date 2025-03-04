@@ -1253,6 +1253,23 @@ exports.getCaseSheetOverViewByPatient = async (req, res, next) => {
 };
 
 
+// get appointments with case sheet
+exports.getAppointmentByCase = async (req, res, next) => {
+    try {
+
+        const { clientId, patientId, caseSheetId } = req.params;
+        if (!clientId || !patientId || !caseSheetId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const result = await caseSheetService.appointmentsWithCase({ clientId, patientId, caseSheetId });
+        return res.status(statusCode.OK).send(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 
 

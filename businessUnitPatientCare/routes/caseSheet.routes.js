@@ -166,6 +166,8 @@ router.put('/closeCaseSheet',entityAuth.authorizeEntity("Patient", "Case Sheet",
 router.put('/updateTreatmentProcedure',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatmentProcedure);
 router.get('/getActiveCaseSheetOverView/:clientId/:patientId', caseSheetController.getCaseSheetOverViewByPatient);
 
+
+router.get('/getAppointmentsWithCaseSheet/:clientId/:patientId/:caseSheetId',caseSheetController.getAppointmentByCase)
 // ------- Treatment plan routes starts starts here -------
 
 
