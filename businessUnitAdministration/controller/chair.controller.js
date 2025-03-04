@@ -14,6 +14,16 @@ const clinetBusinessUnitSchema = require("../../client/model/businessUnit")
 
 const chairService = require("../../client/service/chair.services");
 const getserialNumber = require("../../model/services/getserialNumber");
+const sanitizeBody = require("../../utils/sanitizeBody");
+const updateChairStatus = require("../services/chair/updateChairStatus");
+const updateChairStatustoReady = require("../services/chair/updateChairStatus");
+const updatePatientStatustoChairReady = require("../services/appointment/updatePatientStatustoChairReady");
+const updateChairStatusInprogress = require("../services/chair/updateChairStatusInprogress");
+const updatePatientStatustoInprogress = require("../services/appointment/updatePatientStatustoInprogress");
+const updateChairCleared = require("../services/chair/updateChairCleared");
+const updatePatientBookingCompleted = require("../services/appointment/updatePatientBookingCompleted");
+const CancelChairReadyStatus = require("../services/chair/CancelChairReadyStatus");
+const cancelPatientChairReadyStatus = require("../services/appointment/cancelPatientChairReadyStatus");
 
 
 
@@ -184,7 +194,7 @@ exports.getParticularChairByBusinessUnit = async (req, res, next) => {
 // };
 exports.listChair = async (req, res, next) => {
     try {
-        const { clientId, keyword = '', page = 1, perPage = 10, isAdmin = true, branchId  } = req.query;
+        const { clientId, keyword = '', page = 1, perPage = 10, isAdmin = true, branchId } = req.query;
 
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
@@ -202,10 +212,10 @@ exports.listChair = async (req, res, next) => {
             }),
         };
 
-        if(isAdmin == "false" && branchId ){
+        if (isAdmin == "false" && branchId) {
             filters = {
                 ...filters,
-                branch : branchId
+                branch: branchId
             }
         }
 
@@ -301,7 +311,7 @@ exports.softDeleteChairByBusinesssUnit = async (req, res, next) => {
 
     try {
 
-        const { keyword, page, perPage, chairId, clientId, isAdmin = true, branchId  } = req.body;
+        const { keyword, page, perPage, chairId, clientId, isAdmin = true, branchId } = req.body;
 
         req.query.keyword = keyword;
         req.query.page = page;
@@ -309,7 +319,7 @@ exports.softDeleteChairByBusinesssUnit = async (req, res, next) => {
         req.query.clientId = clientId;
         req.query.isAdmin = isAdmin;
         req.query.branchId = branchId;
-        
+
 
 
         // Validate inputs
@@ -360,6 +370,117 @@ exports.restoreChairByBusinessUnit = async (req, res, next) => {
 };
 
 
+exports.updateChairStatusReady = async (req, res, next) => {
+    try {
+        const data = await sanitizeBody(req.body)
+        const updateChairStatus = await updateChairStatustoReady({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId,appointmentId: data?.appointmentId })
+        if (!updateChairStatus?.status) {
+            res.json({ ...updateChairStatus })
+        }
+        else {
+            const updateAppointStatus = await updatePatientStatustoChairReady({ appointmentId: data?.appointmentId, clientId: data?.clientId, patientId: data?.patientId })
+            if (!updateAppointStatus?.status) res.json({ ...updateAppointStatus })
+                else {
+                    console.log(updateChairStatus,updateAppointStatus, '----------------------')
+
+                if (updateChairStatus && updateAppointStatus) {
+                    res.json({ status: true, message: 'chair status updated ' })
+                }
+                else {
+                    res.json({ status: false, message: 'chair status updated ' })
+                }
+            }
+        }
+    } catch (error) {
+        next(error)
+    }
+
+}
+
+
+
+exports.updateChairStatusInprogress = async (req, res, next) => {
+    try {
+        const data = await sanitizeBody(req.body)
+        const updateChairStatus = await updateChairStatusInprogress({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId })
+        if (!updateChairStatus?.status) {
+            res.json({ ...updateChairStatus })
+        }
+        else {
+            const updateAppointStatus = await updatePatientStatustoInprogress({ appointmentId: data?.appointmentId, clientId: data?.clientId, patientId: data?.patientId })
+            if (!updateAppointStatus?.status) res.json({ ...updateAppointStatus })
+                else {
+                    console.log(updateChairStatus,updateAppointStatus, '----------------------')
+
+                if (updateChairStatus && updateAppointStatus) {
+                    res.json({ status: true, message: 'chair status updated ' })
+                }
+                else {
+                    res.json({ status: false, message: 'chair status updated ' })
+                }
+            }
+        }
+    } catch (error) {
+        next(error)
+    }
+
+}
+
+
+
+exports.updateChairCleared = async (req, res, next) => {
+    try {
+        const data = await sanitizeBody(req.body)
+        const updateChairStatus = await updateChairCleared({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId })
+        if (!updateChairStatus?.status) {
+            res.json({ ...updateChairStatus })
+        }
+        else {
+            const updateAppointStatus = await updatePatientBookingCompleted({ appointmentId: data?.appointmentId, clientId: data?.clientId, patientId: data?.patientId })
+            if (!updateAppointStatus?.status) res.json({ ...updateAppointStatus })
+                else {
+                    console.log(updateChairStatus,updateAppointStatus, '----------------------')
+
+                if (updateChairStatus && updateAppointStatus) {
+                    res.json({ status: true, message: 'chair status updated ' })
+                }
+                else {
+                    res.json({ status: false, message: 'chair status updated ' })
+                }
+            }
+        }
+    } catch (error) {
+        next(error)
+    }
+
+}
+
+exports.CancelChairReadyStatus = async (req, res, next) => {
+    try {
+        const data = await sanitizeBody(req.body)
+        const updateChairStatus = await  CancelChairReadyStatus({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId,appointmentId: data?.appointmentId, })
+        if (!updateChairStatus?.status) {
+            res.json({ ...updateChairStatus })
+        }
+        else {
+            const updateAppointStatus = await cancelPatientChairReadyStatus({ appointmentId: data?.appointmentId, clientId: data?.clientId, patientId: data?.patientId })
+            if (!updateAppointStatus?.status) res.json({ ...updateAppointStatus })
+                else {
+                   
+
+                if (updateChairStatus && updateAppointStatus) {
+                    res.json({ status: true, message: 'chair status updated ' })
+                }
+                else {
+                    res.json({ status: false, message: 'chair status updated ' })
+                }
+            }
+        }
+    } catch (error) {
+        next(error)
+    }
+
+}
 
 
 

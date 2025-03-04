@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
 const { upsertTeeth } = require("./client/model/tooth.js");
-
+const { Server } = require('socket.io');
 const errorHandler = require("./middleware/errorHandler/errorHandler.js");
 
 const swaggerDocs = require("./documentation/swagger.js");
@@ -17,8 +17,18 @@ const clientRoleSchema = require("./client/model/role.js");
 const clinetPatientSchema = require("./client/model/patient.js");
 const serialNumberSchema = require("./model/serialNumber.js")
 const { defaultPersmissionsList, businessUnitPersmissionsList, cheifComplaints, findings, medicalHistory } = require("./utils/constant.js")
+const http = require('http');
+const socketHandler = require('./socketServer/socketio.js');
 
-
+const app = express()
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+      origin: '*',
+      methods: ['GET', 'POST'],
+    },
+  });
+  socketHandler(io);
 // cors setup
 const cors = require("cors");
 
@@ -29,7 +39,7 @@ dotnev.config();
 
 
 // socket setup
-const { app, server } = require("./socket/socket.js");
+//const { app, server } = require("./socket/socket.js");
 
 // databse connection setup
 const { ConnectDb, createClientDatabase, getClientDatabaseConnection } = require("./db/connection.js");
