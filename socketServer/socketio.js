@@ -15,7 +15,7 @@ const socketHandler = (io) => {
                 // console.log(users, 'Online users after adding:');
             }
         }
-        console.log(users,'usersOnline')
+        // console.log(users,'usersOnline')
         io.emit("usersOnline", users);
     };
 
@@ -36,7 +36,7 @@ const socketHandler = (io) => {
         });
 
         socket.on('join', ({ userId }) => {
-            console.log(`User ${userId} has joined with socket id: ${socket.id}`);
+            // console.log(`User ${userId} has joined with socket id: ${socket.id}`);
             io.to(socket.id).emit('notification', {
                 message: `Welcome, user ${userId}!`
             });
@@ -56,7 +56,7 @@ const socketHandler = (io) => {
                 io.to(socketId).emit('receiveNotification', message);
                 const result  = await filterBookingWithfromToDateAndKeyWord ({clientId:clientId,branchId:branchId,fromDate:new Date()?.toISOString()?.split('T')[0] , toDate:new Date()?.toISOString()?.split('T')[0]  })
                 // console.log(`Sent waiting list for branch ${branchId} to ${userId}`);
-                console.log(result,'resul------------tresult')
+                
                 io.emit('currentWaitingList',{result})
                 // console.log(`Notification sent to ${message.receiverId}`);
             } else {
@@ -70,7 +70,7 @@ const socketHandler = (io) => {
             // socket.emit("currentWaitingList", { userId, branchId });
             const result  = await filterBookingWithfromToDateAndKeyWord ({clientId:clientId,branchId:branchId,fromDate:new Date()?.toISOString()?.split('T')[0] , toDate:new Date()?.toISOString()?.split('T')[0]  })
             // console.log(`Sent waiting list for branch ${branchId} to ${userId}`);
-            console.log(result,'resul------------tresult')
+           
             io.emit('currentWaitingList',{result})
         });
         
