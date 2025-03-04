@@ -312,6 +312,7 @@ module.exports = {
   lblCaseSheetFoundSucessfully: "CaseSheet found successfully!",
   lblCaseSheetIdIdRequired: "CaseSheet Id is required!",
   lblCaseOverViewListed :'Case sheet overview received ',
+  lblAppointmentWithCaseFoundSuccessfully :'Appointment by case found successfully ',
 
 
 

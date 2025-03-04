@@ -23,7 +23,8 @@ const caseSheetSchema = new mongoose.Schema({
                         //   { type: mongoose.Schema.ObjectId, ref: "complaint" }
 
                     ]
-                }
+                },
+                painValue: { type: Number, default: 0 }
             },
         ],
         default: [],
@@ -74,7 +75,7 @@ const caseSheetSchema = new mongoose.Schema({
                         },
                     ],
                 },
-                reading: {type: String, default : null}
+                reading: { type: String, default: null }
             }
         ],
         default: [],
@@ -107,7 +108,8 @@ const caseSheetSchema = new mongoose.Schema({
                 subTotal: { type: Number, default: null },
                 discount: { type: Number, default: null },
                 grantTotal: { type: Number, default: null },
-                finished: { type: Boolean, default: false }
+                finished: { type: Boolean, default: false },
+                prposedDate: { type: Date, default: null }
             }
 
         ],
@@ -124,8 +126,9 @@ const caseSheetSchema = new mongoose.Schema({
                 service: { servId: { type: mongoose.Schema.ObjectId, ref: "services" } },
                 procedure: {
                     type: [
-                        { procedId: { type: mongoose.Schema.ObjectId, ref: "procedure" } }
-                    ]
+                        { procedId: { type: mongoose.Schema.ObjectId, ref: "procedure", default: null } }
+                    ],
+                    default: []
                 },
                 prposedTime: { type: Date, default: null },
                 finished: { type: Boolean, default: false }
@@ -158,8 +161,8 @@ const caseSheetSchema = new mongoose.Schema({
                     ]
                 },
 
-                total : {type : Number, default: 0},
-                completed : {type : Number, default: 0},
+                total: { type: Number, default: 0 },
+                completed: { type: Number, default: 0 },
             }
         ]
 
@@ -173,6 +176,13 @@ const caseSheetSchema = new mongoose.Schema({
                         {
                             service: {
                                 serviceName: { type: String },
+                                finished: {
+                                    type: String,
+                                    enum: ['Proposed', 'Opted', 'Cancelled', 'Completed'],
+                                    default: 'Proposed',
+                                    trim: true,
+                                },
+                                updatedAt: { type: Date, default: null, index: true }
                             },
                             procedure: {
                                 type: [
@@ -180,8 +190,8 @@ const caseSheetSchema = new mongoose.Schema({
                                         procedureName: { type: String },
                                         finished: {
                                             type: String,
-                                            enum: ['In Progress', 'Cancelled', 'Completed'],
-                                            default: 'In Progress',
+                                            enum: ['In Progress', 'Proposed', 'Cancelled', 'Completed'],
+                                            default: 'Proposed',
                                             trim: true,
                                         },
                                         updatedAt: { type: Date, default: null, index: true }
@@ -192,8 +202,8 @@ const caseSheetSchema = new mongoose.Schema({
                     ]
                 },
 
-                total : {type : Number, default: 0},
-                completed : {type : Number, default: 0},
+                total: { type: Number, default: 0 },
+                completed: { type: Number, default: 0 },
             }
         ]
 
@@ -228,7 +238,7 @@ const caseSheetSchema = new mongoose.Schema({
     },
 
 
-},{ timestamps: true });
+}, { timestamps: true });
 
 
 module.exports = caseSheetSchema;

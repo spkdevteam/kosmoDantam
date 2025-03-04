@@ -116,7 +116,7 @@ const getallDepartments = async (input) => {
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(input.clientId)
         const departments = await db.model('department', departmentSchema)
-        const result = await departments.find({ deletedAt: null, isActive: true })
+        const result = await departments.find({ deletedAt: null, isActive: true, branchId : input.branchId })
         if (result) return { status: true, message: 'success', result: result, statusCode: 200 }
         else return { status: false, message: 'unKnown error ', statusCode: 500 }
     } catch (error) {
