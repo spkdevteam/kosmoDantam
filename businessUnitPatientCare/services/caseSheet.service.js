@@ -31,10 +31,17 @@ const checkOngoing = async (clientId, patientId) => {
 
         const existing = await CaseSheet.find({
             patientId: patientId,
+            drafted: false,
             status: { $in: ['Proposed', 'In Progress'] },
         });
 
-        return existing;
+        const anyDrafted = await CaseSheet.find({
+            patientId: patientId,
+            drafted: true,
+        });
+
+
+        return { existing, anyDrafted };
 
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error deleting cheif complaint of case sheet: ${error.message}`);
@@ -503,7 +510,7 @@ const updateInvestigation = async (clientId, caseSheetId, dataObject) => {
 };
 
 
-const createService = async (clientId, data) => {
+const createService = async (clientId, isDrafted, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
@@ -524,54 +531,54 @@ const createService = async (clientId, data) => {
         })
 
 
-        let existingTreatmentData3 = populatedCaseSheet.treatmentData3 || [];
-        let newServices = populatedCaseSheet.services;
+        if (isDrafted !== true) {
 
-        // Map existing treatmentData3 for quick lookup
-        let treatmentMap = new Map();
-        existingTreatmentData3.forEach(item => {
-            treatmentMap.set(item.tooth, item);
-        });
+            let existingTreatmentData3 = populatedCaseSheet.treatmentData3 || [];
+            let newServices = populatedCaseSheet.services;
 
-        newServices.forEach(serviceItem => {
-            let { tooth, service } = serviceItem;
-            tooth.forEach(t => {
-                if (treatmentMap.has(t)) {
-                    // Update existing tooth services
-                    let existingToothData = treatmentMap.get(t);
-                    let serviceExists = existingToothData.service.some(s => s.service.serviceName === service.servId.serviceName);
+            // Map existing treatmentData3 for quick lookup
+            let treatmentMap = new Map();
+            existingTreatmentData3.forEach(item => {
+                treatmentMap.set(item.tooth, item);
+            });
 
-                    if (!serviceExists) {
-                        existingToothData.service.push({
-                            service: { serviceName: service.servId.serviceName },
-                            finished: "In Progress",
-                            updatedAt: new Date(),
-                        });
-                    }
-                } else {
-                    // Add new tooth entry
-                    treatmentMap.set(t, {
-                        tooth: t,
-                        service: [
-                            {
+            newServices.forEach(serviceItem => {
+                let { tooth, service } = serviceItem;
+                tooth.forEach(t => {
+                    if (treatmentMap.has(t)) {
+                        // Update existing tooth services
+                        let existingToothData = treatmentMap.get(t);
+                        let serviceExists = existingToothData.service.some(s => s.service.serviceName === service.servId.serviceName);
+
+                        if (!serviceExists) {
+                            existingToothData.service.push({
                                 service: { serviceName: service.servId.serviceName },
                                 finished: "In Progress",
                                 updatedAt: new Date(),
-                            }
-                        ],
-                        total: 1,
-                        completed: 0,
-                    });
-                }
+                            });
+                        }
+                    } else {
+                        // Add new tooth entry
+                        treatmentMap.set(t, {
+                            tooth: t,
+                            service: [
+                                {
+                                    service: { serviceName: service.servId.serviceName },
+                                    finished: "In Progress",
+                                    updatedAt: new Date(),
+                                }
+                            ],
+                            total: 1,
+                            completed: 0,
+                        });
+                    }
+                });
             });
-        });
+            // Convert map back to array
+            populatedCaseSheet.treatmentData3 = Array.from(treatmentMap.values());
+            await populatedCaseSheet.save();
 
-        // Convert map back to array
-        populatedCaseSheet.treatmentData3 = Array.from(treatmentMap.values());
-        await populatedCaseSheet.save();
-
-
-
+        }
 
         return populatedCaseSheet
         // return await CaseSheet.create(data);
@@ -719,7 +726,7 @@ function transformServiceToTreatment(existingData, newProcedures) {
     return Array.from(toothMap.values());
 }
 
-const updateService = async (clientId, caseSheetId, data) => {
+const updateService = async (clientId, caseSheetId, isDrafted, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
@@ -763,56 +770,97 @@ const updateService = async (clientId, caseSheetId, data) => {
             select: 'serviceName _id'
         })
 
-        let existingTreatmentData3 = populatedCaseSheet.treatmentData3 || [];
-        let newServices = populatedCaseSheet.services;
+        if (isDrafted !== true) {
 
-        // Map existing treatmentData3 for quick lookup
-        let treatmentMap = new Map();
-        existingTreatmentData3.forEach(item => {
-            treatmentMap.set(item.tooth, item);
-        });
+            let existingTreatmentData3 = populatedCaseSheet.treatmentData3 || [];
+            let newServices = populatedCaseSheet.services;
 
-        newServices.forEach(serviceItem => {
-            let { tooth, service } = serviceItem;
-            tooth.forEach(t => {
-                if (treatmentMap.has(t)) {
-                    // Update existing tooth services
-                    let existingToothData = treatmentMap.get(t);
-                    let serviceExists = existingToothData.service.some(s => s.service.serviceName === service.servId.serviceName);
+            // Map existing treatmentData3 for quick lookup
+            let treatmentMap = new Map();
+            existingTreatmentData3.forEach(item => {
+                treatmentMap.set(item.tooth, item);
+            });
 
-                    if (!serviceExists) {
-                        existingToothData.service.push({
-                            service: { serviceName: service.servId.serviceName },
-                            finished: "In Progress",
-                            updatedAt: new Date(),
-                        });
-                    }
-                } else {
-                    // Add new tooth entry
-                    treatmentMap.set(t, {
-                        tooth: t,
-                        service: [
-                            {
+            newServices.forEach(serviceItem => {
+                let { tooth, service } = serviceItem;
+                tooth.forEach(t => {
+                    if (treatmentMap.has(t)) {
+                        // Update existing tooth services
+                        let existingToothData = treatmentMap.get(t);
+                        let serviceExists = existingToothData.service.some(s => s.service.serviceName === service.servId.serviceName);
+
+                        if (!serviceExists) {
+                            existingToothData.service.push({
                                 service: { serviceName: service.servId.serviceName },
                                 finished: "In Progress",
                                 updatedAt: new Date(),
-                            }
-                        ],
-                        total: 1,
-                        completed: 0,
-                    });
-                }
+                            });
+                        }
+                    } else {
+                        // Add new tooth entry
+                        treatmentMap.set(t, {
+                            tooth: t,
+                            service: [
+                                {
+                                    service: { serviceName: service.servId.serviceName },
+                                    finished: "In Progress",
+                                    updatedAt: new Date(),
+                                }
+                            ],
+                            total: 1,
+                            completed: 0,
+                        });
+                    }
+                });
             });
-        });
 
-        // Convert map back to array
-        populatedCaseSheet.treatmentData3 = Array.from(treatmentMap.values());
-        await populatedCaseSheet.save();
-
-
+            // Convert map back to array
+            populatedCaseSheet.treatmentData3 = Array.from(treatmentMap.values());
+            await populatedCaseSheet.save();
+        }
         return populatedCaseSheet
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+    }
+};
+
+
+const editServiceService = async (clientId, caseSheetId, data) => {
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Department = clientConnection.model('department', departmentSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+
+        const existing = await CaseSheet.findById(caseSheetId);
+        if (!existing) {
+            throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+
+        const newServiceArr = existing?.services?.map((item) => {
+            if (item?._id == data?.serviceRowId) {
+                return {
+                    ...data.service
+                }
+            } else {
+                return item
+            }
+        })
+        existing.services = newServiceArr
+        await existing.save()
+        const populatedCaseSheet = await CaseSheet.findById(existing._id).populate({
+            path: 'services.department.deptId',
+            model: Department,
+            select: 'deptName _id'
+        }).populate({
+            path: 'services.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        })
+        return populatedCaseSheet
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error editing the service: ${error.message}`);
     }
 };
 
@@ -853,7 +901,7 @@ const deleteServices = async (clientId, caseSheetId, serviceId) => {
 
 
 
-const updateProcedure = async (clientId, caseSheetId, data) => {
+const updateProcedure = async (clientId, caseSheetId, isDrafted, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
@@ -886,12 +934,14 @@ const updateProcedure = async (clientId, caseSheetId, data) => {
         // const result = transformArr2(existingTreatmentData, populatedCaseSheet.procedures);
 
         // new code
-        const existingTreatmentData = populatedCaseSheet.treatmentData3 || [];
-        const result = transformArr2(existingTreatmentData, populatedCaseSheet.procedures);
 
+        if (isDrafted !== true) {
+            const existingTreatmentData = populatedCaseSheet.treatmentData3 || [];
+            const result = transformArr2(existingTreatmentData, populatedCaseSheet.procedures);
+            populatedCaseSheet.treatmentData3 = result;
+            await populatedCaseSheet.save();
+        }
 
-        populatedCaseSheet.treatmentData3 = result;
-        await populatedCaseSheet.save();
 
 
         return populatedCaseSheet
@@ -2208,7 +2258,70 @@ const updateDraft = async (clientId, caseSheetId, data) => {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
         const Service = clientConnection.model('services', serviceSchema);
-        const procedures = clientConnection.model('procedure', procedureSchema)
+        const procedures = clientConnection.model('procedure', procedureSchema);
+        const Department = clientConnection.model('department', departmentSchema);
+
+
+        // updating service in resume case sheet starts here
+
+        const populatedCaseSheet = await CaseSheet.findById(caseSheetId).populate({
+            path: 'services.department.deptId',
+            model: Department,
+            select: 'deptName _id'
+        }).populate({
+            path: 'services.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        })
+
+
+        let existingTreatmentData3 = populatedCaseSheet.treatmentData3 || [];
+        let newServices = populatedCaseSheet.services;
+
+        // Map existing treatmentData3 for quick lookup
+        let treatmentMap = new Map();
+        existingTreatmentData3.forEach(item => {
+            treatmentMap.set(item.tooth, item);
+        });
+
+        newServices.forEach(serviceItem => {
+            let { tooth, service } = serviceItem;
+            tooth.forEach(t => {
+                if (treatmentMap.has(t)) {
+                    // Update existing tooth services
+                    let existingToothData = treatmentMap.get(t);
+                    let serviceExists = existingToothData.service.some(s => s.service.serviceName === service.servId.serviceName);
+
+                    if (!serviceExists) {
+                        existingToothData.service.push({
+                            service: { serviceName: service.servId.serviceName },
+                            finished: "In Progress",
+                            updatedAt: new Date(),
+                        });
+                    }
+                } else {
+                    // Add new tooth entry
+                    treatmentMap.set(t, {
+                        tooth: t,
+                        service: [
+                            {
+                                service: { serviceName: service.servId.serviceName },
+                                finished: "In Progress",
+                                updatedAt: new Date(),
+                            }
+                        ],
+                        total: 1,
+                        completed: 0,
+                    });
+                }
+            });
+        });
+
+        // Convert map back to array
+        populatedCaseSheet.treatmentData3 = Array.from(treatmentMap.values());
+        await populatedCaseSheet.save();
+
+        // updating service in resume case sheet ends here
 
         const existing = await CaseSheet.findById(caseSheetId).populate({
             path: 'procedures.procedure.procedId',
@@ -2224,17 +2337,17 @@ const updateDraft = async (clientId, caseSheetId, data) => {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
 
-        // if (existing?.procedures && existing?.procedures?.length > 0) {
-        //     const transformedData = transformArr(existing?.procedures);
 
-        //     existing.treatmentData = JSON.stringify(transformedData);
-        //     existing.treatmentData2 = transformedData;
-        // }
+        // updating procedures in resume case sheet starts here 
+        const existingTreatmentData = existing.treatmentData3 || [];
+        const result = transformArr2(existingTreatmentData, existing.procedures);
+        existing.treatmentData3 = result;
+        await existing.save();
+        // updating procedure in resume case sheet ends here
 
 
         Object.assign(existing, data);
         const patientId = existing?.patientId;
-
 
         const Appointment = await clientConnection.model('appointment', appointmentSchema)
         const latestAppointment = await Appointment.findOne({
@@ -2245,7 +2358,6 @@ const updateDraft = async (clientId, caseSheetId, data) => {
         }).sort({ createdAt: -1 }).exec();
 
         if (latestAppointment) {
-
             latestAppointment.caseSheetId = existing._id;
             await latestAppointment.save();
         }
@@ -2748,6 +2860,9 @@ module.exports = {
 
     getCaseDetail,
     caseSheetOverView,
-    appointmentsWithCase
+    appointmentsWithCase,
+
+
+    editServiceService
 
 };
