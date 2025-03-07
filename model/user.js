@@ -28,10 +28,7 @@ const userSchema = new Schema(
       default: 'Prefer not to say',
       trim: true, 
     },
-<<<<<<< HEAD
-=======
     
->>>>>>> b625f089231552118a9d15270e51e93aaaa0088c
     dateOfBirth: {
       type: Date,
       validate: {

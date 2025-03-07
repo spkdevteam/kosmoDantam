@@ -13,12 +13,6 @@ module.exports = {
 
 
 
-<<<<<<< HEAD
-    //Role
-    lblNotFoundRole: 'This role has not been set up on the platform!',
-    lblRoleNotFound: 'Role not found.',
-    lblMenuHeadNotFound: "menu head could not be blank" ,
-=======
   //Role
   lblNotFoundRole: 'This role has not been set up on the platform!',
   lblRoleNotFound: "Role not found.",
@@ -29,7 +23,6 @@ module.exports = {
   lblBusinessUnitRoleFoundSuccessfully: "Roles and permmission found successfully!",
   lblBusinessUnitRoleCreatedSuccessfully: "Roles and permmission created successfully!",
   lblBusinessUnitRoleUpdatedSuccessfully: "Roles and permmission updated successfully!",
->>>>>>> b625f089231552118a9d15270e51e93aaaa0088c
 
 
 
