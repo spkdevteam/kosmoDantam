@@ -439,7 +439,7 @@ exports.updateChairCleared = async (req, res, next) => {
             const updateAppointStatus = await updatePatientBookingCompleted({ appointmentId: data?.appointmentId, clientId: data?.clientId, patientId: data?.patientId })
             if (!updateAppointStatus?.status) res.json({ ...updateAppointStatus })
                 else {
-                    console.log(updateChairStatus,updateAppointStatus, '----------------------')
+                   
 
                 if (updateChairStatus && updateAppointStatus) {
                     res.json({ status: true, message: 'chair status updated ' })

@@ -497,8 +497,8 @@ exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
     
         const {clientId,fromDate,toDate,keyword='',page=1,perPage=1000} = input
         // clientId, buId, bookingDate, page, perPage, branchId======>>>>>  input 
-       console.clear()
-        console.log(input, 'input')
+       
+        
         if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         // if (! await validateObjectId({ clientid: clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
 
@@ -629,7 +629,7 @@ exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
                 $limit: parseInt(perPage)
             }
         ]);
-        console.log(out, (parseInt(page) - 1) * parseInt(perPage), parseInt(perPage), 'outoutout')
+       
         return { status: true, message: 'Success', data: out }
     } catch (error) {
         return { status: false, message: error.message}
@@ -649,7 +649,7 @@ exports.filterPatientBookingWithfromToDateAndKeyWord = async (input) => {
         const appointment = await db.model('appointment', appointmentSchema)
         const query = { isActive: true, deletedAt: null };
 
-        console.log(input, 'mer++++++++dd++++++++++')
+         
 
         const out = await appointment.find({
             patientId:new mongoose.Types.ObjectId( input?.patientId),
