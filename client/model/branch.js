@@ -7,14 +7,17 @@ const ObjectId = Schema.ObjectId;
 const clinetBranchSchema = new Schema(
     {
 
-
-        branchHead: { type: ObjectId, ref: "user", default:null, index: true }, // Index for admin/user relationships
+        displayId : {type:String,unique:true},
+        businessUnit: { type: ObjectId, ref: "businessUnit", default:null, index: true }, 
+        branchHead: { type: ObjectId, ref: "clientUsers", default:null, index: true }, 
 
         name: { type: String, required: true },
         incorporationName: { type: String, required: true },
         cinNumber:  { type: String },
         gstNumber:  { type: String },
-
+        branchPrefix:  { type: String },
+        branchId:{type:String},
+        branchLogo : {type: String, default : null},
         emailContact: {
             type: String,
             unique: true,
@@ -70,7 +73,7 @@ const clinetBranchSchema = new Schema(
         isActive: { type: Boolean, default: false },
 
         // handlign created by
-        createdBy: { type: ObjectId, ref: "user", default:null, index: true }, // Index for admin/user relationships
+        createdBy: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
 
         deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality
     },

@@ -15,10 +15,32 @@ const swaggerOptions = {
         },
          
       ],
+<<<<<<< HEAD
     },
     apis: ['./documentation/*.js'],  
   };
   
+=======
+       components: {
+          securitySchemes: {
+              bearerAuth: {
+                  type: 'http',
+                  scheme: 'bearer',
+                  bearerFormat: 'JWT', // Optional: indicates token format
+              },
+          },
+      },
+      security: [
+          {
+              bearerAuth: [], // Applies Bearer authentication globally
+          },
+      ],
+    },
+    
+    apis: ['./documentation/*.js'],  
+  };
+   
+>>>>>>> b625f089231552118a9d15270e51e93aaaa0088c
 const swaggerDocs = swaggerJSDoc(swaggerOptions);
 
 module.exports = swaggerDocs;

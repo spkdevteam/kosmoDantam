@@ -13,6 +13,25 @@ if(!fs.existsSync('./public/profile')){
 }
 
 
+// create investigation folder
+if(!fs.existsSync('./public/investigation')){
+    fs.mkdirSync('./public/investigation')
+}
+
+
+
+// create patient folder
+if(!fs.existsSync('./public/patient')){
+    fs.mkdirSync('./public/patient')
+}
+
+
+if(!fs.existsSync('./public/branch')){
+    fs.mkdirSync('./public/branch')
+}
+
+
+
 
 
 // image filter
@@ -56,4 +75,86 @@ const uploadProfile = multer({
 });
 
 
+// upload patient image
+const patientStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './public/patient');
+    },
+    filename: async (req, file, cb) => {
+        cb(null, `${Date.now()}_${file.originalname.toLowerCase().replaceAll(' ', '')}`);
+    },
+});
+
+
+
+const uploadPatient = multer({
+    storage: patientStorage,
+    limits: {
+        fileSize: 1024 * 1024,
+        files: 1
+    },
+    fileFilter: imageFilter
+});
+
+
+// upload investigation
+
+// upload profile image
+const investigationStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './public/investigation');
+    },
+    filename: async (req, file, cb) => {
+        cb(null, `${Date.now()}_${file.originalname.toLowerCase().replaceAll(' ', '')}`);
+    },
+});
+
+const uploadInvestigation = multer({
+    storage: investigationStorage,
+    limits: {
+        fileSize: 10 * 1024 * 1024, 
+        files: 1
+    },
+    fileFilter: imageFilter
+});
+
+
+// upload attachment
+const uploadAttachment = multer({
+    storage: investigationStorage,
+    limits: {
+        fileSize: 10 * 1024 * 1024, 
+        files: 5
+    },
+    fileFilter: imageFilter
+});
+
+// upload patient image
+const branchStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './public/branch');
+    },
+    filename: async (req, file, cb) => {
+        cb(null, `${Date.now()}_${file.originalname.toLowerCase().replaceAll(' ', '')}`);
+    },
+});
+
+
+
+const uploadBranch = multer({
+    storage: branchStorage,
+    limits: {
+        fileSize: 1024 * 1024,
+        files: 1
+    },
+    fileFilter: imageFilter
+});
+
+
+
+
 exports.uploadProfile = uploadProfile;
+exports.uploadPatient = uploadPatient;
+exports.uploadInvestigation = uploadInvestigation;
+exports.uploadAttachment = uploadAttachment;
+exports.uploadBranch = uploadBranch;

@@ -43,6 +43,9 @@ const connectionPool = new Map();
 
 const getClientDatabaseConnection = async (clientId) => {
 
+    // console.log("connectionPool",connectionPool);
+    
+
     if (connectionPool.has(clientId)) {
         // Reuse existing connection if available
         return connectionPool.get(clientId);
@@ -61,12 +64,12 @@ const getClientDatabaseConnection = async (clientId) => {
     connectionPool.set(clientId, clientConnection);
 
     // Optionally set a timeout to close the connection if idle
-    setTimeout(() => {
-        if (connectionPool.has(clientId)) {
-            connectionPool.get(clientId).close();
-            connectionPool.delete(clientId);
-        }
-    }, 10 * 60 * 1000); // Close after 10 minutes of inactivity
+    // setTimeout(() => {
+    //     if (connectionPool.has(clientId)) {
+    //         connectionPool.get(clientId).close();
+    //         connectionPool.delete(clientId);
+    //     }
+    // }, 10 * 60 * 1000); // Close after 10 minutes of inactivity
 
     return clientConnection;
 

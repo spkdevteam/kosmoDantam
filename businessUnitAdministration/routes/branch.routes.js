@@ -3,29 +3,71 @@
 const express = require("express");
 let router = express.Router();
 
+const statusCode = require("../../utils/http-status-code")
 
 
 const businessUnitBranchContrller = require("../controller/branch.controller");
+const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization");
+const { uploadBranch } = require("../../utils/multer");
+
 
 
 
 // # create, update, view, list, activate/inactive, delete Branch by business unit routes starts here
 
 
-router.post('/createBranch', businessUnitBranchContrller.createBranchByBusinessUnit);
+router.post('/createBranch', entityAuth.authorizeEntity("Administration", "Branch", "create"), (req, res, next) => {
+    uploadBranch.single("file")(req, res, (err) => {
+        if (err) {
+            if (err instanceof multer.MulterError) {
+                return res.status(statusCode.BadRequest).send({
+                    message: 'File too large. Maximum file size allowed is 1 MB.'
+                });
+            } else {
+                console.error('Multer Error:', err.message);
+                return res.status(statusCode.BadRequest).send({
+                    message: err.message
+                });
+            }
+        }
+        next();
+    });
+}, businessUnitBranchContrller.createBranchByBusinessUnit);
 
-router.put('/updateBranch', businessUnitBranchContrller.updateBranchByBusinessUnit);
+// router.post('/createBranch', entityAuth.authorizeEntity("Administration", "Branch", "create"), businessUnitBranchContrller.createBranchByBusinessUnit);
 
-router.get('/branch/:clientId/:branchId', businessUnitBranchContrller.getParticularBranchByBusinessUnit);
+// router.put('/updateBranch', entityAuth.authorizeEntity("Administration", "Branch", "update"), businessUnitBranchContrller.updateBranchByBusinessUnit);
 
-router.get('/listBranch', businessUnitBranchContrller.listBranch);
 
-router.post("/activeInactiveBranch", businessUnitBranchContrller.activeinactiveBranchByBusinessUnit);
+router.put('/updateBranch', entityAuth.authorizeEntity("Administration", "Branch", "update"), (req, res, next) => {
+    uploadBranch.single("file")(req, res, (err) => {
+        if (err) {
+            if (err instanceof multer.MulterError) {
+                return res.status(statusCode.BadRequest).send({
+                    message: 'File too large. Maximum file size allowed is 1 MB.'
+                });
+            } else {
+                console.error('Multer Error:', err.message);
+                return res.status(statusCode.BadRequest).send({
+                    message: err.message
+                });
+            }
+        }
+        next();
+    });
+}, businessUnitBranchContrller.updateBranchByBusinessUnit);
 
-router.post("/softDeleteBranch", businessUnitBranchContrller.softDeleteBranchByBusinesssUnit);
+router.get('/branch/:clientId/:branchId', entityAuth.authorizeEntity("Administration", "Branch", "view"), businessUnitBranchContrller.getParticularBranchByBusinessUnit);
 
-router.post("/restoreBranch", businessUnitBranchContrller.restoreBranchByBusinessUnit);
+router.get('/listBranch', entityAuth.authorizeEntity("Administration", "Branch", "view"), businessUnitBranchContrller.listBranch);
 
+router.post("/activeInactiveBranch", entityAuth.authorizeEntity("Administration", "Branch", "update"), businessUnitBranchContrller.activeinactiveBranchByBusinessUnit);
+
+router.post("/softDeleteBranch", entityAuth.authorizeEntity("Administration", "Branch", "softDelete"), businessUnitBranchContrller.softDeleteBranchByBusinesssUnit);
+
+router.post("/restoreBranch", entityAuth.authorizeEntity("Administration", "Branch", "update"), businessUnitBranchContrller.restoreBranchByBusinessUnit);
+
+router.get('/getAllActiveBranch',  businessUnitBranchContrller.getAllActiveBranch)
 
 
 // # create, update, view, list, activate/inactive, delete Branch by business unit routes ends here

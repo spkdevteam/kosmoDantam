@@ -4,4 +4,4 @@ const validateEmail = require("../../utils/validateEmail")
 const createUser = (user)=>{
 
 }
-module.exports = createUser
+

@@ -10,11 +10,14 @@ const Roles = require("../../model/role");
 
 const clientRoleSchema = require("../../client/model/role");
 const clinetUserSchema = require("../../client/model/user");
+const clinetBusinessUnitSchema = require("../../client/model/businessUnit");
 const clinetBranchSchema = require("../../client/model/branch");
+const serialNumebrSchema = require("../../model/serialNumber");
 
 
 
-const { clientRoles } = require("../../utils/constant")
+
+const { clientRoles, serialNumber, cheifComplaints, findings, medicalHistory } = require("../../utils/constant")
 
 
 
@@ -24,6 +27,9 @@ const statusCode = require("../../utils/http-status-code");
 const message = require("../../utils/message");
 
 const { createClientDatabase } = require("../../db/connection");
+const complaintSchema = require("../../client/model/complaint");
+const patientFindingsSchema = require("../../client/model/finding");
+const medicalSchema = require("../../client/model/medical");
 
 
 // env 
@@ -38,12 +44,11 @@ const PRIVATEKEY = process.env.PRIVATEKEY;
 // create Business unit
 exports.createBusinessUnit = async (req, res) => {
   const session = await mongoose.startSession(); // Start Mongoose session for transaction-like behavior
-
   try {
     session.startTransaction(); // Start transaction
 
 
-    const superAdmin =  req.user
+    const superAdmin = req.user
 
     // Destructure fields from request body
     const { firstName, lastName, middleName, email, phone, password } = req.body;
@@ -92,18 +97,21 @@ exports.createBusinessUnit = async (req, res) => {
           isUserVerified: true,
           tc: true,
           isCreatedBySuperAdmin: true,
-          createdBy : superAdmin._id,
+          createdBy: superAdmin._id,
         },
       ],
       { session }
     );
 
     // const clientConnection = await getClientDatabaseConnection(newUser._id);
+    console.log(newUser)
     const clientConnection = await createClientDatabase(newUser[0]._id);
 
     // Use the imported schema to create the roles model in the client database
     const clientRole = clientConnection.model('clientRoles', clientRoleSchema);
     const roles = clientRoles;
+
+    
 
     // insert fixed
     const createdRole = await clientRole.insertMany(roles);
@@ -117,7 +125,7 @@ exports.createBusinessUnit = async (req, res) => {
     const clientUser = clientConnection.model('clientUsers', clinetUserSchema);
 
 
-    await clientUser.create({
+    const newClient = await clientUser.create({
 
       role: buRoleId?._id,
       roleId: 2,
@@ -133,12 +141,41 @@ exports.createBusinessUnit = async (req, res) => {
     });
 
 
+    const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
+
+    await BusinessUnit.create({
+      buHead: newClient._id,
+      name: newUser[0].firstName + " " + newUser[0].lastName + " " + "Businsenss Unit",
+      emailContact: newUser[0].email,
+      contactNumber: newUser[0].phone,
+      createdBy: newClient._id
+    });
+
+    const SerialNumber = clientConnection.model("serialNumber", serialNumebrSchema);
+    await SerialNumber.insertMany(serialNumber);
+
+    // insert cheif complaints
+    const Complaint = clientConnection.model('complaint', complaintSchema);
+    const data1 = cheifComplaints;
+    await Complaint.insertMany(data1);
+
+    // insert clinical finding
+    const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+    const data2 = findings;
+    await Finding.insertMany(data2);
+
+    // insert medical case
+    const Medical = clientConnection.model('medical', medicalSchema);
+    const data3 = medicalHistory;
+    await Medical.insertMany(data3);
+
+
     // Commit the transaction (if everything goes well)
     await session.commitTransaction();
     session.endSession();
     return res.status(statusCode.OK).send({
       message: message.lblBusinessUnitCreatedSuccess,
-      data: { userId: newUser[0]._id, email: newUser[0].email },
+      data: { userId: newUser[0]._id, email: newUser[0].email, roles, createdRole },
     });
 
   } catch (error) {
@@ -286,6 +323,7 @@ exports.listBusinessUnit = async (req, res) => {
 
     let whereCondition = {
       deletedAt: null,
+      roleId : 4,
     };
 
     if (searchText) {
@@ -299,7 +337,7 @@ exports.listBusinessUnit = async (req, res) => {
 
     const [businessUnit, count] = await Promise.all([
       User.find(whereCondition)
-        .select('firstName lastName email phone')
+        .select('firstName lastName email phone isActive middleName')
         .skip(skip)
         .limit(limit)
         .sort({ _id: 'desc' }),

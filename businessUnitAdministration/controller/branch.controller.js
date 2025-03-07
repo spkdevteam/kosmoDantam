@@ -7,65 +7,70 @@ const message = require("../../utils/message");
 
 const { getClientDatabaseConnection } = require("../../db/connection");
 const clinetBranchSchema = require("../../client/model/branch");
-
+const clinetBusinessUnitSchema = require("../../client/model/businessUnit");
+const getserialNumber = require("../../model/services/getserialNumber");
 
 
 
 
 // create branch by business unit
 exports.createBranchByBusinessUnit = async (req, res) => {
-
     try {
-
-        // Destructure fields from request body
-        const { clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber } = req.body;
-
+        // asd
+        const { clientId, name, emailContact, branchPrefix, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit, branchHeadId } = req.body;
+        
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
             });
         }
-
-        // Check if required fields are missing
         if (!name || !incorporationName || !emailContact || !contactNumber) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
         }
-
         const clientConnection = await getClientDatabaseConnection(clientId);
-
         const Branch = clientConnection.model('branch', clinetBranchSchema);
-
         const existingBranch = await Branch.findOne({
             $or: [{ emailContact: emailContact.toLowerCase() }, { contactNumber }],
         });
-
         if (existingBranch) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblBranchAlreadyExists,
             });
         }
+        // const prefixExist = await Branch.findOne({branchPrefix});
+        // if (prefixExist) {
+        //     return res.status(statusCode.BadRequest).send({
+        //         message: message.lblBranchprefixConflict,
+        //     });
+        // }
+        const displayId = await getserialNumber('branch', clientId, "", businessUnit);
 
-        // Create new brnanch 
+        const dataObject = {
+            displayId: displayId, branchPrefix: branchPrefix, clientId, name, emailContact, contactNumber, country, state, city : city[0], ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId
+        }
+
+        if (req.file?.filename) {
+            dataObject.branchLogo = req.file.filename;
+        }
+
         const newBranch = await Branch.create(
             [
                 {
-                    clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber
+                    ...dataObject
                 },
             ],
         );
-
         return res.status(statusCode.OK).send({
             message: message.lblBranchCreatedSuccess,
             data: { branchId: newBranch[0]._id, emailContact: newBranch[0].emailContact },
         });
-
     } catch (error) {
         console.error("Error in createBranch:", error);
         return res.status(statusCode.InternalServerError).send({
             message: message.lblInternalServerError,
-            error: error.message, // Optional: Include detailed error message for debugging
+            error: error.message,
         });
     }
 };
@@ -115,6 +120,13 @@ exports.updateBranchByBusinessUnit = async (req, res) => {
                 },
             ],
         });
+        // const prefixExist = await Branch.findOne({branchPrefix:branchPrefix,_id: { $ne: branchId }});
+        // if (prefixExist) {
+        //     return res.status(statusCode.BadRequest).send({
+        //         message: message.lblBranchprefixConflict,
+        //     });
+        // }
+
 
         if (existingBranch) {
             return res.status(statusCode.BadRequest).send({
@@ -128,12 +140,16 @@ exports.updateBranchByBusinessUnit = async (req, res) => {
         branch.contactNumber = contactNumber;
         branch.country = country;
         branch.state = state;
-        branch.city = city;
+        branch.city = city[0];
         branch.ZipCode = ZipCode;
         branch.address = address;
         branch.incorporationName = incorporationName;
         branch.cinNumber = cinNumber;
         branch.gstNumber = gstNumber;
+        if (req.file?.filename) {
+            branch.branchLogo = req.file.filename;
+        }
+        // branchPrefix ? branch.branchPrefix = branchPrefix:'';
 
         // Save the updated branch
         await branch.save();
@@ -156,7 +172,7 @@ exports.updateBranchByBusinessUnit = async (req, res) => {
 exports.getParticularBranchByBusinessUnit = async (req, res) => {
     try {
         const { clientId, branchId } = req.params; // Extract clientId and branchId from request params
-
+        console.log(req.params,'saaasasasasasasa')
         // Validate inputs
         if (!clientId || !branchId) {
             return res.status(400).send({
@@ -167,9 +183,17 @@ exports.getParticularBranchByBusinessUnit = async (req, res) => {
         // Get client database connection
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
+
 
         // Fetch the branch by ID
-        const branch = await Branch.findById(branchId);
+        const branch = await Branch.findById(branchId)
+            .populate({
+                path: 'businessUnit',
+                model: BusinessUnit,
+                select: 'name emailContact city state', // Specify fields to return from businessUnit
+            });
+
 
         if (!branch) {
             return res.status(404).send({
@@ -215,6 +239,8 @@ exports.listBranch = async (req, res) => {
                 { incorporationName: { $regex: searchText, $options: "i" } },
                 { emailContact: { $regex: searchText, $options: "i" } },
                 { contactNumber: { $regex: searchText, $options: "i" } },
+                { city: { $regex: searchText, $options: "i" } },
+                { address: { $regex: searchText, $options: "i" } },
             ];
         }
 
@@ -229,7 +255,6 @@ exports.listBranch = async (req, res) => {
         // Get client database connection
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
-
 
         const [branches, count] = await Promise.all([
             Branch.find(whereCondition)
@@ -408,6 +433,38 @@ exports.restoreBranchByBusinessUnit = async (req, res) => {
         session.endSession();
 
         console.error("Error in restoreBusinessUnit:", error);
+        return res.status(statusCode.InternalServerError).send({
+            message: message.lblInternalServerError,
+            error: error.message,
+        });
+    }
+};
+
+// get all active branch
+exports.getAllActiveBranch = async (req, res) => {
+    try {
+
+        const clientId = req.query.clientId;
+        let whereCondition = {
+            deletedAt: null,
+            isActive: true,
+        };
+        if (!clientId) {
+            return res.status(400).send({
+                message: message.lblClinetIdIsRequired,
+            });
+        }
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const [branches] = await Promise.all([
+            Branch.find(whereCondition).sort({ _id: 'desc' }),
+        ]);
+        return res.json({
+            message: 'List of all Branches!',
+            listOfBranches: branches,
+        });
+    } catch (error) {
+        console.error("Error in list Branches:", error);
         return res.status(statusCode.InternalServerError).send({
             message: message.lblInternalServerError,
             error: error.message,
