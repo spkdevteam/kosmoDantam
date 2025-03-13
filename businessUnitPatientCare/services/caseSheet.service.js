@@ -434,13 +434,22 @@ const createOtherAttachment = async (clientId, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
         const newCheifComplaint = await CaseSheet.create(data);
-        const populatedCaseSheet = await CaseSheet.findById(newCheifComplaint._id)
+        const populatedCaseSheet = await CaseSheet.findById(newCheifComplaint._id).populate({
+            path: 'otherAttachment.procedure.procedId', 
+            model: procedures, 
+            select: 'procedureName _id' 
+        }).populate({  
+            path: 'otherAttachment.service.servId', 
+            model: Service, 
+            select: 'serviceName _id' 
+        });
 
         return populatedCaseSheet
     } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+        throw new CustomError(error.statusCode || 500, `Error creating other attachment of case sheet: ${error.message}`);
     }
 };
 
@@ -449,24 +458,28 @@ const updateOtherAttachment = async (clientId, caseSheetId, dataObject) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
         const existing = await CaseSheet.findById(caseSheetId);
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
-
         const previousData = existing.otherAttachment;
-
         const newData = [dataObject, ...previousData];
-
         existing.otherAttachment = newData;
-
-        // console.log("newData",newData);
-
-        return await existing.save();
-
+        await existing.save();
+        const populatedCaseSheet = await CaseSheet.findById(caseSheetId).populate({
+            path: 'otherAttachment.procedure.procedId', 
+            model: procedures, 
+            select: 'procedureName _id' 
+        }).populate({
+            path: 'otherAttachment.service.servId', 
+            model: Service,
+            select: 'serviceName _id' 
+        });
+        return  populatedCaseSheet
     } catch (error) {
-        throw new CustomError(error.statusCode || 500, `Error creating cheif complaint of case sheet: ${error.message}`);
+        throw new CustomError(error.statusCode || 500, `Error updating other attachment of case sheet: ${error.message}`);
     }
 };
 
@@ -767,7 +780,7 @@ const updateService = async (clientId, caseSheetId, isDrafted, data) => {
         }).populate({
             path: 'services.service.servId',
             model: Service,
-            select: 'serviceName _id'
+            select: 'serviceName _id rate'
         })
 
         if (isDrafted !== true) {
@@ -781,18 +794,29 @@ const updateService = async (clientId, caseSheetId, isDrafted, data) => {
                 treatmentMap.set(item.tooth, item);
             });
 
+            console.log("newServices",newServices);
+            
+
             newServices.forEach(serviceItem => {
-                let { tooth, service } = serviceItem;
+                let { tooth, service , rate} = serviceItem;
                 tooth.forEach(t => {
                     if (treatmentMap.has(t)) {
                         // Update existing tooth services
                         let existingToothData = treatmentMap.get(t);
-                        let serviceExists = existingToothData.service.some(s => s.service.serviceName === service.servId.serviceName);
+                        let serviceExists = existingToothData.service.some(s => {
+                            console.log("kasif", service);
+                            console.log("aatif", s);
+                            
+                            if(s.service.serviceName === service.servId.serviceName ){
+                                return s
+                            }
+                        });
 
                         if (!serviceExists) {
                             existingToothData.service.push({
                                 service: { serviceName: service.servId.serviceName },
                                 finished: "In Progress",
+                                unitPrice: rate,
                                 updatedAt: new Date(),
                             });
                         }
@@ -1840,7 +1864,15 @@ const getById = async (clientId, caseSheetId) => {
             path: 'procedures.service.servId',
             model: Service,
             select: 'serviceName _id'
-        });
+        }).populate({
+            path: 'otherAttachment.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'otherAttachment.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        })
 
         if (!caseSheet) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
@@ -2014,6 +2046,17 @@ const updateTreatment = async (clientId, caseSheetId, treatmentData) => {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
         }
         existing.treatmentData3 = treatmentData;
+
+
+
+
+        
+
+
+
+
+
+
         existing.status = "In Progress";
         return await existing.save();
     } catch (error) {
@@ -2285,17 +2328,24 @@ const updateDraft = async (clientId, caseSheetId, data) => {
         });
 
         newServices.forEach(serviceItem => {
-            let { tooth, service } = serviceItem;
+            let { tooth, service, rate } = serviceItem;
             tooth.forEach(t => {
                 if (treatmentMap.has(t)) {
                     // Update existing tooth services
                     let existingToothData = treatmentMap.get(t);
-                    let serviceExists = existingToothData.service.some(s => s.service.serviceName === service.servId.serviceName);
-
+                    let serviceExists = existingToothData.service.some(s => {
+                        console.log("kasif", service);
+                        console.log("aatif", s);
+                        
+                        if(s.service.serviceName === service.servId.serviceName ){
+                            return s
+                        }
+                    });
                     if (!serviceExists) {
                         existingToothData.service.push({
                             service: { serviceName: service.servId.serviceName },
                             finished: "In Progress",
+                            unitPrice: rate,
                             updatedAt: new Date(),
                         });
                     }
@@ -2307,6 +2357,7 @@ const updateDraft = async (clientId, caseSheetId, data) => {
                             {
                                 service: { serviceName: service.servId.serviceName },
                                 finished: "In Progress",
+                                unitPrice: rate,
                                 updatedAt: new Date(),
                             }
                         ],

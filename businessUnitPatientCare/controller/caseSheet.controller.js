@@ -450,7 +450,7 @@ exports.deleteInvestigation = async (req, res, next) => {
 // create other attachment by business unit
 exports.createOtherAttachment = async (req, res, next) => {
     try {
-        const { clientId, patientId, branchId, businessUnitId, remark, } = req.body;
+        const { clientId, patientId, branchId, businessUnitId, remark, tooth, service, procedure } = req.body;
         const mainUser = req.user;
         await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!remark) {
@@ -461,11 +461,15 @@ exports.createOtherAttachment = async (req, res, next) => {
         let dataObject = {
             remark: remark,
         }
-
-        // if (req.file?.filename) {
-        //     dataObject.file = req.file.filename;
-        // }
-
+        if( tooth !== "null"){ 
+            dataObject = {...dataObject, tooth : JSON.parse(tooth) } 
+        } 
+        if(service !== "null"){ 
+            dataObject = {...dataObject,  service : JSON.parse(service), } 
+        } 
+        if(procedure !== "null"){ 
+            dataObject = {...dataObject,  procedure :  JSON.parse(procedure), }
+        } 
         let attachments = [];
         if (req.files && req.files.length > 0) {
             for (let index = 0; index < req.files.length; index++) {
@@ -474,7 +478,6 @@ exports.createOtherAttachment = async (req, res, next) => {
             }
             dataObject.file = JSON.stringify(attachments);
         }
-
         const serialNumber = await getserialNumber('caseSheet', clientId, "", businessUnitId)
         const created = await caseSheetService.createOtherAttachment(clientId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, otherAttachment: [dataObject], displayId: serialNumber,
@@ -491,7 +494,7 @@ exports.createOtherAttachment = async (req, res, next) => {
 // update other attachment by busines unit
 exports.updateOtherAttachment = async (req, res, next) => {
     try {
-        const { clientId, caseSheetId, patientId, branchId, businessUnitId, remark, } = req.body;
+        const { clientId, caseSheetId, patientId, branchId, businessUnitId, remark, tooth, service, procedure } = req.body;
         await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!remark) {
             return res.status(statusCode.BadRequest).send({
@@ -501,9 +504,21 @@ exports.updateOtherAttachment = async (req, res, next) => {
         let dataObject = {
             remark: remark,
         }
+        if( tooth !== "null"){
+            dataObject = {...dataObject, tooth : JSON.parse(tooth) } 
+        }   
+
+        if(service !== "null"){
+            dataObject = {...dataObject,  service : JSON.parse(service), } 
+        }
+
+        if(procedure !== "null"){
+            dataObject = {...dataObject,  procedure :  JSON.parse(procedure), } 
+        } 
+
         // if (req.file?.filename) {
         //     dataObject.file = req.file.filename;
-        // }
+        // } 
         let attachments = [];
         if (req.files && req.files.length > 0) {
             for (let index = 0; index < req.files.length; index++) {
@@ -512,7 +527,6 @@ exports.updateOtherAttachment = async (req, res, next) => {
             }
             dataObject.file = JSON.stringify(attachments);
         }
-
         const updated = await caseSheetService.updateOtherAttachment(clientId, caseSheetId, dataObject);
         return res.status(statusCode.OK).send({
             message: message.lblOtherAttachmentUpdatedSuccess,
