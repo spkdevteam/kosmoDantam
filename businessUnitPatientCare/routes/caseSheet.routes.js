@@ -135,6 +135,11 @@ router.put('/updateServices', entityAuth.authorizeEntity("Patient", "Case Sheet"
 router.post('/editParticularServices', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.editParticularServices);
 router.post('/deleteServices', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteServices);
 
+// new api for service
+router.post('/new/createServices', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createServicesNew);
+router.put('/new/updateServices', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.updateServicesNew);
+
+
 // procedures
 router.post('/createProcedure', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createProcedure);
 router.put('/updateProcedure', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.updateProcedure);
