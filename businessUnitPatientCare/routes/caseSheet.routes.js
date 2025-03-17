@@ -17,6 +17,8 @@ const {
     uploadInvestigation,
     uploadAttachment,
 } = require('../../utils/multer');
+const editcaseSheet = require("../services/caseSheet/editCaseSheet");
+const postEditCaseSheet = require("../controller/caseSheet/editCaseSheet");
 
 
 
@@ -178,7 +180,7 @@ router.put('/updatePatientMedicalHistory', entityAuth.authorizeEntity("Patient",
 
 
 
-
+router.post('/editCaseSheet',postEditCaseSheet)
 
 
 
