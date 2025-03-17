@@ -10,7 +10,14 @@ const clinetBranchSchema = new Schema(
         displayId : {type:String,unique:true},
         businessUnit: { type: ObjectId, ref: "businessUnit", default:null, index: true }, 
         branchHead: { type: ObjectId, ref: "clientUsers", default:null, index: true }, 
-
+        bookingContact: { type: String, trim: true, validate: {
+                validator: function (v) {
+                    return /^\+?[1-9]\d{1,14}$/.test(v);
+                },
+                message: 'Invalid phone number format.',
+            },
+            default:'7907441232'
+        },
         name: { type: String, required: true },
         incorporationName: { type: String, required: true },
         cinNumber:  { type: String },

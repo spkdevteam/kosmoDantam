@@ -171,17 +171,27 @@ const caseSheetSchema = new mongoose.Schema({
         type: [
             {
                 tooth: { type: String, default: null },
+                department: {
+                    deptId: { type: mongoose.Schema.ObjectId, ref: "department" }
+                },
                 service: {
                     type: [
                         {
+
                             service: {
-                                serviceName: { type: String },
+                                serviceName: { servId: { type: mongoose.Schema.ObjectId, ref: "services" } },
                                 finished: {
                                     type: String,
                                     enum: ['Proposed', 'Opted', 'Cancelled', 'Completed'],
                                     default: 'Proposed',
                                     trim: true,
                                 },
+                                unitPrice: { type: Number, default: null },
+                                discount: { type: Number, default: null },
+                                estimateId: { type: String, default: null },
+                                opptedOrCompleted: { type: Boolean, default: false },
+                                invoiceId: { type: mongoose.Schema.ObjectId, ref: "invoices", default: null },
+                                prposedDate: { type: Date, default: null },
                                 updatedAt: { type: Date, default: null, index: true }
                             },
                             procedure: {
@@ -214,6 +224,17 @@ const caseSheetSchema = new mongoose.Schema({
             {
                 file: { type: String, default: null },
                 remark: { type: String, default: null },
+                tooth: {
+                    type: [],
+                    default: [],
+                },
+                service: { servId: { type: mongoose.Schema.ObjectId, ref: "services", default: null } },
+                procedure: {
+                    type: [
+                        { procedId: { type: mongoose.Schema.ObjectId, ref: "procedure", default: null } }
+                    ],
+                    default: []
+                },
             },
         ],
         default: [],
@@ -242,6 +263,3 @@ const caseSheetSchema = new mongoose.Schema({
 
 
 module.exports = caseSheetSchema;
-
-
-
