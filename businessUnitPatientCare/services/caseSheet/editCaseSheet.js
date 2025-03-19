@@ -78,13 +78,13 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
                                                 : 0;
                                             fetchedServiceArr.service.prposedDate = inputObj?.prposedDate;
                                             fetchedServiceArr.service.departmentId = inputObj?.department;
-                                            // fetchedServiceArr.procedure = [
-                                            //     {
-                                            //         procedureName : "",
-                                            //         finished:"",
-                                            //         updatedAt:""
-                                            //     }
-                                            // ];
+                                            fetchedServiceArr.procedure = [
+                                                // {
+                                                //     procedureName : "",
+                                                //     finished:"",
+                                                //     updatedAt:""
+                                                // }
+                                            ];
         
                                             if (inputTooth?.status == "Opted" && !fetchedServiceArr.service.estimateId) {
                                                 console.log("Updating valid service =>", inputTooth?.tooth);
@@ -113,14 +113,14 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
                                             // updatedAt:"",
                                             departmentId: inputObj?.department
                                         }
-                                        //    ,
-                                        //    procedure:[
-                                        //         {
-                                        //             procedureName : "",
-                                        //             finished:"",
-                                        //             updatedAt:""
-                                        //         }
-                                        //     ]
+                                           ,
+                                           procedure:[
+                                                // {
+                                                //     procedureName : "",
+                                                //     finished:"",
+                                                //     updatedAt:""
+                                                // }
+                                            ]
                                     };
                                     if (inputTooth?.status == "Opted") {
                                         const random = await getserialNumber("estimate", clientId, branchId, buid);
