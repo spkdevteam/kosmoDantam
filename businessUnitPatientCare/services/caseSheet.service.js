@@ -22,6 +22,7 @@ const clinetBranchSchema = require("../../client/model/branch");
 const appointmentSchema = require('../../client/model/appointments');
 const { validateObjectId } = require('../../businessUnitAdministration/services/validate.serialNumber');
 const clinetChairSchema = require('../../client/model/chair');
+const getserialNumber = require('../../model/services/getserialNumber');
 
 const checkOngoing = async (clientId, patientId) => {
     try {
@@ -2012,6 +2013,25 @@ const updateTreatment = async (clientId, caseSheetId, treatmentData) => {
         });
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+        }
+        //handling if fineshed = opted && estimateId is nonexistatnt then random estimateId is generated and inserted:
+        const Branch = await clientConnection.model("branch", clinetBranchSchema);
+        const branchObj = await Branch.findOne({_id : existing?.branchId }).lean();
+        if(!branchObj)  return { status: false, message: 'Error fetching Branch of case sheet overview!!' };
+        // console.log("branchObjbranchObj=>>",branchObj);
+        for(const toothEntry of treatmentData){
+            for(const serviceArrObj of toothEntry?.service)
+            {
+                // console.log(toothEntry.tooth,"->>",serviceArrObj?.service?.finished,"tooth, finished");
+                if (serviceArrObj?.service?.finished == "Opted" && (serviceArrObj?.service?.estimateId == null || serviceArrObj?.service?.estimateId == '') )
+                {
+                    // console.log(clientId,  existing?.branchId, branchObj?.businessUnit,"clientId, branchId, buid");
+                    const random = await getserialNumber("estimate", clientId, existing?.branchId, branchObj?.businessUnit);
+                    if(!random) return { status: false, message: 'Error generating estimate!!' };
+                    // console.log("random=>>", random);
+                    serviceArrObj.service.estimateId = random;
+                }
+            }
         }
         existing.treatmentData3 = treatmentData;
         existing.status = "In Progress";

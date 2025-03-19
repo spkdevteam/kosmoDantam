@@ -192,7 +192,8 @@ const caseSheetSchema = new mongoose.Schema({
                                 opptedOrCompleted: { type: Boolean, default: false },
                                 invoiceId: { type: mongoose.Schema.ObjectId, ref: "invoices", default: null },
                                 prposedDate: { type: Date, default: null },
-                                updatedAt: { type: Date, default: null, index: true }
+                                updatedAt: { type: Date, default: null, index: true },
+                                departmentId : {type:mongoose.Schema.ObjectId, ref: "department"}
                             },
                             procedure: {
                                 type: [
