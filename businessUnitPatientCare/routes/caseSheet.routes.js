@@ -17,9 +17,10 @@ const {
     uploadInvestigation,
     uploadAttachment,
 } = require('../../utils/multer');
-const editcaseSheet = require("../services/caseSheet/editCaseSheet");
+// const editcaseSheet = require("../services/caseSheet/editCaseSheet");
 const postEditCaseSheet = require("../controller/caseSheet/editCaseSheet");
 const getUnbilledItemsFromCaseSheet = require("../controller/caseSheet/getUnbilledItemsFromCaseSheet");
+const patchUpdateInvoice = require("../controller/caseSheet/updateInvoice");
 
 
 
@@ -162,7 +163,7 @@ router.get('/getAllDraftedCaseSheet/:clientId/:patientId', entityAuth.authorizeE
 router.get('/getAllCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllCaseSheet);
 router.get('/getAllCaseSheetOfPatient', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllCaseSheetOfPatient);
 router.delete('/deleteCaseSheet/:clientId/:caseSheetId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.deleteCaseSheet);
-router.get('/getCaseDetail/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getCaseDetail)
+router.get('/getCaseDetail/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getCaseDetail) //middleware commented
 
 // ------- case sheet details routes ends here ------
 
@@ -171,7 +172,7 @@ router.get('/getCaseDetail/:clientId/:caseSheetId',entityAuth.authorizeEntity("P
 router.get('/getTreatmentPlan/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getTreatmentPlan);
 router.put('/updateTreatment',
     // entityAuth.authorizeEntity("Patient", "Case Sheet", "view"),
-     caseSheetController.updateTreatment);
+     caseSheetController.updateTreatment); //middleware commented
 router.put('/updateTreatmentAndCloseCaseSheet',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatmentAndCloseCaseSheet);
 router.put('/closeCaseSheet',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.closeCaseSheet);
 router.put('/updateTreatmentProcedure',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatmentProcedure);
@@ -190,6 +191,7 @@ router.put('/updatePatientMedicalHistory', entityAuth.authorizeEntity("Patient",
 
 router.post('/editCaseSheet',postEditCaseSheet)
 router.get('/loadUnbilledItemsFromCaseSheet/:clientId/:caseSheetId',getUnbilledItemsFromCaseSheet)
+router.patch("/updateInvoice",patchUpdateInvoice)
 
 
 
