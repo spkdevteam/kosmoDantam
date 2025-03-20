@@ -2018,7 +2018,7 @@ const listDrafted = async (clientId, filters = {}) => {
 
 
 
-const getById = async (clientId, caseSheetId) => {
+const getById = async (clientId, caseSheetId) => { 
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);

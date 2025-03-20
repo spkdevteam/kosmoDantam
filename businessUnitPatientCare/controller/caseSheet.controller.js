@@ -1106,7 +1106,7 @@ exports.getAllCaseSheetOfPatient = async (req, res, next) => {
 
 
 // get particular case sheet
-exports.getParticularCaseSheet = async (req, res, next) => {
+exports.getParticularCaseSheet = async (req, res, next) => { 
     try {
         const { clientId, caseSheetId } = req.params;
         if (!clientId || !caseSheetId) {

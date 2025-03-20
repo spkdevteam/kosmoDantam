@@ -158,7 +158,6 @@ router.post('/updateCaseSheet',entityAuth.authorizeEntity("Patient", "Case Sheet
 // ------- case sheet details routes starts here ------
 
 router.get('/listCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.listCaseSheet);
-// router.get('/getCaseSheet/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getParticularCaseSheet)
 router.get('/getCaseSheet/:clientId/:caseSheetId',
     // entityAuth.authorizeEntity("Patient", "Case Sheet", "view"),
      caseSheetController.getParticularCaseSheet)
