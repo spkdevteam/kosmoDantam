@@ -172,9 +172,9 @@ const caseSheetSchema = new mongoose.Schema({
             {
                 tooth: { type: String, default: null },
                 department: {
-                    deptId: { type: mongoose.Schema.ObjectId, ref: "department" }
+                    deptId: { type: mongoose.Schema.ObjectId, ref: "department",default:'67a6edb65f984dad91cd02d9'  }
                 },
-                service: {
+            service: {
                     type: [
                         {
 
@@ -193,7 +193,7 @@ const caseSheetSchema = new mongoose.Schema({
                                 invoiceId: { type: mongoose.Schema.ObjectId, ref: "invoices", default: null },
                                 prposedDate: { type: Date, default: null },
                                 updatedAt: { type: Date, default: null, index: true },
-                                departmentId : {type:mongoose.Schema.ObjectId, ref: "department"}
+                                departmentId : {type:mongoose.Schema.ObjectId, ref: "department",default:'67a6edb65f984dad91cd02d9'}
                             },
                             procedure: {
                                 type: [

@@ -158,7 +158,10 @@ router.post('/updateCaseSheet',entityAuth.authorizeEntity("Patient", "Case Sheet
 // ------- case sheet details routes starts here ------
 
 router.get('/listCaseSheet', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.listCaseSheet);
-router.get('/getCaseSheet/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getParticularCaseSheet)
+// router.get('/getCaseSheet/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getParticularCaseSheet)
+router.get('/getCaseSheet/:clientId/:caseSheetId',
+    // entityAuth.authorizeEntity("Patient", "Case Sheet", "view"),
+     caseSheetController.getParticularCaseSheet)
 router.get('/getAllDraftedCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllDrafted);
 router.get('/getAllCaseSheet/:clientId/:patientId', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllCaseSheet);
 router.get('/getAllCaseSheetOfPatient', entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getAllCaseSheetOfPatient);
