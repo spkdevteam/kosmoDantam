@@ -40,10 +40,9 @@ exports.create = async (req, res, next) => {
                 message: message.lblBusinessUnitNotFound,
             });
         }
-        const existing = await Service.findOne({
-            $or: [{ serviceName: serviceName },
-            ],
-        });
+        const existing = await Service.findOne( 
+             { serviceName: serviceName,departmentId:departmentId }
+          );
         if (existing) {
             throw new CustomError(statusCode.Conflict, message.lblServiceExist);
         }

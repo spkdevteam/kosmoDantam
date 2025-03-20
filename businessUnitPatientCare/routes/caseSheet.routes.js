@@ -17,6 +17,9 @@ const {
     uploadInvestigation,
     uploadAttachment,
 } = require('../../utils/multer');
+const editcaseSheet = require("../services/caseSheet/editCaseSheet");
+const postEditCaseSheet = require("../controller/caseSheet/editCaseSheet");
+const getUnbilledItemsFromCaseSheet = require("../controller/caseSheet/getUnbilledItemsFromCaseSheet");
 
 
 
@@ -166,7 +169,9 @@ router.get('/getCaseDetail/:clientId/:caseSheetId',entityAuth.authorizeEntity("P
 // ------- Treatment plan routes starts starts here -------
 
 router.get('/getTreatmentPlan/:clientId/:caseSheetId',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.getTreatmentPlan);
-router.put('/updateTreatment',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatment);
+router.put('/updateTreatment',
+    // entityAuth.authorizeEntity("Patient", "Case Sheet", "view"),
+     caseSheetController.updateTreatment);
 router.put('/updateTreatmentAndCloseCaseSheet',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatmentAndCloseCaseSheet);
 router.put('/closeCaseSheet',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.closeCaseSheet);
 router.put('/updateTreatmentProcedure',entityAuth.authorizeEntity("Patient", "Case Sheet", "view"), caseSheetController.updateTreatmentProcedure);
@@ -183,7 +188,8 @@ router.put('/updatePatientMedicalHistory', entityAuth.authorizeEntity("Patient",
 
 
 
-
+router.post('/editCaseSheet',postEditCaseSheet)
+router.get('/loadUnbilledItemsFromCaseSheet/:clientId/:caseSheetId',getUnbilledItemsFromCaseSheet)
 
 
 

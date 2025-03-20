@@ -1,0 +1,21 @@
+const express = require('express')
+const { router } = require('../routes/welcome')
+const postCreateMenu = require('./controller/postCreateMenu')
+const getMenuList = require('./controller/getMenuList')
+const postCreateRole = require('./controller/postCreateRole')
+const postUpdateRoleAccess = require('./model/services/postUpdateRoleAccess')
+const error404 = require('./controller/error404')
+const postLogin = require('./controller/postLogin')
+const postCreateUser = require('./controller/postCreateUser')
+const humanRouter = express.Router()
+
+
+humanRouter.post('/createMenu',postCreateMenu)
+humanRouter.get('/menuList',getMenuList)
+humanRouter.post('/createRole',postCreateRole)
+humanRouter.post('/updateRoleAccess',postUpdateRoleAccess)
+humanRouter.post('/login',postLogin)
+humanRouter.post('/createUser',postCreateUser)
+//humanRouter.get('/login',postLogin)
+humanRouter.use(error404)
+module.exports = humanRouter

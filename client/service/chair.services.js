@@ -101,6 +101,8 @@ const getChairById = async (clientId, chairId) => {
 
 const listChairs = async (clientId, filters = {}, options = { page: 1, limit: 10 }) => {
     try {
+        console.log(clientId,filters,options,'clientId,filters,options')
+
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Chair = clientConnection.model('chair', clinetChairSchema);
         const Branch = clientConnection.model('branch', clinetBranchSchema);

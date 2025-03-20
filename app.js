@@ -91,6 +91,7 @@ const medicalSchema = require("./client/model/medical.js");
 const preScriptionRouter = require("./businessUnitAdministration/routes/priscription.routes.js");
 const priscriptionRouter = require("./businessUnitPatientCare/routes/prescription.routes.js");
 const utilsRouter = require("./businessUnitAdministration/routes/utils.routes.js");
+const humanRouter = require("./HumanResource/router.js");
 
 const corsOptions = {
     origin: '*',
@@ -116,9 +117,14 @@ app.use(express.urlencoded({ extended: true }))
 // connecting database
 const DATABASE_URL = process.env.DATABASE_URL;
 ConnectDb(DATABASE_URL);
-
+app.use((req,res,next)=>{
+    console.log(req.path)
+    next()
+})
 
 // routes setup
+// 
+// app.use("/human", humanRouter);
 app.use("/api", welcomeRouter.router);
 app.use("/api/superAdmin", superAdminRouter.router);
 app.use("/api/superAdmin/tooth", toothRouter);

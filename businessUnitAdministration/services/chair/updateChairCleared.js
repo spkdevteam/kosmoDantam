@@ -12,14 +12,7 @@ const updateChairCleared = async ({ clientId, chairId, patientId }) => {
         const result = await Chairs.findOne({ _id: chairId })
         const selectedChair = result?.toObject()
         console.log(selectedChair, 'selectedChair')
-        // if(selectedChair?.status  !== 'Ready' && selectedChair?.activePatientId){
-        //     return {status:false, message:'chair is busy with other patient '}
-        // }
-        // else
-        //  if (selectedChair?.status  !== 'Ready' && !selectedChair?.activePatientId){
-        //     return {status:false, message:'chair is getting ready  '}
-        // }
-        // else {
+         
         const updated = await Chairs.
             updateOne({
                 _id: new mongoose.Types.ObjectId(selectedChair?._id),
@@ -31,7 +24,7 @@ const updateChairCleared = async ({ clientId, chairId, patientId }) => {
                     activeAppointmentId:null
                 }
             })
-
+            console.log(updated,'updatedupdatedupdated')
         if (updated.modifiedCount) {
             return { status: true, message: 'chair is getting ready  ' }
         }
