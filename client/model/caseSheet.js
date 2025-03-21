@@ -195,6 +195,19 @@ const caseSheetSchema = new mongoose.Schema({
                                 updatedAt: { type: Date, default: null, index: true },
                                 departmentId : {type:mongoose.Schema.ObjectId, ref: "department"}
                             },
+                            department: {
+                                deptId: { type: mongoose.Schema.ObjectId, ref: "department" }
+                            },
+                            rate: { type: Number, default: null },
+                            discount: { type: Number, default: null },
+                            quaintity: { type: Number, default: null },
+                            subTotal: { type: Number, default: null },
+                            grantTotal: { type: Number, default: null },
+                            prposedDate: { type: Date, default: null },
+                            estimateId: { type: String, default: null },
+                            opptedOrCompleted: { type: Boolean, default: false },
+                            invoiceId: { type: mongoose.Schema.ObjectId, ref: "invoices", default: null },
+                            updatedAt: { type: Date, default: null, index: true },
                             procedure: {
                                 type: [
                                     {
@@ -212,7 +225,7 @@ const caseSheetSchema = new mongoose.Schema({
                         }
                     ]
                 },
-
+                rowId: { type: String, default: null },
                 total: { type: Number, default: 0 },
                 completed: { type: Number, default: 0 },
             }
