@@ -2012,12 +2012,6 @@ const listDrafted = async (clientId, filters = {}) => {
     }
 };
 
-
-
-
-
-
-
 const getById = async (clientId, caseSheetId) => { 
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
@@ -2030,7 +2024,9 @@ const getById = async (clientId, caseSheetId) => {
         const procedures = clientConnection.model('procedure', procedureSchema)
 
 
-        const caseSheet = await CaseSheet.findById(caseSheetId).populate({
+        const caseSheet = await CaseSheet.findById(caseSheetId)
+        .
+        populate({
             path: 'cheifComplaints.complaints.compId',
             model: Complaint,
             select: 'complaintName _id'
@@ -2050,34 +2046,16 @@ const getById = async (clientId, caseSheetId) => {
             path: 'services.department.deptId',
             model: Department,
             select: 'deptName _id'
-        }).populate({
+        })
+        .populate({
             path: 'services.service.servId',
             model: Service,
             select: 'serviceName _id'
-        }).populate({
+        })
+        .populate({
             path: 'procedures.procedure.procedId',
             model: procedures,
             select: 'procedureName _id'
-        }).populate({
-            path: 'procedures.service.servId',
-            model: Service,
-            select: 'serviceName _id'
-        }).populate({
-            path: 'otherAttachment.procedure.procedId',
-            model: procedures,
-            select: 'procedureName _id'
-        }).populate({
-            path: 'otherAttachment.service.servId',
-            model: Service,
-            select: 'serviceName _id'
-        }).populate({
-            path: 'treatmentData3.service.department.deptId',
-            model: Department,
-            select: 'deptName _id'
-        }).populate({
-            path: 'treatmentData3.service.service.serviceName.servId',
-            model: Service,
-            select: 'serviceName _id'
         })
 
         if (!caseSheet) {
@@ -2088,6 +2066,82 @@ const getById = async (clientId, caseSheetId) => {
         throw new CustomError(error.statusCode || 500, `Error getting case sheet: ${error.message}`);
     }
 };
+
+
+
+
+
+
+// const getById = async (clientId, caseSheetId) => { 
+//     try {
+//         const clientConnection = await getClientDatabaseConnection(clientId);
+//         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+//         const Complaint = clientConnection.model('complaint', complaintSchema);
+//         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
+//         const Medical = clientConnection.model('medical', medicalSchema);
+//         const Department = clientConnection.model('department', departmentSchema);
+//         const Service = clientConnection.model('services', serviceSchema);
+//         const procedures = clientConnection.model('procedure', procedureSchema)
+
+
+//         const caseSheet = await CaseSheet.findById(caseSheetId).populate({
+//             path: 'cheifComplaints.complaints.compId',
+//             model: Complaint,
+//             select: 'complaintName _id'
+//         }).populate({
+//             path: 'clinicalFindings.findings.findId',
+//             model: Finding,
+//             select: 'findingsName _id'
+//         }).populate({
+//             path: 'diagnosis.findings.findId',
+//             model: Finding,
+//             select: 'findingsName _id'
+//         }).populate({
+//             path: 'medicalHistory.medicals.medId',
+//             model: Medical,
+//             select: 'caseName _id'
+//         }).populate({
+//             path: 'services.department.deptId',
+//             model: Department,
+//             select: 'deptName _id'
+//         }).populate({
+//             path: 'services.service.servId',
+//             model: Service,
+//             select: 'serviceName _id'
+//         }).populate({
+//             path: 'procedures.procedure.procedId',
+//             model: procedures,
+//             select: 'procedureName _id'
+//         }).populate({
+//             path: 'procedures.service.servId',
+//             model: Service,
+//             select: 'serviceName _id'
+//         }).populate({
+//             path: 'otherAttachment.procedure.procedId',
+//             model: procedures,
+//             select: 'procedureName _id'
+//         }).populate({
+//             path: 'otherAttachment.service.servId',
+//             model: Service,
+//             select: 'serviceName _id'
+//         }).populate({
+//             path: 'treatmentData3.service.department.deptId',
+//             model: Department,
+//             select: 'deptName _id'
+//         }).populate({
+//             path: 'treatmentData3.service.service.serviceName.servId',
+//             model: Service,
+//             select: 'serviceName _id'
+//         })
+
+//         if (!caseSheet) {
+//             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
+//         }
+//         return caseSheet;
+//     } catch (error) {
+//         throw new CustomError(error.statusCode || 500, `Error getting case sheet: ${error.message}`);
+//     }
+// };
 
 const getCaseDetail = async (clientId, caseSheetId) => {
     try {

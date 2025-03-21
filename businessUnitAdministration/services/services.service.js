@@ -302,8 +302,22 @@ const deleteServ = async (clientId, serviceId, softDelete = true) => {
 };
 
 
+const getServiceById = async ({clientId,serviceId})=>{
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Service = clientConnection.model('services', serviceSchema);
+        const service = await Service.findById(serviceId);
+        return service
 
-module.exports = { 
+    } catch (error) {
+        
+    }
+}
+
+
+
+module.exports = {
+    getServiceById, 
     readActiveServicesbyPage,
     createService, 
     deleteService,

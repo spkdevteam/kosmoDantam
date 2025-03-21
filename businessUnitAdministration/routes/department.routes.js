@@ -17,5 +17,6 @@ deptRouter
     .patch('/activeInactiveDepartment', entityAuth.authorizeEntity("Administration", "Department", "update"), deptController.activeinactiveDepartment)
     .put('/revokeDepartment', deptController.revokeDepartment)
     .put('/toggleDepartmentWithPage', deptController.putToggleDepartmentsWithPage)
+    .get('/getDepartmentById',deptController.getDepartmentById)
 
 module.exports = deptRouter
