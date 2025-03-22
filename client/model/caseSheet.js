@@ -246,15 +246,17 @@ const caseSheetSchema = new mongoose.Schema({
                                 finished: {
                                     type: String,
                                     enum: ['Proposed', 'Opted', 'Cancelled', 'Completed'],
-                                    // oppted : { type: Boolean, default: false },
-                                    // invoiceId : {  type: mongoose.Schema.ObjectId, ref : "invoices", default : null },
-                                    // estimateId : {  type: String, default : null },
-                                    // unitPrice : {  type: Number, default : null },
                                     default: 'Proposed',
                                     trim: true,
                                 },
                                 unitPrice: { type: Number, default: null },
-                                updatedAt: { type: Date, default: null, index: true }
+                                discount: { type: Number, default: null },
+                                estimateId: { type: String, default: null },
+                                opptedOrCompleted: { type: Boolean, default: false },
+                                invoiceId: { type: mongoose.Schema.ObjectId, ref: "invoices", default: null },
+                                prposedDate: { type: Date, default: null },
+                                updatedAt: { type: Date, default: null, index: true },
+                                departmentId : {type:mongoose.Schema.ObjectId, ref: "department"}
                             },
                             procedure: {
                                 type: [
