@@ -15,7 +15,9 @@ const getUnbilledItemsFromCaseSheetFn = async ({ clientId, caseSheetId }) => {
             for (const serviceObj of toothEntry?.service) {
                 // console.log("serviceObj?.service?.finished=>>",serviceObj?.service?.finished);             
                 if (serviceObj?.service?.finished == "Opted" && serviceObj?.service?.estimateId && !serviceObj?.service?.invoiceId) {
-                    const serviceDetails = await ServiceModelObj.findOne({ _id: serviceObj?.service?.serviceName?.servId, deletedAt: null });
+                    //fix:=>
+                    // const serviceDetails = await ServiceModelObj.findOne({ _id: serviceObj?.service?.serviceName?.servId, deletedAt: null });
+                    const serviceDetails = await ServiceModelObj.findOne({ _id: serviceObj?.service?.serviceId, deletedAt: null });
                     if (!serviceDetails) return { status: false, message: "Service doesn't exist or deleted!!" }
                     //console.log("serviceDetailsserviceDetails=>>", serviceDetails); //_id, serviceName
                     // Check if entry with all 3 params exists
