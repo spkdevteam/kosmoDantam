@@ -23,7 +23,8 @@ const getUnbilledItemsFromCaseSheetFn = async ({ clientId, caseSheetId }) => {
                             (item) =>
                                 item.serviceId.toString() === serviceDetails._id.toString() &&
                                 item.unitPrice === serviceObj.service.unitPrice &&
-                                item.discount === serviceObj.service.discount
+                                // item.discount === serviceObj.service.discount
+                                item.discount === parseFloat(serviceObj.service.discount.toFixed(2))
                     );
                     if (existingIndex !== -1) {//if found
                        returnData[existingIndex].toothArray.push(toothEntry?.tooth);
@@ -34,7 +35,8 @@ const getUnbilledItemsFromCaseSheetFn = async ({ clientId, caseSheetId }) => {
                             serviceId: serviceDetails._id,
                             serviceName: serviceDetails.serviceName,
                             unitPrice: serviceObj.service.unitPrice,
-                            discount: serviceObj.service.discount,
+                            // discount: serviceObj.service.discount,
+                            discount: parseFloat(serviceObj.service.discount.toFixed(2)),
                             //                         "_id": {
                             //     "$oid": "67a32f5a074ac38a6f71a928"    /////??????
                             //   }
