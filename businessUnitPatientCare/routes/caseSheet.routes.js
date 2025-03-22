@@ -22,6 +22,7 @@ const postEditCaseSheet = require("../controller/caseSheet/editCaseSheet");
 const getUnbilledItemsFromCaseSheet = require("../controller/caseSheet/getUnbilledItemsFromCaseSheet");
 const patchUpdateInvoice = require("../controller/caseSheet/updateInvoice");
 const migrationIntoTreatmentData3 = require("../controller/caseSheet/migrationIntoTreatmentData3");
+const updateCaseSheetWithInvoiceNumber = require("../controller/caseSheet/updateCaseSheetWithInvoiceNumber");
 
 
 
@@ -189,6 +190,7 @@ router.post('/editCaseSheet',postEditCaseSheet)
 router.get('/loadUnbilledItemsFromCaseSheet/:clientId/:caseSheetId',getUnbilledItemsFromCaseSheet)
 router.patch("/updateInvoice",patchUpdateInvoice)
 router.post("/migrationIntoTreatmentData3",migrationIntoTreatmentData3)
+router.patch("/updateCaseSheetWithInvoiceNumber",updateCaseSheetWithInvoiceNumber)
 
 
 
