@@ -556,17 +556,21 @@ const createService = async (clientId, isDrafted, data) => {
                 treatmentMap.set(item.tooth, item);
             });
 
-            newServices.forEach(serviceItem => {
+            // newServices.forEach(serviceItem => {fix=>replacing forEach with for-of as async operation needed
+            for (const serviceItem of newServices) {
                 let { tooth, service } = serviceItem;
+                const getServiceName = await Service.findOne({_id : service?.servId, deletedAt: null});
+                if(!getServiceName) return {status : false, message: "Service doesn't exist!!"};
                 tooth.forEach(t => {
                     if (treatmentMap.has(t)) {
                         // Update existing tooth services
                         let existingToothData = treatmentMap.get(t);
-                        let serviceExists = existingToothData.service.some(s => s.service.serviceName === service.servId.serviceName);
-
+                        // let serviceExists = existingToothData.service.some(s => s.service.serviceName === service.servId.serviceName);
+                        let serviceExists = existingToothData.service.some(s => String(s.service.serviceName) === String(getServiceName?.serviceName));//fix
                         if (!serviceExists) {
                             existingToothData.service.push({
-                                service: { serviceName: service.servId.serviceName },
+                                // service: { serviceName: service.servId.serviceName },
+                                service: { serviceName : String(getServiceName?.serviceName) ,serviceId: service?.servId },//fix
                                 finished: "In Progress",
                                 updatedAt: new Date(),
                             });
@@ -577,7 +581,8 @@ const createService = async (clientId, isDrafted, data) => {
                             tooth: t,
                             service: [
                                 {
-                                    service: { serviceName: service.servId.serviceName },
+                                    // service: { serviceName: service.servId.serviceName },
+                                    service: { serviceName : String(getServiceName?.serviceName) ,serviceId: service?.servId },//fix
                                     finished: "In Progress",
                                     updatedAt: new Date(),
                                 }
@@ -587,7 +592,7 @@ const createService = async (clientId, isDrafted, data) => {
                         });
                     }
                 });
-            });
+            };
             // Convert map back to array
             populatedCaseSheet.treatmentData3 = Array.from(treatmentMap.values());
             await populatedCaseSheet.save();
