@@ -35,7 +35,7 @@ exports.checkAlreadyOngoingCaseSheet = async (req, res, next) => {
         const cases = await caseSheetService.checkOngoing(clientId, patientId);
         return res.status(statusCode.OK).send({
             message: message.lblCaseSheetFoundSucessfully,
-            data: { cases: cases.existing, ongoing: cases?.existing?.length > 0 ? true : false, totalOngoingCases: cases?.existing?.length, draftedCase : cases?.anyDrafted, drafted : cases?.anyDrafted?.length > 0 ? true : false, totalDraftedCases :  cases?.anyDrafted?.length }
+            data: { cases: cases.existing, ongoing: cases?.existing?.length > 0 ? true : false, totalOngoingCases: cases?.existing?.length, draftedCase: cases?.anyDrafted, drafted: cases?.anyDrafted?.length > 0 ? true : false, totalDraftedCases: cases?.anyDrafted?.length }
         });
     } catch (error) {
         next(error)
@@ -450,7 +450,7 @@ exports.deleteInvestigation = async (req, res, next) => {
 // create other attachment by business unit
 exports.createOtherAttachment = async (req, res, next) => {
     try {
-        const { clientId, patientId, branchId, businessUnitId, remark, } = req.body;
+        const { clientId, patientId, branchId, businessUnitId, remark, tooth, service, procedure } = req.body;
         const mainUser = req.user;
         await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!remark) {
@@ -461,11 +461,15 @@ exports.createOtherAttachment = async (req, res, next) => {
         let dataObject = {
             remark: remark,
         }
-
-        // if (req.file?.filename) {
-        //     dataObject.file = req.file.filename;
-        // }
-
+        if (tooth !== "null") {
+            dataObject = { ...dataObject, tooth: JSON.parse(tooth) }
+        }
+        if (service !== "null") {
+            dataObject = { ...dataObject, service: JSON.parse(service), }
+        }
+        if (procedure !== "null") {
+            dataObject = { ...dataObject, procedure: JSON.parse(procedure), }
+        }
         let attachments = [];
         if (req.files && req.files.length > 0) {
             for (let index = 0; index < req.files.length; index++) {
@@ -474,7 +478,6 @@ exports.createOtherAttachment = async (req, res, next) => {
             }
             dataObject.file = JSON.stringify(attachments);
         }
-
         const serialNumber = await getserialNumber('caseSheet', clientId, "", businessUnitId)
         const created = await caseSheetService.createOtherAttachment(clientId, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, otherAttachment: [dataObject], displayId: serialNumber,
@@ -491,7 +494,7 @@ exports.createOtherAttachment = async (req, res, next) => {
 // update other attachment by busines unit
 exports.updateOtherAttachment = async (req, res, next) => {
     try {
-        const { clientId, caseSheetId, patientId, branchId, businessUnitId, remark, } = req.body;
+        const { clientId, caseSheetId, patientId, branchId, businessUnitId, remark, tooth, service, procedure } = req.body;
         await commonCheck(clientId, patientId, branchId, businessUnitId);
         if (!remark) {
             return res.status(statusCode.BadRequest).send({
@@ -501,9 +504,21 @@ exports.updateOtherAttachment = async (req, res, next) => {
         let dataObject = {
             remark: remark,
         }
+        if (tooth !== "null") {
+            dataObject = { ...dataObject, tooth: JSON.parse(tooth) }
+        }
+
+        if (service !== "null") {
+            dataObject = { ...dataObject, service: JSON.parse(service), }
+        }
+
+        if (procedure !== "null") {
+            dataObject = { ...dataObject, procedure: JSON.parse(procedure), }
+        }
+
         // if (req.file?.filename) {
         //     dataObject.file = req.file.filename;
-        // }
+        // } 
         let attachments = [];
         if (req.files && req.files.length > 0) {
             for (let index = 0; index < req.files.length; index++) {
@@ -512,7 +527,6 @@ exports.updateOtherAttachment = async (req, res, next) => {
             }
             dataObject.file = JSON.stringify(attachments);
         }
-
         const updated = await caseSheetService.updateOtherAttachment(clientId, caseSheetId, dataObject);
         return res.status(statusCode.OK).send({
             message: message.lblOtherAttachmentUpdatedSuccess,
@@ -670,6 +684,77 @@ exports.createServices = async (req, res, next) => {
     }
 };
 
+
+// new create service controller
+exports.createServicesNew = async (req, res, next) => {
+    try {
+        const { clientId, patientId, branchId, businessUnitId, services, isDrafted = true } = req.body;
+        const mainUser = req.user;
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
+        if (!services) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const serialNumber = await getserialNumber('caseSheet', clientId, "", businessUnitId)
+        const newcaseSheet = await caseSheetService.createServiceNew(clientId, isDrafted, {
+            patientId, branchId, businessUnitId, createdBy: mainUser?._id, displayId: serialNumber,
+        }, services);
+
+
+        const newServiceArray = transformTreatmentData3ToServices(newcaseSheet.treatmentData3);
+
+        return res.status(statusCode.OK).send({
+            message: message.lblServicesCreatedSuccess,
+            data: { services: newServiceArray, _id: newcaseSheet._id, caseSheets: newcaseSheet },
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+
+const transformTreatmentData3ToServices = (treatmentData3) => {
+    let servicesMap = new Map();
+
+    treatmentData3.forEach(item => {
+        const { tooth, service } = item;
+
+        service.forEach(serviceItem => {
+            const { service, department, rate, quaintity, subTotal, discount, grantTotal, prposedDate } = serviceItem;
+
+            // Create a unique key based on department, service, rate, and discount
+            const key = `${department.deptId}-${service.serviceName.servId}-${rate}-${discount}`;
+
+            if (!servicesMap.has(key)) {
+                servicesMap.set(key, {
+                    tooth: [],
+                    department: { deptId: department.deptId },
+                    service: { servId: service.serviceName.servId },
+                    rate: rate,
+                    quaintity: quaintity,
+                    subTotal: subTotal,
+                    discount: discount,
+                    grantTotal: grantTotal,
+                    finished: false, // Assuming default value
+                    prposedDate: prposedDate
+                });
+            }
+
+            // Add unique tooth values
+            let existingService = servicesMap.get(key);
+            if (!existingService.tooth.includes(tooth)) {
+                existingService.tooth.push(tooth);
+            }
+        });
+    });
+
+    return Array.from(servicesMap.values());
+};
+
+
+
+
 // update services by busines unit
 exports.updateServices = async (req, res, next) => {
     try {
@@ -693,6 +778,33 @@ exports.updateServices = async (req, res, next) => {
     }
 };
 
+
+// new update service controller
+exports.updateServicesNew = async (req, res, next) => {
+    try {
+        const { clientId, caseSheetId, patientId, branchId, businessUnitId, services, isDrafted = true } = req.body;
+        const mainUser = req.user;
+        await commonCheck(clientId, patientId, branchId, businessUnitId);
+        if (!services) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const updatedCaseSheet = await caseSheetService.updateServiceNew(clientId, caseSheetId, isDrafted, {
+            patientId, branchId, businessUnitId, createdBy: mainUser?._id,
+        }, services);
+
+        const newServiceArray = transformTreatmentData3ToServices(updatedCaseSheet.treatmentData3);
+        return res.status(statusCode.OK).send({
+            message: message.lblServicesUpdatedSuccess,
+            data: { services: newServiceArray, _id: updatedCaseSheet._id }
+        });
+        
+    } catch (error) {
+        next(error)
+    }
+};
+
 exports.editParticularServices = async (req, res, next) => {
     try {
         const { clientId, caseSheetId, patientId, serviceRowId, branchId, businessUnitId, service, } = req.body;
@@ -704,7 +816,7 @@ exports.editParticularServices = async (req, res, next) => {
             });
         }
 
-        if(!serviceRowId){
+        if (!serviceRowId) {
             return res.status(statusCode.BadRequest).send({
                 message: "Service row id is required.",
             });

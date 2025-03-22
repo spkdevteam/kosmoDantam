@@ -11,7 +11,8 @@ const {
     allDepartmentsByPage,
     list,
     activeInactive,
-    deleteDept
+    deleteDept,
+    getDeptById
 } = require("../services/department.service")
 
 
@@ -106,7 +107,7 @@ exports.putToggleDepartmentsWithPage = async (req, res, next) => {
 
 exports.listDepartment = async (req, res, next) => {
     try {
-        const { clientId, keyword = '', page = 1, perPage = 10,branchId } = req.query;
+        const { clientId, keyword = '', page = 1, perPage = 10, branchId } = req.query;
         if (!clientId) {
             return res.status(httpStatusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
@@ -114,15 +115,15 @@ exports.listDepartment = async (req, res, next) => {
         }
         const filters = {
             deletedAt: null,
-            
+
             ...(keyword && {
                 $or: [
                     { deptName: { $regex: keyword.trim(), $options: "i" } },
                     { description: { $regex: keyword.trim(), $options: "i" } },
                 ],
             }),
-        } 
-        branchId?.length ?filters.branchId = branchId:'';
+        }
+        branchId?.length ? filters.branchId = branchId : '';
         const result = await list(clientId, filters, { page, limit: perPage });
         return res.status(httpStatusCode.OK).send({
             message: message.lblDepartFound,
@@ -155,14 +156,28 @@ exports.activeinactiveDepartment = async (req, res, next) => {
 };
 
 
+exports.getDepartmentById = async (req, res, next) => {
+
+    try {
+        const { departmentId, clientId } = req.query;
+        const result = await getDeptById({ clientId, departmentId })
+        res.json({ result })
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+
+
 exports.softDeleteDepartment = async (req, res, next) => {
 
     try {
 
         const { keyword, page, perPage, departmentId, clientId } = req.body;
 
-        console.log("clientId",req.body);
-        
+        console.log("clientId", req.body);
+
 
         req.query.keyword = keyword;
         req.query.page = page;

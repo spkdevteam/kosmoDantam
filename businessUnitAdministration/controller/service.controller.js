@@ -4,7 +4,7 @@ const httpStatusCode = require("../../utils/http-status-code")
 const message = require("../../utils/message")
 const sanitizeBody = require("../../utils/sanitizeBody");
 const CustomError = require("../../utils/customeError")
-const {list,activeInactive,deleteServ, createService, deleteService, readActiveServices, toggleServiceStatus, editService, serviceUnderDepartment, readActiveServicesbyPage } = require("../services/services.service");
+const {list,activeInactive,deleteServ, createService, deleteService, readActiveServices, toggleServiceStatus, editService, serviceUnderDepartment, readActiveServicesbyPage, getServiceById } = require("../services/services.service");
 const { getClientDatabaseConnection } = require("../../db/connection");
 const getserialNumber = require("../../model/services/getserialNumber");
 
@@ -277,3 +277,14 @@ exports.putToggleServiceByPage = async (req, res, next) => {
     }
 }
 
+
+
+exports.getServiceDetailsById = async (req, res, next) => {
+    try {
+        const data = await sanitizeBody(req.query)
+        const result = await getServiceById({clientId:data.clientId,serviceId:data.serviceId})
+        res.json(result)
+    } catch (error) {
+        next(error)
+    }
+}

@@ -3,7 +3,8 @@ const express = require('express')
 const { createServices, getReadActiveServicesbyPage,
     editService, deleteService, readActiveServices,
     toggleService, getServiceUnderDepartment, create, update, listServices,activeinactiveService,softDeleteService,
-    putToggleServiceByPage } = require('../controller/service.controller')
+    putToggleServiceByPage, 
+    getServiceDetailsById} = require('../controller/service.controller')
 
 const serviceRouter = express.Router()
 
@@ -22,6 +23,7 @@ serviceRouter
     .patch('/activeInactiveService', entityAuth.authorizeEntity("Administration", "Services", "update"), activeinactiveService)
     .put('/toggleServiceByPage', putToggleServiceByPage)
     .get('/serviceUnderDepartment', getServiceUnderDepartment)
+    .get('/getServiceById', getServiceDetailsById)
 
 
 module.exports = serviceRouter

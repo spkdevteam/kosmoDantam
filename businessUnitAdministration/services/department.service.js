@@ -11,6 +11,7 @@ const { getClientDatabaseConnection } = require("../../db/connection")
 const buSettingsSchema = require("../../model/buSettings")
 
 const getserialNumber = require("../../model/services/getserialNumber")
+const CustomError = require("../../utils/customeError")
 const httpStatusCode = require("../../utils/http-status-code")
 const message = require("../../utils/message")
 const { validateObjectId } = require("./validate.serialNumber")
@@ -281,4 +282,23 @@ const deleteDept = async (clientId, chairId, softDelete = true) => {
 
 
 
-module.exports = {list,activeInactive,deleteDept, allDepartmentsByPage,createDepartment, deleteDepartment, getallDepartments, toggleDepartment, editDepartment, revokeDeleteDepartment }
+const getDeptById = async ({clientId,departmentId} ) => {
+    console.log("clientId",clientId);
+    
+    try {
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const Department = clientConnection.model('department', departmentSchema);
+
+        const department = await Department.findById(departmentId);
+        if (!department) {
+            return {status:false,message:'no department found '}
+        }
+        else return {status:true,message:'success',data:department}
+
+    } catch (error) {
+        throw new CustomError(error.statusCode || 500, `Error soft delete chair: ${error.message}`);
+    }
+};
+
+
+module.exports = {list,activeInactive,deleteDept,getDeptById, allDepartmentsByPage,createDepartment, deleteDepartment, getallDepartments, toggleDepartment, editDepartment, revokeDeleteDepartment } 
