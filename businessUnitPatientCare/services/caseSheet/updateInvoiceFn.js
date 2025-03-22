@@ -26,7 +26,7 @@ const updateInvoiceFn = async ({ caseSheetId, inputArrObj, clientId }) => {
                         //if tooth is found the find the particular service
                         const serviceIndexOf = fetchedCaseSheet?.treatmentData3[toothIndexOf].service.findIndex((item) => item?._id.toString() === serviceArrObj?._id.toString());
                         if (serviceIndexOf !== -1) {//if service is found then assign the invoiceId coming from frontend
-                            fetchedCaseSheet.treatmentData3[toothIndexOf].service[serviceIndexOf].service.invoiceIda = serviceArrObj?.service?.invoiceId;
+                            fetchedCaseSheet.treatmentData3[toothIndexOf].service[serviceIndexOf].service.invoiceId = serviceArrObj?.service?.invoiceId;
                         }
                         else {
                             return { status: false, message: `Particular service for Tooth ${inputToothObj?.tooth} can't be found!!`, data: {} }
