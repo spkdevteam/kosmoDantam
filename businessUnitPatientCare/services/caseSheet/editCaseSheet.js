@@ -1,6 +1,8 @@
 const caseSheetSchema = require("../../../client/model/caseSheet");
+const serviceSchema = require("../../../client/model/service");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const getserialNumber = require("../../../model/services/getserialNumber");
+// const {service} require("../../../client/model/service")
 //how to handle total, completed?
 //handle if estimateId comes from frontend
 const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }) => {
@@ -8,6 +10,7 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
         // return {status : true, message :"CAsesheet is edited successfully" , data : {"testKey":"testVAl"}};
         const db = await getClientDatabaseConnection(clientId);
         const CaseSheetModelObj = await db.model('caseSheet', caseSheetSchema);
+        const ServiceSchema = await db.model('service',serviceSchema);
         const fetchedCaseSheet = await CaseSheetModelObj.findOne({ _id: caseSheetId, deletedAt: null });
         if (!fetchedCaseSheet) return { status: false, message: "Casesheet can't be found or deleted already!!", data: {} };
         //updating:
@@ -23,14 +26,15 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
             inputObj?.tooth?.map(async (inputTooth) => {//inputTooth=>each row of inputObj
                 await Promise.all(
                     fetchedCaseSheet?.treatmentData3?.map(async (fetchedTooth) => {//fetchedTooth=>each row of treatmentData3 of fetched document from db
-        
                         if (inputTooth?.tooth == fetchedTooth?.tooth) {
-        
+                            const getServiceName = ServiceSchema.find({_id : inputObj?.serviceid, deletedAt: null});
+                            if(!getServiceName) return {status : false, message :"Service doesnt exist or deleted!!"};
                             // CASE 1: serviceId is null => push new service ONLY ONCE
                             if (inputTooth?.serviceId == null || inputTooth?.serviceId == '') {//if serviceId for individual tooth is null in request
                                 const newService = {
                                     service: {
-                                        serviceName: { servId: inputObj?.serviceid },
+                                        serviceName: getServiceName?.serviceName,//servId
+                                        serviceId : inputObj?.serviceid,
                                         finished: inputTooth?.status,
                                         unitPrice: parseInt(inputObj?.rate),
                                         discount: totalTeethCount !== 0
@@ -65,13 +69,16 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
                             } 
                             else // CASE 2: serviceId is valid 
                             {
+                                
                                 const arrayForEachToothServiceId = [];
                                 await Promise.all(
                                     fetchedTooth?.service?.map(async (fetchedServiceArr) => {//fetchedServiceArr is each object element inside service array of a particular tooth
                                         arrayForEachToothServiceId.push(String(fetchedServiceArr?._id));
                                         if (fetchedServiceArr?._id == inputTooth?.serviceId) {//if servieId of each tooth coming from req mathed with _id of fetchedServiceArr
                                             fetchedServiceArr.service.finished = inputTooth?.status;
-                                            fetchedServiceArr.service.serviceName = { servId: inputObj?.serviceid };
+                                            //fix:=>
+                                            fetchedServiceArr.service.serviceName = getServiceName?.serviceName; //servId
+                                            fetchedServiceArr.service.serviceId = inputObj?.serviceid;
                                             fetchedServiceArr.service.unitPrice = parseInt(inputObj?.rate);
                                             fetchedServiceArr.service.discount = totalTeethCount !== 0
                                                 ? parseInt(inputObj?.discount) / totalTeethCount
@@ -99,9 +106,11 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
                                 //tag1//if serviceId of each individual tooth is valid but doesnt exist in treatmentDAta3 but tooth is there in treatmentDAta3
                                 if(!arrayForEachToothServiceId.includes(String(inputTooth?.serviceId)))//if serviceId of each individual tooth doesnt exist in treatmentDAta3 but tooth is there in treatmentDAta3
                                 {
+                                //fix:=>
                                     const newService = {
                                         service: {
-                                            serviceName: { servId: inputObj?.serviceid },
+                                            serviceName: getServiceName?.serviceName, //servId,
+                                            serviceId : inputObj?.serviceid,
                                             finished: inputTooth?.status,
                                             unitPrice: parseInt(inputObj?.rate),
                                             discount: totalTeethCount !== 0
@@ -150,6 +159,8 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
         const tempToothMap = {};
         await Promise.all(
             inputObj?.tooth?.map(async (inputTooth) => {
+                const getServiceName = ServiceSchema.find({_id : inputObj?.serviceid, deletedAt: null});
+                if(!getServiceName) return {status : false, message :"Service doesnt exist or deleted!!"};
                 if(!fetchedToothListArr.includes(String(inputTooth?.tooth)) && !tempToothMap[String(inputTooth?.tooth)])
                 {
                     console.log("inserting for=>",inputTooth?.tooth);
@@ -167,7 +178,9 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
                     }
                     newToothEntry.service.push({
                         service : {
-                            serviceName: { servId: inputObj?.serviceid },
+                            //fix:=>
+                            serviceName: getServiceName?.serviceName,//servId
+                            serviceId : inputObj?.serviceid,
                             finished : inputTooth?.status,
                             unitPrice : parseInt(inputObj?.rate),
                             discount : totalTeethCount !== 0
@@ -205,7 +218,9 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
                     fetchedCaseSheet.treatmentData3[existingIndex].service.push(
                         {
                             service : {
-                                serviceName: { servId: inputObj?.serviceid },
+                                //fix:=>
+                                serviceName: getServiceName?.serviceName,
+                                serviceId : inputObj?.serviceid,//servId
                                 finished : inputTooth?.status,
                                 unitPrice : parseInt(inputObj?.rate),
                                 discount : totalTeethCount !== 0

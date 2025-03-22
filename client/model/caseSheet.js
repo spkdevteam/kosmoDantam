@@ -243,6 +243,7 @@ const caseSheetSchema = new mongoose.Schema({
                         {
                             service: {
                                 serviceName: { type: String },
+                                serviceId : {type:mongoose.Schema.ObjectId, ref: "services"},
                                 finished: {
                                     type: String,
                                     enum: ['Proposed', 'Opted', 'Cancelled', 'Completed'],
