@@ -10,7 +10,7 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
         // return {status : true, message :"CAsesheet is edited successfully" , data : {"testKey":"testVAl"}};
         const db = await getClientDatabaseConnection(clientId);
         const CaseSheetModelObj = await db.model('caseSheet', caseSheetSchema);
-        const ServiceSchema = await db.model('service',serviceSchema);
+        const ServiceSchemaObj = await db.model('service',serviceSchema);
         const fetchedCaseSheet = await CaseSheetModelObj.findOne({ _id: caseSheetId, deletedAt: null });
         if (!fetchedCaseSheet) return { status: false, message: "Casesheet can't be found or deleted already!!", data: {} };
         //updating:
@@ -27,13 +27,14 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
                 await Promise.all(
                     fetchedCaseSheet?.treatmentData3?.map(async (fetchedTooth) => {//fetchedTooth=>each row of treatmentData3 of fetched document from db
                         if (inputTooth?.tooth == fetchedTooth?.tooth) {
-                            const getServiceName = ServiceSchema.find({_id : inputObj?.serviceid, deletedAt: null});
+                            const getServiceName = await ServiceSchemaObj.find({_id : inputObj?.serviceid, deletedAt: null});
                             if(!getServiceName) return {status : false, message :"Service doesnt exist or deleted!!"};
+                            console.log("getServiceName?.serviceName=>>",getServiceName);
                             // CASE 1: serviceId is null => push new service ONLY ONCE
                             if (inputTooth?.serviceId == null || inputTooth?.serviceId == '') {//if serviceId for individual tooth is null in request
                                 const newService = {
                                     service: {
-                                        serviceName: getServiceName?.serviceName,//servId
+                                        serviceName: getServiceName[0]?.serviceName,//servId
                                         serviceId : inputObj?.serviceid,
                                         finished: inputTooth?.status,
                                         unitPrice: parseInt(inputObj?.rate),
@@ -77,7 +78,7 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
                                         if (fetchedServiceArr?._id == inputTooth?.serviceId) {//if servieId of each tooth coming from req mathed with _id of fetchedServiceArr
                                             fetchedServiceArr.service.finished = inputTooth?.status;
                                             //fix:=>
-                                            fetchedServiceArr.service.serviceName = getServiceName?.serviceName; //servId
+                                            fetchedServiceArr.service.serviceName = getServiceName[0]?.serviceName; //servId
                                             fetchedServiceArr.service.serviceId = inputObj?.serviceid;
                                             fetchedServiceArr.service.unitPrice = parseInt(inputObj?.rate);
                                             fetchedServiceArr.service.discount = totalTeethCount !== 0
@@ -109,7 +110,7 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
                                 //fix:=>
                                     const newService = {
                                         service: {
-                                            serviceName: getServiceName?.serviceName, //servId,
+                                            serviceName: getServiceName[0]?.serviceName, //servId,
                                             serviceId : inputObj?.serviceid,
                                             finished: inputTooth?.status,
                                             unitPrice: parseInt(inputObj?.rate),
@@ -159,8 +160,9 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
         const tempToothMap = {};
         await Promise.all(
             inputObj?.tooth?.map(async (inputTooth) => {
-                const getServiceName = ServiceSchema.find({_id : inputObj?.serviceid, deletedAt: null});
+                const getServiceName =await ServiceSchemaObj.find({_id : inputObj?.serviceid, deletedAt: null});
                 if(!getServiceName) return {status : false, message :"Service doesnt exist or deleted!!"};
+                console.log("getServiceName?.serviceName=>>",getServiceName[0]?.serviceName);
                 if(!fetchedToothListArr.includes(String(inputTooth?.tooth)) && !tempToothMap[String(inputTooth?.tooth)])
                 {
                     console.log("inserting for=>",inputTooth?.tooth);
@@ -179,7 +181,7 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
                     newToothEntry.service.push({
                         service : {
                             //fix:=>
-                            serviceName: getServiceName?.serviceName,//servId
+                            serviceName: getServiceName[0]?.serviceName,//servId
                             serviceId : inputObj?.serviceid,
                             finished : inputTooth?.status,
                             unitPrice : parseInt(inputObj?.rate),
@@ -219,7 +221,7 @@ const editcaseSheet = async ({ inputObj, clientId, caseSheetId, branchId, buid }
                         {
                             service : {
                                 //fix:=>
-                                serviceName: getServiceName?.serviceName,
+                                serviceName: getServiceName[0]?.serviceName,
                                 serviceId : inputObj?.serviceid,//servId
                                 finished : inputTooth?.status,
                                 unitPrice : parseInt(inputObj?.rate),
