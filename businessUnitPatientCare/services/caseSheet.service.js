@@ -2314,7 +2314,7 @@ const updateTreatment = async (clientId, caseSheetId, treatmentData) => {
             for(const serviceArrObj of toothEntry?.service)
             {
                 // console.log(toothEntry.tooth,"->>",serviceArrObj?.service?.finished,"tooth, finished");
-                if (serviceArrObj?.service?.finished == "Opted" && (serviceArrObj?.service?.estimateId == null || serviceArrObj?.service?.estimateId == '') )
+                if ((String(serviceArrObj?.service?.finished) == "Opted" || String(serviceArrObj?.service?.finished) == "Completed") && (serviceArrObj?.service?.estimateId == null || serviceArrObj?.service?.estimateId == '') )
                 {
                     // console.log(clientId,  existing?.branchId, branchObj?.businessUnit,"clientId, branchId, buid");
                     const random = await getserialNumber("estimate", clientId, existing?.branchId, branchObj?.businessUnit);
