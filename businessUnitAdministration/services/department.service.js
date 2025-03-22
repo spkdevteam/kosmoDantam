@@ -11,6 +11,7 @@ const { getClientDatabaseConnection } = require("../../db/connection")
 const buSettingsSchema = require("../../model/buSettings")
 
 const getserialNumber = require("../../model/services/getserialNumber")
+const CustomError = require("../../utils/customeError")
 const httpStatusCode = require("../../utils/http-status-code")
 const message = require("../../utils/message")
 const { validateObjectId } = require("./validate.serialNumber")
@@ -281,12 +282,14 @@ const deleteDept = async (clientId, chairId, softDelete = true) => {
 
 
 
-const getDeptById = async (clientId, chairId, softDelete = true) => {
+const getDeptById = async ({clientId,departmentId} ) => {
+    console.log("clientId",clientId);
+    
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Department = clientConnection.model('department', departmentSchema);
 
-        const department = await Department.findById(chairId);
+        const department = await Department.findById(departmentId);
         if (!department) {
             return {status:false,message:'no department found '}
         }

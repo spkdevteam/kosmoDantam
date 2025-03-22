@@ -159,7 +159,7 @@ exports.activeinactiveDepartment = async (req, res, next) => {
 exports.getDepartmentById = async (req, res, next) => {
 
     try {
-        const { departmentId, clientId } = req.body;
+        const { departmentId, clientId } = req.query;
         const result = await getDeptById({ clientId, departmentId })
         res.json({ result })
     } catch (error) {

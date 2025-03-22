@@ -283,7 +283,7 @@ exports.getServiceDetailsById = async (req, res, next) => {
     try {
         const data = await sanitizeBody(req.query)
         const result = await getServiceById({clientId:data.clientId,serviceId:data.serviceId})
-        res.status(result?.statusCode).json(result)
+        res.json(result)
     } catch (error) {
         next(error)
     }

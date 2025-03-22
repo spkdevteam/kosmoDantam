@@ -307,7 +307,10 @@ const getServiceById = async ({clientId,serviceId})=>{
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Service = clientConnection.model('services', serviceSchema);
         const service = await Service.findById(serviceId);
-        return service
+        if (!service) {
+            return {status:false,message:'no service found '}
+        }
+        else return {status:true,message:'success',data:service}
 
     } catch (error) {
         
