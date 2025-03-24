@@ -2656,54 +2656,79 @@ const updateDraft = async (clientId, caseSheetId, data) => {
         let newServices = populatedCaseSheet.services;
 
         // Map existing treatmentData3 for quick lookup
-        let treatmentMap = new Map();
+        // let treatmentMap = new Map();
+        // existingTreatmentData3.forEach(item => {
+        //     treatmentMap.set(item.tooth, item);
+        // });
+        let treatmentMap = {};
         existingTreatmentData3.forEach(item => {
-            treatmentMap.set(item.tooth, item);
+            treatmentMap[item.tooth] = item;
         });
 
         newServices.forEach(serviceItem => {
             let { tooth, service, rate } = serviceItem;
             tooth.forEach(t => {
-                if (treatmentMap.has(t)) {
+                if (treatmentMap[t]) {
                     // Update existing tooth services
-                    let existingToothData = treatmentMap.get(t);
+                    let existingToothData = treatmentMap[t];
                     let serviceExists = existingToothData.service.some(s => {
                         console.log("kasif", service);
                         console.log("aatif", s);
 
-                        if (s.service.serviceName === service.servId.serviceName) {
+                        if (String(s?.service?.serviceName) === String(service?.servId?.serviceName)) {
                             return s
                         }
                     });
                     if (!serviceExists) {
-                        existingToothData.service.push({
-                            service: { serviceName: service.servId.serviceName },
-                            finished: "In Progress",
-                            unitPrice: rate,
-                            updatedAt: new Date(),
-                        });
-                    }
-                } else {
-                    // Add new tooth entry
-                    treatmentMap.set(t, {
-                        tooth: t,
-                        service: [
-                            {
-                                service: { serviceName: service.servId.serviceName },
-                                finished: "In Progress",
+                        const newPush = {
+                            service: {
+                                // service: { serviceName: service.servId.serviceName },
+                                serviceName: service.servId?.serviceName,//fix
+                                serviceId: service.servId?._id,//fix
+                                finished: "Proposed",//in code it was 'In Progress'
                                 unitPrice: rate,
                                 updatedAt: new Date(),
                             }
+                        };
+                        treatmentMap[t].service.push(newPush);
+                        // existingToothData.service.push({
+                        //     service: { serviceName: service.servId.serviceName },
+                        //     finished: "In Progress",
+                        //     unitPrice: rate,
+                        //     updatedAt: new Date(),
+                        // });
+                    }
+                } else {
+                    // Add new tooth entry
+                    treatmentMap[t] = {
+                        tooth: t,
+                        service: [{
+                            service: {
+                                // service: { serviceName: service.servId.serviceName },
+                                serviceName: service.servId?.serviceName,//fix
+                                serviceId: service.servId?._id,//fix
+                                finished: "Proposed",//in code it was 'In Progress'
+                                updatedAt: new Date(),
+                            }
+                        }
+                            // {
+                            //     service: { serviceName: service.servId.serviceName },
+                            //     finished: "In Progress",
+                            //     unitPrice: rate,
+                            //     updatedAt: new Date(),
+                            // }
                         ],
                         total: 1,
                         completed: 0,
-                    });
+                    };
                 }
             });
         });
 
         // Convert map back to array
-        populatedCaseSheet.treatmentData3 = Array.from(treatmentMap.values());
+        populatedCaseSheet.treatmentData3 = Object.values(treatmentMap);
+        populatedCaseSheet.markModified('treatmentData3');
+        // populatedCaseSheet.treatmentData3 = Array.from(treatmentMap.values());
         await populatedCaseSheet.save();
 
         // updating service in resume case sheet ends here
