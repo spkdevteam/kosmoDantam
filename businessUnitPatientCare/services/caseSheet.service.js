@@ -559,8 +559,8 @@ const createService = async (clientId, isDrafted, data) => {
             // newServices.forEach(serviceItem => {fix=>replacing forEach with for-of as async operation needed
             for (const serviceItem of newServices) {
                 let { tooth, service } = serviceItem;
-                const getServiceName = await Service.findOne({_id : service?.servId, deletedAt: null});
-                if(!getServiceName) return {status : false, message: "Service doesn't exist!!"};
+                const getServiceName = await Service.findOne({ _id: service?.servId, deletedAt: null });
+                if (!getServiceName) return { status: false, message: "Service doesn't exist!!" };
                 tooth.forEach(t => {
                     if (treatmentMap.has(t)) {
                         // Update existing tooth services
@@ -570,7 +570,7 @@ const createService = async (clientId, isDrafted, data) => {
                         if (!serviceExists) {
                             existingToothData.service.push({
                                 // service: { serviceName: service.servId.serviceName },
-                                service: { serviceName : String(getServiceName?.serviceName) ,serviceId: service?.servId },//fix
+                                service: { serviceName: String(getServiceName?.serviceName), serviceId: service?.servId },//fix
                                 finished: "In Progress",
                                 updatedAt: new Date(),
                             });
@@ -582,7 +582,7 @@ const createService = async (clientId, isDrafted, data) => {
                             service: [
                                 {
                                     // service: { serviceName: service.servId.serviceName },
-                                    service: { serviceName : String(getServiceName?.serviceName) ,serviceId: service?.servId },//fix
+                                    service: { serviceName: String(getServiceName?.serviceName), serviceId: service?.servId },//fix
                                     finished: "In Progress",
                                     updatedAt: new Date(),
                                 }
@@ -637,14 +637,14 @@ const createServiceNew = async (clientId, isDrafted, data, services) => {
                     let serviceExists = existingToothData.service.some(s => {
                         console.log("s.service.serviceName.servId ", s.service.serviceName.servId.toString());
                         console.log("service.servId", service.servId.toString());
-                    
+
                         return s.service.serviceName.servId.toString() === service.servId.toString();
                     });
 
                     if (!serviceExists) {
                         existingToothData.service.push({
                             service: { serviceName: { servId: service.servId } },
-                            department: {deptId :  department.deptId },
+                            department: { deptId: department.deptId },
                             finished: "Proposed",
                             updatedAt: new Date(),
                             rate: rate,
@@ -654,8 +654,8 @@ const createServiceNew = async (clientId, isDrafted, data, services) => {
                             grantTotal: grantTotal,
                             prposedDate: prposedDate,
                         });
-                    } 
-                   
+                    }
+
                 } else {
                     treatmentMap.set(t, {
                         tooth: t,
@@ -664,7 +664,7 @@ const createServiceNew = async (clientId, isDrafted, data, services) => {
                                 service: { serviceName: { servId: service.servId } },
                                 finished: "Proposed",
                                 updatedAt: new Date(),
-                                department: {deptId :  department.deptId },
+                                department: { deptId: department.deptId },
                                 rate: rate,
                                 discount: discount,
                                 quaintity: quaintity,
@@ -895,57 +895,109 @@ const updateService = async (clientId, caseSheetId, isDrafted, data) => {
             let newServices = populatedCaseSheet.services;
 
             // Map existing treatmentData3 for quick lookup
-            let treatmentMap = new Map();
+            // let treatmentMap = new Map();
+            // existingTreatmentData3.forEach(item => {
+            //     treatmentMap.set(item.tooth, item);
+            // });
+            let treatmentMap = {};
             existingTreatmentData3.forEach(item => {
-                treatmentMap.set(item.tooth, item);
+                treatmentMap[item.tooth] = item;
             });
 
-            console.log("newServices", newServices);
+            console.log("newServices=>", newServices);
 
 
-            newServices.forEach(serviceItem => {
+            // newServices.forEach(serviceItem => {
+            for (const serviceItem of newServices) {//fix->replaced forEach with for-of as async needed 
                 let { tooth, service, rate } = serviceItem;
-                tooth.forEach(t => {
-                    if (treatmentMap.has(t)) {
+                // tooth.forEach(t => {
+                for (const t of tooth) {//fix->replaced forEach with for-of as async needed 
+                    if (treatmentMap[t]) {
                         // Update existing tooth services
-                        let existingToothData = treatmentMap.get(t);
+                        let existingToothData = treatmentMap[t];
                         let serviceExists = existingToothData.service.some(s => {
                             console.log("kasif", service);
                             console.log("aatif", s);
+                            //fix->
+                            // if (s.service.serviceName === service.servId.serviceName) {
+                            console.log("s?.service?.serviceName=>", String(s?.service?.serviceName));
+                            console.log("service?.servId?.serviceName=>>", String(service?.servId?.serviceName));
 
-                            if (s.service.serviceName === service.servId.serviceName) {
+
+                            if (String(s?.service?.serviceName) === String(service?.servId?.serviceName)) {
                                 return s
                             }
                         });
 
                         if (!serviceExists) {
-                            existingToothData.service.push({
-                                service: { serviceName: service.servId.serviceName },
-                                finished: "In Progress",
-                                unitPrice: rate,
-                                updatedAt: new Date(),
-                            });
+                            //fix:=>
+                            console.log("not_exist=>>", service?.servId?.serviceName);
+                            const newPush = {
+                                service: {
+                                    // service: { serviceName: service.servId.serviceName },
+                                    serviceName: service.servId?.serviceName,//fix
+                                    serviceId: service.servId?._id,//fix
+                                    finished: "Proposed",//in code it was 'In Progress'
+                                    unitPrice: rate,
+                                    updatedAt: new Date(),
+                                }
+                            };
+                            //
+                            treatmentMap[t].service.push(newPush);
+                            //
+                            // console.log("newPush=>",newPush);
+                            // console.log("after_push=>>", treatmentMap[t].service);
+                            // const val = JSON.parse(JSON.stringify(existingToothData.service))
+                            // val.push(newPush);
+
+                            // existingToothData.service = val;
+
+                            // existingToothData.service.push({
+                            //     // service: { serviceName: service.servId.serviceName },
+                            //     serviceName : service.servId?.serviceName,//fix
+                            //     serviceId : service.servId?._id,//fix
+                            //     finished: "In Progress",
+                            //     unitPrice: rate,
+                            //     updatedAt: new Date(),
+                            // });
                         }
                     } else {
                         // Add new tooth entry
-                        treatmentMap.set(t, {
+                        //fix:=>
+                        console.log("new tooth entry=>>", service.servId?.serviceName);
+                        treatmentMap[t] = {
                             tooth: t,
-                            service: [
-                                {
-                                    service: { serviceName: service.servId.serviceName },
-                                    finished: "In Progress",
+                            service: [{
+                                service: {
+                                    // service: { serviceName: service.servId.serviceName },
+                                    serviceName: service.servId?.serviceName,//fix
+                                    serviceId: service.servId?._id,//fix
+                                    finished: "Proposed",//in code it was 'In Progress'
                                     updatedAt: new Date(),
                                 }
+                            }
                             ],
                             total: 1,
                             completed: 0,
-                        });
+                        };
                     }
-                });
-            });
+                };
+            };
+            // Array.from(treatmentMap.values()).map(element=>{
+            //     element.service.map(e=>{
+            //         console.log("treatmentMap=>>>",e.service);
+
+            //     })
+            // })
 
             // Convert map back to array
-            populatedCaseSheet.treatmentData3 = Array.from(treatmentMap.values());
+            populatedCaseSheet.treatmentData3 = Object.values(treatmentMap);
+            populatedCaseSheet.markModified('treatmentData3');
+            // populatedCaseSheet.treatmentData3.map(e=>{
+            //     e.service.map(el=>{
+            //         console.log("el.service=>>",el.service);    
+            //     })
+            // });
             await populatedCaseSheet.save();
         }
         return populatedCaseSheet
@@ -989,7 +1041,7 @@ const updateServiceNew = async (clientId, caseSheetId, isDrafted, data, services
                     let serviceExists = existingToothData.service.some(s => {
                         console.log("s.service.serviceName.servId ", s.service.serviceName.servId.toString());
                         console.log("service.servId", service.servId.toString());
-                    
+
                         return s.service.serviceName.servId.toString() === service.servId.toString();
                     });
 
@@ -997,7 +1049,7 @@ const updateServiceNew = async (clientId, caseSheetId, isDrafted, data, services
                         console.log("1111");
                         existingToothData.service.push({
                             service: { serviceName: { servId: service.servId } },
-                            department: {deptId :  department.deptId },
+                            department: { deptId: department.deptId },
                             finished: "Proposed",
                             updatedAt: new Date(),
                             rate: rate,
@@ -1008,7 +1060,7 @@ const updateServiceNew = async (clientId, caseSheetId, isDrafted, data, services
                             prposedDate: prposedDate,
                         });
                         // existingToothData.department.deptId = department.deptId
-                    } 
+                    }
 
                 } else {
                     treatmentMap.set(t, {
@@ -1018,7 +1070,7 @@ const updateServiceNew = async (clientId, caseSheetId, isDrafted, data, services
                                 service: { serviceName: { servId: service.servId } },
                                 finished: "Proposed",
                                 updatedAt: new Date(),
-                                department: {deptId :  department.deptId },
+                                department: { deptId: department.deptId },
                                 rate: rate,
                                 discount: discount,
                                 quaintity: quaintity,
@@ -2030,38 +2082,38 @@ const getById = async (clientId, caseSheetId) => {
 
 
         const caseSheet = await CaseSheet.findById(caseSheetId)
-        .
-        populate({
-            path: 'cheifComplaints.complaints.compId',
-            model: Complaint,
-            select: 'complaintName _id'
-        }).populate({
-            path: 'clinicalFindings.findings.findId',
-            model: Finding,
-            select: 'findingsName _id'
-        }).populate({
-            path: 'diagnosis.findings.findId',
-            model: Finding,
-            select: 'findingsName _id'
-        }).populate({
-            path: 'medicalHistory.medicals.medId',
-            model: Medical,
-            select: 'caseName _id'
-        }).populate({
-            path: 'services.department.deptId',
-            model: Department,
-            select: 'deptName _id'
-        })
-        .populate({
-            path: 'services.service.servId',
-            model: Service,
-            select: 'serviceName _id'
-        })
-        .populate({
-            path: 'procedures.procedure.procedId',
-            model: procedures,
-            select: 'procedureName _id'
-        })
+            .
+            populate({
+                path: 'cheifComplaints.complaints.compId',
+                model: Complaint,
+                select: 'complaintName _id'
+            }).populate({
+                path: 'clinicalFindings.findings.findId',
+                model: Finding,
+                select: 'findingsName _id'
+            }).populate({
+                path: 'diagnosis.findings.findId',
+                model: Finding,
+                select: 'findingsName _id'
+            }).populate({
+                path: 'medicalHistory.medicals.medId',
+                model: Medical,
+                select: 'caseName _id'
+            }).populate({
+                path: 'services.department.deptId',
+                model: Department,
+                select: 'deptName _id'
+            })
+            .populate({
+                path: 'services.service.servId',
+                model: Service,
+                select: 'serviceName _id'
+            })
+            .populate({
+                path: 'procedures.procedure.procedId',
+                model: procedures,
+                select: 'procedureName _id'
+            })
 
         if (!caseSheet) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
@@ -2312,18 +2364,16 @@ const updateTreatment = async (clientId, caseSheetId, treatmentData) => {
         }
         //handling if fineshed = opted && estimateId is nonexistatnt then random estimateId is generated and inserted:
         const Branch = await clientConnection.model("branch", clinetBranchSchema);
-        const branchObj = await Branch.findOne({_id : existing?.branchId }).lean();
-        if(!branchObj)  return { status: false, message: 'Error fetching Branch of case sheet overview!!' };
+        const branchObj = await Branch.findOne({ _id: existing?.branchId }).lean();
+        if (!branchObj) return { status: false, message: 'Error fetching Branch of case sheet overview!!' };
         // console.log("branchObjbranchObj=>>",branchObj);
-        for(const toothEntry of treatmentData){
-            for(const serviceArrObj of toothEntry?.service)
-            {
+        for (const toothEntry of treatmentData) {
+            for (const serviceArrObj of toothEntry?.service) {
                 // console.log(toothEntry.tooth,"->>",serviceArrObj?.service?.finished,"tooth, finished");
-                if ((String(serviceArrObj?.service?.finished) == "Opted" || String(serviceArrObj?.service?.finished) == "Completed") && (serviceArrObj?.service?.estimateId == null || serviceArrObj?.service?.estimateId == '') )
-                {
+                if ((String(serviceArrObj?.service?.finished) == "Opted" || String(serviceArrObj?.service?.finished) == "Completed") && (serviceArrObj?.service?.estimateId == null || serviceArrObj?.service?.estimateId == '')) {
                     // console.log(clientId,  existing?.branchId, branchObj?.businessUnit,"clientId, branchId, buid");
                     const random = await getserialNumber("estimate", clientId, existing?.branchId, branchObj?.businessUnit);
-                    if(!random) return { status: false, message: 'Error generating estimate!!' };
+                    if (!random) return { status: false, message: 'Error generating estimate!!' };
                     // console.log("random=>>", random);
                     serviceArrObj.service.estimateId = random;
                 }
