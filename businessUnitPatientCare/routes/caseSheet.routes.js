@@ -137,7 +137,9 @@ router.post('/deleteNotes', entityAuth.authorizeEntity("Patient", "Case Sheet", 
 
 // services
 router.post('/createServices', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.createServices);
-router.put('/updateServices', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.updateServices);
+router.put('/updateServices',
+    //  entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), 
+     caseSheetController.updateServices); //middleware 
 router.post('/editParticularServices', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.editParticularServices);
 router.post('/deleteServices', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteServices);
 
