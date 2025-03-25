@@ -36,7 +36,7 @@ const getUnbilledItemsFromCaseSheetFn = async ({ clientId, caseSheetId }) => {
                         returnData.push({
                             serviceId: serviceDetails._id,
                             serviceName: serviceDetails.serviceName,
-                            unitPrice: serviceObj.service.unitPrice,
+                            unitPrice: parseFloat(serviceObj.service.unitPrice.toFixed(2)),
                             // discount: serviceObj.service.discount,
                             discount: parseFloat(serviceObj.service.discount.toFixed(2)),
                             //                         "_id": {
@@ -58,8 +58,10 @@ const getUnbilledItemsFromCaseSheetFn = async ({ clientId, caseSheetId }) => {
         }
         //calculting total :
         for (const returnElement of returnData)
-        {
-            returnElement.total = (returnElement.unitPrice * returnElement.toothArray.length)-(parseFloat(serviceObj.service.discount.toFixed(2)) * returnElement.toothArray.length);
+        {   
+            const totalAmt = (returnElement.unitPrice * returnElement.toothArray.length);
+            const totalDiscount = (returnElement.discount * returnElement.toothArray.length);
+            returnElement.total = parseFloat(totalAmt.toFixed(2)) - parseFloat(totalDiscount.toFixed(2));
             returnElement.quantity = returnElement.toothArray.length;
         }
         console.log("returnData=>>", returnData);
