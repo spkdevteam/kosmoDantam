@@ -903,13 +903,16 @@ const updateService = async (clientId, caseSheetId, isDrafted, data) => {
             existingTreatmentData3.forEach(item => {
                 treatmentMap[item.tooth] = item;
             });
-
-            console.log("newServices=>", newServices);
-
+            // console.log("existingTreatmentData3=>", existingTreatmentData3);
+            // console.log("newServices=>", newServices);
+            // return newServices;
 
             // newServices.forEach(serviceItem => {
             for (const serviceItem of newServices) {//fix->replaced forEach with for-of as async needed 
-                let { tooth, service, rate } = serviceItem;
+                let { tooth, service, rate, department, prposedDate } = serviceItem;
+                const teethCount = serviceItem?.tooth?.length;
+                if(teethCount == 0) return {status : false, message: "Atleast one tooth is required" };
+                const discountForEachTooth = (rate/teethCount);
                 // tooth.forEach(t => {
                 for (const t of tooth) {//fix->replaced forEach with for-of as async needed 
                     if (treatmentMap[t]) {
@@ -939,7 +942,10 @@ const updateService = async (clientId, caseSheetId, isDrafted, data) => {
                                     serviceId: service.servId?._id,//fix
                                     finished: "Proposed",//in code it was 'In Progress'
                                     unitPrice: rate,
+                                    discount :  parseFloat(discountForEachTooth.toFixed(2)),
                                     updatedAt: new Date(),
+                                    prposedDate : prposedDate,
+                                    departmentId : department?.deptId
                                 }
                             };
                             //
@@ -974,6 +980,10 @@ const updateService = async (clientId, caseSheetId, isDrafted, data) => {
                                     serviceId: service.servId?._id,//fix
                                     finished: "Proposed",//in code it was 'In Progress'
                                     updatedAt: new Date(),
+                                    unitPrice: rate,
+                                    discount :  parseFloat(discountForEachTooth.toFixed(2)),
+                                    prposedDate : prposedDate,
+                                    departmentId : department?.deptId
                                 }
                             }
                             ],
@@ -2367,12 +2377,16 @@ const updateTreatment = async (clientId, caseSheetId, treatmentData) => {
         const branchObj = await Branch.findOne({ _id: existing?.branchId }).lean();
         if (!branchObj) return { status: false, message: 'Error fetching Branch of case sheet overview!!' };
         // console.log("branchObjbranchObj=>>",branchObj);
+        console.log("hittttt");
+        
         for (const toothEntry of treatmentData) {
             for (const serviceArrObj of toothEntry?.service) {
                 // console.log(toothEntry.tooth,"->>",serviceArrObj?.service?.finished,"tooth, finished");
                 if ((String(serviceArrObj?.service?.finished) == "Opted" || String(serviceArrObj?.service?.finished) == "Completed") && (serviceArrObj?.service?.estimateId == null || serviceArrObj?.service?.estimateId == '')) {
                     // console.log(clientId,  existing?.branchId, branchObj?.businessUnit,"clientId, branchId, buid");
                     const random = await getserialNumber("estimate", clientId, existing?.branchId, branchObj?.businessUnit);
+                    // const random = await getserialNumber("testCollection", clientId, existing?.branchId, branchObj?.businessUnit);
+
                     if (!random) return { status: false, message: 'Error generating estimate!!' };
                     // console.log("random=>>", random);
                     serviceArrObj.service.estimateId = random;
