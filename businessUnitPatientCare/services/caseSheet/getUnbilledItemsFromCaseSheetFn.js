@@ -59,7 +59,7 @@ const getUnbilledItemsFromCaseSheetFn = async ({ clientId, caseSheetId }) => {
         //calculting total :
         for (const returnElement of returnData)
         {
-            returnElement.total = returnElement.unitPrice * returnElement.toothArray.length;
+            returnElement.total = (returnElement.unitPrice * returnElement.toothArray.length)-(parseFloat(serviceObj.service.discount.toFixed(2)) * returnElement.toothArray.length);
             returnElement.quantity = returnElement.toothArray.length;
         }
         console.log("returnData=>>", returnData);
