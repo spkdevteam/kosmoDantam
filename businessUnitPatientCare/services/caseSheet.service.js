@@ -2680,7 +2680,10 @@ const updateDraft = async (clientId, caseSheetId, data) => {
         });
 
         newServices.forEach(serviceItem => {
-            let { tooth, service, rate } = serviceItem;
+            let { tooth, service, rate, department, prposedDate,discount } = serviceItem;
+            const teethCount = parseInt(serviceItem?.tooth?.length);
+            if(teethCount == 0) return {status : false, message: "Atleast one tooth is required" };
+            const discountForEachTooth = (discount/teethCount);
             tooth.forEach(t => {
                 if (treatmentMap[t]) {
                     // Update existing tooth services
@@ -2701,7 +2704,10 @@ const updateDraft = async (clientId, caseSheetId, data) => {
                                 serviceId: service.servId?._id,//fix
                                 finished: "Proposed",//in code it was 'In Progress'
                                 unitPrice: rate,
+                                discount :  parseFloat(discountForEachTooth.toFixed(2)),
                                 updatedAt: new Date(),
+                                prposedDate : prposedDate ? prposedDate : null,
+                                departmentId : department?.deptId
                             }
                         };
                         treatmentMap[t].service.push(newPush);
@@ -2723,6 +2729,10 @@ const updateDraft = async (clientId, caseSheetId, data) => {
                                 serviceId: service.servId?._id,//fix
                                 finished: "Proposed",//in code it was 'In Progress'
                                 updatedAt: new Date(),
+                                unitPrice: rate,
+                                discount :  parseFloat(discountForEachTooth.toFixed(2)),
+                                prposedDate : prposedDate ? prposedDate : null,
+                                departmentId : department?.deptId
                             }
                         }
                             // {
