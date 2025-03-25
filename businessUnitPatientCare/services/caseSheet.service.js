@@ -909,10 +909,10 @@ const updateService = async (clientId, caseSheetId, isDrafted, data) => {
 
             // newServices.forEach(serviceItem => {
             for (const serviceItem of newServices) {//fix->replaced forEach with for-of as async needed 
-                let { tooth, service, rate, department, prposedDate } = serviceItem;
-                const teethCount = serviceItem?.tooth?.length;
+                let { tooth, service, rate, department, prposedDate,discount } = serviceItem;
+                const teethCount = parseInt(serviceItem?.tooth?.length);
                 if(teethCount == 0) return {status : false, message: "Atleast one tooth is required" };
-                const discountForEachTooth = (rate/teethCount);
+                const discountForEachTooth = (discount/teethCount);
                 // tooth.forEach(t => {
                 for (const t of tooth) {//fix->replaced forEach with for-of as async needed 
                     if (treatmentMap[t]) {
