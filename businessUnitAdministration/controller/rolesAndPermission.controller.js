@@ -184,9 +184,83 @@ exports.listRolesAndPermission = async (req, res) => {
         }
         const clientConnection = await getClientDatabaseConnection(clientId);
         const RolesAndpermission = clientConnection.model('clientRoles', clientRoleSchema);
+        //////RAHUL:=>
+        // const [roles] = await Promise.all([
+        //     RolesAndpermission.find(whereCondition).select("name id createdBy isActive").sort({ _id: -1 }),
+        // ]);
         const [roles] = await Promise.all([
-            RolesAndpermission.find(whereCondition).select("name id createdBy isActive").sort({ _id: -1 }),
+            RolesAndpermission.find(whereCondition).select("name id createdBy isActive capability").sort({ _id: -1 }),//capability added extra
         ]);
+        // console.log("roles=>>",roles);
+        //updatation of capability
+        
+        for(const r of roles){
+            let isUpdated = false
+            for (const cap of r.capability){
+                if(String(cap.name) == "Administration"){
+                    
+                    const constArray = [];
+                    for(def of defaultPersmissionsList[0].menu){
+                        constArray.push(def.name);
+                    }
+                    const dbArray = [];
+                    for(const m of cap.menu){
+                        dbArray.push(m?.name);
+                    }
+                    
+                    const notExistObj = constArray
+                    .map((num, index) => ({ num, index }))
+                    .filter(({ num }) => 
+                        !dbArray.some(el => 
+                        el.toLowerCase().trim() === num.toLowerCase().trim()
+                        )
+                    );
+                    // console.log("AdministrationnotExistObj=>>",notExistObj);
+                    for(let key of notExistObj){
+                        if(String(key) === "index"){
+                            const pushMenu = defaultPersmissionsList[0].menu[notExistObj[key]];
+                            // console.log("AdministrationpushMenu=>>>>",pushMenu);
+                            cap.menu.push(pushMenu);
+                            isUpdated = true;
+                        }
+                    }
+                    
+                }
+                if(String(cap.name) == "Patient"){
+                    const constArray = [];
+                    for(def of defaultPersmissionsList[1].menu){
+                        constArray.push(def.name);
+                    }
+                    // console.log("constArray=>",constArray);
+                    const dbArray = [];
+                    for(const m of cap.menu){
+                        dbArray.push(m?.name);
+                    }
+                    // console.log("dbArray=>",dbArray);
+                    // const notExistObj = constArray.map((num, index) => ({ num, index })).filter(({ num }) => !dbArray.some(el => String(el) === String(num)));
+                    const notExistObj = constArray
+                    .map((num, index) => ({ num, index }))
+                    .filter(({ num }) => 
+                        !dbArray.some(el => 
+                        el.toLowerCase().trim() === num.toLowerCase().trim()
+                        )
+                    );
+                    // console.log("notExistObj=>>",notExistObj);
+                    for(element of notExistObj){
+                        const pushMenu = defaultPersmissionsList[1].menu[element?.index];
+                        // console.log("PatientpushMenu=>>>",pushMenu);
+                            cap.menu.push(pushMenu);
+                            isUpdated = true;
+                    }
+                }
+            }
+            if (isUpdated) {
+                await r.save();
+                // console.log(`Updated document ID: ${r?._id}`);
+            }  
+        }
+
+        //
         return res.json({
             message: 'List of all roles!',
             listOfRoles: roles,
