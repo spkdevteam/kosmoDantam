@@ -125,6 +125,7 @@ const defaultPersmissionsList = [
                     // activeActive: { id: 56, access: false, api: "/demo/path" },
                 }
             },
+            
             {
                 name: "Appointment",
                 displayName: "All Appointment",
@@ -179,6 +180,34 @@ const defaultPersmissionsList = [
                     softDelete: { id: 82, access: false, api: "/demo/path" },
                     // hardDelete: { id: 83, access: false, api: "/demo/path" },
                     // activeActive: { id: 84, access: false, api: "/demo/path" },
+                }
+            },
+            {
+                name : "Token",
+                displayName : "Token Screen",
+                access : false,
+                subMenus: {
+                    // list: { id: 85, access: false, api: "/demo/path" },
+                    create: { id: 86, access: false, api: "/demo/path" },
+                    view: { id: 87, access: false, api: "/demo/path" },
+                    update: { id: 88, access: false, api: "/demo/path" },
+                    softDelete: { id: 89, access: false, api: "/demo/path" },
+                    // hardDelete: { id: 90, access: false, api: "/demo/path" },
+                    // activeActive: { id: 91, access: false, api: "/demo/path" },
+                }
+            },
+            {
+                name : "Chair Dashboard",
+                displayName : "Chair Dashboard Screen",
+                access : false,
+                subMenus: {
+                    // list: { id: 92, access: false, api: "/demo/path" },
+                    create: { id: 93, access: false, api: "/demo/path" },
+                    view: { id: 94, access: false, api: "/demo/path" },
+                    update: { id: 95, access: false, api: "/demo/path" },
+                    softDelete: { id: 96, access: false, api: "/demo/path" },
+                    // hardDelete: { id: 97, access: false, api: "/demo/path" },
+                    // activeActive: { id: 98, access: false, api: "/demo/path" },
                 }
             },
         ]
