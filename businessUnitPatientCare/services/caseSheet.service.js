@@ -2124,6 +2124,11 @@ const getById = async (clientId, caseSheetId) => {
                 model: procedures,
                 select: 'procedureName _id'
             })
+            .populate({
+                path : "procedures.service.servId",
+                modle : Service,
+                select : "serviceName _id"
+            })
 
         if (!caseSheet) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
