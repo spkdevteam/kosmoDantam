@@ -65,11 +65,9 @@ exports.signIn = async (req, res, next) => {
             }
         }
         else{
-            if(user?.roleId === 4){
                 return res.status(statusCode.NotFound).send({
-                    message: "You don't have Staff Access!!"
+                    message: "Navigate to Staff login!!"
                 })
-            }
         }
 
         await commonCheckForClient(user);
