@@ -18,8 +18,10 @@ const handlebarsOptions = {
     host: "smtp.gmail.com",
     port: 587,
     auth: {
-      user: "aatif13698@gmail.com",
-      pass: "rnklewuogajnhsgt",
+      // user: "aatif13698@gmail.com",
+      user : "spkdevteam@gmail.com",//changed by rahul
+      // pass: "rnklewuogajnhsgt",
+      pass : "ysbj yxrt qoqb ybho",//changed by rahul
     },
   });
   
