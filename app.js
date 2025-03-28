@@ -126,7 +126,7 @@ app.use((req,res,next)=>{
 // routes setup
 // 
 // app.use("/human", humanRouter);
-app.use('/',commonAuthForValidToken)
+ 
 app.use("/api", welcomeRouter.router);
 app.use("/api/superAdmin", superAdminRouter.router);
 app.use("/api/superAdmin/tooth", toothRouter);
