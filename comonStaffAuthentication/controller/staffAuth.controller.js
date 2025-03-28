@@ -24,7 +24,7 @@ const PRIVATEKEY = process.env.PRIVATEKEY;
 exports.signIn = async (req, res, next) => {
     try {
 
-        const { identifier, password } = req.body;
+        const { identifier, password, isAdmin } = req.body;
 
         // Validate input data
         if (!identifier || !password) {
@@ -51,6 +51,20 @@ exports.signIn = async (req, res, next) => {
 
         // Check if user exists
         const user = await User.findOne(query).populate('role');
+        //if user isn't admin but trying to login through admin login portal and vice versa
+
+        if (!isAdmin) {
+            if (user?.roleId === 4) {
+                return res.status(statusCode.NotFound).send({
+                    message: "You don't have Staff Access!!"
+                })
+            }
+        }
+        else {
+                return res.status(statusCode.NotFound).send({
+                    message: "Navigate to Admin login!!"
+                })
+        }
 
         await commonCheckForClient(user);
 
@@ -156,7 +170,7 @@ exports.signInByOtp = async (req, res, next) => {
 
         const client = await staffInfo(accessUnits[0].id, user?.email);
         console.log("staff", client.role.capability);
-        
+
 
         return res.status(statusCode.OK).send({
             token,

@@ -1,8 +1,8 @@
 const nodemailer = require("nodemailer");
 const path = require("path");
 const hbs = require("nodemailer-express-handlebars");
-
-
+const dotnev = require("dotenv");
+dotnev.config();
 const handlebarsOptions = {
     viewEngine: {
       extName: ".handlebars",
@@ -19,9 +19,11 @@ const handlebarsOptions = {
     port: 587,
     auth: {
       // user: "aatif13698@gmail.com",
-      user : "spkdevteam@gmail.com",//changed by rahul
+      // user : "spkdevteam@gmail.com",//changed by rahul
+      user : process.env.EMAIL_FROM,//changed by rahul
       // pass: "rnklewuogajnhsgt",
-      pass : "ysbj yxrt qoqb ybho",//changed by rahul
+      // pass : "ysbj yxrt qoqb ybho",//changed by rahul
+      pass : process.env.EMAIL_PASS,
     },
   });
   
