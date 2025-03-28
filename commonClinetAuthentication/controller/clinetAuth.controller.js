@@ -30,7 +30,7 @@ exports.signIn = async (req, res, next) => {
     try {
 
         const { identifier, password, isAdmin } = req.body;
-
+            console.log( { identifier, password, isAdmin })
         // Validate input data
         if (!identifier || !password) {
             return res.status(statusCode.BadRequest).send({
