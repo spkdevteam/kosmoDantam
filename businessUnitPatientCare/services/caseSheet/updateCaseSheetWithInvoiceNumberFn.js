@@ -51,7 +51,7 @@ const updateCaseSheetWithInvoiceNumberFn = async ({ clientId, invoice, branchId 
 
     }
     catch (error) {
-
+        return { status: false, message: error?.message || "Couldn't update CaseSheet", data : {} }
     }
 }
 

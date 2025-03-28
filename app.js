@@ -92,6 +92,7 @@ const preScriptionRouter = require("./businessUnitAdministration/routes/priscrip
 const priscriptionRouter = require("./businessUnitPatientCare/routes/prescription.routes.js");
 const utilsRouter = require("./businessUnitAdministration/routes/utils.routes.js");
 const humanRouter = require("./HumanResource/router.js");
+const businessUnitRouter = require("./businessUnitAdministration/routes/businessUnit.routes.js");
 
 const corsOptions = {
     origin: '*',
@@ -155,6 +156,8 @@ app.use("/api/client/bu/leave", leaveRouter)
 app.use("/api/client/bu/prescription", priscriptionRouter)
 app.use('/initialise',utilsRouter)
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
+app.use('/api/client/bu/businessUnit', businessUnitRouter.router)
+
 
 // insert role
 const roles = [
