@@ -198,7 +198,7 @@ const serviceUnderDepartment  = async (input) => {
 }
 const readActiveServicesbyPage = async (input) => {
     try {
-        console.log(input,'asasaasasasasasas')
+        
         !input?.keyword ? input.keyWord = "" : ''
         !input?.page ? input.page = 0 : input.page = parseInt(input.page)
         !input?.perPage ? input.perPage = 10 : input.perPage = parseInt(input.perPage)
@@ -226,8 +226,7 @@ const readActiveServicesbyPage = async (input) => {
             ],
             deletedAt:null}) 
 
-            
-        console.log( parseInt(input?.page),parseInt(input?.perPade) ,totalCount , 'dey data fetched ')
+             
 
         if (data) {
             return {

@@ -92,6 +92,7 @@ const preScriptionRouter = require("./businessUnitAdministration/routes/priscrip
 const priscriptionRouter = require("./businessUnitPatientCare/routes/prescription.routes.js");
 const utilsRouter = require("./businessUnitAdministration/routes/utils.routes.js");
 const humanRouter = require("./HumanResource/router.js");
+const { commonAuthForValidToken } = require("./middleware/authorization/commonEntityAuthorization/commonEntityAuthorization.js");
 
 const corsOptions = {
     origin: '*',
@@ -125,6 +126,7 @@ app.use((req,res,next)=>{
 // routes setup
 // 
 // app.use("/human", humanRouter);
+app.use('/',commonAuthForValidToken)
 app.use("/api", welcomeRouter.router);
 app.use("/api/superAdmin", superAdminRouter.router);
 app.use("/api/superAdmin/tooth", toothRouter);
@@ -155,6 +157,7 @@ app.use("/api/client/bu/leave", leaveRouter)
 app.use("/api/client/bu/prescription", priscriptionRouter)
 app.use('/initialise',utilsRouter)
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
+
 
 // insert role
 const roles = [
