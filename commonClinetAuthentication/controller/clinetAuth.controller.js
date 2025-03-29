@@ -23,6 +23,31 @@ const clinetUserSchema = require("../../client/model/user");
 // env 
 dotnev.config();
 const PRIVATEKEY = process.env.PRIVATEKEY;
+exports.verifyToken = async (req, res, next) => {
+    try {
+        const { token } = req?.body;
+        if (token) {
+            const decodedToken = jwt.verify(token, process.env.PRIVATEKEY);
+            console.log("Decoded Token:", decodedToken);
+            if (!decodedToken) return res.status(statusCode.BadRequest).send({
+                message: "TOken decodation failed!!!"
+            });
+            return res.status(200).send({
+                success: true,
+                decodedToken: decodedToken,
+                message: "TOken decoded successfully"
+            });
+        }
+        else {
+            return res.status(statusCode.BadRequest).send({
+                message: "No token is sent!"
+            });
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+}
 
 
 // Sign in
@@ -57,17 +82,17 @@ exports.signIn = async (req, res, next) => {
         // Check if user exists
         const user = await User.findOne(query).populate('role');
         //if user isn't admin but trying to login through admin login portal and vice versa
-        if(isAdmin) {
-            if(user?.roleId !== 4){
+        if (isAdmin) {
+            if (user?.roleId !== 4) {
                 return res.status(statusCode.NotFound).send({
                     message: "You don't have Admin Access!!"
                 })
             }
         }
-        else{
-                return res.status(statusCode.NotFound).send({
-                    message: "Navigate to Staff login!!"
-                })
+        else {
+            return res.status(statusCode.NotFound).send({
+                message: "Navigate to Staff login!!"
+            })
         }
 
         await commonCheckForClient(user);
@@ -159,7 +184,7 @@ exports.signInByOtp = async (req, res, next) => {
             const clientConnection = await createClientDatabase(user._id.toString());
             const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
             const ClientUser = clientConnection.model('clientUsers', clinetUserSchema);
-            const userInstance = await ClientUser.findOne({email: user?.email});
+            const userInstance = await ClientUser.findOne({ email: user?.email });
             const businessUnit = await BusinessUnit.findOne({ buHead: userInstance._id.toString() });
             businessUnitId = businessUnit?._id
         }
@@ -169,7 +194,7 @@ exports.signInByOtp = async (req, res, next) => {
             expiryTime,
             adminInfo: client,
             clientId: user?._id,
-            businessUnitId : businessUnitId,
+            businessUnitId: businessUnitId,
             message: message.lblLoginSuccess
         });
 
