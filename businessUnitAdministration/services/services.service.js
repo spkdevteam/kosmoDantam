@@ -140,7 +140,7 @@ const editService = async (input) => {
         const services = db.model('services', serviceSchema)
         const department = db.model('department', departmentSchema)
         const branch = db.model('branch', clinetBranchSchema)
-        if (!input.serviceId) {
+        if (input.serviceId) {
              const isNameExist = await services.findOne({ _id: { $ne: input.serviceId }, serviceName: input?.serviceName,branchId:input?.branchId?._id })
             // if (isNameExist) return { status: false, statusCode: 409, message: message.lblServiceExist }
             
