@@ -60,11 +60,11 @@ exports.signIn = async (req, res, next) => {
                 })
             }
         }
-        else {
-                return res.status(statusCode.NotFound).send({
-                    message: "Navigate to Admin login!!"
-                })
-        }
+        // else {
+        //         return res.status(statusCode.NotFound).send({
+        //             message: "Navigate to Admin login!!"
+        //         })
+        // }
 
         await commonCheckForClient(user);
 

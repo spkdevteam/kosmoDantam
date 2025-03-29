@@ -41,7 +41,7 @@ exports.create = async (req, res, next) => {
             });
         }
         const existing = await Service.findOne( 
-             { serviceName: serviceName,departmentId:departmentId }
+             { serviceName: serviceName,departmentId:departmentId,branchId:branchId }
           );
         if (existing) {
             throw new CustomError(statusCode.Conflict, message.lblServiceExist);
