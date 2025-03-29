@@ -18,6 +18,7 @@ const createChair = async (clientId, chairData) => {
             $or: [{ chairNumber: chairData.chairNumber },
             // { chairLocation: chairData?.chairLocation }
             ],
+            deletedAt: null
         });
 
         if (existingChair) {
