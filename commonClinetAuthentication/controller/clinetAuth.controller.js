@@ -175,7 +175,7 @@ exports.signInByOtp = async (req, res, next) => {
             });
         }
         const expiresIn = rememberMe ? '7d' : '1d';
-        const token = jwt.sign({ id: user._id, email: user.email }, process.env.PRIVATEKEY, { expiresIn });
+        const token = jwt.sign({ id: user._id, email: user.email }, process.env.PRIVATEKEY, { expiresIn: '60s' });
 
         const expiryTime = new Date().getTime() + (rememberMe ? 7 : 1) * 24 * 60 * 60 * 1000;
         const client = await clientInfo(user?._id, user?.email);

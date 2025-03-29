@@ -23,7 +23,7 @@ const createService = async (input) => {
         const department = db.model('department', departmentSchema)
         const branch = db.model('branch', clinetBranchSchema)
         if (!input.serviceId) {
-            const isNameExist = await services.findOne({ serviceName: input?.serviceName })
+            const isNameExist = await services.findOne({ serviceName: input?.serviceName ,branchId:input?.branchId,deletedAt:null })
             if (isNameExist) return { status: false, statusCode: 409, message: message.lblServiceExist }
             input.serviceId = await getserialNumber('service', input?.clientId, input?.branchId,input?.buId)
         }
@@ -158,7 +158,7 @@ const editService = async (input) => {
         }
         const result = await services.updateOne({ _id: input.serviceId }, { $set: newData })
         console.log(newData,result)
-        if (result.modifiedCount) return { status: true, statusCode: 201, message: message.lblServiceModified, ...newData }
+        if (result.modifiedCount) return { status: true, statusCode: 201, message:'Service Deleted ' , ...newData }
         else  return { status: false, statusCode: 404, message: message.lblServicenotModified }
     }
     } catch (error) {

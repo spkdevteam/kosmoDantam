@@ -21,6 +21,7 @@ exports.createServices = async (req, res, next) => {
 exports.create = async (req, res, next) => {
     try {
         const { clientId, departmentId, serviceName, description, buId,branchId } = req.body;
+        console.log({ clientId, departmentId, serviceName, description, buId,branchId },'{ clientId, departmentId, serviceName, description, buId,branchId }')
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
@@ -240,7 +241,7 @@ exports.softDeleteService = async (req, res, next) => {
 
     try {
 
-        const { keyword, page, perPage, serviceId, clientId } = req.body;
+        const { keyword, page, perPage, serviceId, clientId,branchId } = req.body;
 
         req.query.keyword = keyword;
         req.query.page = page;
@@ -257,7 +258,25 @@ exports.softDeleteService = async (req, res, next) => {
 
         await deleteServ(clientId, serviceId, softDelete = true)
 
-        this.listServices(req, res, next);
+         
+         
+        const filters = {
+            deletedAt: null,
+            ...(keyword && {
+                $or: [
+                    { serviceName: { $regex: keyword.trim(), $options: "i" } },
+                    { description: { $regex: keyword.trim(), $options: "i" } },
+                ],
+            }),
+        };
+        branchId?.length ? filters.branchId=branchId:''
+
+        const result = await list(clientId, filters, { page, limit: perPage });
+        return res.status(httpStatusCode.OK).send({
+            message: 'Service deleted',
+            data: result,
+        });
+
 
 
     } catch (error) {
