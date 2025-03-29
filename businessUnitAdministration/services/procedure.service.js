@@ -27,7 +27,7 @@ const createProcedure = async (input) => {
         const db = await getClientDatabaseConnection(input.clientId)
         const procedures = await db.model('procedure', procedureSchema)
         if (!input.procedureId) {
-            const isExist = await procedures.findOne({ procedureName: input?.procedureName })
+            const isExist = await procedures.findOne({ procedureName: input?.procedureName, branchId : input?.branchId , deletedAt : null})
             if (isExist) return { status: false, message: message.lblProcedureAlreadyExists, statusCode: httpStatusCode.Conflict }
             input.displayId = await getserialNumber('procedure', input?.clientId, input?.branchId, input?.buId)
         }
