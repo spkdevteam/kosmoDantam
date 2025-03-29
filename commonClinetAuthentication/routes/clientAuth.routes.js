@@ -27,7 +27,7 @@ router.post('/forgetpassword', clientAuthController.forgetPassword );
 
 router.post('/resetpassword', clientAuthController.resetPassword );
 
-router.get('/verifyToken', clientAuthController.verifyToken);
+router.post('/verifyToken', clientAuthController.verifyToken);
 
 // create and update profile for admin
 // router.post('/clientProfile', auth.superAdminAuth, (req, res, next) => {
