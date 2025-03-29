@@ -660,7 +660,7 @@ exports.filterPatientBookingWithfromToDateAndKeyWord = async (input) => {
                 $gte: new Date(input.fromDate + 'T00:00:00.000Z'),
                 $lte: new Date(input.toDate + 'T00:00:00.000Z')
             }}),
-            //...(input?.branchId ? { branchId: new mongoose.Types.ObjectId(input?.branchId) } : {})
+            ...(input?.branchId ? { branchId: new mongoose.Types.ObjectId(input?.branchId) } : {})
 
         })
         .populate('dutyDoctorId')
