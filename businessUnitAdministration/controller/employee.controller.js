@@ -213,6 +213,7 @@ exports.updateEmployee = async (req, res, next) => {
             phone, gender, city, state, country, ZipCode, address, panNumber, adharNumber : aadharNumber, emergencyPhone, bloodGroup,
             branch: branchId,
             role: roleId,
+            roleId:role?.id,
             businessUnit: businessUnit,
         }
 

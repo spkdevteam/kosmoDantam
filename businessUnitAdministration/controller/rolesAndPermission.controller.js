@@ -7,8 +7,8 @@ const message = require("../../utils/message");
 
 const { getClientDatabaseConnection } = require("../../db/connection");
 const clientRoleSchema = require("../../client/model/role");
-const { defaultPersmissionsList } = require("../../utils/constant")
-
+const { defaultPersmissionsList } = require("../../utils/constant"); 
+const togglePermissionStatus = require("../services/roleandPermission/togglePermissionStatus");
 
 
 
@@ -48,7 +48,7 @@ exports.createRolesAndPermissionByBusinessUnit = async (req, res) => {
 
 
         if (role) {
-            return res.status(statusCode.BadRequest).send({
+            return res.status(200).send({status:false,
                 message: message.lblBusinessUnitRoleAlreadyExists,
             });
         }
@@ -60,6 +60,7 @@ exports.createRolesAndPermissionByBusinessUnit = async (req, res) => {
             ],
         );
         return res.status(statusCode.OK).send({
+            status:true,
             message: message.lblBusinessUnitRoleCreatedSuccessfully,
             data: { roleId: newRole[0]._id, roleName: newRole[0].name, capability: newRole[0].capability },
         });
@@ -112,7 +113,7 @@ exports.updateRoleAndPermissionByBusinessUnit = async (req, res) => {
         }
         await role.save();
         return res.status(statusCode.OK).send({
-            message: message.lblBusinessUnitRoleUpdatedSuccessfully,
+            message: !capability ? 'Role name modified ' : 'User permission modified' ,
             data: { roleId: role._id, name: role.name },
         });
     } catch (error) {
@@ -193,71 +194,71 @@ exports.listRolesAndPermission = async (req, res) => {
         ]);
         // console.log("roles=>>",roles);
         //updatation of capability
-        
-        for(const r of roles){
+
+        for (const r of roles) {
             let isUpdated = false
-            for (const cap of r.capability){
-                if(String(cap.name) == "Administration"){
-                    
+            for (const cap of r.capability) {
+                if (String(cap.name) == "Administration") {
+
                     const constArray = [];
-                    for(def of defaultPersmissionsList[0].menu){
+                    for (def of defaultPersmissionsList[0].menu) {
                         constArray.push(def.name);
                     }
                     const dbArray = [];
-                    for(const m of cap.menu){
+                    for (const m of cap.menu) {
                         dbArray.push(m?.name);
                     }
-                    
+
                     const notExistObj = constArray
-                    .map((num, index) => ({ num, index }))
-                    .filter(({ num }) => 
-                        !dbArray.some(el => 
-                        el.toLowerCase().trim() === num.toLowerCase().trim()
-                        )
-                    );
+                        .map((num, index) => ({ num, index }))
+                        .filter(({ num }) =>
+                            !dbArray.some(el =>
+                                el.toLowerCase().trim() === num.toLowerCase().trim()
+                            )
+                        );
                     // console.log("AdministrationnotExistObj=>>",notExistObj);
-                    for(let key of notExistObj){
-                        if(String(key) === "index"){
+                    for (let key of notExistObj) {
+                        if (String(key) === "index") {
                             const pushMenu = defaultPersmissionsList[0].menu[notExistObj[key]];
                             // console.log("AdministrationpushMenu=>>>>",pushMenu);
                             cap.menu.push(pushMenu);
                             isUpdated = true;
                         }
                     }
-                    
+
                 }
-                if(String(cap.name) == "Patient"){
+                if (String(cap.name) == "Patient") {
                     const constArray = [];
-                    for(def of defaultPersmissionsList[1].menu){
+                    for (def of defaultPersmissionsList[1].menu) {
                         constArray.push(def.name);
                     }
                     // console.log("constArray=>",constArray);
                     const dbArray = [];
-                    for(const m of cap.menu){
+                    for (const m of cap.menu) {
                         dbArray.push(m?.name);
                     }
                     // console.log("dbArray=>",dbArray);
                     // const notExistObj = constArray.map((num, index) => ({ num, index })).filter(({ num }) => !dbArray.some(el => String(el) === String(num)));
                     const notExistObj = constArray
-                    .map((num, index) => ({ num, index }))
-                    .filter(({ num }) => 
-                        !dbArray.some(el => 
-                        el.toLowerCase().trim() === num.toLowerCase().trim()
-                        )
-                    );
+                        .map((num, index) => ({ num, index }))
+                        .filter(({ num }) =>
+                            !dbArray.some(el =>
+                                el.toLowerCase().trim() === num.toLowerCase().trim()
+                            )
+                        );
                     // console.log("notExistObj=>>",notExistObj);
-                    for(element of notExistObj){
+                    for (element of notExistObj) {
                         const pushMenu = defaultPersmissionsList[1].menu[element?.index];
                         // console.log("PatientpushMenu=>>>",pushMenu);
-                            cap.menu.push(pushMenu);
-                            isUpdated = true;
+                        cap.menu.push(pushMenu);
+                        isUpdated = true;
                     }
                 }
             }
             if (isUpdated) {
                 await r.save();
                 // console.log(`Updated document ID: ${r?._id}`);
-            }  
+            }
         }
 
         //
@@ -297,10 +298,12 @@ exports.softDeleteRolesAndPermissionByBusinesssUnit = async (req, res) => {
         if (softDelete == "1") {
             role.deletedAt = new Date();
             await role.save()
+            res.json ({status:true,message:'Role deleted successfully  '})
         } else {
             await RolesAndpermission.deleteOne({ _id: roleId });
+            res.json ({status:true,message:'Role deleted successfully  '})
         }
-        this.listRolesAndPermission(req, res);
+        // this.listRolesAndPermission(req, res);
     } catch (error) {
         return res.status(statusCode.InternalServerError).send({
             message: message.lblInternalServerError,
@@ -365,6 +368,7 @@ exports.restoreRoleAndPermissionByBusinessUnit = async (req, res) => {
         }
         const clientConnection = await getClientDatabaseConnection(clientId);
         const RolesAndpermission = clientConnection.model('clientRoles', clientRoleSchema);
+
         const role = await RolesAndpermission.findById(roleId)
         if (!role) {
             return res.status(statusCode.ExpectationFailed).send({
@@ -381,6 +385,20 @@ exports.restoreRoleAndPermissionByBusinessUnit = async (req, res) => {
         });
     }
 };
+
+exports.togglePermissionStatus = async (req, res) => {
+    try {
+        const { roleId, clientId } = req.body;
+        const result = await togglePermissionStatus({ clientId: clientId, permissionId: roleId })
+        res.json(result)
+
+    } catch (error) {
+        return res.status(statusCode.InternalServerError).send({
+            message: message.lblInternalServerError,
+            error: error.message,
+        });
+    }
+}
 
 
 

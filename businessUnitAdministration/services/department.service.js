@@ -26,7 +26,7 @@ const createDepartment = async (input) => {
         const department = await db.model('department', departmentSchema)
         // If deptId doesn't exist, generate a new one or check if the department already exists
         if (!input?.deptId) {
-            const result = await department.findOne({ deptName: input.deptName, deletedAt: null })
+            const result = await department.findOne({ deptName: input.deptName, deletedAt: null ,branchId:input?.branchId })
             if (result) {
                 return {
                     status: false,

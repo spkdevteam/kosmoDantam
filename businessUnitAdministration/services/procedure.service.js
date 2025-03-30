@@ -31,6 +31,7 @@ const createProcedure = async (input) => {
             if (isExist) return { status: false, message: message.lblProcedureAlreadyExists, statusCode: httpStatusCode.Conflict }
             input.displayId = await getserialNumber('procedure', input?.clientId, input?.branchId, input?.buId)
         }
+        
         const newRecord = {
             deptId: input?.deptId,
             services: input?.services || [],
