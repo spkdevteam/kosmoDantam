@@ -497,7 +497,7 @@ exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
     
         const {clientId,fromDate,toDate,keyword='',page=1,perPage=1000} = input
         // clientId, buId, bookingDate, page, perPage, branchId======>>>>>  input 
-       
+        console.log(input?.branchId ,'input?.branchId input?.branchId input?.branchId ')
         
         if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         // if (! await validateObjectId({ clientid: clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
@@ -517,7 +517,7 @@ exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
                         $gte: new Date(fromDate + 'T00:00:00.000Z'),
                         $lte: new Date(toDate + 'T00:00:00.000Z')
                     },
-                    // ...(input?.branchId ? { branchId: new mongoose.Types.ObjectId(input?.branchId) } : {})
+                     ...(input?.branchId ? { branchId:new mongoose.Types.ObjectId(input?.branchId)  } : {})
 
                 }
             },
