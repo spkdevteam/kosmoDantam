@@ -15,7 +15,6 @@ exports.getchairList =async  (input)=>{
         const chairs =await db.model('chair',clinetChairSchema)
         const result = await chairs.find({deletedAt:null,isActive:true,branch:input?.branchId,businessUnit:input?.buId})
         return result
-    
     } catch (error) {
         
     }

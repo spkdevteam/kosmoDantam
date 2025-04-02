@@ -7,7 +7,8 @@ const auth = require("../../middleware/authorization/chairAuthorization/chairAut
 
 const businessUnitChairContrller = require("../controller/chair.controller");
 
-const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization")
+const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization");
+const getChairDetailsWithFilters = require("../controller/Chairs/getChairDetailsWithFilters.controller");
 
 
 
@@ -29,10 +30,11 @@ router.post("/softDeleteChair", entityAuth.authorizeEntity("Administration", "Ch
 
 router.post("/restoreChair", entityAuth.authorizeEntity("Administration", "Chair", "update"), businessUnitChairContrller.restoreChairByBusinessUnit);
 
-router.patch('/updateChairStatusReady',businessUnitChairContrller?.updateChairStatusReady)
-router.patch('/updateChairStatusInProgress',businessUnitChairContrller?.updateChairStatusInprogress)
-router.patch('/updateChairCleared',businessUnitChairContrller?.updateChairCleared)  
-router.patch('/CancelChairReadyStatus',businessUnitChairContrller?.CancelChairReadyStatus) 
+router.patch('/updateChairStatusReady', entityAuth.authorizeEntity("Administration", "Chair", "update"), businessUnitChairContrller?.updateChairStatusReady)
+router.patch('/updateChairStatusInProgress', entityAuth.authorizeEntity("Administration", "Chair", "update"),  businessUnitChairContrller?.updateChairStatusInprogress)
+router.patch('/updateChairCleared', entityAuth.authorizeEntity("Administration", "Chair", "update"), businessUnitChairContrller?.updateChairCleared)  
+router.patch('/CancelChairReadyStatus', entityAuth.authorizeEntity("Administration", "Chair", "update"), businessUnitChairContrller?.CancelChairReadyStatus) 
+        .get("/getChairDetailsWithFilters", getChairDetailsWithFilters)
 
 // # create, update, view, list, activate/inactive, delete Chair by business unit routes ends here
 

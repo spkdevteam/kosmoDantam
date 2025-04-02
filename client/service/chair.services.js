@@ -127,7 +127,7 @@ const listChairs = async (clientId, filters = {}, options = { page: 1, limit: 10
     }
 };
 
-const deleteChair = async (clientId, chairId, softDelete = true) => {
+const deleteChair = async (clientId, chairId, softDelete = true, id) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Chair = clientConnection.model('chair', clinetChairSchema);
@@ -139,6 +139,7 @@ const deleteChair = async (clientId, chairId, softDelete = true) => {
 
         if (softDelete) {
             chair.deletedAt = new Date();
+            chair.deletedBy = id;
             await chair.save();
         } else {
             await chair.remove();
@@ -162,6 +163,7 @@ const restoreChair = async (clientId, chairId) => {
         }
 
         chair.deletedAt = null;
+        chair.deletedBy = null;
         await chair.save();
 
         return chair;

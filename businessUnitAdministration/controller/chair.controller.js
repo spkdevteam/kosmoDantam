@@ -102,6 +102,8 @@ exports.updateChairByBusinessUnit = async (req, res, next) => {
         // Destructure fields from request body
         const { chairId, clientId, chairLocation, chairNumber, } = req.body;
 
+        const mainUser = req.user;
+
         // Check if branchId and clientId are provided
         if (!chairId || !clientId) {
             return res.status(statusCode.BadRequest).send({
@@ -119,8 +121,8 @@ exports.updateChairByBusinessUnit = async (req, res, next) => {
         const updatedChair = await chairService.updateChair(clientId, chairId, {
             chairLocation,
             chairNumber,
+            updatedBy: mainUser._id,
         });
-
 
 
         return res.status(statusCode.OK).send({
@@ -319,6 +321,7 @@ exports.softDeleteChairByBusinesssUnit = async (req, res, next) => {
         req.query.clientId = clientId;
         req.query.isAdmin = isAdmin;
         req.query.branchId = branchId;
+        const mainUser = req.user;
 
 
 
@@ -327,9 +330,9 @@ exports.softDeleteChairByBusinesssUnit = async (req, res, next) => {
             return res.status(400).send({
                 message: message.lblChairIdIdAndClientIdRequired,
             });
-        }
+        };
 
-        await chairService.deleteChair(clientId, chairId, softDelete = true)
+        await chairService.deleteChair(clientId, chairId, softDelete = true, mainUser._id);
 
         this.listChair(req, res, next);
 
@@ -372,13 +375,17 @@ exports.restoreChairByBusinessUnit = async (req, res, next) => {
 
 exports.updateChairStatusReady = async (req, res, next) => {
     try {
+        const mainUser = req.user;
         const data = await sanitizeBody(req.body)
-        const updateChairStatus = await updateChairStatustoReady({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId,appointmentId: data?.appointmentId })
+        const updateChairStatus = await updateChairStatustoReady({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId,appointmentId: data?.appointmentId, user: mainUser._id })
+
+        
+
         if (!updateChairStatus?.status) {
             res.json({ ...updateChairStatus })
         }
         else {
-            const updateAppointStatus = await updatePatientStatustoChairReady({ appointmentId: data?.appointmentId, clientId: data?.clientId, patientId: data?.patientId })
+            const updateAppointStatus = await updatePatientStatustoChairReady({ appointmentId: data?.appointmentId, clientId: data?.clientId, patientId: data?.patientId });
             if (!updateAppointStatus?.status) res.json({ ...updateAppointStatus })
                 else {
                     console.log(updateChairStatus,updateAppointStatus, '----------------------')
@@ -401,8 +408,9 @@ exports.updateChairStatusReady = async (req, res, next) => {
 
 exports.updateChairStatusInprogress = async (req, res, next) => {
     try {
+        const mainUser = req.user;
         const data = await sanitizeBody(req.body)
-        const updateChairStatus = await updateChairStatusInprogress({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId })
+        const updateChairStatus = await updateChairStatusInprogress({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId, user: mainUser._id })
         if (!updateChairStatus?.status) {
             res.json({ ...updateChairStatus })
         }
@@ -430,8 +438,9 @@ exports.updateChairStatusInprogress = async (req, res, next) => {
 
 exports.updateChairCleared = async (req, res, next) => {
     try {
+        const mainUser = req.user;
         const data = await sanitizeBody(req.body)
-        const updateChairStatus = await updateChairCleared({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId })
+        const updateChairStatus = await updateChairCleared({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId, user: mainUser._id });
         if (!updateChairStatus?.status) {
             res.json({ ...updateChairStatus })
         }
@@ -457,8 +466,9 @@ exports.updateChairCleared = async (req, res, next) => {
 
 exports.CancelChairReadyStatus = async (req, res, next) => {
     try {
+        const mainUser = req.user;
         const data = await sanitizeBody(req.body)
-        const updateChairStatus = await  CancelChairReadyStatus({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId,appointmentId: data?.appointmentId, })
+        const updateChairStatus = await  CancelChairReadyStatus({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId,appointmentId: data?.appointmentId, user: mainUser._id })
         if (!updateChairStatus?.status) {
             res.json({ ...updateChairStatus })
         }

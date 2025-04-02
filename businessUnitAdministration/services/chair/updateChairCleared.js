@@ -2,7 +2,7 @@ const { default: mongoose } = require("mongoose")
 const clinetChairSchema = require("../../../client/model/chair")
 const { getClientDatabaseConnection } = require("../../../db/connection")
 
-const updateChairCleared = async ({ clientId, chairId, patientId }) => {
+const updateChairCleared = async ({ clientId, chairId, patientId, user }) => {
     try {
         if (!clientId) return { status: false, message: 'clientId is not valid' }
         if (!chairId) return { status: false, message: 'chairId is not valid' }
@@ -11,7 +11,6 @@ const updateChairCleared = async ({ clientId, chairId, patientId }) => {
         const Chairs = db.model('chair', clinetChairSchema)
         const result = await Chairs.findOne({ _id: chairId })
         const selectedChair = result?.toObject()
-        console.log(selectedChair, 'selectedChair')
          
         const updated = await Chairs.
             updateOne({
@@ -21,7 +20,8 @@ const updateChairCleared = async ({ clientId, chairId, patientId }) => {
                 $set: {
                     status: 'Ready',
                     activePatientId: null,
-                    activeAppointmentId:null
+                    activeAppointmentId:null,
+                    updatedBy: user
                 }
             })
             console.log(updated,'updatedupdatedupdated')

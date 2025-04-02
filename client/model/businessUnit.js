@@ -60,6 +60,8 @@ const clinetBusinessUnitSchema = new Schema(
 
         // handlign created by
         createdBy: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
+        updatedBy: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
+        deletedBy: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
 
         deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality
     },

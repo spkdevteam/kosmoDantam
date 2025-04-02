@@ -11,7 +11,6 @@ const updatePatientStatustoChairReady = async ({ clientId, patientId, appointmen
         if (!patientId) return { status: false, message: 'patientId   is not valid' }
         
         const db = await getClientDatabaseConnection(clientId)
-        console.log( clientId, patientId, appointmentId,' clientId, patientId, appointmentId')
         const Appointment = await  db.model('appointment', appointmentSchema)
         const result = await Appointment.findOne({ _id: appointmentId, deletedAt: null })
         const selectedAppointment  = result?.toObject() 
@@ -22,12 +21,11 @@ const updatePatientStatustoChairReady = async ({ clientId, patientId, appointmen
         else if (selectedAppointment.status != 'Arrived' && selectedAppointment?.token) return { status: false, message: 'patient already consulted the doctor  ' }
 
         const updateAppoinment = await Appointment.updateOne({_id:new mongoose.Types.ObjectId(appointmentId)},{$set:{status:'Chair ready'}})
-        console.log(updateAppoinment,'updateAppoinment')
         if (updateAppoinment?.modifiedCount){
-            return { status: true, message: 'chair is ready for patient   ' }
+            return { status: true, message: 'chair is ready for patient' }
         }
         else {
-            return { status: false, message: 'no changes done   ' }
+            return { status: false, message: 'no changes done' }
         }
 
 

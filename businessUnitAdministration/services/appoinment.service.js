@@ -15,7 +15,6 @@ const caseSheetSchema = require("../../client/model/caseSheet");
 
 exports.creatAppointment = async (input) => {
     try {
-        console.log(input, 'input')
         //handling missing credential  
         if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
         if (!input?.branchId) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }

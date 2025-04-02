@@ -6,8 +6,6 @@ const ObjectId = Schema.ObjectId;
 
 const clinetChairSchema = new Schema(
     {
-
-
         branch: { type: ObjectId, ref: "branch", default:null, index: true }, // Index for admin/user relationships
         businessUnit: { type: ObjectId, ref: "businessUnit", default:null, index: true }, 
 
@@ -15,11 +13,13 @@ const clinetChairSchema = new Schema(
         chairNumber:  { type: String, index: true },
 
         isActive: { type: Boolean, default: false },
-        status:{type:String,default:'Ready'},
-        activePatientId:{type:ObjectId,ref: "patient", default:null, index: true},
-        activeAppointmentId:{type:ObjectId,ref: "appointments", default:null, index: true},
+        status: {type:String, default:'Ready'},
+        activePatientId: {type:ObjectId,ref: "patient", default:null, index: true},
+        activeAppointmentId: {type:ObjectId,ref: "appointments", default:null, index: true},
        
         createdBy: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
+        updatedBy: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
+        deletedBy: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
 
         deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality
     },
