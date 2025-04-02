@@ -5,7 +5,7 @@
  *     summary: Get chair details with filters
  *     description: Fetches details of chairs based on filters such as date range, client, business unit, and user actions.
  *     tags:
- *       - Chairs
+ *       - ChairManagement
  *     parameters:
  *       - in: query
  *         name: from_Date
@@ -75,9 +75,35 @@
  *               statusCode: 200
  *               message: "Chair details retrieved successfully."
  *               data:
- *                 chairNumber: "1"
- *                 status: "Ready"
+ *                 _id: { "$oid": "67e58c51ffe39db434e7414c" }
+ *                 branch:
+ *                   _id: "67e57ddcffe39db434e73769"
+ *                   name: "Kosmo"
+ *                 businessUnit:
+ *                   _id: "67e5351aace4e5db084ae486"
+ *                   name: "business Unit"
  *                 chairLocation: "DumDum"
+ *                 chairNumber: "1"
+ *                 isActive: true
+ *                 status: "Ready"
+ *                 activePatientId: null
+ *                 activeAppointmentId: null
+ *                 createdBy:
+ *                   _id: "67e5351aace4e5db084ae484"
+ *                   firstName: "67e5351aace4e5db084ae484"
+ *                   lastName: "67e5351aace4e5db084ae484"
+ *                 deletedBy:
+ *                   _id: "67e5351aace4e5db084ae484"
+ *                   firstName: "67e5351aace4e5db084ae484"
+ *                   lastName: "67e5351aace4e5db084ae484"
+ *                 lastUpdationBy:
+ *                   _id: "67e5351aace4e5db084ae484"
+ *                   firstName: "67e5351aace4e5db084ae484"
+ *                   lastName: "67e5351aace4e5db084ae484"
+ *                 deletedAt: null
+ *                 createdAt: { "$date": "2025-03-27T17:35:13.812Z" }
+ *                 updatedAt: { "$date": "2025-03-28T04:23:34.979Z" }
+ *                 __v: 0
  *       500:
  *         description: Internal server error.
  *         content:
