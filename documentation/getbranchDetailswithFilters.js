@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /api/client/bu/booking/getBranchDetails:
+ * /api/client/bu/branch/getBranchDetails:
  *   get:
  *     summary: Get branch details
  *     description: Fetches details of branches based on the provided criteria.

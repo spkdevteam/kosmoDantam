@@ -1,0 +1,89 @@
+/**
+ * @swagger
+    /api/client/bu/chair/getChairDetailsWithFilters:
+ *   get:
+ *     summary: Get chair details with filters
+ *     description: Fetches details of chairs based on filters such as date range, client, business unit, and user actions.
+ *     tags:
+ *       - Chairs
+ *     parameters:
+ *       - in: query
+ *         name: from_Date
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: Start date of the filter range.
+ *         example: "2025-03-01"
+ *       - in: query
+ *         name: toDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: End date of the filter range.
+ *         example: "2025-03-31"
+ *       - in: query
+ *         name: searchKey
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Search keyword for filtering chair details.
+ *         example: "Kosmo"
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: Page number for pagination.
+ *         example: 1
+ *       - in: query
+ *         name: perPage
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: Number of results per page.
+ *         example: 10
+ *       - in: query
+ *         name: clientId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Unique identifier for the client.
+ *         example: "67e5351aace4e5db084ae486"
+ *       - in: query
+ *         name: businessUnitId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Unique identifier for the business unit.
+ *         example: "67e5351aace4e5db084ae486"
+ *       - in: query
+ *         name: branchId
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Unique identifier for the branch.
+ *         example: "67e57ddcffe39db434e73769"
+ *     responses:
+ *       200:
+ *         description: Chair details retrieved successfully.
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: true
+ *               statusCode: 200
+ *               message: "Chair details retrieved successfully."
+ *               data:
+ *                 chairNumber: "1"
+ *                 status: "Ready"
+ *                 chairLocation: "DumDum"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: false
+ *               statusCode: 500
+ *               message: "Internal server error."
+ */
