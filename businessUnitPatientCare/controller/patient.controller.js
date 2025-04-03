@@ -146,6 +146,7 @@ exports.createSubPatientByBusinessUnit = async (req, res, next) => {
 // update Patient by business unit
 exports.updatePatientByBusinessUnit = async (req, res, next) => {
     try {
+        const mainUser = req.user;
         const { clientId, branchId, businessUnit, patientId, firstName, lastName, email, phone, gender, age, bloodGroup, patientGroup, referedBy, city, state, country, ZipCode, address, } = req.body;
         await commonIdCheck({ clientId, branchId, businessUnit });
         if (!patientId) {
@@ -169,6 +170,7 @@ exports.updatePatientByBusinessUnit = async (req, res, next) => {
             gender, bloodGroup, patientGroup, referedBy,
             branch: branchId,
             businessUnit: businessUnit,
+            updatedBy: mainUser?._id
         }
 
         if(age){
@@ -346,6 +348,7 @@ exports.searchPatients = async (req, res, next) => {
 // active inactive Patient by business unit
 exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
     try {
+        const mainUser = req.user;
         const { status, patientId, clientId, keyword, page, perPage } = req.body;
         req.query.clientId = clientId;
         req.query.keyword = keyword;
@@ -371,6 +374,7 @@ exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
         }
         Object.assign(patient, {
             isActive: status === "1",
+            updatedBy: mainUser?._id
         });
         await patient.save();
         this.listPatient(req, res)
@@ -382,6 +386,7 @@ exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
 
 exports.softDeletePatient = async (req, res) => {
     try {
+        const mainUser = req.user;
         const { keyword, page, perPage, patientId, clientId, isAdmin = true, branchId } = req.body;
         req.query.keyword = keyword;
         req.query.page = page;
@@ -406,7 +411,8 @@ exports.softDeletePatient = async (req, res) => {
         }
         if (!patient.isChainedWithMainPatient) {
             await patientService.deleteOne(clientId, patient.email, {
-                deletedAt: new Date()
+                deletedAt: new Date(),
+                deletedBy: mainUser?._id
             });
         }
         Object.assign(patient, {
@@ -502,7 +508,7 @@ exports.createMinimalPatient = async (req, res, next) => {
             businessUnit: businessUnit,
             tc: true,
             isUserVerified: true,
-
+            createdBy: mainUser?._id
         }
         // ------------------------------
         const User = clientConnection.model('clientUsers', clinetUserSchema);

@@ -4,7 +4,7 @@ const getChairDetailsWithFiltersFn = require("../../services/chair/getChairDetai
 
 const getChairDetailsWithFilters = async (req, res, next) => {
     try {
-        const { page = null, perPage = null, searchKey, businessUnitId, branchId, status, fromDate, toDate, clientId } = await sanitizeBody(req.query);
+        const { page = null, perPage = null, searchKey, businessUnitId, branchId, status, fromDate, toDate, createdUser, updatedUser, deletedUser, clientId } = await sanitizeBody(req.query);
 
         const validation = [
             clientIdValidation({ clientId })
@@ -15,6 +15,15 @@ const getChairDetailsWithFilters = async (req, res, next) => {
         if(branchId){
             validation.push(mongoIdValidation({_id: branchId, name: "branchId"}));
         }
+        if(createdUser){
+            validation.push(mongoIdValidation({_id: createdUser, name: "createdUser"}));
+        }
+        if(updatedUser){
+            validation.push(mongoIdValidation({_id: updatedUser, name: "updatedUser"}));
+        }
+        if(deletedUser){
+            validation.push(mongoIdValidation({_id: deletedUser, name: "deletedUser"}));
+        }
 
         const errors = validation.filter((e)=> !e.status);
         if(errors.length > 0) return res.status(400).json({status: false, message: errors.map((e)=> e.message).join(", ")})
@@ -24,7 +33,7 @@ const getChairDetailsWithFilters = async (req, res, next) => {
 
         if (fromDate && !isValidDate({ value: fromDate }).status) return { status: false, message: "Invalid from date" };
         if (toDate && !isValidDate({ value: toDate }).status) return { status: false, message: "Invalid to date" };
-        const result = await getChairDetailsWithFiltersFn({ page, perPage, searchKey, businessUnitId, branchId, status, fromDate, toDate, clientId });
+        const result = await getChairDetailsWithFiltersFn({ page, perPage, searchKey, businessUnitId, branchId, status, fromDate, toDate, createdUser, updatedUser, deletedUser, clientId });
         return res.status(200).json({ status: result?.status, message: result?.message, data: result?.data });
     } catch (error) {
         next(error);

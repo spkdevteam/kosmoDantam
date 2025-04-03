@@ -9,7 +9,7 @@ const serviceSchema = new mongoose.Schema({
     branchId: { type: mongoose.Types.ObjectId, ref: 'branch' },
     description: { type: String },
     buId: { type: mongoose.Schema.ObjectId, ref: "businessUnit", default: null, index: true },
-    price: { type: Number, default: 0.00 },
+    //price: { type: Number, default: 0.00 },
 
     createdBy: { type: mongoose.Types.ObjectId, ref: "clientUsers", default: null, index: true }, // Index for admin/user relationships
     updatedBy: { type: mongoose.Types.ObjectId, ref: "clientUsers", default: null, index: true }, // Index for admin/user relationships
