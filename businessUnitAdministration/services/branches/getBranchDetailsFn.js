@@ -4,7 +4,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const mongoose = require("mongoose");
 const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey = "", page = null, perPage = null,
-    clientId, businessUnitId = null }) => {
+    clientId, businessUnitId = null , createdBy, updatedBy}) => {
     try {
         let searchQuery = {};
         if (SearchKey) {
@@ -46,6 +46,14 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
                 createdAt: { $lte: new Date(toDate) }
             }
         }
+        let createdBySearchKey = {};
+        if(createdBy){
+            createdBySearchKey = {createdBy : createdBy}
+        }
+        let updatedBySearchKey = {};
+        if(updatedBy){
+            updatedBySearchKey = {updatedBy : updatedBy}
+        }
         //establishing db connection :
         const db = await getClientDatabaseConnection(clientId);
         const branch = await db.model('branch', clinetBranchSchema);
@@ -67,6 +75,8 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
             ...businessSearchKey,
             ...from_DateSearchKey,
             ...toDateSearchKey,
+            ...createdBySearchKey,
+            ...updatedBySearchKey,
             deletedAt: null
         });
         const totalDocs = await branch.countDocuments({
@@ -74,6 +84,8 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
             ...businessSearchKey,
             ...from_DateSearchKey,
             ...toDateSearchKey,
+            ...createdBySearchKey,
+            ...updatedBySearchKey,
             deletedAt: null
         });
         console.log("totalDocs==>>>", totalDocs);
@@ -112,7 +124,7 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
             if (fetchedBranch?.length > 0)
                 return { status: true, data: fetchedBranch, metaData: metaData, message: "Branch details retrieved successfully." }
             else
-                return { status: false, data: [], metaData: metaData, message: "Branch details Not Found!" }
+                return { status: false, data: [], metaData: metaData, message: "Branch details Not Found!!!" }
         }
         else {
             metaData = {

@@ -9,7 +9,7 @@ const getCaseSheetDetailsctrl = async (req, res) => {
         const data = await sanitizeBody(req?.query);
         console.log("inputData==>>>", data);
         const { from_Date, toDate, clientId, patientId, branchId, buId, createdBy, compId,
-            clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId } = data
+            clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId, updatedUser, createdUser } = data
         //from_Date, toDate,SearchKey, page, perPage, clientId, patientId, branchId, buId, createdBy, compId, clinicalFindingsFindId,
         //diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId
         const validation = [
@@ -58,6 +58,12 @@ const getCaseSheetDetailsctrl = async (req, res) => {
         if (invoiceId) {
             validation.push(mongoIdValidation({ _id: invoiceId, name: "invoiceId" }));
         }
+        if (createdUser) {
+            validation.push(mongoIdValidation({ _id: createdUser, name: createdUser }))
+        }
+        if (updatedUser) {
+            validation.push(mongoIdValidation({ _id: updatedUser, name: updatedUser }))
+        }
         const error = validation.filter((e) => e && e.status == false);
         if (error.length > 0) return { status: false, message: error.map(e => e.message).join(", ") };
         console.log("here");
@@ -69,7 +75,8 @@ const getCaseSheetDetailsctrl = async (req, res) => {
         const { page, perPage, SearchKey } = cleanQuery;
         const result = await getCaseSheetDetailsFn({
             from_Date, toDate, SearchKey, page, perPage, clientId, patientId, branchId, buId,
-            createdBy, compId, clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId
+            compId, clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId,
+            createdBy : createdUser, updatedBy : updatedUser
         });
         // console.log("result=>>>>", result)
         if (!result?.status) return res.status(httpStatusCode.InternalServerError).send({

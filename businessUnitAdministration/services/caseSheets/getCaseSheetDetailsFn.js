@@ -13,8 +13,8 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const mongoose = require("mongoose");
 
-const getCaseSheetDetailsFn = async ({ from_Date, toDate, SearchKey, page, perPage, clientId, patientId, branchId, buId,
-    createdBy, compId, clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId
+const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey="", page= null, perPage= null, clientId, patientId, branchId, buId,
+    createdBy, compId, clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId, updatedBy
 }) => {
     try {
         let searchQuery = {};
@@ -86,6 +86,10 @@ const getCaseSheetDetailsFn = async ({ from_Date, toDate, SearchKey, page, perPa
         if (createdBy) {
             createdBySearchKey = { createdBy: createdBy }
         }
+        let updatedBySearchKey = {};
+        if (updatedBy) {
+            updatedBySearchKey = { updatedBy: updatedBy }
+        }
         let compIdSearchKey = {};
         if (compId) {
             compIdSearchKey = { "cheifComplaints.complaints.compId": compId }
@@ -154,6 +158,7 @@ const getCaseSheetDetailsFn = async ({ from_Date, toDate, SearchKey, page, perPa
             ...servIdSearchKey4,
             ...procedIdSearchKey,
             ...invoiceIdSearchKey,
+            ...updatedBySearchKey,
             deletedAt: null
         });
         const totalDocs = await caseSheets.countDocuments({
@@ -176,6 +181,7 @@ const getCaseSheetDetailsFn = async ({ from_Date, toDate, SearchKey, page, perPa
             ...servIdSearchKey4,
             ...procedIdSearchKey,
             ...invoiceIdSearchKey,
+            ...updatedBySearchKey,
             deletedAt: null
         });
         console.log("totalDocs==>>>", totalDocs);
@@ -194,6 +200,7 @@ const getCaseSheetDetailsFn = async ({ from_Date, toDate, SearchKey, page, perPa
             .populate("branchId", "name")
             .populate("buId", "name")
             .populate("createdBy", "firstName lastName")
+            .populate("updatedBy", "firstName lastName")
             .populate("cheifComplaints.complaints.compId", "complaintName discription")
             .populate("clinicalFindings.findings.findId", "findingsName discription")
             .populate("medicalHistory.medicals.medId", "caseName remark")//where is collection

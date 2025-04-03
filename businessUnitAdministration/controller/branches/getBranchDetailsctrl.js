@@ -8,7 +8,7 @@ const getBranchDetailsctrl = async (req, res) => {
     try {
         const data = await sanitizeBody(req?.query);
         console.log("inputData==>>>",data);
-        const {from_Date, toDate, clientId, businessUnitId} = data;
+        const {from_Date, toDate, clientId, businessUnitId, updatedUser, createdUser} = data;
         //from_Date, toDate,SearchKey, page, perPage, clientId, businessUnitId
         
         const validation = [
@@ -24,6 +24,12 @@ const getBranchDetailsctrl = async (req, res) => {
         if(businessUnitId){
             validation.push(mongoIdValidation({_id :businessUnitId, name:"businessUnitId" }));
         }
+        if(createdUser){
+            validation.push(mongoIdValidation({_id : createdUser, name : createdUser}))
+        }
+        if(updatedUser){
+            validation.push(mongoIdValidation({_id : updatedUser, name : updatedUser}))
+        }
         const error = validation.filter((e) => e && e.status == false);
         if (error.length > 0) return { status: false, message: error.map(e => e.message).join(", ") };
         console.log("here");
@@ -33,7 +39,9 @@ const getBranchDetailsctrl = async (req, res) => {
             SearchKey: data.SearchKey ? String(data.SearchKey.replace(/^"|"$/g, "")) : "", // default to empty string
         };
         const { page, perPage, SearchKey } = cleanQuery;
-        const result = await getBranchDetailsFn({from_Date, toDate, SearchKey, page, perPage, clientId, businessUnitId });
+        const result = await getBranchDetailsFn({from_Date, toDate, SearchKey, page, perPage, clientId, businessUnitId,
+            createdBy : createdUser, updatedBy : updatedUser
+         });
         console.log("result=>>>>",result) 
         if(!result?.status) return res.status(httpStatusCode.InternalServerError).send({
             message: result?.message

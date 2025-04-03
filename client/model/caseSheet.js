@@ -322,7 +322,8 @@ const caseSheetSchema = new mongoose.Schema({
         default: 'Proposed',
         trim: true,
     },
-
+    updatedBy: { type: mongoose.Schema.ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships/added by rahul
+    deletedBy: { type: mongoose.Schema.ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships/added by rahul
 
 }, { timestamps: true });
 
