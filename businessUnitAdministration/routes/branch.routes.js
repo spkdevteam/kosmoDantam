@@ -9,6 +9,7 @@ const statusCode = require("../../utils/http-status-code")
 const businessUnitBranchContrller = require("../controller/branch.controller");
 const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization");
 const { uploadBranch } = require("../../utils/multer");
+const getBranchDetailsctrl = require("../controller/branches/getBranchDetailsctrl");
 
 
 
@@ -68,7 +69,7 @@ router.post("/softDeleteBranch", entityAuth.authorizeEntity("Administration", "B
 router.post("/restoreBranch", entityAuth.authorizeEntity("Administration", "Branch", "update"), businessUnitBranchContrller.restoreBranchByBusinessUnit);
 
 router.get('/getAllActiveBranch',  businessUnitBranchContrller.getAllActiveBranch)
-
+router.get('/getBranchDetails', getBranchDetailsctrl)
 
 // # create, update, view, list, activate/inactive, delete Branch by business unit routes ends here
 

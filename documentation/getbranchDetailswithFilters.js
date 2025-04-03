@@ -14,7 +14,6 @@
  *           format: date
  *         required: false
  *         description: Start date for filtering branch details (YYYY-MM-DD).
- *         example: "2024-01-01"
  *       - in: query
  *         name: toDate
  *         schema:
@@ -22,14 +21,12 @@
  *           format: date
  *         required: false
  *         description: End date for filtering branch details (YYYY-MM-DD).
- *         example: "2024-12-31"
  *       - in: query
  *         name: SearchKey
  *         schema:
  *           type: string
  *         required: false
  *         description: Search keyword for filtering branch details.
- *         example: "pragya"
  *       - in: query
  *         name: page
  *         schema:
@@ -50,14 +47,25 @@
  *           type: string
  *         required: true
  *         description: Unique identifier for the client.
- *         example: "6735e64c5c58f271b1ce1678"
+ *         example: "6782084da840f3a7bf1a2f72"
  *       - in: query
  *         name: businessUnitId
  *         schema:
  *           type: string
  *         required: false
  *         description: Unique identifier for the business unit.
- *         example: "67e5351aace4e5db084ae486"
+ *       - in: query
+ *         name: createdUser
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: ID of the user who created the branch.
+ *       - in: query
+ *         name: updatedUser
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: ID of the user who last updated the branch.
  *     responses:
  *       200:
  *         description: Branch details retrieved successfully.
@@ -65,34 +73,28 @@
  *           application/json:
  *             example:
  *               status: true
- *               statusCode: 200
  *               message: "Branch details retrieved successfully."
  *               data:
- *                 _id: "67e578b0ffe39db434e73658"
- *                 displayId: "KC-bnch-2024-BR1000001"
- *                 businessUnit:
- *                   _id: "67e5351aace4e5db084ae486"
- *                   name: "Business Unit"
- *                 branchHead: null
- *                 bookingContact: "7907441232"
- *                 name: "pragya"
- *                 incorporationName: "L12345MH2023PLC000789"
- *                 cinNumber: "U12345KA2019PTC012345"
- *                 gstNumber: "27AAAPA1234A1Z5"
- *                 branchPrefix: "pd"
- *                 branchLogo: null
- *                 emailContact: "pragya@yopmail.com"
- *                 contactNumber: "9836867983"
- *                 city: "South 24 Parganas district"
- *                 state: "West Bengal"
- *                 country: "India"
- *                 ZipCode: "700074"
- *                 address: "2/13 DumDum, Nager Bazar"
- *                 isActive: false
- *                 createdBy: null
- *                 deletedAt: "2025-03-27T16:16:27.361Z"
- *                 createdAt: "2025-03-27T16:11:28.969Z"
- *                 updatedAt: "2025-03-27T16:16:27.362Z"
+ *                 branches:
+ *                   - _id: "67820c87a840f3a7bf1a3114"
+ *                     displayId: "KC-BU-2024-BR1000001"
+ *                     businessUnit:
+ *                       _id: "67820851a840f3a7bf1a307a"
+ *                       name: "kasif unit two Business Unit"
+ *                     name: "Kosmo Dental Clinic Branch one"
+ *                     emailContact: "kasifbu2bnch1@yopmail.com"
+ *                     contactNumber: "9999999101"
+ *                     city: "Asansol"
+ *                     state: "West Bengal"
+ *                     country: "India"
+ *                     isActive: true
+ *                     createdAt: "2025-01-11T06:15:35.615Z"
+ *                     updatedAt: "2025-01-11T06:15:38.372Z"
+ *                 metaData:
+ *                   currentPage: 1
+ *                   perPage: 3
+ *                   totalDocs: 3
+ *                   totalPages: 1
  *       400:
  *         description: Missing or invalid input parameters.
  *         content:
