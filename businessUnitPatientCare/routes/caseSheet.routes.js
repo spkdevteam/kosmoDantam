@@ -23,6 +23,7 @@ const getUnbilledItemsFromCaseSheet = require("../controller/caseSheet/getUnbill
 const patchUpdateInvoice = require("../controller/caseSheet/updateInvoice");
 const migrationIntoTreatmentData3 = require("../controller/caseSheet/migrationIntoTreatmentData3");
 const updateCaseSheetWithInvoiceNumber = require("../controller/caseSheet/updateCaseSheetWithInvoiceNumber");
+const getCaseSheetDetailsctrl = require("../../businessUnitAdministration/controller/caseSheet/getcaseSheetDetailsctrl");
 
 
 
@@ -199,6 +200,6 @@ router.patch("/updateInvoice",patchUpdateInvoice)
 router.post("/migrationIntoTreatmentData3",migrationIntoTreatmentData3)
 router.patch("/updateCaseSheetWithInvoiceNumber",updateCaseSheetWithInvoiceNumber)
 
-
+router.get("/getCaseSheetDetails",getCaseSheetDetailsctrl)
 
 exports.router = router;

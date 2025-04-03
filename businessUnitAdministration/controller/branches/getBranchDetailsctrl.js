@@ -11,21 +11,21 @@ const getBranchDetailsctrl = async (req, res) => {
         const {from_Date, toDate, clientId, businessUnitId} = data;
         //from_Date, toDate,SearchKey, page, perPage, clientId, businessUnitId
         
-        // const validation = [
-        //     clientIdValidation({ clientId }),
-        //     emptyStringValidation({string:data?.SearchKey, name: "searchKey"}),
-        // ];
-        // if(from_Date){
-        //     validation.push(isValidDate({from_Date}));
-        // }
-        // if(toDate){
-        //     validation.push(isValidDate({toDate}),);
-        // }
-        // if(businessUnitId){
-        //     mongoIdValidation({_id :businessUnitId, name:"businessUnitId" })
-        // }
-        // const error = validation.filter((e) => e && e.status == false);
-        // if (error.length > 0) return { status: false, message: error.map(e => e.message).join(", ") };
+        const validation = [
+            clientIdValidation({ clientId }),
+            emptyStringValidation({string:data?.SearchKey, name: "searchKey"}),
+        ];
+        if(from_Date){
+            validation.push(isValidDate({ value :from_Date}));
+        }
+        if(toDate){
+            validation.push(isValidDate({ value : toDate}));
+        }
+        if(businessUnitId){
+            validation.push(mongoIdValidation({_id :businessUnitId, name:"businessUnitId" }));
+        }
+        const error = validation.filter((e) => e && e.status == false);
+        if (error.length > 0) return { status: false, message: error.map(e => e.message).join(", ") };
         console.log("here");
         const cleanQuery = {
             page: data.page ? data.page.replace(/^"|"$/g, "") : null, // default to "1" if missing
