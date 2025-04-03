@@ -25,8 +25,9 @@ const {list} = require('../services/prescription.service')
 // create prescription by business unit
 exports.createPrescription = async (req, res, next) => {
     try {
+        const mainUser = req.user;
         const data =await sanitizeBody(req.body)
-        const result = await prescriptionService.create(data)
+        const result = await prescriptionService.create({...data, id: mainUser?._id });
         res.json(result)
     } catch (error) {
         next(error)
@@ -36,7 +37,8 @@ exports.createPrescription = async (req, res, next) => {
 // update prescription by business unit
 exports.updatePrescription = async (req, res, next) => {
     try {
-        const { clientId, branchId, buId, patientId, doctorId, caseSheetId, prescriptionId, drugArray } = req.body;
+        const mainUser = req.user;
+        const { clientId, branchId, buId, patientId, doctorId, caseSheetId, prescriptionId, drugArray, id } = req.body;
         await commonIdCheck({ clientId, branchId, buId, patientId, doctorId, caseSheetId });
         if (!drugArray) {
             return res.status(statusCode.BadRequest).send({
@@ -45,6 +47,7 @@ exports.updatePrescription = async (req, res, next) => {
         }
         const updated = await prescriptionService.update(clientId, prescriptionId, {
             drugArray,
+            updatedBy: mainUser?._id
         })
         return res.status(statusCode.OK).send({
             message: message.lblPrescriptionUpdatedSuccess,
@@ -78,9 +81,10 @@ exports.getParticularPrescription = async (req, res, next) => {
 exports.deletePrescription = async (req,res,next)=>{
 
     try {
+        const mainUser = req.user;
         const { clientId, prescriptionId } = req.query;
         console.log(req.params)
-        const result = await prescriptionService.deletePrescription(clientId, prescriptionId)
+        const result = await prescriptionService.deletePrescription(clientId, prescriptionId, mainUser?._id);
         res.status(result.statusCode).json({status:result.status,message:result.message})
     } catch (error) {
         next(error)

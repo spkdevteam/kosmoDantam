@@ -14,9 +14,9 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
 
         
         //these are user for populating the data
-        const bussinessUnit = db.model("businessUnit", clinetBusinessUnitSchema);
-        const branch = db.model("branch", clinetBranchSchema);
-        const user = db.model("clientUsers", clinetUserSchema);
+        const bussinessUnit = await db.model("businessUnit", clinetBusinessUnitSchema);
+        const branch = await db.model("branch", clinetBranchSchema);
+        const user = await db.model("clientUsers", clinetUserSchema);
         
         if (!page || !perPage) {
             const allChairs = await Chair.find({ deletedAt: null })

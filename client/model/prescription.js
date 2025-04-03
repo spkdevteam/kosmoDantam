@@ -22,7 +22,6 @@ const prescriptionSchema = new Schema(
             instruction: { type: String, default: "" }, 
             note: { type: String, index: true },
             timing:{ type: String  },
-           
           },
         ],
         default: [],
@@ -33,6 +32,9 @@ const prescriptionSchema = new Schema(
       createdAt: { type: Date, default: null, index: true },
       nextVisitDate: { type: Date, default: null, index: true },
       nextVisitDiscription: { type: String, default: null }, // Fixed spelling
+
+      updatedBy: { type: mongoose.Schema.ObjectId, ref: "clientUsers", default: null, index: true },
+      deletedBy: { type: mongoose.Schema.ObjectId, ref: "clientUsers", default: null, index: true },
     },
     { timestamps: true }
   );

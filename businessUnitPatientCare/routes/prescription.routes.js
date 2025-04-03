@@ -7,7 +7,8 @@ let priscriptionRouter = express.Router();
 
 const prescriptionContrller = require("../controller/prescription.controller");
 
-const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization")
+const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization");
+const getPrescriptionDetailsWithFilters = require("../../businessUnitAdministration/controller/prescription/getPrescriptionDetailsWithFilters.controller");
 
 
 
@@ -15,7 +16,7 @@ const entityAuth = require("../../middleware/authorization/commonEntityAuthoriza
 // # create, update, view, list, activate/inactive, delete Prescription by business unit routes starts here
 
 
-priscriptionRouter.post('/createPrescription',  prescriptionContrller.createPrescription);//entityAuth.authorizeEntity("Pataints", "Prescription", "create"),
+priscriptionRouter.post('/createPrescription', entityAuth.authorizeEntity("Pataints", "Prescription", "create"),  prescriptionContrller.createPrescription);//entityAuth.authorizeEntity("Pataints", "Prescription", "create"),
 
 priscriptionRouter.put('/updatePrescription', entityAuth.authorizeEntity("Pataints", "Prescription", "update"), prescriptionContrller.updatePrescription);
 
@@ -24,7 +25,9 @@ priscriptionRouter.get('/prescription/:clientId/:prescriptionId',   prescription
 priscriptionRouter.get('/pataintPrescription', entityAuth.authorizeEntity("Pataints", "Prescription", "view"), prescriptionContrller.pataintPrescriptionList);
 
 priscriptionRouter.get('/listPrescription',  prescriptionContrller.listPrescription); //entityAuth.authorizeEntity("Pataints", "Prescription", "list"),
-priscriptionRouter.delete('/deletePrescription',  prescriptionContrller.deletePrescription); //entityAuth.authorizeEntity("Pataints", "Prescription", "list"),
+priscriptionRouter.delete('/deletePrescription',  prescriptionContrller.deletePrescription) //entityAuth.authorizeEntity
+                  .get("/getPrescriptionDetailsWithFilters", getPrescriptionDetailsWithFilters)
+// ("Pataints", "Prescription", "list"),
 
 
 

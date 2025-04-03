@@ -17,6 +17,7 @@ const getserialNumber = require("../../model/services/getserialNumber");
 exports.createBranchByBusinessUnit = async (req, res) => {
     try {
         // asd
+        const mainUser = req.user;
         const { clientId, name, emailContact, branchPrefix, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit, branchHeadId } = req.body;
         
         if (!clientId) {
@@ -48,7 +49,7 @@ exports.createBranchByBusinessUnit = async (req, res) => {
         const displayId = await getserialNumber('branch', clientId, "", businessUnit);
 
         const dataObject = {
-            displayId: displayId, branchPrefix: branchPrefix, clientId, name, emailContact, contactNumber, country, state, city : city[0], ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId
+            displayId: displayId, branchPrefix: branchPrefix, clientId, name, emailContact, contactNumber, country, state, city : city[0], ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId, createdBy: mainUser?._id
         }
 
         if (req.file?.filename) {
@@ -79,6 +80,7 @@ exports.createBranchByBusinessUnit = async (req, res) => {
 exports.updateBranchByBusinessUnit = async (req, res) => {
 
     try {
+        const mainUser = req.user;
         // Destructure fields from request body
         const { branchId, clientId, name, emailContact, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber } = req.body;
 
@@ -146,6 +148,7 @@ exports.updateBranchByBusinessUnit = async (req, res) => {
         branch.incorporationName = incorporationName;
         branch.cinNumber = cinNumber;
         branch.gstNumber = gstNumber;
+        branch.updatedBy = mainUser?._id;
         if (req.file?.filename) {
             branch.branchLogo = req.file.filename;
         }
@@ -283,9 +286,8 @@ exports.listBranch = async (req, res) => {
 
 // active inactive branch by Business unit
 exports.activeinactiveBranchByBusinessUnit = async (req, res) => {
-
-
     try {
+        const mainUser = req.user;
         const { keyword, page, perPage, status, branchId, clientId } = req.body;
         req.query.keyword = keyword;
         req.query.page = page;
@@ -315,6 +317,7 @@ exports.activeinactiveBranchByBusinessUnit = async (req, res) => {
         }
 
         branch.isActive = status === "1";
+        branch.updatedBy = mainUser?._id;
         await branch.save();
 
         this.listBranch(req, res);
@@ -336,7 +339,7 @@ exports.activeinactiveBranchByBusinessUnit = async (req, res) => {
 exports.softDeleteBranchByBusinesssUnit = async (req, res) => {
 
     try {
-
+        const mainUser = req.user;
         const { keyword, page, perPage, branchId, clientId } = req.body;
 
         req.query.keyword = keyword;
@@ -366,7 +369,8 @@ exports.softDeleteBranchByBusinesssUnit = async (req, res) => {
         }
 
         branch.deletedAt = new Date();
-        await branch.save()
+        branch.deletedBy = mainUser?._id;
+        await branch.save();
         this.listBranch(req, res);
 
 
@@ -423,6 +427,7 @@ exports.restoreBranchByBusinessUnit = async (req, res) => {
         }
 
         branch.deletedAt = null;
+        branch.deletedBy = null;
         await branch.save();
 
         this.listBranch(req, res);

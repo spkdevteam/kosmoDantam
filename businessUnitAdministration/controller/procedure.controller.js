@@ -11,8 +11,9 @@ const {
 
 exports.createProcedure = async (req, res) => {
     try {
+        const mainUser = req.user;
         const data = await sanitizeBody(req.body)
-        const result = await createProcedure(data)
+        const result = await createProcedure({...data, id: mainUser?._id});
         res.status(result?.statusCode || 200).json(result)
     } catch (error) {
         res.json({ status: false, message: error.message, statusCode: 500 })
@@ -22,8 +23,9 @@ exports.createProcedure = async (req, res) => {
 
 exports.editProcedure = async (req, res) => {
     try {
+        const mainUser = req.user;
         const data = await sanitizeBody(req.body)
-        const result = await editProcedure(data)
+        const result = await editProcedure({...data, id: mainUser?._id });
         res.status(result?.statusCode || 200).json(result)
     } catch (error) {
         res.json({ status: false, message: error.message, statusCode: 500 })
@@ -32,8 +34,9 @@ exports.editProcedure = async (req, res) => {
 
 exports.deleteProcedure = async (req, res) => {
     try {
+        const mainUser = req.user;
         const data = await sanitizeBody(req.query)
-        const result = await deleteProcedure(data)
+        const result = await deleteProcedure({...data, id: mainUser?._id });
         res.status(result?.statusCode || 200).json(result)
     } catch (error) {
         res.json({ status: false, message: error.message, statusCode: 500 })
@@ -52,8 +55,9 @@ exports.revokeProcedure = async (req, res) => {
 
 exports.toggleProcedure = async (req, res) => {
     try {
+        const mainUser = req.user;
         const data = await sanitizeBody(req.body)
-        const result = await toggleProcedure(data)
+        const result = await toggleProcedure({...data, id: mainUser?._id });
         res.status(result?.statusCode || 200).json(result)
     } catch (error) {
         res.json({ status: false, message: error.message, statusCode: 500 })
@@ -93,8 +97,9 @@ exports.getAllProceduresByPage = async (req, res) => {
 
 exports.putToggleProcedureByPage = async (req, res) => {
     try {
+        const mainUser = req.user;
         const data = await sanitizeBody(req.body)
-        const toggle = await toggleProcedure(data)
+        const toggle = await toggleProcedure({...data, id: mainUser?._id });
         const result = await getAllProceduresByPage(data)
         result.message = toggle.message
         res.status(toggle?.statusCode || 200).json(result)

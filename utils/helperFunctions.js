@@ -107,6 +107,47 @@ function formatProcedure(procedure) {
     }
 }
 
+
+function formatPrescription(prescription) {
+    return {
+        _id: prescription._id,
+        displayId: prescription.displayId,
+        additionalAdvice: prescription.additionalAdvice,
+        branchId: prescription.branchId ? { _id: prescription.branchId._id, name: prescription.branchId.name } : null,
+        buId: prescription.buId ? { _id: prescription.buId._id, name: prescription.buId.name } : null,
+        doctorId: prescription.doctorId ? { _id: prescription.doctorId._id, firstName: prescription.doctorId.firstName, lastName: prescription.doctorId.lastName } : null,
+        caseSheetId: prescription.caseSheetId ? { _id: prescription.caseSheetId._id, displayId: prescription.caseSheetId.displayId } : null,
+        drugArray: prescription.drugArray
+            ? prescription.drugArray.map(prescription => ({
+                _id: prescription._id,
+                drugName: prescription.drugName,
+                drug: prescription.drug,
+                dosage: prescription.dosage,
+                freequency: prescription.freequency,
+                duration: prescription.duration,
+                instruction: prescription.instruction,
+                note: prescription.note,
+                timing: prescription.timing,
+            }))
+            : [],
+        patientId: prescription.patientId ? { _id: prescription.patientId._id, firstName: prescription.patientId.firstName, lastName: prescription.patientId.lastName } : null,
+        isActive: prescription.isActive,
+        createdBy: prescription.createdBy
+            ? { _id: prescription.createdBy._id, firstName: prescription.createdBy.firstName, lastName: prescription.createdBy.lastName }
+            : null,
+        deletedBy: prescription.deletedBy
+            ? { _id: prescription.deletedBy._id, firstName: prescription.deletedBy.firstName, lastName: prescription.deletedBy.lastName }
+            : null,
+        updatedBy: prescription.updatedBy
+            ? { _id: prescription.updatedBy._id, firstName: prescription.updatedBy.firstName, lastName: prescription.updatedBy.lastName }
+            : null,
+        deletedAt: prescription.deletedAt || null,
+        createdAt: prescription.createdAt || null,
+        updatedAt: prescription.updatedAt || null,
+        __v: prescription.__v,
+    }
+}
+
 // services: procedure.services 
 // ? procedure.services.map(service => ({
 //     _id: service._id,
@@ -114,4 +155,4 @@ function formatProcedure(procedure) {
 // }))
 // : [],
 
-module.exports = { formatChair, formatDepartment, formatService, formatProcedure };
+module.exports = { formatChair, formatDepartment, formatService, formatProcedure, formatPrescription };

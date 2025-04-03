@@ -13,10 +13,10 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
 
         //these are user for populating the data
-        const businessUnit = db.model("businessUnit", clinetBusinessUnitSchema);
-        const department = db.model("department", departmentSchema);
-        const branch = db.model("branch", clinetBranchSchema);
-        const user = db.model("clientUsers", clinetUserSchema);
+        const businessUnit = await db.model("businessUnit", clinetBusinessUnitSchema);
+        const department = await db.model("department", departmentSchema);
+        const branch = await db.model("branch", clinetBranchSchema);
+        const user = await db.model("clientUsers", clinetUserSchema);
 
         if (!page || !perPage) {
             const allService = await Service.find({ deletedAt: null })
@@ -60,15 +60,15 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
                 //const escapedSearchKey = searchKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 searchQuery = {
                     $or: words.flatMap(word => {
-                        const num = Number(word);
-                        const isNumber = Number.isFinite(num) && word.trim() !== "";
+                        // const num = Number(word);
+                        // const isNumber = Number.isFinite(num) && word.trim() !== "";
 
-                        console.log("number:", num, "typeof num:", typeof num, "isNumber:", isNumber);
+                        // console.log("number:", num, "typeof num:", typeof num, "isNumber:", isNumber);
 
                         return [
                             { displayId: { $regex: word, $options: "i" } },
                             { serviceName: { $regex: word, $options: "i" } },
-                            ...(isNumber ? [{ price: { $gte: num - 5, $lte: num + 5 } }] : []),
+                            //...(isNumber ? [{ price: { $gte: num - 5, $lte: num + 5 } }] : []),
                         ];
                     }),
                 };

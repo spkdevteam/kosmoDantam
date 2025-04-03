@@ -18,7 +18,7 @@ const clinetPatientSchema = require("../../client/model/patient");
 
 const create = async (data) => {
     try {
-        const { _id, displayId, branchId, buId, patientId, doctorId, caseSheetId, drugArray, additionalAdvice, clientId } = data
+        const { _id, displayId, branchId, buId, patientId, doctorId, caseSheetId, drugArray, additionalAdvice, clientId, id } = data
         if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: clientId, objectId: buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
@@ -36,13 +36,8 @@ const create = async (data) => {
                 data.displayId = await getserialNumber('prescription', clientId, branchId, buId)
             }
             const newData = {
-                ...data
+                ...data, createdBy: id
             }
-
-
-
-
-
             if (!newData.caseSheetId) delete newData.caseSheetId
             const result = await prescription
                 .findOneAndUpdate(
@@ -215,12 +210,12 @@ const readPrescription = async ({ clientId, buId, patientId, keyword, filters, b
 
 }
 
-const deletePrescription = async (clientId, prescriptionId) => {
+const deletePrescription = async (clientId, prescriptionId, id) => {
     try {
         console.log(clientId,'clientId')
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Prescription = await clientConnection.model('prescription', prescriptionSchema);
-        const result = await Prescription.updateOne({ _id: prescriptionId }, { $set: { deletedAt: Date.now() } })
+        const result = await Prescription.updateOne({ _id: prescriptionId }, { $set: { deletedAt: Date.now(), deletedBy: id } });
         if (result.modifiedCount) {
             return { status: true, statusCode: 200, message: 'prescription has deleted ' }
         }

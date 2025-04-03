@@ -3,7 +3,7 @@ const sanitizeBody = require("../../utils/sanitizeBody")
 const { createPrescription } = require("../services/priscription.service")
 
 const create = async (req,res,next) =>  {
-    try {   
+    try {
         const data = await sanitizeBody(req.body)
         const result = await createPrescription(data)
         res.status(result.statusCode|| 200).json(result)

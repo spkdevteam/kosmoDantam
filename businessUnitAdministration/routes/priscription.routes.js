@@ -1,5 +1,8 @@
 const prescriptionController = require('../controller/preScription.controller')
 const express = require('express')
+const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization");
+
+
 const preScriptionRouter = express.Router()
 
 preScriptionRouter

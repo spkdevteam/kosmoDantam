@@ -9,16 +9,17 @@ const { formatProcedure } = require("../../../utils/helperFunctions");
 
 const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, deptId, serviceId, buId, branchId, createdUser, updatedUser, deletedUser, fromDate, toDate, clientId }) => {
     try {
+        console.log(clientId);
         const db = await getClientDatabaseConnection(clientId);
         const Procedure = await db.model('procedure', procedureSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
 
         //these are user for populating the data
-        const businessUnit = db.model("businessUnit", clinetBusinessUnitSchema);
-        const branch = db.model("branch", clinetBranchSchema);
-        const user = db.model("clientUsers", clinetUserSchema);
-        const department = db.model("department", departmentSchema);
-        const service = db.model("service", serviceSchema)
+        const businessUnit = await db.model("businessUnit", clinetBusinessUnitSchema);
+        const branch = await db.model("branch", clinetBranchSchema);
+        const user = await db.model("clientUsers", clinetUserSchema);
+        const department = await db.model("department", departmentSchema);
+        const service = await db.model('services', serviceSchema);
 
         if (!page || !perPage) {
             const allProcedure = await Procedure.find({ deletedAt: null })

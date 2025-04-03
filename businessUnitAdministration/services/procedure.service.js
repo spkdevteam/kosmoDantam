@@ -42,6 +42,7 @@ const createProcedure = async (input) => {
             deletedAt: null,
             isActive: true,
             buId: input?.buId,
+            createdBy: input?.id
         }
         const result = await procedures.updateOne({ displayId: input?.displayId }, { $set: newRecord }, { upsert: true })
         if (result.modifiedCount) return { status: true, message: message.lblProcedureModified, statusCode: 200, ...newRecord }
@@ -64,7 +65,7 @@ const deleteProcedure = async (input) => {
         const isExit = await procedures.findOne({ _id: input?.procedureId, deletedAt: null })
         console.log(isExit, 'isExit')
         if (!isExit || isExit.deletedAt) return { status: false, message: message.lblProcedureNotFound, statusCode: 404 }
-        const result = await procedures.updateOne({ _id: input?.procedureId }, { $set: { deletedAt: new Date() } })
+        const result = await procedures.updateOne({ _id: input?.procedureId }, { $set: { deletedAt: new Date(), deletedBy: input?.id } })
         if (result.modifiedCount) return { status: true, message: message.lblProcedureDeleted, statusCode: 200 }
         else return { status: false, message: message.lblFailed, statusCode: 304 }
     } catch (error) {
@@ -76,13 +77,13 @@ const revokeDeletedProcedure = async (input) => {
         if (!input?.clientId) return { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.procedureId, collectionName: 'procedure' })) return { status: false, message: message.lblProcedureDoesNotExist, statusCode: httpStatusCode.Unauthorized }
-        const db = await getClientDatabaseConnection(input.clientId)
-        const procedures = await db.model('procedure', procedureSchema)
-        const result = await procedures.updateOne({ _id: input?.procedureId }, { $set: { deletedAt: null } })
-        if (result.modifiedCount) return { status: true, message: message.lblProcedureRestored, statusCode: 200 }
-        else return { status: false, message: message.lblFailed, statusCode: 304 }
+        const db = await getClientDatabaseConnection(input.clientId);
+        const procedures = await db.model('procedure', procedureSchema);
+        const result = await procedures.updateOne({ _id: input?.procedureId }, { $set: { deletedAt: null, deletedBy: null } });
+        if (result.modifiedCount) return { status: true, message: message.lblProcedureRestored, statusCode: 200 };
+        else return { status: false, message: message.lblFailed, statusCode: 304 };
     } catch (error) {
-        return { status: false, message: error.message, statusCode: 500 }
+        return { status: false, message: error.message, statusCode: 500 };
     }
 }
 const toggleProcedure = async (input) => {
@@ -96,7 +97,7 @@ const toggleProcedure = async (input) => {
         if (!isExit || isExit.deletedAt) return { status: false, message: message.lblProcedureNotFound, statusCode: 404 }
         const result = await procedures.updateOne(
             { _id: input?.procedureId },
-            { $set: { isActive: !isExit.isActive } }
+            { $set: { isActive: !isExit.isActive, updatedBy: input?.id } }
         )
         console.log(input, result)
         if (result.modifiedCount)
@@ -223,6 +224,7 @@ const editProcedure = async (input) => {
             procedureName: input?.procedureName,
             description: input?.description,
             branchId: input?.branchId,
+            updatedBy: input?.id,
         };
 
         const result = await procedures.updateOne({ _id: input?.procedureId }, { $set: newRecord });
