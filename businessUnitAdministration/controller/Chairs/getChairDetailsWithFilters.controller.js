@@ -2,9 +2,10 @@ const sanitizeBody = require("../../../utils/sanitizeBody");
 const { mongoIdValidation, clientIdValidation, isValidDate } = require("../../../utils/validation");
 const getChairDetailsWithFiltersFn = require("../../services/chair/getChairDetailsWithFiltersFn");
 
-const getChairDetailsWithFilters = async (req, res) => {
+const getChairDetailsWithFilters = async (req, res, next) => {
     try {
         const { page = null, perPage = null, searchKey, businessUnitId, branchId, status, fromDate, toDate, clientId } = await sanitizeBody(req.query);
+
         const validation = [
             clientIdValidation({ clientId })
         ];
@@ -16,18 +17,17 @@ const getChairDetailsWithFilters = async (req, res) => {
         }
 
         const errors = validation.filter((e)=> !e.status);
-        if(errors.length > 0) return res.sttaus(400).json({status: false, message: errors.map((e)=> e.message).join(", ")})
+        if(errors.length > 0) return res.status(400).json({status: false, message: errors.map((e)=> e.message).join(", ")})
 
         if (page && (isNaN(page) || page < 1)) return { status: false, message: "Invalid page number" };
         if (perPage && (isNaN(perPage) || perPage < 1)) return { status: false, message: "Invalid per page number" };
 
         if (fromDate && !isValidDate({ value: fromDate }).status) return { status: false, message: "Invalid from date" };
         if (toDate && !isValidDate({ value: toDate }).status) return { status: false, message: "Invalid to date" };
-        
         const result = await getChairDetailsWithFiltersFn({ page, perPage, searchKey, businessUnitId, branchId, status, fromDate, toDate, clientId });
-        return res.status(200).json({ status: result?.status, message: result?.message, data: result?.data })
+        return res.status(200).json({ status: result?.status, message: result?.message, data: result?.data });
     } catch (error) {
-        return res.status(500).json({ status: false, message: error?.message });
+        next(error);
     }
 }
 

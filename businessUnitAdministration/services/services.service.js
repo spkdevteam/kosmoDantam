@@ -41,9 +41,9 @@ const createService = async (input) => {
             price: input?.price||0.00,
             buId: input?.buId,
             isActive: true,
-            deletedAt: null
+            deletedAt: null,
+            createdBy: input?.id,
         }
-        console.log(newData,'newDatanewData')
         const result = await services.findOneAndUpdate({ displayId: newData.serviceId }, { $set: newData }, { upsert: true,new:true,returnDocument:'after'})
         if (result) return { status: true, statusCode: 201, message: message.lblServiceCreated, ...result._doc }
 
@@ -65,7 +65,7 @@ const deleteService = async (input) => {
         }
         const deletedService = await services.updateOne(
             { _id: input?.serviceId },
-            { $set: { deletedAt: new Date() } }
+            { $set: { deletedAt: new Date(), deletedBy: input?.id } }
         );
 
         if (deletedService.modifiedCount,deletedService) {
@@ -118,13 +118,12 @@ const toggleServiceStatus = async (input) => {
         const services = await db.model('services', serviceSchema);
         const isExist = await services.findOne({ _id: input?.serviceId })
         if (!isExist || isExist.deletedAt) return { status: false, statusCode: 404, message: message.lblServicenotFound }
-        const result = await services.updateOne({ _id: input?.serviceId }, { $set: { isActive: !isExist.isActive } })
+        const result = await services.updateOne({ _id: input?.serviceId }, { $set: { isActive: !isExist.isActive, updatedBy: input?.id } });
         if (result.modifiedCount) return {
             status: true,
             statusCode: 200,
             message: `Service ${isExist?.serviceName} ${isExist.isActive ? 'enabled' : 'disabled'}`
         }
-
     } catch (error) {
         return { status: false, statusCode: 500, message: error.message }
     }
@@ -144,9 +143,6 @@ const editService = async (input) => {
              const isNameExist = await services.findOne({ _id: { $ne: input.serviceId }, serviceName: input?.serviceName,branchId:input?.branchId?._id })
             // if (isNameExist) return { status: false, statusCode: 409, message: message.lblServiceExist }
             
-        
-        
-        
         const newData = {
             branchId:input?.branchId, 
             departmentId: input?.deptId,
@@ -154,7 +150,8 @@ const editService = async (input) => {
             description: input?.description,
             price: input?.price||0.00,
             isActive: true,
-            deletedAt: null
+            deletedAt: null,
+            updatedBy: input?.id,
         }
         const result = await services.updateOne({ _id: input.serviceId }, { $set: newData })
         console.log(newData,result)
@@ -280,7 +277,7 @@ const activeInactive = async (clientId, serviceId, updateData) => {
 
 
 
-const deleteServ = async (clientId, serviceId, softDelete = true) => {
+const deleteServ = async (clientId, serviceId, softDelete = true, id) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Service = clientConnection.model('services', serviceSchema);
@@ -290,6 +287,7 @@ const deleteServ = async (clientId, serviceId, softDelete = true) => {
         }
         if (softDelete) {
             service.deletedAt = new Date();
+            service.deletedBy = id;
             await service.save();
         } else {
             await service.remove();

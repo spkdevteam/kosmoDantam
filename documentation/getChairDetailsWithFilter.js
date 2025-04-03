@@ -1,20 +1,41 @@
 /**
  * @swagger
-    /api/client/bu/chair/getChairDetailsWithFilters:
+ * /api/client/bu/chair/getChairDetailsWithFilters:
  *   get:
  *     summary: Get chair details with filters
- *     description: Fetches details of chairs based on filters such as date range, client, business unit, and user actions.
+ *     description: Fetches details of chairs based on filters such as date range, client, business unit, branch, and status.
  *     tags:
  *       - ChairManagement
  *     parameters:
  *       - in: query
- *         name: from_Date
+ *         name: clientId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Unique identifier for the client.
+ *         example: "6782084da840f3a7bf1a2f72"
+ *       - in: query
+ *         name: businessUnitId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Unique identifier for the business unit.
+ *         example: "67820851a840f3a7bf1a307a"
+ *       - in: query
+ *         name: branchId
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Unique identifier for the branch.
+ *         example: "67820e34a840f3a7bf1a312d"
+ *       - in: query
+ *         name: fromDate
  *         schema:
  *           type: string
  *           format: date
  *         required: false
  *         description: Start date of the filter range.
- *         example: "2025-03-01"
+ *         example: "2025-02-15"
  *       - in: query
  *         name: toDate
  *         schema:
@@ -22,14 +43,21 @@
  *           format: date
  *         required: false
  *         description: End date of the filter range.
- *         example: "2025-03-31"
+ *         example: "2025-02-17"
  *       - in: query
  *         name: searchKey
  *         schema:
  *           type: string
  *         required: false
  *         description: Search keyword for filtering chair details.
- *         example: "Kosmo"
+ *         example: "first"
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Chair status filter.
+ *         example: "Ready"
  *       - in: query
  *         name: page
  *         schema:
@@ -44,27 +72,6 @@
  *         required: false
  *         description: Number of results per page.
  *         example: 10
- *       - in: query
- *         name: clientId
- *         schema:
- *           type: string
- *         required: true
- *         description: Unique identifier for the client.
- *         example: "67e5351aace4e5db084ae486"
- *       - in: query
- *         name: businessUnitId
- *         schema:
- *           type: string
- *         required: true
- *         description: Unique identifier for the business unit.
- *         example: "67e5351aace4e5db084ae486"
- *       - in: query
- *         name: branchId
- *         schema:
- *           type: string
- *         required: false
- *         description: Unique identifier for the branch.
- *         example: "67e57ddcffe39db434e73769"
  *     responses:
  *       200:
  *         description: Chair details retrieved successfully.
@@ -72,38 +79,37 @@
  *           application/json:
  *             example:
  *               status: true
- *               statusCode: 200
  *               message: "Chair details retrieved successfully."
  *               data:
- *                 _id: { "$oid": "67e58c51ffe39db434e7414c" }
- *                 branch:
- *                   _id: "67e57ddcffe39db434e73769"
- *                   name: "Kosmo"
- *                 businessUnit:
- *                   _id: "67e5351aace4e5db084ae486"
- *                   name: "business Unit"
- *                 chairLocation: "DumDum"
- *                 chairNumber: "1"
- *                 isActive: true
- *                 status: "Ready"
- *                 activePatientId: null
- *                 activeAppointmentId: null
- *                 createdBy:
- *                   _id: "67e5351aace4e5db084ae484"
- *                   firstName: "67e5351aace4e5db084ae484"
- *                   lastName: "67e5351aace4e5db084ae484"
- *                 deletedBy:
- *                   _id: "67e5351aace4e5db084ae484"
- *                   firstName: "67e5351aace4e5db084ae484"
- *                   lastName: "67e5351aace4e5db084ae484"
- *                 lastUpdationBy:
- *                   _id: "67e5351aace4e5db084ae484"
- *                   firstName: "67e5351aace4e5db084ae484"
- *                   lastName: "67e5351aace4e5db084ae484"
- *                 deletedAt: null
- *                 createdAt: { "$date": "2025-03-27T17:35:13.812Z" }
- *                 updatedAt: { "$date": "2025-03-28T04:23:34.979Z" }
- *                 __v: 0
+ *                 chairs:
+ *                   - _id: "67b15b76c7a6e7bc20805217"
+ *                     branch:
+ *                       _id: "67820e34a840f3a7bf1a312d"
+ *                       name: "Kosmo Dental Clinic Branch two"
+ *                     businessUnit:
+ *                       _id: "67820851a840f3a7bf1a307a"
+ *                       name: "kasif unit two Business Unit"
+ *                     chairLocation: "first floor"
+ *                     chairNumber: "Chair 4"
+ *                     isActive: true
+ *                     status: "Ready"
+ *                     activePatientId: null
+ *                     activeAppointmentId: null
+ *                     createdBy:
+ *                       _id: "67820851a840f3a7bf1a3077"
+ *                       firstName: "kasif"
+ *                       lastName: "unit two"
+ *                     deletedBy: null
+ *                     updatedBy: null
+ *                     deletedAt: null
+ *                     createdAt: "2025-02-16T03:28:54.227Z"
+ *                     updatedAt: "2025-03-18T16:34:52.425Z"
+ *                     __v: 0
+ *                 pagination:
+ *                   page: 1
+ *                   perPage: 10
+ *                   totalCount: 1
+ *                   totalPages: 1
  *       500:
  *         description: Internal server error.
  *         content:

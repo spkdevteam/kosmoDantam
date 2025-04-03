@@ -10,6 +10,7 @@ const {
     getAllProceduresByPage,
     putToggleProcedureByPage
 } = require('../controller/procedure.controller');
+const getProcedureDetailsWithFilters = require('../controller/procedure/getProcedureDetailsWithFilters.controller');
 
 
 const procedureRouter = express.Router();
@@ -25,4 +26,5 @@ procedureRouter
     .get('/getAllProcedures',getAllProcedures)
     .get('/proceduresByPage',getAllProceduresByPage)
     .get('/procedureUnderService',getProcedureUnderService)
+    .get('/getProcedureDetailsWithFilters',getProcedureDetailsWithFilters)
 module.exports = procedureRouter;

@@ -9,21 +9,23 @@ const { createServices, getReadActiveServicesbyPage,
 const serviceRouter = express.Router()
 
 const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization")
+const getServiceDetailsWithFilters = require('../controller/Services/getServiceDetailsWithFilters.controller')
 
 
 
 serviceRouter
     .post('/createServices', entityAuth.authorizeEntity("Administration", "Services", "create"), createServices)
     .put('/editService', entityAuth.authorizeEntity("Administration", "Services", "update"), editService)
-    .delete('/deleteService', deleteService)
-    .post('/softDeleteService', softDeleteService)
+    .delete('/deleteService', entityAuth.authorizeEntity("Administration", "Services", "delete"), deleteService)
+    .post('/softDeleteService', entityAuth.authorizeEntity("Administration", "Services", "delete"), softDeleteService)
     .get('/getAllActiveServices', readActiveServices)
     .get('/allServicesByPage', entityAuth.authorizeEntity("Administration", "Services", "view"), getReadActiveServicesbyPage)//listServices
     // .patch('/toggleService', entityAuth.authorizeEntity("Administration", "Services", "update"), toggleService)
     .patch('/activeInactiveService', entityAuth.authorizeEntity("Administration", "Services", "update"), activeinactiveService)
-    .put('/toggleServiceByPage', putToggleServiceByPage)
+    .put('/toggleServiceByPage', entityAuth.authorizeEntity("Administration", "Services", "update"), putToggleServiceByPage)
     .get('/serviceUnderDepartment', getServiceUnderDepartment)
     .get('/getServiceById', getServiceDetailsById)
+    .get('/getServiceDetailsWithFilters', getServiceDetailsWithFilters)
 
 
 module.exports = serviceRouter

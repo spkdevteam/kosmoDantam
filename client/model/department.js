@@ -8,8 +8,10 @@ const departmentSchema = mongoose.Schema({
     description:{type:String} ,
     deletedAt:{type:Date,default:null},
     isActive:{type:Boolean,default:true},
-    old_Id: {type: String     },
-    createdBy: { type: mongoose.Schema.ObjectId, ref: "clientUsers", default:null, index: true } 
-})
+    old_Id: {type: String},
+    createdBy: { type: mongoose.Types.ObjectId, ref: "clientUsers", default:null, index: true },
+    updatedBy: { type: mongoose.Types.ObjectId, ref: "clientUsers", default:null, index: true },
+    deletedBy: { type: mongoose.Types.ObjectId, ref: "clientUsers", default:null, index: true } 
+}, { timestamps: true });
 
 module.exports  = departmentSchema

@@ -891,7 +891,6 @@ exports.bookingSummarybyPeriod = async ({ clientId, branchId, fromDate, toDate }
 };
 
 
-
 exports.DatewiseBookingSummaryByPeriod = async ({ clientId, branchId, fromDate, toDate }) => {
     try {
         if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }

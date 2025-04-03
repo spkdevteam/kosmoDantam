@@ -1,43 +1,41 @@
 const clinetBranchSchema = require("../../../client/model/branch");
 const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
-const clinetChairSchema = require("../../../client/model/chair");
+const departmentSchema = require("../../../client/model/department");
 const clinetUserSchema = require("../../../client/model/user");
-
 const { getClientDatabaseConnection } = require("../../../db/connection");
-const { formatChair } = require("../../../utils/helperFunctions");
+const { formatDepartment } = require("../../../utils/helperFunctions");
 
-const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, businessUnitId, branchId, status, fromDate, toDate, clientId }) => {
+const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchKey, fromDate, toDate, buId, branchId, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
         const db = await getClientDatabaseConnection(clientId);
-        const Chair = await db.model("chair", clinetChairSchema);
+        const Department = await db.model("department", departmentSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
 
-        
         //these are user for populating the data
-        const bussinessUnit = db.model("businessUnit", clinetBusinessUnitSchema);
+        const businessUnit = db.model("businessUnit", clinetBusinessUnitSchema);
         const branch = db.model("branch", clinetBranchSchema);
         const user = db.model("clientUsers", clinetUserSchema);
-        
+
         if (!page || !perPage) {
-            const allChairs = await Chair.find({ deletedAt: null })
-                .populate("businessUnit", "_id name")
-                .populate("branch", "_id name")
+            const allDepartments = await Department.find({ deletedAt: null })
+                .populate("buId", "_id name")
+                .populate("branchId", "_id name")
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
                 .lean();
 
-            const formattedChairs = allChairs.map((chair) => formatChair(chair));
+            const formattedDepartments = allDepartments.map((department) => formatDepartment(department));
 
             return {
                 status: true,
-                message: "All chairs retrieved successfully.",
+                message: "All Departments retrieved successfully.",
                 data: {
-                    chairs: formattedChairs,
+                    departments: formattedDepartments,
                     pagination: {
                         page: 1,
-                        perPage: allChairs?.length,
-                        totalCount: allChairs?.length,
+                        perPage: allDepartments?.length,
+                        totalCount: allDepartments?.length,
                         totalPages: 1
                     },
                 },
@@ -59,21 +57,23 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
                 //const escapedSearchKey = searchKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 searchQuery = {
                     $or: words.flatMap(word => [
-                        { chairNumber: { $regex: word, $options: "i" } },
-                        { chairLocation: { $regex: word, $options: "i" } },
-                        { status: { $regex: word, $options: "i" } },
+                        { deptName: { $regex: word, $options: "i" } },
+                        { displayId: { $regex: word, $options: "i" } },
+                        { description: { $regex: word, $options: "i" } },
                     ]),
                 };
             }
         }
 
-        //apply filters only if parameters exist
-        const businessSearchKey = businessUnitId ? { businessUnit: businessUnitId } : {};
-        const branchIdSearchKey = branchId ? { branch: branchId } : {};
-        const statusSearchKey = status ? { status } : {};
+        // Apply filters only if parameters exist
+        const businessSearchKey = buId ? { buId: buId } : {};
+        const branchIdSearchKey = branchId ? { branchId } : {};
+        const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
+        const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
+        const deletedUserSearchKey  = deletedUser ? { deletedBy: deletedUser } : {};
 
 
-        //apply date filters
+        // Apply date filters
         let dateSearchKey = {};
         if (fromDate || toDate) {
             dateSearchKey = { createdAt: {} };
@@ -82,41 +82,45 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
         }
 
 
-        //query the database
-        let query = Chair.find({
+        // Query the database
+        let query = Department.find({
             ...searchQuery,
             ...businessSearchKey,
-            ...statusSearchKey,
             ...branchIdSearchKey,
             ...dateSearchKey,
+            ...createdUserSearchKey,
+            ...updatedUserSearchKey,
+            ...deletedUserSearchKey,
             deletedAt: null,
         })
-            .populate("businessUnit", "_id name")
-            .populate("branch", "_id name")
+            .populate("buId", "_id name")
+            .populate("branchId", "_id name")
             .populate("createdBy", "_id firstName lastName")
             .populate("deletedBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")
             .lean();
 
-        //apply pagination only if page & perPage are provided
+        // Apply pagination only if page & perPage are provided
         page = Number(page) || 1;
         perPage = Number(perPage) || 10;
 
         const skip = (page - 1) * perPage;
 
         // Fetch data
-        const chairs = await query.skip(skip).limit(perPage);
+        const departments = await query.skip(skip).limit(perPage);
 
 
-        const formattedChairs = chairs.map((chair) => formatChair(chair));
+        const formattedDepartments = departments.map((department) => formatDepartment(department));
 
         // Get total count properly
-        const totalCount = await Chair.countDocuments({
+        const totalCount = await Department.countDocuments({
             ...searchQuery,
             ...businessSearchKey,
-            ...statusSearchKey,
             ...branchIdSearchKey,
             ...dateSearchKey,
+            ...createdUserSearchKey,
+            ...updatedUserSearchKey,
+            ...deletedUserSearchKey,
             deletedAt: null,
         });
 
@@ -125,9 +129,9 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
 
         return {
             status: true,
-            message: totalCount < 1 ? "No Chairs found" : "Chair details retrieved successfully.",
+            message: totalCount < 1 ? "No departments found" : "Department details retrieved successfully.",
             data: {
-                chairs: formattedChairs,
+                departments: formattedDepartments,
                 pagination: {
                     page,
                     perPage,
@@ -143,5 +147,4 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
     }
 }
 
-
-module.exports = getChairDetailsWithFiltersFn;
+module.exports = getDepartmentWithFiltersFn;

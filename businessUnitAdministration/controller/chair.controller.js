@@ -285,6 +285,7 @@ exports.listChair = async (req, res, next) => {
 
 exports.activeinactiveChairByBusinessUnit = async (req, res, next) => {
     try {
+        const mainUser = req.user;
         const { status, chairId, clientId } = req.body;
 
         // Validate inputs
@@ -296,6 +297,7 @@ exports.activeinactiveChairByBusinessUnit = async (req, res, next) => {
 
         const updatedChair = await chairService.activeInactiveChair(clientId, chairId, {
             isActive: status === "1",
+            updatedBy: mainUser?._id,
         });
 
         // Optionally, you can return the updated chair details if needed
@@ -312,7 +314,6 @@ exports.activeinactiveChairByBusinessUnit = async (req, res, next) => {
 exports.softDeleteChairByBusinesssUnit = async (req, res, next) => {
 
     try {
-
         const { keyword, page, perPage, chairId, clientId, isAdmin = true, branchId } = req.body;
 
         req.query.keyword = keyword;

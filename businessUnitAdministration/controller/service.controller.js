@@ -10,11 +10,12 @@ const getserialNumber = require("../../model/services/getserialNumber");
 
 exports.createServices = async (req, res, next) => {
     try {
+        const mainUser = req.user;
         const data = await sanitizeBody(req.body)
-        const result = await createService(data)
+        const result = await createService({...data, id: mainUser?._id})
         res.status(result?.statusCode).json(result)
     } catch (error) {
-        next(error)
+        next(error);
     }
 }
 
@@ -125,8 +126,9 @@ exports.update = async (req, res, next) => {
 
 exports.editService = async (req, res, next) => {
     try {
+        const mainUser = req.user;
         const data = await sanitizeBody(req.body)
-        const result = await editService(data)
+        const result = await editService({...data, id: mainUser?._id});
         res.status(result?.statusCode || 200).json(result)
     } catch (error) {
         next(error)
@@ -135,9 +137,9 @@ exports.editService = async (req, res, next) => {
 
 exports.deleteService = async (req, res, next) => {
     try {
-        console.log(req.query)
+        const mainUser = req.user;
         const data = await sanitizeBody(req.query)
-        const result = await deleteService(data)
+        const result = await deleteService({...data, id: mainUser?._id});
         res.status(result?.statusCode).json(result)
     } catch (error) {
         next(error)
@@ -219,6 +221,7 @@ exports.listServices = async (req, res, next) => {
 
 exports.activeinactiveService = async (req, res, next) => {
     try {
+        const mainUser = req.user;
         const { status, serviceId, clientId } = req.body;
         if (!clientId || !serviceId) {
             return res.status(400).send({
@@ -227,6 +230,7 @@ exports.activeinactiveService = async (req, res, next) => {
         }
         const updated = await activeInactive(clientId, serviceId, {
             isActive: status === "1",
+            updatedBy: mainUser?._id
         });
         return res.status(httpStatusCode.OK).send({
             message: message.lblServiceModified,
@@ -240,7 +244,7 @@ exports.activeinactiveService = async (req, res, next) => {
 exports.softDeleteService = async (req, res, next) => {
 
     try {
-
+        const mainUser = req.user;
         const { keyword, page, perPage, serviceId, clientId,branchId } = req.body;
 
         req.query.keyword = keyword;
@@ -256,7 +260,7 @@ exports.softDeleteService = async (req, res, next) => {
             });
         }
 
-        await deleteServ(clientId, serviceId, softDelete = true)
+        await deleteServ(clientId, serviceId, softDelete = true, mainUser?._id);
 
          
          
@@ -286,8 +290,9 @@ exports.softDeleteService = async (req, res, next) => {
 
 exports.putToggleServiceByPage = async (req, res, next) => {
     try {
+        const mainUser = req.user;
         const data = await sanitizeBody(req.body)
-        const toggle = await toggleServiceStatus(data)
+        const toggle = await toggleServiceStatus({...data, id: mainUser?._id});
         const result = await readActiveServicesbyPage(data)
         result.message = toggle.message
         res.status(toggle?.statusCode).json(result)

@@ -26,7 +26,7 @@ const createDepartment = async (input) => {
         const department = await db.model('department', departmentSchema)
         // If deptId doesn't exist, generate a new one or check if the department already exists
         if (!input?.deptId) {
-            const result = await department.findOne({ deptName: input.deptName, deletedAt: null ,branchId:input?.branchId })
+            const result = await department.findOne({ deptName: input.deptName, deletedAt: null, branchId:input?.branchId })
             if (result) {
                 return {
                     status: false,
@@ -44,8 +44,9 @@ const createDepartment = async (input) => {
             displayId: input.deptId,
             buId: input?.buId,
             isActive: true,
+            createdBy: input?.id
         }
-        console.log(newData, 'iput')
+        console.log(newData, 'input')
 
 
         const result = await department.findOneAndUpdate(
@@ -87,9 +88,9 @@ const deleteDepartment = async (input) => {
         const db = await getClientDatabaseConnection(input?.clientId)
         const department = await db.model('department', departmentSchema)
 
-        const result = await department.findOneAndUpdate({ _id: input.deptId }, { $set: { deletedAt: new Date() } }, { new: true, returnDocument: 'after' })
-        if (result) return { status: true, message: message.lblDepartmentDeleted }
-        else return { status: false, message: message.lbldepartmentNotFound, statusCode: 303 }
+        const result = await department.findOneAndUpdate({ _id: input.deptId }, { $set: { deletedAt: new Date(), deletedBy: input?.id } }, { new: true, returnDocument: 'after' });
+        if (result) return { status: true, message: message.lblDepartmentDeleted };
+        else return { status: false, message: message.lbldepartmentNotFound, statusCode: 303 };
     } catch (error) {
         return { status: false, message: error.message, statusCode: 500 }
     }
@@ -102,7 +103,7 @@ const revokeDeleteDepartment = async (input) => {
 
         const db = await getClientDatabaseConnection(input?.clientId)
         const department = await db.model('department', departmentSchema)
-        const result = await department.updateOne({ _id: input.deptId }, { $set: { deletedAt: null } })
+        const result = await department.updateOne({ _id: input.deptId }, { $set: { deletedAt: null, deletedBy: null } });
         if (result.modifiedCount) return { status: true, message: message.lblDepartmentRestored }
         else return { status: false, message: message.lblNoChanges, statusCode: 303 }
     } catch (error) {
@@ -147,6 +148,7 @@ const editDepartment = async (input) => {
             description: input.description,
             deletedAt: null,
             isActive: true,
+            updatedBy: input?.id,
         }
         const result = await department.findOneAndUpdate({ _id: input.deptId }, { $set: newData }, { new: true, returnDocument: 'after' })
         return { status: true, message: message.lblDpartmentModified, ...result?._doc, statusCode: 200 }
@@ -158,7 +160,6 @@ const editDepartment = async (input) => {
 
 const toggleDepartment = async (input) => {
     try {
-        
         if (!input?.clientId) return { status: false, message: message.lblClinetIdIsRequired, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.deptId, collectionName: 'department' })) return { status: false, message: message.lbldepartmentNotFound, statusCode: httpStatusCode.Unauthorized }
@@ -166,7 +167,7 @@ const toggleDepartment = async (input) => {
         const departments = await db.model('department', departmentSchema)
         const isExist = await departments.findOne({ _id: input?.deptId })
         if (!isExist || isExist.deletedAt) return { status: false, message: message.lbldepartmentNotFound, statusCode: 400 }
-        const result = await departments.updateOne({ _id: input?.deptId }, { $set: { isActive: !isExist?.isActive } })
+        const result = await departments.updateOne({ _id: input?.deptId }, { $set: { isActive: !isExist?.isActive, updatedBy: input?.id } });
         if (result.modifiedCount) return { statusCode: 200, status: true, message: `Department ${isExist?.deptName} has ${isExist?.isActive ? 'disabled' : 'enabled'} ` }
     } catch (error) {
         return { statusCode: 200, status: true, message: error.message }
@@ -194,7 +195,6 @@ const allDepartmentsByPage = async (input) => {
                 ...(input?.branchId ? {branchId:input?.branchId}:{})
             })
             .populate('branchId','name')
-             
             .skip((input?.page - 1) * input?.perPage)
             .limit(input?.page * input?.perPage)
             .sort({_id:-1});
@@ -258,7 +258,7 @@ const activeInactive = async (clientId, departmentId, updateData) => {
 
 
 
-const deleteDept = async (clientId, chairId, softDelete = true) => {
+const deleteDept = async (clientId, chairId, softDelete = true, id) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Department = clientConnection.model('department', departmentSchema);
@@ -270,6 +270,7 @@ const deleteDept = async (clientId, chairId, softDelete = true) => {
 
         if (softDelete) {
             department.deletedAt = new Date();
+            department.deletedBy = id;
             await department.save();
         } else {
             await department.remove();

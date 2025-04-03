@@ -13,7 +13,7 @@ const clinetChairSchema = new Schema(
         chairNumber:  { type: String, index: true },
 
         isActive: { type: Boolean, default: false },
-        status: {type:String, default:'Ready'},
+        status: { type: String, default:'Ready'},
         activePatientId: {type:ObjectId,ref: "patient", default:null, index: true},
         activeAppointmentId: {type:ObjectId,ref: "appointments", default:null, index: true},
        
