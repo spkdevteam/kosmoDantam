@@ -19,7 +19,7 @@ const clinetPatientSchema = new Schema(
             type: String,
             lowercase: true,
             trim: true,
-           
+
         },
         phone: {
             type: String,
@@ -96,6 +96,11 @@ const clinetPatientSchema = new Schema(
         // handlign created by
         createdBy: { type: ObjectId, ref: "clientUsers", index: true },
         deletedAt: { type: Date, default: null, index: true },
+
+        isActive: { type: Boolean, default: false },
+
+        updatedBy: { type: mongoose.Types.ObjectId, ref: "clientUsers", default: null, index: true },
+        deletedBy: { type: mongoose.Types.ObjectId, ref: "clientUsers", default: null, index: true }
     },
     { timestamps: true }
 );

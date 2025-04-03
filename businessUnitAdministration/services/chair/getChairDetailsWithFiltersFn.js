@@ -1,27 +1,33 @@
+const appointmentSchema = require("../../../client/model/appointments");
 const clinetBranchSchema = require("../../../client/model/branch");
 const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
 const clinetChairSchema = require("../../../client/model/chair");
+const clinetPatientSchema = require("../../../client/model/patient");
 const clinetUserSchema = require("../../../client/model/user");
 
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatChair } = require("../../../utils/helperFunctions");
 
-const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, businessUnitId, branchId, status, fromDate, toDate, clientId }) => {
+const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, businessUnitId, branchId, status, fromDate, toDate, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
         const db = await getClientDatabaseConnection(clientId);
         const Chair = await db.model("chair", clinetChairSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
 
-        
+
         //these are user for populating the data
         const bussinessUnit = await db.model("businessUnit", clinetBusinessUnitSchema);
         const branch = await db.model("branch", clinetBranchSchema);
         const user = await db.model("clientUsers", clinetUserSchema);
-        
+        const appoinments = await db.model("appointments", appointmentSchema);
+        const patient = db.model('patient', clinetPatientSchema);
+
         if (!page || !perPage) {
             const allChairs = await Chair.find({ deletedAt: null })
                 .populate("businessUnit", "_id name")
                 .populate("branch", "_id name")
+                .populate("activePatientId", "_id firstName lastName")
+                .populate("activeAppointmentId", "_id displayId")
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
@@ -71,6 +77,9 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
         const businessSearchKey = businessUnitId ? { businessUnit: businessUnitId } : {};
         const branchIdSearchKey = branchId ? { branch: branchId } : {};
         const statusSearchKey = status ? { status } : {};
+        const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
+        const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
+        const deletedUserSearchKey = deletedUser ? { deletedBy: deletedUser } : {};
 
 
         //apply date filters
@@ -89,13 +98,18 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
             ...statusSearchKey,
             ...branchIdSearchKey,
             ...dateSearchKey,
+            ...createdUserSearchKey,
+            ...updatedUserSearchKey,
+            ...deletedUserSearchKey,
             deletedAt: null,
         })
             .populate("businessUnit", "_id name")
             .populate("branch", "_id name")
+            .populate("activePatientId", "_id firstName lastName")
+            .populate("activeAppointmentId", "_id displayId")
             .populate("createdBy", "_id firstName lastName")
-            .populate("deletedBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")
+            .populate("deletedBy", "_id firstName lastName")
             .lean();
 
         //apply pagination only if page & perPage are provided
@@ -117,6 +131,9 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
             ...statusSearchKey,
             ...branchIdSearchKey,
             ...dateSearchKey,
+            ...createdUserSearchKey,
+            ...updatedUserSearchKey,
+            ...deletedUserSearchKey,
             deletedAt: null,
         });
 
