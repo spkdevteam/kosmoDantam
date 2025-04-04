@@ -32,7 +32,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
                 message: "All Departments retrieved successfully.",
                 data: {
                     departments: formattedDepartments,
-                    pagination: {
+                    metadata: {
                         page: 1,
                         perPage: allDepartments?.length,
                         totalCount: allDepartments?.length,
@@ -132,7 +132,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
             message: totalCount < 1 ? "No departments found" : "Department details retrieved successfully.",
             data: {
                 departments: formattedDepartments,
-                pagination: {
+                metadata: {
                     page,
                     perPage,
                     totalCount,

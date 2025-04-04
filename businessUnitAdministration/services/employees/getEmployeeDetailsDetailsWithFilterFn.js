@@ -1,48 +1,43 @@
 const clinetBranchSchema = require("../../../client/model/branch");
 const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
-const departmentSchema = require("../../../client/model/department");
-const procedureSchema = require("../../../client/model/procedure");
-const serviceSchema = require("../../../client/model/service");
+const clientRoleSchema = require("../../../client/model/role");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
-const { formatProcedure } = require("../../../utils/helperFunctions");
+const { formatEmployee } = require("../../../utils/helperFunctions");
 
-const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, deptId, serviceId, buId, branchId, createdUser, updatedUser, deletedUser, fromDate, toDate, clientId }) => {
+const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, searchKey = "", fromDate, toDate, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
-        console.log(clientId);
         const db = await getClientDatabaseConnection(clientId);
-        const Procedure = await db.model('procedure', procedureSchema);
+        const Employee = await db.model("clientUsers", clinetUserSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
 
         //these are user for populating the data
-        const businessUnit = await db.model("businessUnit", clinetBusinessUnitSchema);
-        const branch = await db.model("branch", clinetBranchSchema);
+        const BusinessUnit = await db.model("businessUnit", clinetBusinessUnitSchema);
+        const Branch = await db.model("branch", clinetBranchSchema);
         const user = await db.model("clientUsers", clinetUserSchema);
-        const department = await db.model("department", departmentSchema);
-        const service = await db.model('services', serviceSchema);
+        const role = await db.model("clientRoles", clientRoleSchema);
 
         if (!page || !perPage) {
-            const allProcedure = await Procedure.find({ deletedAt: null })
-                .populate("buId", "_id name")
-                .populate("branchId", "_id name")
-                .populate("services", "_id serviceName")
-                .populate("deptId", "_id deptName")
+            const allEmployees = await Employee.find({ deletedAt: null })
+                .populate("businessUnit", "_id name")
+                .populate("branch", "_id name")
+                .populate("role", "_id name")
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
                 .lean();
 
-            const formattedProcedure = allProcedure.map((procedure) => formatProcedure(procedure));
+            const formattedEmployees = allEmployees.map((employee) => formatEmployee(employee));
 
             return {
                 status: true,
-                message: "All Procedures retrieved successfully.",
+                message: "All Departments retrieved successfully.",
                 data: {
-                    procedures: formattedProcedure,
+                    employees: formattedEmployees,
                     metadata: {
                         page: 1,
-                        perPage: allProcedure?.length,
-                        totalCount: allProcedure?.length,
+                        perPage: allEmployees?.length,
+                        totalCount: allEmployees?.length,
                         totalPages: 1
                     },
                 },
@@ -59,23 +54,33 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
             if (searchKey.trim()) {
                 const words = searchKey.trim().split(/\s+/)
                     .map(word =>
-                        word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').trim()
+                        word.replace(/[*+?^${}()|[\]\\]/g, '\\$&').trim()
                     );
                 //const escapedSearchKey = searchKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 searchQuery = {
                     $or: words.flatMap(word => [
-                        { procedureName: { $regex: word, $options: "i" } },
+                        { firstName: { $regex: word, $options: "i" } },
+                        { lastName: { $regex: word, $options: "i" } },
+                        { email: { $regex: word, $options: "i" } },
+                        { phone: { $regex: word, $options: "i" } },
+                        { gender: { $regex: word, $options: "i" } },
+                        { bloodGroup: { $regex: word, $options: "i" } },
+                        { panNumber: { $regex: word, $options: "i" } },
+                        { adharNumber: { $regex: word, $options: "i" } },
+                        { city: { $regex: word, $options: "i" } },
+                        { state: { $regex: word, $options: "i" } },
+                        { country: { $regex: word, $options: "i" } },
+                        { ZipCode: { $regex: word, $options: "i" } },
                         { displayId: { $regex: word, $options: "i" } },
+                        { description: { $regex: word, $options: "i" } },
                     ]),
                 };
-            };
-        };
+            }
+        }
 
         // Apply filters only if parameters exist
-        const businessSearchKey = buId ? { buId: buId } : {};
-        const branchIdSearchKey = branchId ? { branchId } : {};
-        const departmentSearchkey = deptId ? { deptId } : {};
-        const serviceSearchKey = serviceId ? { services: serviceId } : {};
+        const businessSearchKey = businessUnit ? { businessUnit } : {};
+        const branchIdSearchKey = branch ? { branch } : {};
         const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
         const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
         const deletedUserSearchKey = deletedUser ? { deletedBy: deletedUser } : {};
@@ -91,26 +96,23 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
 
 
         // Query the database
-        let query = Procedure.find({
+        let query = Employee.find({
             ...searchQuery,
             ...businessSearchKey,
             ...branchIdSearchKey,
-            ...departmentSearchkey,
-            ...serviceSearchKey,
+            ...dateSearchKey,
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,
             deletedAt: null,
         })
-        .populate("buId", "_id name")
-        .populate("branchId", "_id name")
-        .populate("services", "_id serviceName")
-        .populate("deptId", "_id deptName")
-        .populate("createdBy", "_id firstName lastName")
-        .populate("updatedBy", "_id firstName lastName")
-        .populate("deletedBy", "_id firstName lastName")
-        .lean();
-
+            .populate("businessUnit", "_id name")
+            .populate("branch", "_id name")
+            .populate("role", "_id name")
+            .populate("createdBy", "_id firstName lastName")
+            .populate("updatedBy", "_id firstName lastName")
+            .populate("deletedBy", "_id firstName lastName")
+            .lean();
 
         // Apply pagination only if page & perPage are provided
         page = Number(page) || 1;
@@ -119,18 +121,17 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
         const skip = (page - 1) * perPage;
 
         // Fetch data
-        const procedures = await query.skip(skip).limit(perPage);
+        const employees = await query.skip(skip).limit(perPage);
 
 
-        const formattedProcedures = procedures.map((procedures) => formatProcedure(procedures));
+        const formattedEmployees = employees.map((employee) => formatEmployee(employee));
 
         // Get total count properly
-        const totalCount = await Procedure.countDocuments({
+        const totalCount = await Employee.countDocuments({
             ...searchQuery,
             ...businessSearchKey,
             ...branchIdSearchKey,
-            ...departmentSearchkey,
-            ...serviceSearchKey,
+            ...dateSearchKey,
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,
@@ -142,9 +143,9 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
 
         return {
             status: true,
-            message: totalCount < 1 ? "No Procedures found" : "Procedure details retrieved successfully.",
+            message: totalCount < 1 ? "No employees found" : "Employee details retrieved successfully.",
             data: {
-                procedures: formattedProcedures,
+                employees: formattedEmployees,
                 metadata: {
                     page,
                     perPage,
@@ -154,10 +155,10 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
             },
         };
         //return { status: true, data: result };
+
     } catch (error) {
-        console.log(error?.message)
-        return { status: false, message: error?.message }
+        return { status: false, message: error.message };
     }
 }
 
-module.exports = getProcedureDetailsWithFiltersFn;
+module.exports = getEmployeeDetailsDetailsWithFilterFn;

@@ -143,7 +143,7 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
 
         return {
             status: true,
-            message: totalCount < 1 ? "No departments found" : "Department details retrieved successfully.",
+            message: totalCount < 1 ? "No Services found" : "Service details retrieved successfully.",
             data: {
                 services: formattedServices,
                 pagination: {

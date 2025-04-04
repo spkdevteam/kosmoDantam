@@ -40,7 +40,7 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
                 message: "All chairs retrieved successfully.",
                 data: {
                     chairs: formattedChairs,
-                    pagination: {
+                    metadata: {
                         page: 1,
                         perPage: allChairs?.length,
                         totalCount: allChairs?.length,
@@ -145,7 +145,7 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
             message: totalCount < 1 ? "No Chairs found" : "Chair details retrieved successfully.",
             data: {
                 chairs: formattedChairs,
-                pagination: {
+                metadata: {
                     page,
                     perPage,
                     totalCount,

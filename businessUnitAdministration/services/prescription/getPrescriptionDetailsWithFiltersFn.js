@@ -38,7 +38,7 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
                 message: "All Prescriptions retrieved successfully.",
                 data: {
                     prescriptions: formattedPrescription,
-                    pagination: {
+                    metadata: {
                         page: 1,
                         perPage: allPrescription?.length,
                         totalCount: allPrescription?.length,
@@ -166,7 +166,7 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
             message: totalCount < 1 ? "No Prescriptions found" : "Precription details retrieved successfully.",
             data: {
                 prescriptions: formattedPrescriptions,
-                pagination: {
+                metadata: {
                     page,
                     perPage,
                     totalCount,
