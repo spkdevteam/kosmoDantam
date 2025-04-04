@@ -5,7 +5,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatDepartment } = require("../../../utils/helperFunctions");
 
-const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchKey, fromDate, toDate, buId, branchId, createdUser, updatedUser, deletedUser, clientId }) => {
+const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchKey, fromDate, toDate, buId, branchId, createdUser, updatedUser, deletedUser, clientId, status }) => {
     try {
         const db = await getClientDatabaseConnection(clientId);
         const Department = await db.model("department", departmentSchema);
@@ -71,7 +71,11 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
         const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
         const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
         const deletedUserSearchKey  = deletedUser ? { deletedBy: deletedUser } : {};
-
+        const statusBool = status.toLowerCase() === "true" ? true : status.toLowerCase() === "false" ? false : null;
+        let statusSearchKey = {};
+        if(statusBool !== null){
+            statusSearchKey = {isActive : statusBool}
+        }
 
         // Apply date filters
         let dateSearchKey = {};
@@ -91,6 +95,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,
+            ...statusSearchKey,
             deletedAt: null,
         })
             .populate("buId", "_id name")
@@ -121,6 +126,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,
+            ...statusSearchKey,
             deletedAt: null,
         });
 

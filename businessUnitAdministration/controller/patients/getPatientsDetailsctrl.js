@@ -8,7 +8,7 @@ const getPatientsDetailsctrl = async (req, res) => {
     try {
         const data = await sanitizeBody(req?.query);
         console.log("inputData==>>>", data);
-        const { from_Date, toDate, clientId, branchId, businessUnitId, mainPatientLinkedId, createdUser, updatedUser } = data;
+        const { from_Date, toDate, clientId, branchId, businessUnitId, mainPatientLinkedId, createdUser, updatedUser, status } = data;
         //from_Date, toDate,SearchKey, page, perPage, clientId,branchId, businessUnitId, mainPatientLinkedId, createdById
         const validation = [
             clientIdValidation({ clientId }),
@@ -46,9 +46,9 @@ const getPatientsDetailsctrl = async (req, res) => {
         const { page, perPage, SearchKey } = cleanQuery;
         const result = await getPatientsDetailsFn({
             from_Date, toDate, SearchKey, page, perPage,
-            clientId, branchId, businessUnitId, mainPatientLinkedId, createdById : createdUser, updatedById : updatedUser
+            clientId, branchId, businessUnitId, mainPatientLinkedId, createdById : createdUser, updatedById : updatedUser, status
         });
-        console.log("result=>>>>", result)
+        // console.log("result=>>>>", result)
         if (!result?.status) return res.status(httpStatusCode.InternalServerError).send({
             message: result?.message, status : result?.status
         });
