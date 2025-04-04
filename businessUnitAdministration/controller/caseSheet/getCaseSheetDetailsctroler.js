@@ -8,7 +8,7 @@ const getCaseSheetDetailsctrl = async (req, res) => {
     try {
         const data = await sanitizeBody(req?.query);
         console.log("inputData==>>>", data);
-        const { from_Date, toDate, clientId, patientId, branchId, buId, createdBy, compId,
+        const { from_Date, toDate, clientId, patientId, branchId, buId, compId,
             clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId, updatedUser, createdUser } = data
         //from_Date, toDate,SearchKey, page, perPage, clientId, patientId, branchId, buId, createdBy, compId, clinicalFindingsFindId,
         //diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId
@@ -30,9 +30,6 @@ const getCaseSheetDetailsctrl = async (req, res) => {
         }
         if (buId) {
             validation.push(mongoIdValidation({ _id: buId, name: "buId" }));
-        }
-        if (createdBy) {
-            validation.push(mongoIdValidation({ _id: createdBy, name: "createdBy" }));
         }
         if (compId) {
             validation.push(mongoIdValidation({ _id: compId, name: "compId" }));
