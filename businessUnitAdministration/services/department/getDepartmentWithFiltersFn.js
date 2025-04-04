@@ -16,31 +16,31 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
         const branch = await db.model("branch", clinetBranchSchema);
         const user = await db.model("clientUsers", clinetUserSchema);
 
-        if (!page || !perPage) {
-            const allDepartments = await Department.find({ deletedAt: null })
-                .populate("buId", "_id name")
-                .populate("branchId", "_id name")
-                .populate("createdBy", "_id firstName lastName")
-                .populate("updatedBy", "_id firstName lastName")
-                .populate("deletedBy", "_id firstName lastName")
-                .lean();
+        // if (!page || !perPage) {
+        //     const allDepartments = await Department.find({ deletedAt: null })
+        //         .populate("buId", "_id name")
+        //         .populate("branchId", "_id name")
+        //         .populate("createdBy", "_id firstName lastName")
+        //         .populate("updatedBy", "_id firstName lastName")
+        //         .populate("deletedBy", "_id firstName lastName")
+        //         .lean();
 
-            const formattedDepartments = allDepartments.map((department) => formatDepartment(department));
+        //     const formattedDepartments = allDepartments.map((department) => formatDepartment(department));
 
-            return {
-                status: true,
-                message: "All Departments retrieved successfully.",
-                data: {
-                    departments: formattedDepartments,
-                    metadata: {
-                        page: 1,
-                        perPage: allDepartments?.length,
-                        totalCount: allDepartments?.length,
-                        totalPages: 1
-                    },
-                },
-            };
-        };
+        //     return {
+        //         status: true,
+        //         message: "All Departments retrieved successfully.",
+        //         data: {
+        //             departments: formattedDepartments,
+        //             metadata: {
+        //                 page: 1,
+        //                 perPage: allDepartments?.length,
+        //                 totalCount: allDepartments?.length,
+        //                 totalPages: 1
+        //             },
+        //         },
+        //     };
+        // };
 
         //.map((chair) => formatChair(chair))
 
@@ -70,7 +70,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
         const branchIdSearchKey = branchId ? { branchId } : {};
         const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
         const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
-        const deletedUserSearchKey  = deletedUser ? { deletedBy: deletedUser } : {};
+        const deletedUserSearchKey = deletedUser ? { deletedBy: deletedUser } : {};
 
 
         // Apply date filters
@@ -80,6 +80,43 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
             if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
             if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
         }
+
+
+
+        if (!page || !perPage) {
+            const allDepartments = await Department.find({
+                ...searchQuery,
+                ...businessSearchKey,
+                ...branchIdSearchKey,
+                ...dateSearchKey,
+                ...createdUserSearchKey,
+                ...updatedUserSearchKey,
+                ...deletedUserSearchKey,
+                deletedAt: null,
+            })
+                .populate("buId", "_id name")
+                .populate("branchId", "_id name")
+                .populate("createdBy", "_id firstName lastName")
+                .populate("updatedBy", "_id firstName lastName")
+                .populate("deletedBy", "_id firstName lastName")
+                .lean();
+
+            const formattedDepartments = allDepartments.map((department) => formatDepartment(department));
+
+            return {
+                status: true,
+                message: "All Departments retrieved successfully.",
+                data: {
+                    departments: formattedDepartments,
+                    metadata: {
+                        page: 1,
+                        perPage: allDepartments?.length,
+                        totalCount: allDepartments?.length,
+                        totalPages: 1
+                    },
+                },
+            };
+        };
 
 
         // Query the database

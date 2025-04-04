@@ -52,6 +52,13 @@
  *         description: End date for filtering employees.
  *         example: ""
  *       - in: query
+ *         name: role
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: ID of the user who created the employee record.
+ *         example: ""
+ *       - in: query
  *         name: createdUser
  *         schema:
  *           type: string

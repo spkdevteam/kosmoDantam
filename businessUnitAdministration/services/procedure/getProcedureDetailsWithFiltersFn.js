@@ -21,33 +21,33 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
         const department = await db.model("department", departmentSchema);
         const service = await db.model('services', serviceSchema);
 
-        if (!page || !perPage) {
-            const allProcedure = await Procedure.find({ deletedAt: null })
-                .populate("buId", "_id name")
-                .populate("branchId", "_id name")
-                .populate("services", "_id serviceName")
-                .populate("deptId", "_id deptName")
-                .populate("createdBy", "_id firstName lastName")
-                .populate("updatedBy", "_id firstName lastName")
-                .populate("deletedBy", "_id firstName lastName")
-                .lean();
+        // if (!page || !perPage) {
+        //     const allProcedure = await Procedure.find({ deletedAt: null })
+        //         .populate("buId", "_id name")
+        //         .populate("branchId", "_id name")
+        //         .populate("services", "_id serviceName")
+        //         .populate("deptId", "_id deptName")
+        //         .populate("createdBy", "_id firstName lastName")
+        //         .populate("updatedBy", "_id firstName lastName")
+        //         .populate("deletedBy", "_id firstName lastName")
+        //         .lean();
 
-            const formattedProcedure = allProcedure.map((procedure) => formatProcedure(procedure));
+        //     const formattedProcedure = allProcedure.map((procedure) => formatProcedure(procedure));
 
-            return {
-                status: true,
-                message: "All Procedures retrieved successfully.",
-                data: {
-                    procedures: formattedProcedure,
-                    metadata: {
-                        page: 1,
-                        perPage: allProcedure?.length,
-                        totalCount: allProcedure?.length,
-                        totalPages: 1
-                    },
-                },
-            };
-        };
+        //     return {
+        //         status: true,
+        //         message: "All Procedures retrieved successfully.",
+        //         data: {
+        //             procedures: formattedProcedure,
+        //             metadata: {
+        //                 page: 1,
+        //                 perPage: allProcedure?.length,
+        //                 totalCount: allProcedure?.length,
+        //                 totalPages: 1
+        //             },
+        //         },
+        //     };
+        // };
 
         //.map((chair) => formatChair(chair))
 
@@ -90,6 +90,47 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
         }
 
 
+
+
+        if (!page || !perPage) {
+            const allProcedure = await Procedure.find({
+                ...searchQuery,
+                ...businessSearchKey,
+                ...branchIdSearchKey,
+                ...departmentSearchkey,
+                ...serviceSearchKey,
+                ...createdUserSearchKey,
+                ...updatedUserSearchKey,
+                ...deletedUserSearchKey,
+                deletedAt: null,
+            })
+                .populate("buId", "_id name")
+                .populate("branchId", "_id name")
+                .populate("services", "_id serviceName")
+                .populate("deptId", "_id deptName")
+                .populate("createdBy", "_id firstName lastName")
+                .populate("updatedBy", "_id firstName lastName")
+                .populate("deletedBy", "_id firstName lastName")
+                .lean();
+
+            const formattedProcedure = allProcedure.map((procedure) => formatProcedure(procedure));
+
+            return {
+                status: true,
+                message: "All Procedures retrieved successfully.",
+                data: {
+                    procedures: formattedProcedure,
+                    metadata: {
+                        page: 1,
+                        perPage: allProcedure?.length,
+                        totalCount: allProcedure?.length,
+                        totalPages: 1
+                    },
+                },
+            };
+        };
+
+
         // Query the database
         let query = Procedure.find({
             ...searchQuery,
@@ -102,14 +143,14 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
             ...deletedUserSearchKey,
             deletedAt: null,
         })
-        .populate("buId", "_id name")
-        .populate("branchId", "_id name")
-        .populate("services", "_id serviceName")
-        .populate("deptId", "_id deptName")
-        .populate("createdBy", "_id firstName lastName")
-        .populate("updatedBy", "_id firstName lastName")
-        .populate("deletedBy", "_id firstName lastName")
-        .lean();
+            .populate("buId", "_id name")
+            .populate("branchId", "_id name")
+            .populate("services", "_id serviceName")
+            .populate("deptId", "_id deptName")
+            .populate("createdBy", "_id firstName lastName")
+            .populate("updatedBy", "_id firstName lastName")
+            .populate("deletedBy", "_id firstName lastName")
+            .lean();
 
 
         // Apply pagination only if page & perPage are provided

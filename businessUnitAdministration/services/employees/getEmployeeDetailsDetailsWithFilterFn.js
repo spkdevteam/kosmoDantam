@@ -5,8 +5,10 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatEmployee } = require("../../../utils/helperFunctions");
 
-const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, searchKey = "", fromDate, toDate, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
+const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, searchKey = "", fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
+
+        console.log("rolerolerole", role);
         const db = await getClientDatabaseConnection(clientId);
         const Employee = await db.model("clientUsers", clinetUserSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
@@ -14,35 +16,35 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
         //these are user for populating the data
         const BusinessUnit = await db.model("businessUnit", clinetBusinessUnitSchema);
         const Branch = await db.model("branch", clinetBranchSchema);
+        const clientRoles = await db.model("clientRoles", clientRoleSchema);
         const user = await db.model("clientUsers", clinetUserSchema);
-        const role = await db.model("clientRoles", clientRoleSchema);
 
-        if (!page || !perPage) {
-            const allEmployees = await Employee.find({ deletedAt: null })
-                .populate("businessUnit", "_id name")
-                .populate("branch", "_id name")
-                .populate("role", "_id name")
-                .populate("createdBy", "_id firstName lastName")
-                .populate("updatedBy", "_id firstName lastName")
-                .populate("deletedBy", "_id firstName lastName")
-                .lean();
+        // if (!page || !perPage) {
+        //     const allEmployees = await Employee.find({ deletedAt: null })
+        //         .populate("businessUnit", "_id name")
+        //         .populate("branch", "_id name")
+        //         .populate("role", "_id name")
+        //         .populate("createdBy", "_id firstName lastName")
+        //         .populate("updatedBy", "_id firstName lastName")
+        //         .populate("deletedBy", "_id firstName lastName")
+        //         .lean();
 
-            const formattedEmployees = allEmployees.map((employee) => formatEmployee(employee));
+        //     const formattedEmployees = allEmployees.map((employee) => formatEmployee(employee));
 
-            return {
-                status: true,
-                message: "All Departments retrieved successfully.",
-                data: {
-                    employees: formattedEmployees,
-                    metadata: {
-                        page: 1,
-                        perPage: allEmployees?.length,
-                        totalCount: allEmployees?.length,
-                        totalPages: 1
-                    },
-                },
-            };
-        };
+        //     return {
+        //         status: true,
+        //         message: "All Departments retrieved successfully.",
+        //         data: {
+        //             employees: formattedEmployees,
+        //             metadata: {
+        //                 page: 1,
+        //                 perPage: allEmployees?.length,
+        //                 totalCount: allEmployees?.length,
+        //                 totalPages: 1
+        //             },
+        //         },
+        //     };
+        // };
 
         //.map((chair) => formatChair(chair))
 
@@ -82,6 +84,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
         const businessSearchKey = businessUnit ? { businessUnit } : {};
         const branchIdSearchKey = branch ? { branch } : {};
         const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
+        const roleSearchKey = role ? { role: role } : {};
         const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
         const deletedUserSearchKey = deletedUser ? { deletedBy: deletedUser } : {};
 
@@ -95,12 +98,51 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
         }
 
 
+        if (!page || !perPage) {
+            const allEmployees = await Employee.find({
+                ...searchQuery,
+                ...businessSearchKey,
+                ...branchIdSearchKey,
+                ...dateSearchKey,
+                ...roleSearchKey,
+                ...createdUserSearchKey,
+                ...updatedUserSearchKey,
+                ...deletedUserSearchKey,
+                deletedAt: null,
+            })
+                .populate("businessUnit", "_id name")
+                .populate("branch", "_id name")
+                .populate("role", "_id name")
+                .populate("createdBy", "_id firstName lastName")
+                .populate("updatedBy", "_id firstName lastName")
+                .populate("deletedBy", "_id firstName lastName")
+                .lean();
+
+            const formattedEmployees = allEmployees.map((employee) => formatEmployee(employee));
+
+            return {
+                status: true,
+                message: "All Employee details retrieved successfully.",
+                data: {
+                    employees: formattedEmployees,
+                    metadata: {
+                        page: 1,
+                        perPage: allEmployees?.length,
+                        totalCount: allEmployees?.length,
+                        totalPages: 1
+                    },
+                },
+            };
+        };
+
+
         // Query the database
         let query = Employee.find({
             ...searchQuery,
             ...businessSearchKey,
             ...branchIdSearchKey,
             ...dateSearchKey,
+            ...roleSearchKey,
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,
@@ -132,6 +174,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
             ...businessSearchKey,
             ...branchIdSearchKey,
             ...dateSearchKey,
+            ...roleSearchKey,
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,
@@ -155,7 +198,6 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
             },
         };
         //return { status: true, data: result };
-
     } catch (error) {
         return { status: false, message: error.message };
     }

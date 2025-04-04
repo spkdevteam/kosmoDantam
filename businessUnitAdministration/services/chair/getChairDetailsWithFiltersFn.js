@@ -22,33 +22,33 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
         const appoinments = await db.model("appointments", appointmentSchema);
         const patient = db.model('patient', clinetPatientSchema);
 
-        if (!page || !perPage) {
-            const allChairs = await Chair.find({ deletedAt: null })
-                .populate("businessUnit", "_id name")
-                .populate("branch", "_id name")
-                .populate("activePatientId", "_id firstName lastName")
-                .populate("activeAppointmentId", "_id displayId")
-                .populate("createdBy", "_id firstName lastName")
-                .populate("updatedBy", "_id firstName lastName")
-                .populate("deletedBy", "_id firstName lastName")
-                .lean();
+        // if (!page || !perPage) {
+        //     const allChairs = await Chair.find({ deletedAt: null })
+        //         .populate("businessUnit", "_id name")
+        //         .populate("branch", "_id name")
+        //         .populate("activePatientId", "_id firstName lastName")
+        //         .populate("activeAppointmentId", "_id displayId")
+        //         .populate("createdBy", "_id firstName lastName")
+        //         .populate("updatedBy", "_id firstName lastName")
+        //         .populate("deletedBy", "_id firstName lastName")
+        //         .lean();
 
-            const formattedChairs = allChairs.map((chair) => formatChair(chair));
+        //     const formattedChairs = allChairs.map((chair) => formatChair(chair));
 
-            return {
-                status: true,
-                message: "All chairs retrieved successfully.",
-                data: {
-                    chairs: formattedChairs,
-                    metadata: {
-                        page: 1,
-                        perPage: allChairs?.length,
-                        totalCount: allChairs?.length,
-                        totalPages: 1
-                    },
-                },
-            };
-        };
+        //     return {
+        //         status: true,
+        //         message: "All chairs retrieved successfully.",
+        //         data: {
+        //             chairs: formattedChairs,
+        //             metadata: {
+        //                 page: 1,
+        //                 perPage: allChairs?.length,
+        //                 totalCount: allChairs?.length,
+        //                 totalPages: 1
+        //             },
+        //         },
+        //     };
+        // };
 
         //.map((chair) => formatChair(chair))
 
@@ -88,7 +88,46 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
             dateSearchKey = { createdAt: {} };
             if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
             if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
-        }
+        };
+
+
+        if (!page || !perPage) {
+            const allChairs = await Chair.find({
+                ...searchQuery,
+                ...businessSearchKey,
+                ...statusSearchKey,
+                ...branchIdSearchKey,
+                ...dateSearchKey,
+                ...createdUserSearchKey,
+                ...updatedUserSearchKey,
+                ...deletedUserSearchKey,
+                deletedAt: null,
+            })
+                .populate("businessUnit", "_id name")
+                .populate("branch", "_id name")
+                .populate("activePatientId", "_id firstName lastName")
+                .populate("activeAppointmentId", "_id displayId")
+                .populate("createdBy", "_id firstName lastName")
+                .populate("updatedBy", "_id firstName lastName")
+                .populate("deletedBy", "_id firstName lastName")
+                .lean();
+
+            const formattedChairs = allChairs.map((chair) => formatChair(chair));
+
+            return {
+                status: true,
+                message: "All chairs retrieved successfully.",
+                data: {
+                    chairs: formattedChairs,
+                    metadata: {
+                        page: 1,
+                        perPage: allChairs?.length,
+                        totalCount: allChairs?.length,
+                        totalPages: 1
+                    },
+                },
+            };
+        };
 
 
         //query the database

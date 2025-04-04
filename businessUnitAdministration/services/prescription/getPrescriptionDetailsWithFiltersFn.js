@@ -19,34 +19,36 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
         const user = await db.model("clientUsers", clinetUserSchema);
         const caseSheet = db.model('caseSheet', caseSheetSchema);
         const patient = db.model('patient', clinetPatientSchema);
-        if (!page || !perPage) {
-            const allPrescription = await Prescription.find({ deletedAt: null })
-                .populate("buId", "_id name")
-                .populate("branchId", "_id name")
-                .populate("doctorId", "_id firstName lastName")
-                .populate("patientId", "_id firstName lastName")
-                .populate("caseSheetId", "_id displayId")
-                .populate("createdBy", "_id firstName lastName")
-                .populate("updatedBy", "_id firstName lastName")
-                .populate("deletedBy", "_id firstName lastName")
-                .lean();
 
 
-            const formattedPrescription = allPrescription.map((prescription) => formatPrescription(prescription));
-            return {
-                status: true,
-                message: "All Prescriptions retrieved successfully.",
-                data: {
-                    prescriptions: formattedPrescription,
-                    metadata: {
-                        page: 1,
-                        perPage: allPrescription?.length,
-                        totalCount: allPrescription?.length,
-                        totalPages: 1
-                    },
-                },
-            };
-        };
+        // if (!page || !perPage) {
+        //     const allPrescription = await Prescription.find({ deletedAt: null })
+        //         .populate("buId", "_id name")
+        //         .populate("branchId", "_id name")
+        //         .populate("doctorId", "_id firstName lastName")
+        //         .populate("patientId", "_id firstName lastName")
+        //         .populate("caseSheetId", "_id displayId")
+        //         .populate("createdBy", "_id firstName lastName")
+        //         .populate("updatedBy", "_id firstName lastName")
+        //         .populate("deletedBy", "_id firstName lastName")
+        //         .lean();
+
+
+        //     const formattedPrescription = allPrescription.map((prescription) => formatPrescription(prescription));
+        //     return {
+        //         status: true,
+        //         message: "All Prescriptions retrieved successfully.",
+        //         data: {
+        //             prescriptions: formattedPrescription,
+        //             metadata: {
+        //                 page: 1,
+        //                 perPage: allPrescription?.length,
+        //                 totalCount: allPrescription?.length,
+        //                 totalPages: 1
+        //             },
+        //         },
+        //     };
+        // };
 
         //.map((chair) => formatChair(chair))
 
@@ -106,6 +108,47 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
             if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
             if (nextVisitDate) dateSearchKey.nextVisitDateSearchKey = new Date(nextVisitDate);
         }
+
+
+        if (!page || !perPage) {
+            const allPrescription = await Prescription.find({
+                ...searchQuery,
+                ...businessSearchKey,
+                ...branchIdSearchKey,
+                ...doctorIdSearchKey,
+                ...patientIdIdSearchKey,
+                ...caseSheetIdSearchKey,
+                ...createdUserSearchKey,
+                ...updatedUserSearchKey,
+                ...deletedUserSearchKey,
+                deletedAt: null,
+            })
+                .populate("buId", "_id name")
+                .populate("branchId", "_id name")
+                .populate("doctorId", "_id firstName lastName")
+                .populate("patientId", "_id firstName lastName")
+                .populate("caseSheetId", "_id displayId")
+                .populate("createdBy", "_id firstName lastName")
+                .populate("updatedBy", "_id firstName lastName")
+                .populate("deletedBy", "_id firstName lastName")
+                .lean();
+
+
+            const formattedPrescription = allPrescription.map((prescription) => formatPrescription(prescription));
+            return {
+                status: true,
+                message: "All Prescriptions retrieved successfully.",
+                data: {
+                    prescriptions: formattedPrescription,
+                    metadata: {
+                        page: 1,
+                        perPage: allPrescription?.length,
+                        totalCount: allPrescription?.length,
+                        totalPages: 1
+                    },
+                },
+            };
+        };
 
 
         // Query the database
