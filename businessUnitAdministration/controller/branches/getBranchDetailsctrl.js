@@ -33,12 +33,15 @@ const getBranchDetailsctrl = async (req, res) => {
         const error = validation.filter((e) => e && e.status == false);
         if (error.length > 0) return { status: false, message: error.map(e => e.message).join(", ") };
         console.log("here");
-        const cleanQuery = {
+        const cleanQuery = {    
             page: data.page ? data.page.replace(/^"|"$/g, "") : null, // default to "1" if missing
             perPage: data.perPage ? data.perPage.replace(/^"|"$/g, "") : null, // default to "10"
             SearchKey: data.SearchKey ? String(data.SearchKey.replace(/^"|"$/g, "")) : "", // default to empty string
         };
         const { page, perPage, SearchKey } = cleanQuery;
+        console.log({from_Date, toDate, SearchKey, page, perPage, clientId, businessUnitId,
+            createdBy : createdUser, updatedBy : updatedUser
+         },'{from_Date, toDate, SearchKey, page, perPage, clientId, businessUnitId,            createdBy : createdUser, updatedBy : updatedUser         }')
         const result = await getBranchDetailsFn({from_Date, toDate, SearchKey, page, perPage, clientId, businessUnitId,
             createdBy : createdUser, updatedBy : updatedUser
          });
