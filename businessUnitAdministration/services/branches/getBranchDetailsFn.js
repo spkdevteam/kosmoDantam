@@ -61,13 +61,6 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
         const user = await db.model('clientUsers', clinetUserSchema);
         let businessSearchKey = {};
         if (businessUnitId) {
-            console.log("iiiiiiiiiiiiiiiiiiiiiiiii");
-            const fetchedBusiness = await business.find({ _id: businessUnitId, deletedAt: null });
-            console.log("fetchedBusiness=>>>>", fetchedBusiness);
-
-            if (!fetchedBusiness) {
-                return { status: false, message: "Bunsiness doesn't exist or deleted alreday" };
-            }
             businessSearchKey = { businessUnit: businessUnitId }
         }
         let query = branch.find({
