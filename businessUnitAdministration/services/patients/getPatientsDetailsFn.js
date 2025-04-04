@@ -52,16 +52,28 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
             }
         }
         console.log("searchQuery=>>>", searchQuery);
-        let from_DateSearchKey = {};
-        if (from_Date) {
-            from_DateSearchKey = {
-                createdAt: { $gte: new Date(from_Date) }
+        // let from_DateSearchKey = {};
+        // if (from_Date) {
+        //     from_DateSearchKey = {
+        //         createdAt: { $gte: new Date(from_Date) }
+        //     }
+        // }
+        // let toDateSearchKey = {};
+        // if (toDate) {
+        //     toDateSearchKey = {
+        //         createdAt: { $lte: new Date(toDate) }
+        //     }
+        // }
+        let dateSearchKey = {};
+
+        if (from_Date || toDate) {
+            dateSearchKey.createdAt = {};
+
+            if (from_Date) {
+                dateSearchKey.createdAt.$gte = new Date(from_Date);
             }
-        }
-        let toDateSearchKey = {};
-        if (toDate) {
-            toDateSearchKey = {
-                createdAt: { $lte: new Date(toDate) }
+            if (toDate) {
+                dateSearchKey.createdAt.$lte = new Date(toDate);
             }
         }
         //establishing db connection :
@@ -94,8 +106,9 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
         //query building
         let query = patientsModel.find({
             ...searchQuery,
-            ...from_DateSearchKey,
-            ...toDateSearchKey,
+            // ...from_DateSearchKey,
+            // ...toDateSearchKey,
+            ...dateSearchKey,
             ...branchIdSearchKey,
             ...businessUnitIdSearchKey,
             ...mainPatientLinkedIdSearchKey,
@@ -105,8 +118,9 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
         });
         const totalDocs = await patientsModel.countDocuments({
             ...searchQuery,
-            ...from_DateSearchKey,
-            ...toDateSearchKey,
+            // ...from_DateSearchKey,
+            // ...toDateSearchKey,
+            ...dateSearchKey,
             ...branchIdSearchKey,
             ...businessUnitIdSearchKey,
             ...mainPatientLinkedIdSearchKey,

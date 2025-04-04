@@ -50,7 +50,7 @@ const getPatientsDetailsctrl = async (req, res) => {
         });
         console.log("result=>>>>", result)
         if (!result?.status) return res.status(httpStatusCode.InternalServerError).send({
-            message: result?.message, status : false
+            message: result?.message, status : result?.status
         });
         return res.status(200).send({ message: result?.message, data: { patients: result?.data, metaData: result?.metaData }, status: true });
 
