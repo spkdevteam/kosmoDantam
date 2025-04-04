@@ -4,7 +4,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const mongoose = require("mongoose");
 const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey = "", page = null, perPage = null,
-    clientId, businessUnitId = null , createdBy, updatedBy}) => {
+    clientId, businessUnitId = null, createdBy, updatedBy }) => {
     try {
         let searchQuery = {};
         if (SearchKey) {
@@ -34,25 +34,38 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
         }
         console.log("searchQuery=>>>", searchQuery);
         // return { status: true, data: searchQuery, message: "searchQuery" }
-        let from_DateSearchKey = {};
-        if (from_Date) {
-            from_DateSearchKey = {
-                createdAt: { $gte: new Date(from_Date) }
+        // let from_DateSearchKey = {};
+        // if (from_Date) {
+        //     from_DateSearchKey = {
+        //         createdAt: { $gte: new Date(from_Date) }
+        //     }
+        // }
+        // let toDateSearchKey = {};
+        // if (toDate) {
+        //     toDateSearchKey = {
+        //         createdAt: { $lte: new Date(toDate) }
+        //     }
+        // }
+        
+        let dateSearchKey = {};
+
+        if (from_Date || toDate) {
+            dateSearchKey.createdAt = {};
+
+            if (from_Date) {
+                dateSearchKey.createdAt.$gte = new Date(from_Date);
             }
-        }
-        let toDateSearchKey = {};
-        if (toDate) {
-            toDateSearchKey = {
-                createdAt: { $lte: new Date(toDate) }
+            if (toDate) {
+                dateSearchKey.createdAt.$lte = new Date(toDate);
             }
         }
         let createdBySearchKey = {};
-        if(createdBy){
-            createdBySearchKey = {createdBy : createdBy}
+        if (createdBy) {
+            createdBySearchKey = { createdBy: createdBy }
         }
         let updatedBySearchKey = {};
-        if(updatedBy){
-            updatedBySearchKey = {updatedBy : updatedBy}
+        if (updatedBy) {
+            updatedBySearchKey = { updatedBy: updatedBy }
         }
         //establishing db connection :
         const db = await getClientDatabaseConnection(clientId);
@@ -66,8 +79,9 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
         let query = branch.find({
             ...searchQuery,
             ...businessSearchKey,
-            ...from_DateSearchKey,
-            ...toDateSearchKey,
+            // ...from_DateSearchKey,
+            // ...toDateSearchKey,
+            ...dateSearchKey,
             ...createdBySearchKey,
             ...updatedBySearchKey,
             deletedAt: null
@@ -75,8 +89,9 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
         const totalDocs = await branch.countDocuments({
             ...searchQuery,
             ...businessSearchKey,
-            ...from_DateSearchKey,
-            ...toDateSearchKey,
+            // ...from_DateSearchKey,
+            // ...toDateSearchKey,
+            ...dateSearchKey,
             ...createdBySearchKey,
             ...updatedBySearchKey,
             deletedAt: null

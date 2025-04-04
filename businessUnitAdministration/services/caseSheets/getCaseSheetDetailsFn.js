@@ -44,16 +44,28 @@ const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey=
             }
         }
         //date filter:
-        let from_DateSearchKey = {};
-        if (from_Date) {
-            from_DateSearchKey = {
-                createdAt: { $gte: new Date(from_Date) }
+        // let from_DateSearchKey = {};
+        // if (from_Date) {
+        //     from_DateSearchKey = {
+        //         createdAt: { $gte: new Date(from_Date) }
+        //     }
+        // }
+        // let toDateSearchKey = {};
+        // if (toDate) {
+        //     toDateSearchKey = {
+        //         createdAt: { $lte: new Date(toDate) }
+        //     }
+        // }
+        let dateSearchKey = {};
+
+        if (from_Date || toDate) {
+            dateSearchKey.createdAt = {};
+
+            if (from_Date) {
+                dateSearchKey.createdAt.$gte = new Date(from_Date);
             }
-        }
-        let toDateSearchKey = {};
-        if (toDate) {
-            toDateSearchKey = {
-                createdAt: { $lte: new Date(toDate) }
+            if (toDate) {
+                dateSearchKey.createdAt.$lte = new Date(toDate);
             }
         }
         //db connection :
@@ -140,8 +152,9 @@ const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey=
         }
         let query = caseSheets.find({
             ...searchQuery,
-            ...from_DateSearchKey,
-            ...toDateSearchKey,
+            // ...from_DateSearchKey,
+            // ...toDateSearchKey,
+            ...dateSearchKey,
             ...patientIdSearchKey,
             ...branchIdSearchKey,
             ...buIdSearchKey,
@@ -163,8 +176,9 @@ const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey=
         });
         const totalDocs = await caseSheets.countDocuments({
             ...searchQuery,
-            ...from_DateSearchKey,
-            ...toDateSearchKey,
+            // ...from_DateSearchKey,
+            // ...toDateSearchKey,
+            ...dateSearchKey,
             ...patientIdSearchKey,
             ...branchIdSearchKey,
             ...buIdSearchKey,

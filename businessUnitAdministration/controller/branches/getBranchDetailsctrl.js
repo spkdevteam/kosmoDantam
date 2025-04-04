@@ -44,7 +44,8 @@ const getBranchDetailsctrl = async (req, res) => {
          });
         console.log("result=>>>>",result) 
         if(!result?.status) return res.status(httpStatusCode.InternalServerError).send({
-            message: result?.message
+            message: result?.message,
+            status: result?.status
         });
         return res.status(200).send({message : result?.message, data : {branches : result?.data, metaData : result?.metaData}, status : true});
     } catch (error) {
