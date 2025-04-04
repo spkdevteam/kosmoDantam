@@ -285,7 +285,13 @@ const getAllProceduresByPage = async (input) => {
         if(input?.branchId?.length) filters.branchId = input.branchId
         const result = await procedures.find({ ...filters,...orArray,...(input?.branchId?{branchId:input?.branchId}:{})})
         .populate('branchId','name')
-        .populate('services')
+        .populate({
+            path: 'services',
+            populate: [
+              { path: 'departmentId', select: 'deptName' },
+              { path: 'createdBy', select: 'fullName email' } // if needed
+            ]
+          })
         .skip((input.page) *  input.perPage )
         .limit( input.perPage)
         .sort({_id:-1})
