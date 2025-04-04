@@ -23,7 +23,7 @@ const getUnbilledItemsFromCaseSheet = require("../controller/caseSheet/getUnbill
 const patchUpdateInvoice = require("../controller/caseSheet/updateInvoice");
 const migrationIntoTreatmentData3 = require("../controller/caseSheet/migrationIntoTreatmentData3");
 const updateCaseSheetWithInvoiceNumber = require("../controller/caseSheet/updateCaseSheetWithInvoiceNumber");
-const getCaseSheetDetailsctrl = require("../../businessUnitAdministration/controller/caseSheet/getcaseSheetDetailsctrl");
+const getCaseSheetDetailsctrl = require("../../businessUnitAdministration/controller/caseSheet/getCaseSheetDetailsctroler");
 
 
 
