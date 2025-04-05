@@ -2083,7 +2083,7 @@ const getById = async (clientId, caseSheetId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);

@@ -5,7 +5,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 
 const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey = "", page = null,
-    perPage = null, clientId, branchId, businessUnitId, mainPatientLinkedId, createdById, updatedById }) => {
+    perPage = null, clientId, branchId, businessUnitId, mainPatientLinkedId, createdById, updatedById,status }) => {
     try {
         let searchQuery = {};
         if (SearchKey) {
@@ -64,6 +64,15 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
         //         createdAt: { $lte: new Date(toDate) }
         //     }
         // }
+        let statusSearchKey = {};
+        const statusBool = status.toLowerCase() === "true" ? true : status.toLowerCase() === "false" ? false : null;
+        if(statusBool !== null){
+            statusSearchKey = {isActive : statusBool}
+        }
+        console.log("statusSearchKey=>>>",statusSearchKey);
+        console.log("statusBool====>>>",statusBool);
+        
+        
         let dateSearchKey = {};
 
         if (from_Date || toDate) {
@@ -114,6 +123,7 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
             ...mainPatientLinkedIdSearchKey,
             ...createdByIdSearchKey,
             ...updatedByIdSearchKey,
+            ...statusSearchKey,
             deletedAt: null
         });
         const totalDocs = await patientsModel.countDocuments({
@@ -126,6 +136,7 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
             ...mainPatientLinkedIdSearchKey,
             ...createdByIdSearchKey,
             ...updatedByIdSearchKey,
+            ...statusSearchKey,
             deletedAt: null
         });
         console.log("totalDocs==>>>", totalDocs);
@@ -145,7 +156,7 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
             .populate('mainPatientLinkedid', 'firstName lastName email phone')
             .populate('createdBy', 'firstName lastName email phone')
             .populate('updatedBy', 'firstName lastName email phone')
-        console.log("fetchedPatient=>>>", fetchedPatient);
+        // console.log("fetchedPatient=>>>", fetchedPatient);
         if (!fetchedPatient) return { status: false, message: "Patients can't be fetched!!" };
 
         let metaData = {};

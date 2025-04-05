@@ -210,7 +210,7 @@ const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey=
             query = query.limit(paginationObj?.perPageNumber).skip(paginationObj?.skip);
         }
         const fetchedCaseSheets = await query
-            .populate("patientId", "firstName lastName")
+            .populate("patientId", "firstName lastName displayId patientGroup")
             .populate("branchId", "name")
             .populate("buId", "name")
             .populate("createdBy", "firstName lastName")
