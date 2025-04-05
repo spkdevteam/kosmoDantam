@@ -117,7 +117,7 @@
  *                     createdAt: null
  *                     updatedAt: null
  *                     __v: 0
- *                 pagination:
+ *                 metadata:
  *                   page: 1
  *                   perPage: 2
  *                   totalCount: 2

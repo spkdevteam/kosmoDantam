@@ -183,7 +183,7 @@
  *                     createdBy: null
  *                     createdAt: "2025-02-10T05:17:22.506Z"
  *                     updatedAt: "2025-02-10T05:17:22.506Z"
- *                 pagination:
+ *                 metadata:
  *                   page: 1
  *                   perPage: 5
  *                   totalCount: 2

@@ -76,6 +76,9 @@ const clinetUserSchema = new Schema(
         // handlign created by
         createdBy: { type: ObjectId, ref: "clientUsers", index: true }, // Index for admin/user relationships
         deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality
+
+        updatedBy: { type: ObjectId, ref: "clientUsers", default: null, index: true },
+        deletedBy: { type: ObjectId, ref: "clientUsers", default: null, index: true }
     },
 
     { timestamps: true }

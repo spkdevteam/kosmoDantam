@@ -18,32 +18,32 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
         const branch = await db.model("branch", clinetBranchSchema);
         const user = await db.model("clientUsers", clinetUserSchema);
 
-        if (!page || !perPage) {
-            const allService = await Service.find({ deletedAt: null })
-                .populate("buId", "_id name")
-                .populate("branchId", "_id name")
-                .populate("departmentId", "_id deptName")
-                .populate("createdBy", "_id firstName lastName")
-                .populate("updatedBy", "_id firstName lastName")
-                .populate("deletedBy", "_id firstName lastName")
-                .lean();
+        // if (!page || !perPage) {
+        //     const allService = await Service.find({ deletedAt: null })
+        //         .populate("buId", "_id name")
+        //         .populate("branchId", "_id name")
+        //         .populate("departmentId", "_id deptName")
+        //         .populate("createdBy", "_id firstName lastName")
+        //         .populate("updatedBy", "_id firstName lastName")
+        //         .populate("deletedBy", "_id firstName lastName")
+        //         .lean();
 
-            const formattedServices = allService.map((service) => formatService(service));
+        //     const formattedServices = allService.map((service) => formatService(service));
 
-            return {
-                status: true,
-                message: "All Services retrieved successfully.",
-                data: {
-                    services: formattedServices,
-                    pagination: {
-                        page: 1,
-                        perPage: allService?.length,
-                        totalCount: allService?.length,
-                        totalPages: 1
-                    },
-                },
-            };
-        };
+        //     return {
+        //         status: true,
+        //         message: "All Services retrieved successfully.",
+        //         data: {
+        //             services: formattedServices,
+        //             pagination: {
+        //                 page: 1,
+        //                 perPage: allService?.length,
+        //                 totalCount: allService?.length,
+        //                 totalPages: 1
+        //             },
+        //         },
+        //     };
+        // };
 
         //.map((chair) => formatChair(chair))
 
@@ -90,6 +90,45 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
             dateSearchKey = { createdAt: {} };
             if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
             if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
+        };
+
+
+
+        if (!page || !perPage) {
+            const allService = await Service.find({
+                ...searchQuery,
+                ...businessSearchKey,
+                ...branchIdSearchKey,
+                ...departmentIdSearchKey,
+                ...dateSearchKey,
+                ...createdUserSearchKey,
+                ...updatedUserSearchKey,
+                ...deletedUserSearchKey,
+                deletedAt: null,
+            })
+                .populate("buId", "_id name")
+                .populate("branchId", "_id name")
+                .populate("departmentId", "_id deptName")
+                .populate("createdBy", "_id firstName lastName")
+                .populate("updatedBy", "_id firstName lastName")
+                .populate("deletedBy", "_id firstName lastName")
+                .lean();
+
+            const formattedServices = allService.map((service) => formatService(service));
+
+            return {
+                status: true,
+                message: "All Services retrieved successfully.",
+                data: {
+                    services: formattedServices,
+                    pagination: {
+                        page: 1,
+                        perPage: allService?.length,
+                        totalCount: allService?.length,
+                        totalPages: 1
+                    },
+                },
+            };
         };
 
 
@@ -143,7 +182,7 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
 
         return {
             status: true,
-            message: totalCount < 1 ? "No departments found" : "Department details retrieved successfully.",
+            message: totalCount < 1 ? "No Services found" : "Service details retrieved successfully.",
             data: {
                 services: formattedServices,
                 pagination: {

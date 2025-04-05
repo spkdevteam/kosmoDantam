@@ -35,13 +35,13 @@ exports.createEmployee = async (req, res, next) => {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
             });
-        }
+        };
         // Check if required fields are missing
         if (!firstName || !lastName || !email || !phone  || !password || !roleId ) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblRequiredFieldMissing,
             });
-        }
+        };
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
         const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);

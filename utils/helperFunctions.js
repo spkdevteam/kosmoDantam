@@ -107,7 +107,6 @@ function formatProcedure(procedure) {
     }
 }
 
-
 function formatPrescription(prescription) {
     return {
         _id: prescription._id,
@@ -148,6 +147,55 @@ function formatPrescription(prescription) {
     }
 }
 
+function formatEmployee(employee) {
+    return {
+        _id: employee._id,
+        role: employee.role ? { _id: employee.role._id, name: employee.role.name } : null,
+        branch: employee.branch ? { _id: employee.branch._id, name: employee.branch.name } : null,
+        businessUnit: employee.businessUnit ? { _id: employee.businessUnit._id, name: employee.businessUnit.name } : null,
+        roleId: employee.roleId ? { _id: employee.roleId._id, name: employee.roleId.name } : null,
+        firstName: employee.firstName ? employee.firstName : "",
+        lastName: employee.lastName ? employee.lastName : "",
+        email: employee.email ? employee.email : "",
+        phone: employee.phone ? employee.phone : "",
+        tc: employee.tc ? employee.tc : "",
+        isUserVerified: employee.isUserVerified ? true : false,
+        isActive: employee.isActive ? true : false,
+        gender: employee.gender,
+        age: employee.age,
+        bloodGroup: employee.bloodGroup,
+        patientGroup: employee.patientGroup,
+        referedBy: employee.referedBy ? { _id: employee.referedBy._id, firstName: employee.referedBy.firstName, lastName: employee.referedBy.lastName } : null,
+        profileImage: employee.profileImage ? employee.profileImage : "",
+        profileCreated: employee.profileCreated ? true : false,
+        panNumber: employee.panNumber ? employee.panNumber : "",
+        adharNumber: employee.adharNumber ? employee.adharNumber : "",
+        city: employee.city ? employee.city : "",
+        state: employee.state ? employee.state : "",
+        country: employee.country ? employee.country : "",
+        ZipCode: employee.ZipCode ? employee.ZipCode : "",
+        address: employee.address ? employee.address : "",
+        dateOfBirth: employee.dateOfBirth ? employee.dateOfBirth : null,
+        optionalEmail: employee.optionalEmail ? employee.optionalEmail : "",
+        emergencyPhone: employee.emergencyPhone ? employee.emergencyPhone : "",
+        activePatientId: employee.activePatientId ? { _id: employee.activePatientId._id, firstName: employee.activePatientId.firstName, lastName: employee.activePatientId.lastName } : null,
+        createdBy: employee.createdBy
+            ? { _id: employee.createdBy._id, firstName: employee.createdBy.firstName, lastName: employee.createdBy.lastName }
+            : null,
+        deletedBy: employee.deletedBy
+            ? { _id: employee.deletedBy._id, firstName: employee.deletedBy.firstName, lastName: employee.deletedBy.lastName }
+            : null,
+        updatedBy: employee.updatedBy
+            ? { _id: employee.updatedBy._id, firstName: employee.updatedBy.firstName, lastName: employee.updatedBy.lastName }
+            : null,
+        deletedAt: employee.deletedAt || null,
+        createdAt: employee.createdAt || null,
+        updatedAt: employee.updatedAt || null,
+        __v: employee.__v,
+    };
+};
+
+
 // services: procedure.services 
 // ? procedure.services.map(service => ({
 //     _id: service._id,
@@ -155,4 +203,4 @@ function formatPrescription(prescription) {
 // }))
 // : [],
 
-module.exports = { formatChair, formatDepartment, formatService, formatProcedure, formatPrescription };
+module.exports = { formatChair, formatDepartment, formatService, formatProcedure, formatPrescription, formatEmployee };

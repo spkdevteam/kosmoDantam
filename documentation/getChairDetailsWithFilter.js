@@ -18,16 +18,16 @@
  *         name: businessUnitId
  *         schema:
  *           type: string
- *         required: true
+ *         required: false
  *         description: Unique identifier for the business unit.
- *         example: "67820851a840f3a7bf1a307a"
+ *         example: ""
  *       - in: query
  *         name: branchId
  *         schema:
  *           type: string
  *         required: false
  *         description: Unique identifier for the branch.
- *         example: "67820e34a840f3a7bf1a312d"
+ *         example: ""
  *       - in: query
  *         name: fromDate
  *         schema:
@@ -35,7 +35,7 @@
  *           format: date
  *         required: false
  *         description: Start date of the filter range.
- *         example: "2025-02-15"
+ *         example: ""
  *       - in: query
  *         name: toDate
  *         schema:
@@ -43,7 +43,7 @@
  *           format: date
  *         required: false
  *         description: End date of the filter range.
- *         example: "2025-02-17"
+ *         example: ""
  *       - in: query
  *         name: searchKey
  *         schema:
@@ -57,7 +57,7 @@
  *           type: string
  *         required: false
  *         description: Chair status filter.
- *         example: "Ready"
+ *         example: ""
  *       - in: query
  *         name: page
  *         schema:
@@ -78,21 +78,21 @@
  *           type: string
  *         required: false
  *         description: User who created the chair details.
- *         example: "67820851a840f3a7bf1a3077"
+ *         example: ""
  *       - in: query
  *         name: updatedUser
  *         schema:
  *           type: string
  *         required: false
  *         description: User who last updated the chair details.
- *         example: "67820851a840f3a7bf1a3077"
+ *         example: ""
  *       - in: query
  *         name: deletedUser
  *         schema:
  *           type: string
  *         required: false
  *         description: User who deleted the chair details.
- *         example: "67820851a840f3a7bf1a3077"
+ *         example: ""
  *     responses:
  *       200:
  *         description: Chair details retrieved successfully.
@@ -234,7 +234,7 @@
  *                     createdAt: "2025-02-16T03:29:22.363Z"
  *                     updatedAt: "2025-03-18T15:55:08.893Z"
  *                     __v: 0
- *                 pagination:
+ *                 metadata:
  *                   page: 1
  *                   perPage: 5
  *                   totalCount: 5

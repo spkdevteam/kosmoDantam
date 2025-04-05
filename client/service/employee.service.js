@@ -143,7 +143,6 @@ const activeInactiveEmployee = async (clientId, employeeId, updateData) => {
 
 const listEmployeebyBranchId = async (data) => {
     try {
-
         const { clientId,role,branchId,options = { page: 1, limit: 10 }} = data
         const db = await getClientDatabaseConnection(clientId);
         const User = db.model('clientUsers', clinetUserSchema);
