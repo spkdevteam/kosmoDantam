@@ -75,7 +75,7 @@ function formatService(service) {
         updatedAt: service.updatedAt || null,
         __v: service.__v,
     }
-}
+};
 
 function formatProcedure(procedure) {
     return {
@@ -105,7 +105,7 @@ function formatProcedure(procedure) {
         updatedAt: procedure.updatedAt || null,
         __v: procedure.__v,
     }
-}
+};
 
 function formatPrescription(prescription) {
     return {
@@ -145,7 +145,7 @@ function formatPrescription(prescription) {
         updatedAt: prescription.updatedAt || null,
         __v: prescription.__v,
     }
-}
+};
 
 function formatEmployee(employee) {
     return {
