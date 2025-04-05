@@ -1,7 +1,6 @@
 /**
  * @swagger
- * /api/client/bu/procedures/
- * :
+ * /api/client/bu/procedures/getProcedureDetailsWithFilters:
  *   get:
  *     summary: Get procedure details with filters
  *     description: Retrieves procedure details based on various filters such as date range, client, business unit, department, services, and user actions.
