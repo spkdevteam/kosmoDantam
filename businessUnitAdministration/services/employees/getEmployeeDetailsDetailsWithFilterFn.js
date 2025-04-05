@@ -7,8 +7,6 @@ const { formatEmployee } = require("../../../utils/helperFunctions");
 
 const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, searchKey = "", fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
-
-        console.log("rolerolerole", role);
         const db = await getClientDatabaseConnection(clientId);
         const Employee = await db.model("clientUsers", clinetUserSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
