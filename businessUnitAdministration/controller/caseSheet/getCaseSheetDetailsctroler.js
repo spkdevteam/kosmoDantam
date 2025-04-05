@@ -14,7 +14,7 @@ const getCaseSheetDetailsctrl = async (req, res) => {
         //diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId
         const validation = [
             clientIdValidation({ clientId }),
-            emptyStringValidation({ string: data?.SearchKey, name: "searchKey" }),
+            // emptyStringValidation({ string: data?.SearchKey, name: "searchKey" }),
         ];
         if (from_Date) {
             validation.push(isValidDate({ value: from_Date }));
@@ -62,7 +62,14 @@ const getCaseSheetDetailsctrl = async (req, res) => {
             validation.push(mongoIdValidation({ _id: updatedUser, name: updatedUser }))
         }
         const error = validation.filter((e) => e && e.status == false);
-        if (error.length > 0) return { status: false, message: error.map(e => e.message).join(", ") };
+        // if (error.length > 0) return { status: false, message: error.map(e => e.message).join(", ") };
+        if (error.length > 0) {
+            console.log("Validation failed:", error);
+            return res.status(httpStatusCode.BadRequest).send({
+                status: false,
+                message: error.map(e => e.message).join(", ")
+            });
+        }
         console.log("here");
         const cleanQuery = {
             page: data.page ? data.page.replace(/^"|"$/g, "") : null, // default to "1" if missing
@@ -73,11 +80,11 @@ const getCaseSheetDetailsctrl = async (req, res) => {
         const result = await getCaseSheetDetailsFn({
             from_Date, toDate, SearchKey, page, perPage, clientId, patientId, branchId, buId,
             compId, clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId,
-            createdBy : createdUser, updatedBy : updatedUser
+            createdBy: createdUser, updatedBy: updatedUser
         });
         // console.log("result=>>>>", result)
         if (!result?.status) return res.status(httpStatusCode.InternalServerError).send({
-            message: result?.message, status : result?.status
+            message: result?.message, status: result?.status
         });
         return res.status(200).send({ message: result?.message, data: { caseSheets: result?.data, metaData: result?.metaData }, status: true });
     }
