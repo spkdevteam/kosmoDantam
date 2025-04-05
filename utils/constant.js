@@ -184,7 +184,7 @@ const defaultPersmissionsList = [
             },
             {
                 name : "Token",
-                displayName : "Token Screen",
+                displayName : "All Token",
                 access : false,
                 subMenus: {
                     // list: { id: 85, access: false, api: "/demo/path" },
@@ -198,7 +198,7 @@ const defaultPersmissionsList = [
             },
             {
                 name : "Chair Dashboard",
-                displayName : "Chair Dashboard Screen",
+                displayName : "All Chair Dashboard",
                 access : false,
                 subMenus: {
                     // list: { id: 92, access: false, api: "/demo/path" },
