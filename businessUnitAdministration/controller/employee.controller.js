@@ -79,7 +79,6 @@ exports.createEmployee = async (req, res, next) => {
             tc: true,
             isUserVerified: true,
             createdBy: mainUser._id,
-
         }
 
         if(emergencyPhone){
@@ -163,6 +162,7 @@ exports.createEmployee = async (req, res, next) => {
 exports.updateEmployee = async (req, res, next) => {
 
     try {
+        const mainUser = req.user;
         // Destructure fields from request body
         const { clientId, branchId, roleId, businessUnit, employeeId, firstName, lastName, email, phone, gender, city, state, country, ZipCode, address, panNumber, aadharNumber, emergencyPhone, bloodGroup, password } = req.body;
 
@@ -215,6 +215,7 @@ exports.updateEmployee = async (req, res, next) => {
             role: roleId,
             roleId:role?.id,
             businessUnit: businessUnit,
+            updatedBy: mainUser?._id
         }
 
         let newPassword = "";
@@ -332,6 +333,7 @@ exports.listEmployee = async (req, res, next) => {
 exports.activeinactiveEmployee = async (req, res, next) => {
     try {
         const { status, employeeId, clientId, roleId, keyword, page, perPage } = req.body;
+        const mainUser = req.user;
 
         req.query.clientId = clientId;
         req.query.roleId = roleId;
@@ -348,9 +350,10 @@ exports.activeinactiveEmployee = async (req, res, next) => {
 
         const updatedEmployee = await employeeService.activeInactiveEmployee(clientId, employeeId, {
             isActive: status === "1",
+            updatedBy: mainUser?._id
         });
 
-        this.listEmployee(req, res)
+        this.listEmployee(req, res);
 
     } catch (error) {
         next(error);
@@ -362,6 +365,7 @@ exports.activeinactiveEmployee = async (req, res, next) => {
 exports.softDeleteEmployee = async (req, res) => {
     try {
         const { keyword, page, perPage, employeeId, clientId } = req.body;
+        const mainUser = req.user;
         req.query.keyword = keyword;
         req.query.page = page;
         req.query.perPage = perPage;
@@ -380,6 +384,7 @@ exports.softDeleteEmployee = async (req, res) => {
             });
         }
         employee.deletedAt = new Date();
+        employee.deletedBy = mainUser?._id;
         await employee.save()
         this.listEmployee(req, res);
     } catch (error) {
