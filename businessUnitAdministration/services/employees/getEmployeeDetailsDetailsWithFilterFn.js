@@ -98,14 +98,14 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
 
         if (!page || !perPage) {
             const allEmployees = await Employee.find({
-                ...searchQuery,
-                ...businessSearchKey,
-                ...branchIdSearchKey,
-                ...dateSearchKey,
-                ...roleSearchKey,
-                ...createdUserSearchKey,
-                ...updatedUserSearchKey,
-                ...deletedUserSearchKey,
+                // ...searchQuery,
+                // ...businessSearchKey,
+                // ...branchIdSearchKey,
+                // ...dateSearchKey,
+                // ...roleSearchKey,
+                // ...createdUserSearchKey,
+                // ...updatedUserSearchKey,
+                // ...deletedUserSearchKey,
                 deletedAt: null,
             })
                 .populate("businessUnit", "_id name")
@@ -136,14 +136,14 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
 
         // Query the database
         let query = Employee.find({
-            ...searchQuery,
-            ...businessSearchKey,
-            ...branchIdSearchKey,
-            ...dateSearchKey,
-            ...roleSearchKey,
-            ...createdUserSearchKey,
-            ...updatedUserSearchKey,
-            ...deletedUserSearchKey,
+             ...searchQuery,
+             ...businessSearchKey,
+             ...branchIdSearchKey,
+             ...dateSearchKey,
+             ...roleSearchKey,
+             ...createdUserSearchKey,
+             ...updatedUserSearchKey,
+             ...deletedUserSearchKey,
             deletedAt: null,
         })
             .populate("businessUnit", "_id name")
