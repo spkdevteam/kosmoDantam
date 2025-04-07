@@ -159,7 +159,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,
-            ...statusSearchKey,
+            //...statusSearchKey,
             deletedAt: null,
         })
             .populate("buId", "_id name")
@@ -190,7 +190,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,
-            ...statusSearchKey,
+            //...statusSearchKey,
             deletedAt: null,
         });
 
