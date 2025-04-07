@@ -5,7 +5,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatDepartment } = require("../../../utils/helperFunctions");
 
-const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchKey, fromDate, toDate, buId, branchId, createdUser, updatedUser, deletedUser, clientId, status }) => {
+const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchKey, departmentId, fromDate, toDate, buId, branchId, createdUser, updatedUser, deletedUser, clientId, status }) => {
     try {
         const db = await getClientDatabaseConnection(clientId);
         const Department = await db.model("department", departmentSchema);
@@ -15,6 +15,37 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
         const businessUnit = await db.model("businessUnit", clinetBusinessUnitSchema);
         const branch = await db.model("branch", clinetBranchSchema);
         const user = await db.model("clientUsers", clinetUserSchema);
+
+
+        if (departmentId) {
+            const specificDepartment = await Department.findOne({ _id: departmentId, deletedAt: null })
+                .populate("buId", "_id name")
+                .populate("branchId", "_id name")
+                .populate("createdBy", "_id firstName lastName")
+                .populate("updatedBy", "_id firstName lastName")
+                .populate("deletedBy", "_id firstName lastName")
+                .lean();
+
+            if (!specificDepartment) {
+                return { status: false, message: "Department not found" };
+            }
+
+            const formattedDepartment = formatDepartment(specificDepartment);
+
+            return {
+                status: true,
+                message: "The department retrieved successfully.",
+                data: {
+                    department: formattedDepartment,
+                    metadata: {
+                        page: 1,
+                        perPage: 1,
+                        totalCount: 1,
+                        totalPages: 1
+                    },
+                },
+            };
+        }
 
         // if (!page || !perPage) {
         //     const allDepartments = await Department.find({ deletedAt: null })

@@ -7,7 +7,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatPrescription } = require("../../../utils/helperFunctions");
 
-const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, fromDate, toDate, buId, branchId, doctorId, patientId, caseSheetId, nextVisitDate, createdUser, updatedUser, deletedUser, clientId }) => {
+const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, prescriptionId, fromDate, toDate, buId, branchId, doctorId, patientId, caseSheetId, nextVisitDate, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
         const db = await getClientDatabaseConnection(clientId);
         const Prescription = await db.model('prescription', prescriptionSchema)
@@ -20,6 +20,39 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
         const caseSheet = db.model('caseSheet', caseSheetSchema);
         const patient = db.model('patient', clinetPatientSchema);
 
+
+        if (prescriptionId) {
+            const specificPrescription = await Prescription.findOne({ _id: prescriptionId, deletedAt: null })
+                .populate("buId", "_id name")
+                .populate("branchId", "_id name")
+                .populate("doctorId", "_id firstName lastName")
+                .populate("patientId", "_id firstName lastName")
+                .populate("caseSheetId", "_id displayId")
+                .populate("createdBy", "_id firstName lastName")
+                .populate("updatedBy", "_id firstName lastName")
+                .populate("deletedBy", "_id firstName lastName")
+                .lean();
+
+            if (!specificPrescription) {
+                return { status: false, message: "Prescription not found" };
+            }
+
+            const formattedPrescription = formatPrescription(specificPrescription);
+
+            return {
+                status: true,
+                message: "The Prescription retrieved successfully.",
+                data: {
+                    prescription: formattedPrescription,
+                    metadata: {
+                        page: 1,
+                        perPage: 1,
+                        totalCount: 1,
+                        totalPages: 1
+                    },
+                },
+            };
+        }
 
         // if (!page || !perPage) {
         //     const allPrescription = await Prescription.find({ deletedAt: null })

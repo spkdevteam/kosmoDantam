@@ -8,7 +8,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatChair } = require("../../../utils/helperFunctions");
 
-const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, businessUnitId, branchId, status, fromDate, toDate, createdUser, updatedUser, deletedUser, clientId }) => {
+const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, chairId, businessUnitId, branchId, status, fromDate, toDate, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
         const db = await getClientDatabaseConnection(clientId);
         const Chair = await db.model("chair", clinetChairSchema);
@@ -21,6 +21,40 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
         const user = await db.model("clientUsers", clinetUserSchema);
         const appoinments = await db.model("appointments", appointmentSchema);
         const patient = db.model('patient', clinetPatientSchema);
+
+
+
+        if(chairId){
+            const specificChair = await Chair.findOne({ _id: chairId, deletedAt: null})
+            .populate("businessUnit", "_id name")
+            .populate("branch", "_id name")
+            .populate("activePatientId", "_id firstName lastName")
+            .populate("activeAppointmentId", "_id displayId")
+            .populate("createdBy", "_id firstName lastName")
+            .populate("updatedBy", "_id firstName lastName")
+            .populate("deletedBy", "_id firstName lastName")
+            .lean();
+
+            if(!specificChair){
+                return {status: false, message: "Chair not found"};
+            }
+
+            const formattedChair = formatChair(specificChair);
+
+            return {
+                status: true,
+                message: "The chair retrieved successfully.",
+                data: {
+                    chair: formattedChair,
+                    metadata: {
+                        page: 1,
+                        perPage: 1,
+                        totalCount: 1,
+                        totalPages: 1
+                    },
+                },
+            };
+        };
 
         // if (!page || !perPage) {
         //     const allChairs = await Chair.find({ deletedAt: null })

@@ -35,6 +35,12 @@
  *           example: ""
  *         description: Keyword to filter services (default is an empty string).
  *       - in: query
+ *         name: serviceId
+ *         schema:
+ *           type: string
+ *           example: ""
+ *         description: service ID to filter service (optional).
+ *       - in: query
  *         name: fromDate
  *         schema:
  *           type: string

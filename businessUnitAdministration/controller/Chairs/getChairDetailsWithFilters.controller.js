@@ -4,11 +4,14 @@ const getChairDetailsWithFiltersFn = require("../../services/chair/getChairDetai
 
 const getChairDetailsWithFilters = async (req, res, next) => {
     try {
-        const { page = null, perPage = null, searchKey, businessUnitId, branchId, status, fromDate, toDate, createdUser, updatedUser, deletedUser, clientId } = await sanitizeBody(req.query);
+        const { page = null, perPage = null, searchKey, chairId, businessUnitId, branchId, status, fromDate, toDate, createdUser, updatedUser, deletedUser, clientId } = await sanitizeBody(req.query);
 
         const validation = [
             clientIdValidation({ clientId })
         ];
+        if(chairId){
+            validation.push(mongoIdValidation({_id: chairId, name: "chairId"}));
+        }
         if(businessUnitId){
             validation.push(mongoIdValidation({_id: businessUnitId, name: "businessUnitId"}));
         }
@@ -33,7 +36,7 @@ const getChairDetailsWithFilters = async (req, res, next) => {
 
         if (fromDate && !isValidDate({ value: fromDate }).status) return { status: false, message: "Invalid from date" };
         if (toDate && !isValidDate({ value: toDate }).status) return { status: false, message: "Invalid to date" };
-        const result = await getChairDetailsWithFiltersFn({ page, perPage, searchKey, businessUnitId, branchId, status, fromDate, toDate, createdUser, updatedUser, deletedUser, clientId });
+        const result = await getChairDetailsWithFiltersFn({ page, perPage, searchKey, chairId, businessUnitId, branchId, status, fromDate, toDate, createdUser, updatedUser, deletedUser, clientId });
         return res.status(200).json({ status: result?.status, message: result?.message, data: result?.data });
     } catch (error) {
         next(error);

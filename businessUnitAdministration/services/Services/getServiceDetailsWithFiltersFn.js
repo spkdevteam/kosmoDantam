@@ -6,7 +6,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatService } = require("../../../utils/helperFunctions");
 
-const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, fromDate, toDate, departmentId, branchId, buId, createdUser, updatedUser, deletedUser, clientId }) => {
+const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, serviceId, fromDate, toDate, departmentId, branchId, buId, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
         const db = await getClientDatabaseConnection(clientId);
         const Service = await db.model("service", serviceSchema);
@@ -17,6 +17,37 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
         const department = await db.model("department", departmentSchema);
         const branch = await db.model("branch", clinetBranchSchema);
         const user = await db.model("clientUsers", clinetUserSchema);
+
+        if (serviceId) {
+            const specificService = await Service.findOne({ _id: serviceId, deletedAt: null })
+                .populate("buId", "_id name")
+                .populate("branchId", "_id name")
+                .populate("departmentId", "_id deptName")
+                .populate("createdBy", "_id firstName lastName")
+                .populate("updatedBy", "_id firstName lastName")
+                .populate("deletedBy", "_id firstName lastName")
+                .lean();
+
+            if (!specificService) {
+                return { status: false, message: "Service not found" };
+            }
+
+            const formattedService = formatService(specificService);
+
+            return {
+                status: true,
+                message: "The Service retrieved successfully.",
+                data: {
+                    service: formattedService,
+                    metadata: {
+                        page: 1,
+                        perPage: 1,
+                        totalCount: 1,
+                        totalPages: 1
+                    },
+                },
+            };
+        }
 
         // if (!page || !perPage) {
         //     const allService = await Service.find({ deletedAt: null })

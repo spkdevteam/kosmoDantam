@@ -29,6 +29,12 @@
  *         description: Search term for filtering procedure records.
  *         example: "final"
  *       - in: query
+ *         name: procedureId
+ *         schema:
+ *           type: string
+ *           example: ""
+ *         description: procedure ID to filter procedure (optional).
+ *       - in: query
  *         name: clientId
  *         schema:
  *           type: string

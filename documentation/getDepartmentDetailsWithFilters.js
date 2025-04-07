@@ -35,6 +35,12 @@
  *           example: "perio"
  *         description: Keyword to filter departments (default is an empty string).
  *       - in: query
+ *         name: departmentId
+ *         schema:
+ *           type: string
+ *           example: ""
+ *         description: department ID to filter department (optional).
+ *       - in: query
  *         name: fromDate
  *         schema:
  *           type: string

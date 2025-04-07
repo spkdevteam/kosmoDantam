@@ -4,7 +4,7 @@ const getProcedureDetailsWithFiltersFn = require("../../services/procedure/getPr
 
 const getProcedureDetailsWithFilters = async (req, res, next) => {
     try {
-        const { page = null, perPage = null, searchKey, deptId, serviceId, buId, branchId, createdUser, updatedUser, deletedUser, fromDate, toDate, clientId } = await sanitizeBody(req.query);
+        const { page = null, perPage = null, searchKey, procedureId, deptId, serviceId, buId, branchId, createdUser, updatedUser, deletedUser, fromDate, toDate, clientId } = await sanitizeBody(req.query);
         const validation = [
             clientIdValidation({ clientId })
         ];
@@ -15,6 +15,10 @@ const getProcedureDetailsWithFilters = async (req, res, next) => {
 
         if (branchId) {
             validation.push(mongoIdValidation({ _id: branchId, name: "branchId" }));
+        }
+
+        if (procedureId) {
+            validation.push(mongoIdValidation({ _id: procedureId, name: "procedureId" }));
         }
 
         if (deptId) {
@@ -46,7 +50,7 @@ const getProcedureDetailsWithFilters = async (req, res, next) => {
         if (fromDate && !isValidDate({ value: fromDate }).status) return { status: false, message: "Invalid from date" };
         if (toDate && !isValidDate({ value: toDate }).status) return { status: false, message: "Invalid to date" };
 
-        const result = await getProcedureDetailsWithFiltersFn({ page, perPage, searchKey, deptId, serviceId, buId, branchId, createdUser, updatedUser, deletedUser, fromDate, toDate, clientId });
+        const result = await getProcedureDetailsWithFiltersFn({ page, perPage, searchKey, procedureId, deptId, serviceId, buId, branchId, createdUser, updatedUser, deletedUser, fromDate, toDate, clientId });
         return res.status(200).json({ status: result?.status, message: result?.message, data: result?.data });
     }catch(error){
         next(error);
