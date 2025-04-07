@@ -75,7 +75,7 @@ const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey=
         const branchModel = await db.model('branch',clinetBranchSchema);
         const businessUnitModel = await db.model('businessUnit',clinetBusinessUnitSchema);
         const clientUsersModel = await db.model('clientUsers', clinetUserSchema);
-        const complaintModel = await db.model('complaint',cheifComplaintSchema);
+        const complaintModel = db?.model?.complaint || await db.model('complaint',cheifComplaintSchema);
         const patientFindingModel = await db.model('patientFinding',patientFindingsSchema);
         const medicalCaseModel = await db.model('medicalCase',medicalCasesSchema);
         const departmentModel = await db.model('department',departmentSchema);
