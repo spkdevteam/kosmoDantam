@@ -1,6 +1,8 @@
 
 const express = require('express')
 const appointment = require('../controller/appointment.controller')
+const getAppointmentWithFilter = require('../controller/appointment/getAppointmentWithFilter.controller')
+const { tempAuthorizeEntity } = require('../../middleware/authorization/commonEntityAuthorization/tempUserValidation')
 const bookingRoutes = express.Router()
 
 bookingRoutes
@@ -8,7 +10,7 @@ bookingRoutes
        .get('/BookingByDate',appointment.getBookingByDate)
        .get('/BookingByDateNonTabular',appointment.getBookingByDateNonTabular)
        .get('/getAvailability',appointment.getAvailability)
-       .delete('/delete',appointment.delete)
+       .delete('/delete', appointment.delete)
        .get('/createToken',appointment.createToken)
        .post('/changeAppointmentStatus',appointment.changeBookingStatus)
        .get('/getdailyBookingWithPagination',appointment.getdailyBookingWithPagination)
@@ -18,6 +20,5 @@ bookingRoutes
        .get('/getBookingSummaryByPeriod',appointment.getBookingSummaryByPeriod)
        .get('/getDatewiseBookingSummaryByPeriod',appointment.getDatewiseBookingSummaryByPeriod)
        .get('/filterPatientBookingDetails',appointment.filterPatientBookingDetails)
-       
-
+       .get('/getAppointmentWithFilter', getAppointmentWithFilter)
 module.exports = bookingRoutes

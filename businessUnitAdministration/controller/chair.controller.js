@@ -378,24 +378,24 @@ exports.updateChairStatusReady = async (req, res, next) => {
     try {
         const mainUser = req.user;
         const data = await sanitizeBody(req.body)
-        const updateChairStatus = await updateChairStatustoReady({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId,appointmentId: data?.appointmentId, user: mainUser._id })
+        const updateChairStatus = await updateChairStatustoReady({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId,appointmentId: data?.appointmentId, user: mainUser?._id })
 
         
 
         if (!updateChairStatus?.status) {
-            res.json({ ...updateChairStatus })
+            res.json({ ...updateChairStatus });
         }
         else {
             const updateAppointStatus = await updatePatientStatustoChairReady({ appointmentId: data?.appointmentId, clientId: data?.clientId, patientId: data?.patientId });
             if (!updateAppointStatus?.status) res.json({ ...updateAppointStatus })
                 else {
-                    console.log(updateChairStatus,updateAppointStatus, '----------------------')
+                    console.log(updateChairStatus,updateAppointStatus, '----------------------');
 
                 if (updateChairStatus && updateAppointStatus) {
-                    res.json({ status: true, message: 'chair status updated ' })
+                    res.json({ status: true, message: 'chair status updated ' });
                 }
                 else {
-                    res.json({ status: false, message: 'chair status updated ' })
+                    res.json({ status: false, message: 'chair status updated ' });
                 }
             }
         }
@@ -413,19 +413,19 @@ exports.updateChairStatusInprogress = async (req, res, next) => {
         const data = await sanitizeBody(req.body)
         const updateChairStatus = await updateChairStatusInprogress({ chairId: data?.chairId, clientId: data?.clientId, patientId: data?.patientId, user: mainUser._id })
         if (!updateChairStatus?.status) {
-            res.json({ ...updateChairStatus })
+            res.json({ ...updateChairStatus });
         }
         else {
             const updateAppointStatus = await updatePatientStatustoInprogress({ appointmentId: data?.appointmentId, clientId: data?.clientId, patientId: data?.patientId })
             if (!updateAppointStatus?.status) res.json({ ...updateAppointStatus })
                 else {
-                    console.log(updateChairStatus,updateAppointStatus, '----------------------')
+                    console.log(updateChairStatus,updateAppointStatus, '----------------------');
 
                 if (updateChairStatus && updateAppointStatus) {
-                    res.json({ status: true, message: 'chair status updated ' })
+                    res.json({ status: true, message: 'chair status updated ' });
                 }
                 else {
-                    res.json({ status: false, message: 'chair status updated ' })
+                    res.json({ status: false, message: 'chair status updated ' });
                 }
             }
         }

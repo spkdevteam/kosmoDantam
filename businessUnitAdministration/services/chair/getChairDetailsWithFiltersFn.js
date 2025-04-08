@@ -7,6 +7,7 @@ const clinetUserSchema = require("../../../client/model/user");
 
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatChair } = require("../../../utils/helperFunctions");
+const statusConversion = require("../../../utils/statusConversion");
 
 const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, chairId, businessUnitId, branchId, status, fromDate, toDate, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
@@ -45,7 +46,7 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
                 status: true,
                 message: "The chair retrieved successfully.",
                 data: {
-                    chair: formattedChair,
+                    chairs: formattedChair,
                     metadata: {
                         page: 1,
                         perPage: 1,
@@ -55,39 +56,6 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
                 },
             };
         };
-
-        // if (!page || !perPage) {
-        //     const allChairs = await Chair.find({ deletedAt: null })
-        //         .populate("businessUnit", "_id name")
-        //         .populate("branch", "_id name")
-        //         .populate("activePatientId", "_id firstName lastName")
-        //         .populate("activeAppointmentId", "_id displayId")
-        //         .populate("createdBy", "_id firstName lastName")
-        //         .populate("updatedBy", "_id firstName lastName")
-        //         .populate("deletedBy", "_id firstName lastName")
-        //         .lean();
-
-        //     const formattedChairs = allChairs.map((chair) => formatChair(chair));
-
-        //     return {
-        //         status: true,
-        //         message: "All chairs retrieved successfully.",
-        //         data: {
-        //             chairs: formattedChairs,
-        //             metadata: {
-        //                 page: 1,
-        //                 perPage: allChairs?.length,
-        //                 totalCount: allChairs?.length,
-        //                 totalPages: 1
-        //             },
-        //         },
-        //     };
-        // };
-
-        //.map((chair) => formatChair(chair))
-
-        //const chairsWithBussinessUnitId = await Chair.find({ deletedAt: null, isActive: true, businessUnit: bussinessUnitId });
-        //const chairsWithbranchId = chairsWithBussinessUnitId.includes({ branch: branchId });
 
         let searchQuery = {};
         if (searchKey) {
@@ -110,7 +78,7 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
         //apply filters only if parameters exist
         const businessSearchKey = businessUnitId ? { businessUnit: businessUnitId } : {};
         const branchIdSearchKey = branchId ? { branch: branchId } : {};
-        const statusSearchKey = status ? { status } : {};
+        //const statusSearchKey = statusForSearchKey ? { status: statusForSearchKey } : {};
         const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
         const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
         const deletedUserSearchKey = deletedUser ? { deletedBy: deletedUser } : {};
@@ -129,7 +97,7 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
             const allChairs = await Chair.find({
                 ...searchQuery,
                 ...businessSearchKey,
-                ...statusSearchKey,
+                //...statusSearchKey,
                 ...branchIdSearchKey,
                 ...dateSearchKey,
                 ...createdUserSearchKey,
@@ -168,7 +136,7 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
         let query = Chair.find({
             ...searchQuery,
             ...businessSearchKey,
-            ...statusSearchKey,
+            //...statusSearchKey,
             ...branchIdSearchKey,
             ...dateSearchKey,
             ...createdUserSearchKey,
@@ -201,7 +169,7 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
         const totalCount = await Chair.countDocuments({
             ...searchQuery,
             ...businessSearchKey,
-            ...statusSearchKey,
+            //...statusSearchKey,
             ...branchIdSearchKey,
             ...dateSearchKey,
             ...createdUserSearchKey,

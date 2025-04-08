@@ -9,7 +9,6 @@ const { formatProcedure } = require("../../../utils/helperFunctions");
 
 const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, procedureId, deptId, serviceId, buId, branchId, createdUser, updatedUser, deletedUser, fromDate, toDate, clientId }) => {
     try {
-        console.log(clientId);
         const db = await getClientDatabaseConnection(clientId);
         const Procedure = await db.model('procedure', procedureSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
@@ -42,7 +41,7 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
                 status: true,
                 message: "The Procedure retrieved successfully.",
                 data: {
-                    procedure: formattedProcedure,
+                    procedures: formattedProcedure,
                     metadata: {
                         page: 1,
                         perPage: 1,
@@ -52,39 +51,6 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
                 },
             };
         };
-
-        // if (!page || !perPage) {
-        //     const allProcedure = await Procedure.find({ deletedAt: null })
-        //         .populate("buId", "_id name")
-        //         .populate("branchId", "_id name")
-        //         .populate("services", "_id serviceName")
-        //         .populate("deptId", "_id deptName")
-        //         .populate("createdBy", "_id firstName lastName")
-        //         .populate("updatedBy", "_id firstName lastName")
-        //         .populate("deletedBy", "_id firstName lastName")
-        //         .lean();
-
-        //     const formattedProcedure = allProcedure.map((procedure) => formatProcedure(procedure));
-
-        //     return {
-        //         status: true,
-        //         message: "All Procedures retrieved successfully.",
-        //         data: {
-        //             procedures: formattedProcedure,
-        //             metadata: {
-        //                 page: 1,
-        //                 perPage: allProcedure?.length,
-        //                 totalCount: allProcedure?.length,
-        //                 totalPages: 1
-        //             },
-        //         },
-        //     };
-        // };
-
-        //.map((chair) => formatChair(chair))
-
-        //const chairsWithBussinessUnitId = await Chair.find({ deletedAt: null, isActive: true, businessUnit: bussinessUnitId });
-        //const chairsWithbranchId = chairsWithBussinessUnitId.includes({ branch: branchId });
 
         let searchQuery = {};
         if (searchKey) {

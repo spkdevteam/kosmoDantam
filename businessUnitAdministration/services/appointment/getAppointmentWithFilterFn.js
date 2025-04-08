@@ -1,49 +1,54 @@
-const clinetBranchSchema = require("../../../client/model/branch");
-const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
-const caseSheetSchema = require("../../../client/model/caseSheet");
-const clinetPatientSchema = require("../../../client/model/patient");
-const prescriptionSchema = require("../../../client/model/prescription");
-const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
-const { formatPrescription } = require("../../../utils/helperFunctions");
+const appointmentSchema = require("../../../client/model/appointments");
+const clinetChairSchema = require("../../../client/model/chair");
+const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
+const clinetBranchSchema = require("../../../client/model/branch");
+const caseSheetSchema = require("../../../client/model/caseSheet");
+const clinetUserSchema = require("../../../client/model/user");
+const clinetPatientSchema = require("../../../client/model/patient");
+const { formatAppointment } = require("../../../utils/helperFunctions");
 
-const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, prescriptionId, fromDate, toDate, buId, branchId, doctorId, patientId, caseSheetId, nextVisitDate, createdUser, updatedUser, deletedUser, clientId }) => {
+const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchKey, appointmentId, fromDate, toDate, buId, branchId, dutyDoctorId, specialistDoctorId, dentalAssistant, patientId, caseSheetId, caseId, createdUser, updatedUser, clientId }) => {
     try {
         const db = await getClientDatabaseConnection(clientId);
-        const Prescription = await db.model('prescription', prescriptionSchema)
+        const Appointment = await db.model('Appointment', appointmentSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
 
         //these are user for populating the data
         const businessUnit = await db.model("businessUnit", clinetBusinessUnitSchema);
         const branch = await db.model("branch", clinetBranchSchema);
-        const user = await db.model("clientUsers", clinetUserSchema);
         const caseSheet = db.model('caseSheet', caseSheetSchema);
+        const user = await db.model("clientUsers", clinetUserSchema);
         const patient = db.model('patient', clinetPatientSchema);
+        const chair = await db.model("chair", clinetChairSchema);
 
 
-        if (prescriptionId) {
-            const specificPrescription = await Prescription.findOne({ _id: prescriptionId, deletedAt: null })
+        if (appointmentId) {
+            const specificAppointment = await Appointment.findOne({ _id: appointmentId, deletedAt: null })
                 .populate("buId", "_id name")
                 .populate("branchId", "_id name")
-                .populate("doctorId", "_id firstName lastName")
+                .populate("dutyDoctorId", "_id firstName lastName")
+                .populate("specialistDoctorId", "_id firstName lastName")
                 .populate("patientId", "_id firstName lastName")
                 .populate("caseSheetId", "_id displayId")
+                .populate("chairId", "_id chairNumber")
+                .populate("caseId", "_id displayId")
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
                 .lean();
 
-            if (!specificPrescription) {
-                return { status: false, message: "Prescription not found" };
+            if (!specificAppointment) {
+                return { status: false, message: "Appointment not found" };
             }
 
-            const formattedPrescription = formatPrescription(specificPrescription);
+            const formattedAppointment = formatAppointment(specificAppointment);
 
             return {
                 status: true,
-                message: "The Prescription retrieved successfully.",
+                message: "The Appointment retrieved successfully.",
                 data: {
-                    prescriptions: formattedPrescription,
+                    appointments: formattedAppointment,
                     metadata: {
                         page: 1,
                         perPage: 1,
@@ -52,7 +57,7 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
                     },
                 },
             };
-        }
+        };
 
         let searchQuery = {};
         if (searchKey) {
@@ -65,24 +70,9 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
                 searchQuery = {
                     $or: words.flatMap(word => [
                         { displayId: { $regex: word, $options: "i" } },
-                        { additionalAdvice: { $regex: word, $options: "i" } },
-                        { nextVisitDiscription: { $regex: word, $options: "i" } },
-                        {
-                            drugArray: {
-                                $elemMatch: {
-                                    $or: [
-                                        { drugName: { $regex: word, $options: "i" } },
-                                        { drug: { $regex: word, $options: "i" } },
-                                        { dosage: { $regex: word, $options: "i" } },
-                                        { freequency: { $regex: word, $options: "i" } },
-                                        { duration: { $regex: word, $options: "i" } },
-                                        { instruction: { $regex: word, $options: "i" } },
-                                        { note: { $regex: word, $options: "i" } },
-                                        { timing: { $regex: word, $options: "i" } }
-                                    ]
-                                }
-                            }
-                        }
+                        { status: { $regex: word, $options: "i" } },
+                        { chiefComplaint: { $regex: word, $options: "i" } },
+
                     ]),
                 };
             };
@@ -91,12 +81,15 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
         // Apply filters only if parameters exist
         const businessSearchKey = buId ? { buId } : {};
         const branchIdSearchKey = branchId ? { branchId } : {};
-        const doctorIdSearchKey = doctorId ? { doctorId } : {};
-        const patientIdIdSearchKey = patientId ? { patientId } : {};
+        const dutyDoctorIdSearchKey = dutyDoctorId ? { dutyDoctorId } : {};
+        const specialistDoctorIdSearchKey = specialistDoctorId ? { specialistDoctorId } : {};
+        const patientIdSearchKey = patientId ? { patientId } : {};
+        const dentalAssistantIdSearchKey = dentalAssistant ? { dentalAssistant } : {};
         const caseSheetIdSearchKey = caseSheetId ? { caseSheetId } : {};
+        const caseIdSearchKey = caseId ? { caseId } : {};
         const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
         const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
-        const deletedUserSearchKey = deletedUser ? { deletedBy: deletedUser } : {};
+        //const deletedUserSearchKey = deletedUser ? { deletedBy: deletedUser } : {};
 
 
         // Apply date filters
@@ -105,44 +98,55 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
             dateSearchKey = { createdAt: {} };
             if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
             if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
-            if (nextVisitDate) dateSearchKey.nextVisitDateSearchKey = new Date(nextVisitDate);
         }
 
 
+        // if (slotFrom || slotTo) {
+        //     dateSearchKey = { createdAt: {} };
+        //     if (slotFrom) dateSearchKey.createdAt.$gte = new Date(slotFrom);
+        //     if (slotTo) dateSearchKey.createdAt.$lte = new Date(slotTo);
+        // }
+
+
         if (!page || !perPage) {
-            const allPrescription = await Prescription.find({
+            const allAppointment = await Appointment.find({
                 ...searchQuery,
                 ...businessSearchKey,
                 ...branchIdSearchKey,
-                ...doctorIdSearchKey,
-                ...patientIdIdSearchKey,
+                ...dutyDoctorIdSearchKey,
+                ...specialistDoctorIdSearchKey,
+                ...patientIdSearchKey,
+                ...dentalAssistantIdSearchKey,
                 ...caseSheetIdSearchKey,
+                ...caseIdSearchKey,
                 ...createdUserSearchKey,
                 ...updatedUserSearchKey,
-                ...deletedUserSearchKey,
                 deletedAt: null,
             })
                 .populate("buId", "_id name")
                 .populate("branchId", "_id name")
-                .populate("doctorId", "_id firstName lastName")
+                .populate("dutyDoctorId", "_id firstName lastName")
+                .populate("specialistDoctorId", "_id firstName lastName")
                 .populate("patientId", "_id firstName lastName")
                 .populate("caseSheetId", "_id displayId")
+                .populate("chairId", "_id chairNumber")
+                .populate("caseId", "_id displayId")
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
                 .lean();
 
 
-            const formattedPrescription = allPrescription.map((prescription) => formatPrescription(prescription));
+            const formattedAppointment = allAppointment.map((appointment) => formatAppointment(appointment));
             return {
                 status: true,
-                message: "All Prescriptions retrieved successfully.",
+                message: "All Appointment retrieved successfully.",
                 data: {
-                    prescriptions: formattedPrescription,
+                    appointments: formattedAppointment,
                     metadata: {
                         page: 1,
-                        perPage: allPrescription?.length,
-                        totalCount: allPrescription?.length,
+                        perPage: allAppointment?.length,
+                        totalCount: allAppointment?.length,
                         totalPages: 1
                     },
                 },
@@ -151,23 +155,28 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
 
 
         // Query the database
-        let query = Prescription.find({
+        let query = Appointment.find({
             ...searchQuery,
             ...businessSearchKey,
             ...branchIdSearchKey,
-            ...doctorIdSearchKey,
-            ...patientIdIdSearchKey,
+            ...dutyDoctorIdSearchKey,
+            ...specialistDoctorIdSearchKey,
+            ...patientIdSearchKey,
+            ...dentalAssistantIdSearchKey,
             ...caseSheetIdSearchKey,
+            ...caseIdSearchKey,
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
-            ...deletedUserSearchKey,
             deletedAt: null,
         })
             .populate("buId", "_id name")
             .populate("branchId", "_id name")
-            .populate("doctorId", "_id firstName lastName")
+            .populate("dutyDoctorId", "_id firstName lastName")
+            .populate("specialistDoctorId", "_id firstName lastName")
             .populate("patientId", "_id firstName lastName")
             .populate("caseSheetId", "_id displayId")
+            .populate("chairId", "_id chairNumber")
+            .populate("caseId", "_id displayId")
             .populate("createdBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")
             .populate("deletedBy", "_id firstName lastName")
@@ -181,22 +190,24 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
         const skip = (page - 1) * perPage;
 
         // Fetch data
-        const prescriptions = await query.skip(skip).limit(perPage);
+        const appointments = await query.skip(skip).limit(perPage);
 
 
-        const formattedPrescriptions = prescriptions.map((prescription) => formatPrescription(prescription));
+        const formattedAppointments = appointments.map((appointment) => formatAppointment(appointment));
 
         // Get total count properly
-        const totalCount = await Prescription.countDocuments({
+        const totalCount = await Appointment.countDocuments({
             ...searchQuery,
             ...businessSearchKey,
             ...branchIdSearchKey,
-            ...doctorIdSearchKey,
-            ...patientIdIdSearchKey,
+            ...dutyDoctorIdSearchKey,
+            ...specialistDoctorIdSearchKey,
+            ...patientIdSearchKey,
+            ...dentalAssistantIdSearchKey,
             ...caseSheetIdSearchKey,
+            ...caseIdSearchKey,
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
-            ...deletedUserSearchKey,
             deletedAt: null,
         });
 
@@ -205,9 +216,9 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
 
         return {
             status: true,
-            message: totalCount < 1 ? "No Prescriptions found" : "Precription details retrieved successfully.",
+            message: totalCount < 1 ? "No Appointments found" : "Appointment details retrieved successfully.",
             data: {
-                prescriptions: formattedPrescriptions,
+                appointments: formattedAppointments,
                 metadata: {
                     page,
                     perPage,
@@ -223,4 +234,4 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
     }
 }
 
-module.exports = getPrescriptionDetailsWithFiltersFn;
+module.exports = getAppointmentWithFilterFn;

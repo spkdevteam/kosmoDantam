@@ -318,6 +318,7 @@ exports.activeinactiveBranchByBusinessUnit = async (req, res) => {
 
         branch.isActive = status === "1";
         branch.updatedBy = mainUser?._id;
+
         await branch.save();
 
         this.listBranch(req, res);

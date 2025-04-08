@@ -36,7 +36,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
                 status: true,
                 message: "The department retrieved successfully.",
                 data: {
-                    department: formattedDepartment,
+                    departments: formattedDepartment,
                     metadata: {
                         page: 1,
                         perPage: 1,
@@ -46,37 +46,6 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
                 },
             };
         }
-
-        // if (!page || !perPage) {
-        //     const allDepartments = await Department.find({ deletedAt: null })
-        //         .populate("buId", "_id name")
-        //         .populate("branchId", "_id name")
-        //         .populate("createdBy", "_id firstName lastName")
-        //         .populate("updatedBy", "_id firstName lastName")
-        //         .populate("deletedBy", "_id firstName lastName")
-        //         .lean();
-
-        //     const formattedDepartments = allDepartments.map((department) => formatDepartment(department));
-
-        //     return {
-        //         status: true,
-        //         message: "All Departments retrieved successfully.",
-        //         data: {
-        //             departments: formattedDepartments,
-        //             metadata: {
-        //                 page: 1,
-        //                 perPage: allDepartments?.length,
-        //                 totalCount: allDepartments?.length,
-        //                 totalPages: 1
-        //             },
-        //         },
-        //     };
-        // };
-
-        //.map((chair) => formatChair(chair))
-
-        //const chairsWithBussinessUnitId = await Chair.find({ deletedAt: null, isActive: true, businessUnit: bussinessUnitId });
-        //const chairsWithbranchId = chairsWithBussinessUnitId.includes({ branch: branchId });
 
         let searchQuery = {};
         if (searchKey) {

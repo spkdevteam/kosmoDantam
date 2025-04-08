@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
  
 const appointmentSchema = new mongoose.Schema({
@@ -6,23 +5,26 @@ const appointmentSchema = new mongoose.Schema({
     displayId: { type: String, required: true }, 
     branchId: { type: mongoose.Schema.ObjectId, ref: 'branch', required: true,index:true },
     caseSheetId: { type: mongoose.Schema.ObjectId, ref: 'caseSheet', required: true,index:true },
-    token: { type: String, default: null  }, 
+    token: { type: String, default: null }, 
     date: { type: Date, required: true }, 
     caseId: { type: mongoose.Schema.ObjectId, ref: 'caseSheet', index:true },
     dutyDoctorId: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', required: true,index:true },
     specialistDoctorId: { type: mongoose.Schema.ObjectId, ref: 'clientUsers',index:true },
     dentalAssistant: { type: mongoose.Schema.ObjectId, ref: 'clientUsers', index:true,default:null }, 
-    slotFrom: { type: Date  }, 
-    slotTo: { type: Date }, 
+    slotFrom: { type: Date },
+    slotTo: { type: Date },
     chairId: { type: mongoose.Schema.ObjectId, ref: 'chair', required: true,index:true },  
     patientId: { type: mongoose.Schema.ObjectId, ref: 'patient', required: true,index:true },
     status: { 
-        type: String, 
-        default: 'Scheduled' 
+        type: String,
+        default: 'Scheduled'
     }, 
-    chiefComplaint:{type:String},
+    chiefComplaint: { type:String },
     isActive: { type: Boolean, default: true }, 
     deletedAt: { type: Date, default: null }, 
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "clientUsers", default: null, index: true },
+    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "clientUsers", default: null, index: true },
+    deletedBy: { type: mongoose.Schema.Types.ObjectId, ref: "clientUsers", default: null, index: true }
     // createdUser: { type: String, required: true }
 }, { timestamps: true }); // Automatically adds createdAt and updatedAt timestamps
 

@@ -38,7 +38,7 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
                 status: true,
                 message: "The Service retrieved successfully.",
                 data: {
-                    service: formattedService,
+                    services: formattedService,
                     metadata: {
                         page: 1,
                         perPage: 1,
@@ -48,38 +48,6 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
                 },
             };
         }
-
-        // if (!page || !perPage) {
-        //     const allService = await Service.find({ deletedAt: null })
-        //         .populate("buId", "_id name")
-        //         .populate("branchId", "_id name")
-        //         .populate("departmentId", "_id deptName")
-        //         .populate("createdBy", "_id firstName lastName")
-        //         .populate("updatedBy", "_id firstName lastName")
-        //         .populate("deletedBy", "_id firstName lastName")
-        //         .lean();
-
-        //     const formattedServices = allService.map((service) => formatService(service));
-
-        //     return {
-        //         status: true,
-        //         message: "All Services retrieved successfully.",
-        //         data: {
-        //             services: formattedServices,
-        //             pagination: {
-        //                 page: 1,
-        //                 perPage: allService?.length,
-        //                 totalCount: allService?.length,
-        //                 totalPages: 1
-        //             },
-        //         },
-        //     };
-        // };
-
-        //.map((chair) => formatChair(chair))
-
-        //const chairsWithBussinessUnitId = await Chair.find({ deletedAt: null, isActive: true, businessUnit: bussinessUnitId });
-        //const chairsWithbranchId = chairsWithBussinessUnitId.includes({ branch: branchId });
 
         let searchQuery = {};
         if (searchKey) {

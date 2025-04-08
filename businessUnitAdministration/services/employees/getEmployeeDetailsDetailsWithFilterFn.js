@@ -37,7 +37,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
                 status: true,
                 message: "The Employee retrieved successfully.",
                 data: {
-                    employee: formattedEmployee,
+                    employees: formattedEmployee,
                     metadata: {
                         page: 1,
                         perPage: 1,
@@ -47,38 +47,6 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
                 },
             };
         };
-
-        // if (!page || !perPage) {
-        //     const allEmployees = await Employee.find({ deletedAt: null })
-        //         .populate("businessUnit", "_id name")
-        //         .populate("branch", "_id name")
-        //         .populate("role", "_id name")
-        //         .populate("createdBy", "_id firstName lastName")
-        //         .populate("updatedBy", "_id firstName lastName")
-        //         .populate("deletedBy", "_id firstName lastName")
-        //         .lean();
-
-        //     const formattedEmployees = allEmployees.map((employee) => formatEmployee(employee));
-
-        //     return {
-        //         status: true,
-        //         message: "All Departments retrieved successfully.",
-        //         data: {
-        //             employees: formattedEmployees,
-        //             metadata: {
-        //                 page: 1,
-        //                 perPage: allEmployees?.length,
-        //                 totalCount: allEmployees?.length,
-        //                 totalPages: 1
-        //             },
-        //         },
-        //     };
-        // };
-
-        //.map((chair) => formatChair(chair))
-
-        //const chairsWithBussinessUnitId = await Chair.find({ deletedAt: null, isActive: true, businessUnit: bussinessUnitId });
-        //const chairsWithbranchId = chairsWithBussinessUnitId.includes({ branch: branchId });
 
         let searchQuery = {};
         if (searchKey) {

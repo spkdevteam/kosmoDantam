@@ -1,5 +1,5 @@
 const sanitizeBody = require("../../../utils/sanitizeBody");
-const { mongoIdValidation, clientIdValidation, isValidDate } = require("../../../utils/validation");
+const { mongoIdValidation, clientIdValidation, isValidDate, validateStatus } = require("../../../utils/validation");
 const getChairDetailsWithFiltersFn = require("../../services/chair/getChairDetailsWithFiltersFn");
 
 const getChairDetailsWithFilters = async (req, res, next) => {
@@ -27,6 +27,9 @@ const getChairDetailsWithFilters = async (req, res, next) => {
         if(deletedUser){
             validation.push(mongoIdValidation({_id: deletedUser, name: "deletedUser"}));
         }
+        // if(status){
+        //     validation.push(validateStatus({ value: status }));
+        // }
 
         const errors = validation.filter((e)=> !e.status);
         if(errors.length > 0) return res.status(400).json({status: false, message: errors.map((e)=> e.message).join(", ")})
