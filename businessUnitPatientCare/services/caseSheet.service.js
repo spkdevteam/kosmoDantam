@@ -28,7 +28,7 @@ const checkOngoing = async (clientId, patientId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>Cannot overwrite `complaint` model once compiled."
 
         const existing = await CaseSheet.find({
             patientId: patientId,
@@ -53,7 +53,7 @@ const create = async (clientId, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
 
         const newCheifComplaint = await CaseSheet.create(data);
         const populatedCaseSheet = await CaseSheet.findById(newCheifComplaint._id).populate({
@@ -74,7 +74,7 @@ const update = async (clientId, caseSheetId, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
 
         const existing = await CaseSheet.findById(caseSheetId);
         if (!existing) {
@@ -100,7 +100,7 @@ const deleteCheifComplaints = async (clientId, caseSheetId, cheifComplaintId) =>
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
 
         const existing = await CaseSheet.findById(caseSheetId);
         if (!existing) {
@@ -483,6 +483,28 @@ const updateOtherAttachment = async (clientId, caseSheetId, dataObject) => {
         throw new CustomError(error.statusCode || 500, `Error updating other attachment of case sheet: ${error.message}`);
     }
 };
+//api made by rahul for other attachment:
+const getPopulatedOtherAttachment = async(clientId, caseSheetId)=>{
+    try{
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
+        const Service = clientConnection.model('services', serviceSchema);
+        const procedures = clientConnection.model('procedure', procedureSchema)
+        const populatedCaseSheet = await CaseSheet.findById(caseSheetId).populate({
+            path: 'otherAttachment.procedure.procedId',
+            model: procedures,
+            select: 'procedureName _id'
+        }).populate({
+            path: 'otherAttachment.service.servId',
+            model: Service,
+            select: 'serviceName _id'
+        });
+        return populatedCaseSheet
+    }
+    catch(error){
+        throw new CustomError(error.statusCode || 500, `Error fetching other attachment of case sheet: ${error.message}`);
+    }
+}
 
 const createInvestigation = async (clientId, data) => {
     try {
@@ -528,7 +550,7 @@ const createService = async (clientId, isDrafted, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const Department = clientConnection.model('department', departmentSchema);
         const Service = clientConnection.model('services', serviceSchema);
 
@@ -612,7 +634,7 @@ const createServiceNew = async (clientId, isDrafted, data, services) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const Department = clientConnection.model('department', departmentSchema);
         const Service = clientConnection.model('services', serviceSchema);
 
@@ -849,7 +871,7 @@ const updateService = async (clientId, caseSheetId, isDrafted, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const Department = clientConnection.model('department', departmentSchema);
         const Service = clientConnection.model('services', serviceSchema);
 
@@ -1022,7 +1044,7 @@ const updateServiceNew = async (clientId, caseSheetId, isDrafted, data, services
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const Department = clientConnection.model('department', departmentSchema);
         const Service = clientConnection.model('services', serviceSchema);
 
@@ -1118,7 +1140,7 @@ const editServiceService = async (clientId, caseSheetId, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const Department = clientConnection.model('department', departmentSchema);
         const Service = clientConnection.model('services', serviceSchema);
 
@@ -1194,7 +1216,7 @@ const updateProcedure = async (clientId, caseSheetId, isDrafted, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const Department = clientConnection.model('department', departmentSchema);
         const Service = clientConnection.model('services', serviceSchema);
         const procedures = clientConnection.model('procedure', procedureSchema)
@@ -2055,7 +2077,7 @@ const listDrafted = async (clientId, filters = {}) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const [caseSheets] = await Promise.all([
             CaseSheet.find(filters).sort({ _id: -1 }).populate({
@@ -2083,7 +2105,7 @@ const getById = async (clientId, caseSheetId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);
@@ -2219,7 +2241,7 @@ const getCaseDetail = async (clientId, caseSheetId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);
@@ -2311,7 +2333,7 @@ const updateTreatmentProcedure = async (clientId, caseSheetId, procedureId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const existing = await CaseSheet.findById(caseSheetId).populate({
             path: 'cheifComplaints.complaints.compId',
             model: Complaint,
@@ -2339,7 +2361,7 @@ const updateTreatment = async (clientId, caseSheetId, treatmentData) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint =  clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>Cannot overwrite `complaint` model once compiled." =>clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema)
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);
@@ -2421,7 +2443,7 @@ const updateTreatmentAndCloseCase = async (clientId, caseSheetId, treatmentData)
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);
@@ -2471,7 +2493,7 @@ const closeCase = async (clientId, caseSheetId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);
@@ -2523,7 +2545,7 @@ const markedCompleted = async (clientId, caseSheetId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);
@@ -2977,7 +2999,7 @@ const listAllCases = async (clientId, filters = {}) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
         const User = clientConnection.model('clientUsers', clinetUserSchema);
@@ -3018,7 +3040,7 @@ const listAllCasesOfPatient = async (clientId, filters = {}, options = { page: 1
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
         const User = clientConnection.model('clientUsers', clinetUserSchema);
         const { page, limit } = options;
         const skip = (page - 1) * limit;
@@ -3264,7 +3286,8 @@ module.exports = {
 
     createOtherAttachment,
     updateOtherAttachment,
-
+    getPopulatedOtherAttachment,
+    
     createInvestigation,
     updateInvestigation,
 
