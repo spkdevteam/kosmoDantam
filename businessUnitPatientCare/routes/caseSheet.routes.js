@@ -24,6 +24,7 @@ const patchUpdateInvoice = require("../controller/caseSheet/updateInvoice");
 const migrationIntoTreatmentData3 = require("../controller/caseSheet/migrationIntoTreatmentData3");
 const updateCaseSheetWithInvoiceNumber = require("../controller/caseSheet/updateCaseSheetWithInvoiceNumber");
 const getCaseSheetDetailsctrl = require("../../businessUnitAdministration/controller/caseSheet/getCaseSheetDetailsctroler");
+const reverseUpdateCaseSheetWithInvoiceNumber = require("../controller/caseSheet/reverseUpdateCaseSheetWithInvoiceNumber");
 
 
 
@@ -129,6 +130,10 @@ router.post('/updateOtherAttachment', entityAuth.authorizeEntity("Patient", "Cas
         next();
     });
 }, caseSheetController.updateOtherAttachment);
+//api made by rahul for other attachment:
+router.get('/getPopulatedOtherAttachment',
+    //  entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), 
+     caseSheetController.getPopulatedOtherAttachment);
 router.post('/deleteOtherAttachment', entityAuth.authorizeEntity("Patient", "Case Sheet", "create"), caseSheetController.deleteOtherAttachment);
 
 // notes
@@ -199,6 +204,7 @@ router.get('/loadUnbilledItemsFromCaseSheet/:clientId/:caseSheetId',getUnbilledI
 router.patch("/updateInvoice",patchUpdateInvoice)
 router.post("/migrationIntoTreatmentData3",migrationIntoTreatmentData3)
 router.patch("/updateCaseSheetWithInvoiceNumber",updateCaseSheetWithInvoiceNumber)
+router.patch("/reverseUpdateCaseSheetWithInvoiceNumber",reverseUpdateCaseSheetWithInvoiceNumber)
 
 router.get("/getCaseSheetDetails",getCaseSheetDetailsctrl)
 

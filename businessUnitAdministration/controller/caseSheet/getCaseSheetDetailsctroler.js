@@ -9,7 +9,7 @@ const getCaseSheetDetailsctrl = async (req, res) => {
         const data = await sanitizeBody(req?.query);
         console.log("inputData==>>>", data);
         const { from_Date, toDate, clientId, patientId, branchId, buId, compId,
-            clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId, updatedUser, createdUser } = data
+            clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId, updatedUser, createdUser, caseSheetId } = data
         //from_Date, toDate,SearchKey, page, perPage, clientId, patientId, branchId, buId, createdBy, compId, clinicalFindingsFindId,
         //diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId
         const validation = [
@@ -56,10 +56,13 @@ const getCaseSheetDetailsctrl = async (req, res) => {
             validation.push(mongoIdValidation({ _id: invoiceId, name: "invoiceId" }));
         }
         if (createdUser) {
-            validation.push(mongoIdValidation({ _id: createdUser, name: createdUser }))
+            validation.push(mongoIdValidation({ _id: createdUser, name: "createdUser" }))
         }
         if (updatedUser) {
-            validation.push(mongoIdValidation({ _id: updatedUser, name: updatedUser }))
+            validation.push(mongoIdValidation({ _id: updatedUser, name: "updatedUser" }))
+        }
+        if(caseSheetId){
+            validation.push(mongoIdValidation({ _id: caseSheetId, name: "caseSheetId" }))
         }
         const error = validation.filter((e) => e && e.status == false);
         // if (error.length > 0) return { status: false, message: error.map(e => e.message).join(", ") };
@@ -80,7 +83,7 @@ const getCaseSheetDetailsctrl = async (req, res) => {
         const result = await getCaseSheetDetailsFn({
             from_Date, toDate, SearchKey, page, perPage, clientId, patientId, branchId, buId,
             compId, clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId,
-            createdBy: createdUser, updatedBy: updatedUser
+            createdBy: createdUser, updatedBy: updatedUser, caseSheetId
         });
         // console.log("result=>>>>", result)
         if (!result?.status) return res.status(httpStatusCode.InternalServerError).send({

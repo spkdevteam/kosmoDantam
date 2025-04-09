@@ -536,6 +536,31 @@ exports.updateOtherAttachment = async (req, res, next) => {
         next(error)
     }
 };
+//api made by rahul for other attachment:
+exports.getPopulatedOtherAttachment = async (req, res, next) => {
+    try {
+        console.log("hit");
+        const { clientId, caseSheetId } = req.query;
+        if (!clientId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        if (!caseSheetId) {
+            return res.status(statusCode.BadRequest).send({
+                message: message.lblRequiredFieldMissing,
+            });
+        }
+        const fetched = await caseSheetService.getPopulatedOtherAttachment(clientId, caseSheetId);
+        return res.status(statusCode.OK).send({
+            message: "otherAttchment Fethced successfully",
+            data: { otherAttachment: fetched.otherAttachment, _id: fetched._id, },
+        });
+    }
+    catch (error) {
+        next(error)
+    }
+}
 
 // delete other attachment by business unit
 exports.deleteOtherAttachment = async (req, res, next) => {
@@ -799,7 +824,7 @@ exports.updateServicesNew = async (req, res, next) => {
             message: message.lblServicesUpdatedSuccess,
             data: { services: newServiceArray, _id: updatedCaseSheet._id }
         });
-        
+
     } catch (error) {
         next(error)
     }
@@ -1106,7 +1131,7 @@ exports.getAllCaseSheetOfPatient = async (req, res, next) => {
 
 
 // get particular case sheet
-exports.getParticularCaseSheet = async (req, res, next) => { 
+exports.getParticularCaseSheet = async (req, res, next) => {
     try {
         const { clientId, caseSheetId } = req.params;
         if (!clientId || !caseSheetId) {

@@ -220,7 +220,7 @@ exports.listRolesAndPermission = async (req, res) => {
                     for (let key of notExistObj) {
                         if (String(key) === "index") {
                             const pushMenu = defaultPersmissionsList[0].menu[notExistObj[key]];
-                            pushMenu.access = true;
+                            // pushMenu.access = true;
                             // console.log("AdministrationpushMenu=>>>>",pushMenu);
                             cap.menu.push(pushMenu);
                             isUpdated = true;
@@ -250,7 +250,7 @@ exports.listRolesAndPermission = async (req, res) => {
                     // console.log("notExistObj=>>",notExistObj);
                     for (element of notExistObj) {
                         const pushMenu = defaultPersmissionsList[1].menu[element?.index];
-                        pushMenu.access = true;
+                        // pushMenu.access = true;
                          console.log("PatientpushMenu=>>>",pushMenu);
                          
                         cap.menu.push(pushMenu);

@@ -55,6 +55,12 @@
  *         required: false
  *         description: Unique identifier for the business unit.
  *       - in: query
+ *         name: branchId
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Unique identifier for the branch.
+ *       - in: query
  *         name: createdUser
  *         schema:
  *           type: string

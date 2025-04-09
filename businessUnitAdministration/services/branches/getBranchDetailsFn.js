@@ -4,7 +4,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const mongoose = require("mongoose");
 const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey = "", page = null, perPage = null,
-    clientId, businessUnitId = null, createdBy, updatedBy }) => {
+    clientId, businessUnitId = null, createdBy, updatedBy, branchId }) => {
     try {
         let searchQuery = {};
         if (SearchKey) {
@@ -18,6 +18,7 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
                     $or: words.flatMap(word => [//case insensitive searching and searching from anywhere of the target field
                         { name: { $regex: word, $options: "i" } },
                         { incorporationName: { $regex: word, $options: "i" } },
+                        { bookingContact : { $regex: word, $options: "i" } }, 
                         { cinNumber: { $regex: word, $options: "i" } },
                         { gstNumber: { $regex: word, $options: "i" } },
                         { branchPrefix: { $regex: word, $options: "i" } },
@@ -67,6 +68,10 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
         if (updatedBy) {
             updatedBySearchKey = { updatedBy: updatedBy }
         }
+        let branchIdSearchKey = {};
+        if (branchId){
+            branchIdSearchKey = {_id : branchId}
+        }
         //establishing db connection :
         const db = await getClientDatabaseConnection(clientId);
         const branch = await db.model('branch', clinetBranchSchema);
@@ -84,6 +89,7 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
             ...dateSearchKey,
             ...createdBySearchKey,
             ...updatedBySearchKey,
+            ...branchIdSearchKey,
             deletedAt: null
         });
         const totalDocs = await branch.countDocuments({
@@ -94,6 +100,7 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
             ...dateSearchKey,
             ...createdBySearchKey,
             ...updatedBySearchKey,
+            ...branchIdSearchKey,
             deletedAt: null
         });
         console.log("totalDocs==>>>", totalDocs);
