@@ -4,7 +4,13 @@ const getEmployeeDetailsDetailsWithFilterFn = require("../../services/employees/
 
 const getEmployeeDetailsDetailsWithFilter = async (req, res, next) => {
     try{
-        const { page = 1, perPage = 10, searchKey = "", fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId } = await sanitizeBody(req.query);
+        const { page = 1, perPage = 10, searchKey = "", employeeId, fromDate , toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId } = await sanitizeBody(req.query);
+        if(typeof fromDate === "undefined"){
+            fromDate = "";
+        }
+
+        console.log(page, perPage, searchKey, fromDate , toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId)
+
         const validation = [
             clientIdValidation({ clientId })
         ];
@@ -13,6 +19,9 @@ const getEmployeeDetailsDetailsWithFilter = async (req, res, next) => {
         }
         if (branch) {
             validation.push(mongoIdValidation({ _id: branch, name: "branch" }));
+        }
+        if (employeeId) {
+            validation.push(mongoIdValidation({ _id: employeeId, name: "employeeId" }));
         }
         if (createdUser) {
             validation.push(mongoIdValidation({ _id: createdUser, name: "createdUser" }));
@@ -32,8 +41,7 @@ const getEmployeeDetailsDetailsWithFilter = async (req, res, next) => {
 
         if (fromDate && !isValidDate({ value: fromDate }).status) return { status: false, message: "Invalid from date" };
         if (toDate && !isValidDate({ value: toDate }).status) return { status: false, message: "Invalid to date" };
-
-        const result = await getEmployeeDetailsDetailsWithFilterFn({ page, perPage, searchKey, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId });
+        const result = await getEmployeeDetailsDetailsWithFilterFn({ page, perPage, searchKey, employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId });
         return res.status(200).json({ status: result?.status, message: result?.message, data: result?.data });
     }catch(error){
         next(error);

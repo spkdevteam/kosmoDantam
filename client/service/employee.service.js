@@ -40,7 +40,7 @@ const updateEmployee = async (clientId, employeeId, updateData) => {
 
         if (!employee) {
             throw new CustomError(statusCode.NotFound, message.lblEmployeeNotFound);
-        }
+        };
 
 
         const existingEmployee = await User.findOne({
@@ -62,8 +62,7 @@ const updateEmployee = async (clientId, employeeId, updateData) => {
         // Update chair properties
         Object.assign(employee, updateData);
         await employee.save();
-        return prevEmailAndPhone
-
+        return prevEmailAndPhone;
     } catch (error) {
         throw new CustomError(error.statusCode || 500, `Error updating employee: ${error.message}`);
     }

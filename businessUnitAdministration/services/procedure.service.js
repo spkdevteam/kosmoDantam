@@ -203,15 +203,15 @@ const editProcedure = async (input) => {
         // Check if all values are the same
         console.log(existingProcedure.services,input?.services ,'existingProcedure.services,input?.services ')
         const areServicesEqual = JSON.stringify(existingProcedure.services.sort()) === JSON.stringify((input?.services?.map((item)=>item?._id) || []).sort());
-        console.log(existingProcedure.deptId.toString() === input?.deptId.toString() ,
+        console.log(existingProcedure.deptId?.toString() === input?.deptId?.toString() ,
         existingProcedure.procedureName === input?.procedureName ,
         existingProcedure.description === input?.description ,
-        existingProcedure.branchId.toString() === input?.branchId.toString() ,areServicesEqual,'99999999999999999999999999' )
+        existingProcedure.branchId?.toString() === input?.branchId?.toString() ,areServicesEqual,'99999999999999999999999999' )
         if (
-            existingProcedure.deptId.toString() === input?.deptId.toString() &&
+            existingProcedure.deptId?.toString() === input?.deptId?.toString() &&
             existingProcedure.procedureName === input?.procedureName &&
             existingProcedure.description === input?.description &&
-            existingProcedure.branchId.toString() === input?.branchId.toString() &&
+            existingProcedure.branchId?.toString() === input?.branchId?.toString() &&
             areServicesEqual
         ) {
             return { status: false, message: 'No Changes Found to Update ', statusCode: 200 };

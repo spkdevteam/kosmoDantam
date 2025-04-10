@@ -32,4 +32,12 @@ function isValidDate({ value }) {
     return { status: true, message: "Success" };
 }
 
-module.exports = { clientIdValidation, emptyStringValidation, mongoIdValidation, isValidDate };
+
+function validateStatus({ value }) {
+    if (typeof value !== "string") {
+      return {status: false, message: "Invalid status" };
+    }
+    return { status: true, message: "Success"};
+  }
+
+module.exports = { clientIdValidation, emptyStringValidation, mongoIdValidation, isValidDate, validateStatus };

@@ -29,6 +29,12 @@
  *         description: Search term for filtering prescription records.
  *         example: "before"
  *       - in: query
+ *         name: prescriptionId
+ *         schema:
+ *           type: string
+ *           example: ""
+ *         description: prescription ID to filter prescription (optional).
+ *       - in: query
  *         name: clientId
  *         schema:
  *           type: string

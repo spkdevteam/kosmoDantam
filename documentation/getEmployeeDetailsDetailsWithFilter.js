@@ -29,6 +29,12 @@
  *         description: Search term for filtering employee records.
  *         example: "kasif"
  *       - in: query
+ *         name: employeeId
+ *         schema:
+ *           type: string
+ *           example: ""
+ *         description: employee ID to filter employee (optional).
+ *       - in: query
  *         name: clientId
  *         schema:
  *           type: string

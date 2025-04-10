@@ -5,7 +5,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatDepartment } = require("../../../utils/helperFunctions");
 
-const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchKey, fromDate, toDate, buId, branchId, createdUser, updatedUser, deletedUser, clientId, status }) => {
+const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchKey, departmentId, fromDate, toDate, buId, branchId, createdUser, updatedUser, deletedUser, clientId, status }) => {
     try {
         const db = await getClientDatabaseConnection(clientId);
         const Department = await db.model("department", departmentSchema);
@@ -16,36 +16,36 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
         const branch = await db.model("branch", clinetBranchSchema);
         const user = await db.model("clientUsers", clinetUserSchema);
 
-        // if (!page || !perPage) {
-        //     const allDepartments = await Department.find({ deletedAt: null })
-        //         .populate("buId", "_id name")
-        //         .populate("branchId", "_id name")
-        //         .populate("createdBy", "_id firstName lastName")
-        //         .populate("updatedBy", "_id firstName lastName")
-        //         .populate("deletedBy", "_id firstName lastName")
-        //         .lean();
 
-        //     const formattedDepartments = allDepartments.map((department) => formatDepartment(department));
+        if (departmentId) {
+            const specificDepartment = await Department.findOne({ _id: departmentId, deletedAt: null })
+                .populate("buId", "_id name")
+                .populate("branchId", "_id name")
+                .populate("createdBy", "_id firstName lastName")
+                .populate("updatedBy", "_id firstName lastName")
+                .populate("deletedBy", "_id firstName lastName")
+                .lean();
 
-        //     return {
-        //         status: true,
-        //         message: "All Departments retrieved successfully.",
-        //         data: {
-        //             departments: formattedDepartments,
-        //             metadata: {
-        //                 page: 1,
-        //                 perPage: allDepartments?.length,
-        //                 totalCount: allDepartments?.length,
-        //                 totalPages: 1
-        //             },
-        //         },
-        //     };
-        // };
+            if (!specificDepartment) {
+                return { status: false, message: "Department not found" };
+            }
 
-        //.map((chair) => formatChair(chair))
+            const formattedDepartment = formatDepartment(specificDepartment);
 
-        //const chairsWithBussinessUnitId = await Chair.find({ deletedAt: null, isActive: true, businessUnit: bussinessUnitId });
-        //const chairsWithbranchId = chairsWithBussinessUnitId.includes({ branch: branchId });
+            return {
+                status: true,
+                message: "The department retrieved successfully.",
+                data: {
+                    departments: formattedDepartment,
+                    metadata: {
+                        page: 1,
+                        perPage: 1,
+                        totalCount: 1,
+                        totalPages: 1
+                    },
+                },
+            };
+        }
 
         let searchQuery = {};
         if (searchKey) {
@@ -128,7 +128,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,
-            ...statusSearchKey,
+            //...statusSearchKey,
             deletedAt: null,
         })
             .populate("buId", "_id name")
@@ -159,7 +159,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,
-            ...statusSearchKey,
+            //...statusSearchKey,
             deletedAt: null,
         });
 

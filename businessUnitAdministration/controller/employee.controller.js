@@ -167,6 +167,7 @@ exports.updateEmployee = async (req, res, next) => {
         const { clientId, branchId, roleId, businessUnit, employeeId, firstName, lastName, email, phone, gender, city, state, country, ZipCode, address, panNumber, aadharNumber, emergencyPhone, bloodGroup, password } = req.body;
 
         if (!clientId) {
+            logging.error("Client ID is required");
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
             });
@@ -216,7 +217,7 @@ exports.updateEmployee = async (req, res, next) => {
             roleId:role?.id,
             businessUnit: businessUnit,
             updatedBy: mainUser?._id
-        }
+        };
 
         let newPassword = "";
 

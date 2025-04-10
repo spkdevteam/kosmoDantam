@@ -22,6 +22,12 @@
  *         description: Unique identifier for the business unit.
  *         example: ""
  *       - in: query
+ *         name: chairId
+ *         schema:
+ *           type: string
+ *           example: ""
+ *         description: chair ID to filter chair (optional).
+ *       - in: query
  *         name: branchId
  *         schema:
  *           type: string

@@ -5,10 +5,8 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatEmployee } = require("../../../utils/helperFunctions");
 
-const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, searchKey = "", fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
+const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, searchKey = "", employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
-
-        console.log("rolerolerole", role);
         const db = await getClientDatabaseConnection(clientId);
         const Employee = await db.model("clientUsers", clinetUserSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
@@ -19,37 +17,36 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
         const clientRoles = await db.model("clientRoles", clientRoleSchema);
         const user = await db.model("clientUsers", clinetUserSchema);
 
-        // if (!page || !perPage) {
-        //     const allEmployees = await Employee.find({ deletedAt: null })
-        //         .populate("businessUnit", "_id name")
-        //         .populate("branch", "_id name")
-        //         .populate("role", "_id name")
-        //         .populate("createdBy", "_id firstName lastName")
-        //         .populate("updatedBy", "_id firstName lastName")
-        //         .populate("deletedBy", "_id firstName lastName")
-        //         .lean();
+        if (employeeId) {
+            const specificEmployee = await Employee.findOne({ _id: employeeId, deletedAt: null })
+                .populate("businessUnit", "_id name")
+                .populate("branch", "_id name")
+                .populate("role", "_id name")
+                .populate("createdBy", "_id firstName lastName")
+                .populate("updatedBy", "_id firstName lastName")
+                .populate("deletedBy", "_id firstName lastName")
+                .lean();
 
-        //     const formattedEmployees = allEmployees.map((employee) => formatEmployee(employee));
+            if (!specificEmployee) {
+                return { status: false, message: "Employee not found" };
+            }
 
-        //     return {
-        //         status: true,
-        //         message: "All Departments retrieved successfully.",
-        //         data: {
-        //             employees: formattedEmployees,
-        //             metadata: {
-        //                 page: 1,
-        //                 perPage: allEmployees?.length,
-        //                 totalCount: allEmployees?.length,
-        //                 totalPages: 1
-        //             },
-        //         },
-        //     };
-        // };
+            const formattedEmployee = formatEmployee(specificEmployee);
 
-        //.map((chair) => formatChair(chair))
-
-        //const chairsWithBussinessUnitId = await Chair.find({ deletedAt: null, isActive: true, businessUnit: bussinessUnitId });
-        //const chairsWithbranchId = chairsWithBussinessUnitId.includes({ branch: branchId });
+            return {
+                status: true,
+                message: "The Employee retrieved successfully.",
+                data: {
+                    employees: formattedEmployee,
+                    metadata: {
+                        page: 1,
+                        perPage: 1,
+                        totalCount: 1,
+                        totalPages: 1
+                    },
+                },
+            };
+        };
 
         let searchQuery = {};
         if (searchKey) {
@@ -100,14 +97,14 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
 
         if (!page || !perPage) {
             const allEmployees = await Employee.find({
-                ...searchQuery,
-                ...businessSearchKey,
-                ...branchIdSearchKey,
-                ...dateSearchKey,
-                ...roleSearchKey,
-                ...createdUserSearchKey,
-                ...updatedUserSearchKey,
-                ...deletedUserSearchKey,
+                // ...searchQuery,
+                // ...businessSearchKey,
+                // ...branchIdSearchKey,
+                // ...dateSearchKey,
+                // ...roleSearchKey,
+                // ...createdUserSearchKey,
+                // ...updatedUserSearchKey,
+                // ...deletedUserSearchKey,
                 deletedAt: null,
             })
                 .populate("businessUnit", "_id name")

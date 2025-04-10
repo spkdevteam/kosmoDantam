@@ -4,7 +4,7 @@ const getPrescriptionDetailsWithFiltersFn = require("../../services/prescription
 
 const getPrescriptionDetailsWithFilters = async (req, res, next) => {
     try {
-        const { page = null, perPage = null, searchKey, fromDate, toDate, buId, branchId, doctorId, patientId, caseSheetId, nextVisitDate, createdUser, updatedUser, deletedUser, clientId } = await sanitizeBody(req.query);
+        const { page = null, perPage = null, searchKey, prescriptionId, fromDate, toDate, buId, branchId, doctorId, patientId, caseSheetId, nextVisitDate, createdUser, updatedUser, deletedUser, clientId } = await sanitizeBody(req.query);
         const validation = [
             clientIdValidation({ clientId })
         ];
@@ -13,6 +13,9 @@ const getPrescriptionDetailsWithFilters = async (req, res, next) => {
         }
         if (branchId) {
             validation.push(mongoIdValidation({ _id: branchId, name: "branchId" }));
+        }
+        if (prescriptionId) {
+            validation.push(mongoIdValidation({ _id: prescriptionId, name: "prescriptionId" }));
         }
         if (doctorId) {
             validation.push(mongoIdValidation({ _id: doctorId, name: "doctorId" }));
@@ -43,7 +46,7 @@ const getPrescriptionDetailsWithFilters = async (req, res, next) => {
         if (toDate && !isValidDate({ value: toDate }).status) return { status: false, message: "Invalid to date" };
         if (nextVisitDate && !isValidDate({ value: nextVisitDate }).status) return { status: false, message: "Invalid next visit date" };
 
-        const result = await getPrescriptionDetailsWithFiltersFn({ page, perPage, searchKey, fromDate, toDate, buId, branchId, doctorId, patientId, caseSheetId, nextVisitDate, createdUser, updatedUser, deletedUser, clientId });
+        const result = await getPrescriptionDetailsWithFiltersFn({ page, perPage, searchKey, prescriptionId, fromDate, toDate, buId, branchId, doctorId, patientId, caseSheetId, nextVisitDate, createdUser, updatedUser, deletedUser, clientId });
         return res.status(200).json({ status: result?.status, message: result?.message, data: result?.data });
     } catch (error) {
         next(error);

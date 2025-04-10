@@ -53,12 +53,12 @@ const clinetUserSchema = new Schema(
         emergencyPhone: {
             type: String,
             trim: true,
-            validate: {
-                validator: function (v) {
-                    return /^\+?[1-9]\d{1,14}$/.test(v);
-                },
-                message: 'Invalid phone number format.',
-            },
+            // validate: {
+            //     validator: function (v) {
+            //         return /^\+?[1-9]\d{1,14}$/.test(v);
+            //     },
+            //     message: 'Invalid phone number format.',
+            // },
         },
         city: { type: String, trim: true, },
         state: { type: String, trim: true, },

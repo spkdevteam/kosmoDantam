@@ -195,7 +195,46 @@ function formatEmployee(employee) {
     };
 };
 
-
+function formatAppointment(appointment) {
+    return {
+        _id: appointment._id,
+        buId: appointment.buId ? { _id: appointment.buId._id, name: appointment.buId.name } : null,
+        displayId: appointment.displayId,
+        branchId: appointment.branchId ? { _id: appointment.branchId._id, name: appointment.branchId.name } : null,
+        caseSheetId: appointment.caseSheetId ? { _id: appointment.caseSheetId._id, displayId: appointment.caseSheetId.displayId } : null,
+        token: appointment.token,
+        date: appointment.date,
+        caseId: appointment.caseId ? { _id: appointment.caseId._id, displayId: appointment.caseId.displayId } : null,
+        dutyDoctorId: appointment.dutyDoctorId
+        ? { _id: appointment.dutyDoctorId._id, firstName: appointment.dutyDoctorId.firstName, lastName: appointment.dutyDoctorId.lastName }
+        : null,
+        specialistDoctorId: appointment.specialistDoctorId
+        ? { _id: appointment.specialistDoctorId._id, firstName: appointment.specialistDoctorId.firstName, lastName: appointment.specialistDoctorId.lastName }
+        : null,
+        dentalAssistant: appointment.dentalAssistant
+        ? { _id: appointment.dentalAssistant._id, firstName: appointment.dentalAssistant.firstName, lastName: appointment.dentalAssistant.lastName }
+        : null,
+        slotFrom: appointment.slotFrom,
+        slotTo: appointment.slotTo,
+        chairId: appointment.chairId ? { _id: appointment.chairId._id, chairNumber: appointment.chairId.chairNumber } : null,
+        patientId: appointment.patientId ? { _id: appointment.patientId._id, firstName: appointment.patientId.firstName } : null,
+        status: appointment.status,
+        chiefComplaint: appointment.chiefComplaint,
+        isActive: appointment.isActive ? true : false,
+        createdBy: appointment.createdBy
+            ? { _id: appointment.createdBy._id, firstName: appointment.createdBy.firstName, lastName: appointment.createdBy.lastName }
+            : null,
+        deletedBy: appointment.deletedBy
+            ? { _id: appointment.deletedBy._id, firstName: appointment.deletedBy.firstName, lastName: appointment.deletedBy.lastName }
+            : null,
+        updatedBy: appointment.updatedBy
+            ? { _id: appointment.updatedBy._id, firstName: appointment.updatedBy.firstName, lastName: appointment.updatedBy.lastName }
+            : null,
+        deletedAt: appointment.deletedAt || null,
+        createdAt: appointment.createdAt || null,
+        updatedAt: appointment.updatedAt || null,
+    }
+}
 // services: procedure.services 
 // ? procedure.services.map(service => ({
 //     _id: service._id,
@@ -203,4 +242,4 @@ function formatEmployee(employee) {
 // }))
 // : [],
 
-module.exports = { formatChair, formatDepartment, formatService, formatProcedure, formatPrescription, formatEmployee };
+module.exports = { formatChair, formatDepartment, formatService, formatProcedure, formatPrescription, formatEmployee, formatAppointment };

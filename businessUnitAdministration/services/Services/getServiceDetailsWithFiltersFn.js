@@ -6,7 +6,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatService } = require("../../../utils/helperFunctions");
 
-const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, fromDate, toDate, departmentId, branchId, buId, createdUser, updatedUser, deletedUser, clientId }) => {
+const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, serviceId, fromDate, toDate, departmentId, branchId, buId, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
         const db = await getClientDatabaseConnection(clientId);
         const Service = await db.model("service", serviceSchema);
@@ -18,37 +18,36 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
         const branch = await db.model("branch", clinetBranchSchema);
         const user = await db.model("clientUsers", clinetUserSchema);
 
-        // if (!page || !perPage) {
-        //     const allService = await Service.find({ deletedAt: null })
-        //         .populate("buId", "_id name")
-        //         .populate("branchId", "_id name")
-        //         .populate("departmentId", "_id deptName")
-        //         .populate("createdBy", "_id firstName lastName")
-        //         .populate("updatedBy", "_id firstName lastName")
-        //         .populate("deletedBy", "_id firstName lastName")
-        //         .lean();
+        if (serviceId) {
+            const specificService = await Service.findOne({ _id: serviceId, deletedAt: null })
+                .populate("buId", "_id name")
+                .populate("branchId", "_id name")
+                .populate("departmentId", "_id deptName")
+                .populate("createdBy", "_id firstName lastName")
+                .populate("updatedBy", "_id firstName lastName")
+                .populate("deletedBy", "_id firstName lastName")
+                .lean();
 
-        //     const formattedServices = allService.map((service) => formatService(service));
+            if (!specificService) {
+                return { status: false, message: "Service not found" };
+            }
 
-        //     return {
-        //         status: true,
-        //         message: "All Services retrieved successfully.",
-        //         data: {
-        //             services: formattedServices,
-        //             pagination: {
-        //                 page: 1,
-        //                 perPage: allService?.length,
-        //                 totalCount: allService?.length,
-        //                 totalPages: 1
-        //             },
-        //         },
-        //     };
-        // };
+            const formattedService = formatService(specificService);
 
-        //.map((chair) => formatChair(chair))
-
-        //const chairsWithBussinessUnitId = await Chair.find({ deletedAt: null, isActive: true, businessUnit: bussinessUnitId });
-        //const chairsWithbranchId = chairsWithBussinessUnitId.includes({ branch: branchId });
+            return {
+                status: true,
+                message: "The Service retrieved successfully.",
+                data: {
+                    services: formattedService,
+                    metadata: {
+                        page: 1,
+                        perPage: 1,
+                        totalCount: 1,
+                        totalPages: 1
+                    },
+                },
+            };
+        }
 
         let searchQuery = {};
         if (searchKey) {
