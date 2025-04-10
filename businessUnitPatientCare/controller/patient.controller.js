@@ -348,6 +348,7 @@ exports.searchPatients = async (req, res, next) => {
 // active inactive Patient by business unit
 exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
     try {
+        // console.log(" req.body===>>>>", req.body)
         const mainUser = req.user;
         const { status, patientId, clientId, keyword, page, perPage } = req.body;
         req.query.clientId = clientId;
@@ -362,16 +363,18 @@ exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const patient = await Patient.findById(patientId);
+        
         if (!patient) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblPatientNotFound,
             });
         }
-        if (!patient.isChainedWithMainPatient) {
-            await patientService.activeInactive(clientId, patient.email, {
-                isActive: status === "1",
-            });
-        }
+        // console.log("patientpatient==>>",patient)
+        // if (!patient.isChainedWithMainPatient) {
+        //     await patientService.activeInactive(clientId, patient.email, {
+        //         isActive: status === "1",
+        //     });
+        // }
         Object.assign(patient, {
             isActive: status === "1",
             updatedBy: mainUser?._id
