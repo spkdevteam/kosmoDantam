@@ -7,6 +7,7 @@ const { formatEmployee } = require("../../../utils/helperFunctions");
 
 const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, searchKey = "", employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
+        console.log("hiiiiiiiiiiiiiittttttttttttttttt")
         const db = await getClientDatabaseConnection(clientId);
         const Employee = await db.model("clientUsers", clinetUserSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
@@ -97,6 +98,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
 
         if (!page || !perPage) {
             const allEmployees = await Employee.find({
+                roleId :{$ne : 17},
                 // ...searchQuery,
                 // ...businessSearchKey,
                 // ...branchIdSearchKey,
@@ -135,6 +137,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
 
         // Query the database
         let query = Employee.find({
+            roleId :{$ne : 17},
             ...searchQuery,
             ...businessSearchKey,
             ...branchIdSearchKey,
@@ -161,6 +164,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
 
         // Fetch data
         const employees = await query.skip(skip).limit(perPage);
+        console.log("employeesemployees=>>>",employees);
 
 
         const formattedEmployees = employees.map((employee) => formatEmployee(employee));

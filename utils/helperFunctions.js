@@ -150,6 +150,8 @@ function formatPrescription(prescription) {
 function formatEmployee(employee) {
     return {
         _id: employee._id,
+        displayId : employee?.displayId ? employee?.displayId : null,
+        rid : employee?.roleId ? employee?.roleId : null,
         role: employee.role ? { _id: employee.role._id, name: employee.role.name } : null,
         branch: employee.branch ? { _id: employee.branch._id, name: employee.branch.name } : null,
         businessUnit: employee.businessUnit ? { _id: employee.businessUnit._id, name: employee.businessUnit.name } : null,
