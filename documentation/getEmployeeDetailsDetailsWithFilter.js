@@ -84,14 +84,12 @@
  *           type: string
  *         required: false
  *         description: Unique identifier for the business unit.
- *         example: ""
  *       - in: query
  *         name: branch
  *         schema:
  *           type: string
  *         required: false
  *         description: Unique identifier for the branch.
- *         example: ""
  *     responses:
  *       200:
  *         description: Employee details retrieved successfully.
