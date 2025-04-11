@@ -143,13 +143,18 @@ exports.createBusinessUnit = async (req, res) => {
 
     const BusinessUnit = clientConnection.model('businessUnit', clinetBusinessUnitSchema);
 
-    await BusinessUnit.create({
+    const newBusinessUnit = await BusinessUnit.create({
       buHead: newClient._id,
       name: newUser[0].firstName + " " + newUser[0].lastName + " " + "Businsenss Unit",
       emailContact: newUser[0].email,
       contactNumber: newUser[0].phone,
       createdBy: newClient._id
     });
+
+    //adding businessUnitId in clientUsers collection:=>
+    newClient.businessUnit = newBusinessUnit?._id;
+    await newClient.save();
+
 
     const SerialNumber = clientConnection.model("serialNumber", serialNumebrSchema);
     await SerialNumber.insertMany(serialNumber);
