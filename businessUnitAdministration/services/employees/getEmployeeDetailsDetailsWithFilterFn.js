@@ -106,7 +106,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
                 // ...updatedUserSearchKey,
                 // ...deletedUserSearchKey,
                 deletedAt: null,
-            })
+            }).sort({ createdAt: -1 })
                 .populate("businessUnit", "_id name")
                 .populate("branch", "_id name")
                 .populate("role", "_id name")
@@ -144,7 +144,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,
             deletedAt: null,
-        })
+        }).sort({ createdAt: -1 })
             .populate("businessUnit", "_id name")
             .populate("branch", "_id name")
             .populate("role", "_id name")

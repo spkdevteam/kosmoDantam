@@ -67,6 +67,12 @@
  *           example: ""
  *         description: Keyword to search appointments by a specific case, chief complaint, etc.
  *       - in: query
+ *         name: branchId
+ *         schema:
+ *           type: string
+ *           example: ""
+ *         description: branch unit identifier.
+ *       - in: query
  *         name: caseId
  *         schema:
  *           type: string
