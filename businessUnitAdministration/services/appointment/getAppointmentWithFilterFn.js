@@ -109,9 +109,9 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
           if (updatedUser) filterQuery.updatedBy = updatedUser;
 
           if (fromDate || toDate) {
-            filterQuery.createdAt = {};
-            if (fromDate) filterQuery.createdAt.$gte = new Date(fromDate);
-            if (toDate) filterQuery.createdAt.$lte = new Date(toDate);
+            filterQuery.date = {};
+            if (fromDate) filterQuery.date.$gte = new Date(fromDate);
+            if (toDate) filterQuery.date.$lte = new Date(toDate);
           }
           
 
