@@ -12,7 +12,6 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
         const db = await getClientDatabaseConnection(clientId);
         const Procedure = await db.model('procedure', procedureSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
-
         //these are user for populating the data
         const businessUnit = await db.model("businessUnit", clinetBusinessUnitSchema);
         const branch = await db.model("branch", clinetBranchSchema);
@@ -22,15 +21,20 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
 
         if (procedureId) {
             const specificProcedure = await Procedure.findOne({ _id: procedureId, deletedAt: null })
-                .populate("buId", "_id name")
-                .populate("branchId", "_id name")
-                .populate("services", "_id serviceName")
-                .populate("deptId", "_id deptName")
+            .populate("buId", "_id name")
+            .populate("branchId", "_id name")
+            .populate({
+                path: 'services',
+                populate: [
+                    { path: 'departmentId', select: 'deptName' },
+                        { path: 'createdBy', select: 'fullName email' } // if needed
+                    ]
+                })
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
                 .lean();
-
+                
             if (!specificProcedure) {
                 return { status: false, message: "Procedure not found" };
             }
@@ -59,7 +63,7 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
                     .map(word =>
                         word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').trim()
                     );
-                //const escapedSearchKey = searchKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    //const escapedSearchKey = searchKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 searchQuery = {
                     $or: words.flatMap(word => [
                         { procedureName: { $regex: word, $options: "i" } },
@@ -86,10 +90,10 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
             if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
             if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
         }
-
-
-
-
+        
+        
+        
+        
         if (!page || !perPage) {
             const allProcedure = await Procedure.find({
                 ...searchQuery,
@@ -102,15 +106,21 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
                 ...deletedUserSearchKey,
                 deletedAt: null,
             })
-                .populate("buId", "_id name")
-                .populate("branchId", "_id name")
-                .populate("services", "_id serviceName")
-                .populate("deptId", "_id deptName")
-                .populate("createdBy", "_id firstName lastName")
-                .populate("updatedBy", "_id firstName lastName")
-                .populate("deletedBy", "_id firstName lastName")
-                .lean();
-
+            .populate("buId", "_id name")
+            .populate("branchId", "_id name")
+            .populate({
+                path: 'services',
+                populate: [
+                    { path: 'departmentId', select: 'deptName' },
+                    { path: 'createdBy', select: 'fullName email' } // if needed
+                ]
+            })
+            .populate("deptId", "_id deptName")
+            .populate("createdBy", "_id firstName lastName")
+            .populate("updatedBy", "_id firstName lastName")
+            .populate("deletedBy", "_id firstName lastName")
+            .lean();
+             
             const formattedProcedure = allProcedure.map((procedure) => formatProcedure(procedure));
 
             return {
@@ -143,7 +153,13 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
         })
             .populate("buId", "_id name")
             .populate("branchId", "_id name")
-            .populate("services", "_id serviceName")
+            .populate({
+                path: 'services',
+                populate: [
+                    { path: 'departmentId', select: 'deptName' },
+                    { path: 'createdBy', select: 'fullName email' } // if needed
+                ]
+            })
             .populate("deptId", "_id deptName")
             .populate("createdBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")
