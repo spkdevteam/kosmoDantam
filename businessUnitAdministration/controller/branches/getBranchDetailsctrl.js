@@ -9,7 +9,7 @@ const getBranchDetailsctrl = async (req, res) => {
         console.log("req?.query==>>>",req?.query);
         const data = await sanitizeBody(req?.query);
         console.log("inputData==>>>",data);
-        const {from_Date, toDate, clientId, businessUnitId, updatedUser, createdUser} = data;
+        const {from_Date, toDate, clientId, businessUnitId, updatedUser, createdUser, branchId} = data;
         //from_Date, toDate,SearchKey, page, perPage, clientId, businessUnitId
         
         const validation = [
@@ -26,10 +26,13 @@ const getBranchDetailsctrl = async (req, res) => {
             validation.push(mongoIdValidation({_id :businessUnitId, name:"businessUnitId" }));
         }
         if(createdUser){
-            validation.push(mongoIdValidation({_id : createdUser, name : createdUser}))
+            validation.push(mongoIdValidation({_id : createdUser, name : "createdUser"}))
         }
         if(updatedUser){
-            validation.push(mongoIdValidation({_id : updatedUser, name : updatedUser}))
+            validation.push(mongoIdValidation({_id : updatedUser, name : "updatedUser"}))
+        }
+        if(branchId){
+            validation.push(mongoIdValidation({_id : branchId, name : "branchId"}))
         }
         const error = validation.filter((e) => e && e.status == false);
         // if (error.length > 0) return { status: false, message: error.map(e => e.message).join(", ") };
@@ -51,7 +54,7 @@ const getBranchDetailsctrl = async (req, res) => {
             createdBy : createdUser, updatedBy : updatedUser
          },'{from_Date, toDate, SearchKey, page, perPage, clientId, businessUnitId,            createdBy : createdUser, updatedBy : updatedUser         }')
         const result = await getBranchDetailsFn({from_Date, toDate, SearchKey, page, perPage, clientId, businessUnitId,
-            createdBy : createdUser, updatedBy : updatedUser
+            createdBy : createdUser, updatedBy : updatedUser, branchId
          });
         console.log("result=>>>>",result) 
         if(!result?.status) return res.status(httpStatusCode.InternalServerError).send({

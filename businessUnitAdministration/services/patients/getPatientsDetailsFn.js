@@ -5,11 +5,14 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 
 const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey = "", page = null,
-    perPage = null, clientId, branchId, businessUnitId, mainPatientLinkedId, createdById, updatedById,status }) => {
+    perPage = null, clientId, branchId, businessUnitId, mainPatientLinkedId, createdById, updatedById, status, patientId }) => {
     try {
         let searchQuery = {};
+        console.log("SearchKey===>>>>", SearchKey);
         if (SearchKey) {
+            console.log("here1");
             if (SearchKey.trim()) {
+                console.log("here2");
                 const words = SearchKey.trim().split(/\s+/)//spiltting by space
                     .map(word =>
                         word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // Escape special characters
@@ -65,14 +68,18 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
         //     }
         // }
         let statusSearchKey = {};
-        const statusBool = status.toLowerCase() === "true" ? true : status.toLowerCase() === "false" ? false : null;
-        if(statusBool !== null){
-            statusSearchKey = {isActive : statusBool}
+        let statusBool = null;
+        if (status) {
+            statusBool = status.toLowerCase() === "true" ? true : status.toLowerCase() === "false" ? false : null;
+
         }
-        console.log("statusSearchKey=>>>",statusSearchKey);
-        console.log("statusBool====>>>",statusBool);
-        
-        
+        if (statusBool !== null) {
+            statusSearchKey = { isActive: statusBool }
+        }
+        console.log("statusSearchKey=>>>", statusSearchKey);
+        console.log("statusBool====>>>", statusBool);
+
+
         let dateSearchKey = {};
 
         if (from_Date || toDate) {
@@ -109,8 +116,12 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
             createdByIdSearchKey = { createdBy: createdById }
         }
         let updatedByIdSearchKey = {}
-        if(updatedById){
+        if (updatedById) {
             updatedByIdSearchKey = { updatedBy: updatedById }
+        }
+        let patientIdSearchKey = []
+        if(patientId){
+            patientIdSearchKey  = {_id : patientId}
         }
         //query building
         let query = patientsModel.find({
@@ -124,6 +135,7 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
             ...createdByIdSearchKey,
             ...updatedByIdSearchKey,
             ...statusSearchKey,
+            ...patientIdSearchKey,
             deletedAt: null
         });
         const totalDocs = await patientsModel.countDocuments({
@@ -137,6 +149,7 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
             ...createdByIdSearchKey,
             ...updatedByIdSearchKey,
             ...statusSearchKey,
+            ...patientIdSearchKey,
             deletedAt: null
         });
         console.log("totalDocs==>>>", totalDocs);

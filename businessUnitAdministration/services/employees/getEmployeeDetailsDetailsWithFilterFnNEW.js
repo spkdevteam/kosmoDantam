@@ -2,14 +2,17 @@ const clinetBranchSchema = require("../../../client/model/branch");
 const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
 const clientRoleSchema = require("../../../client/model/role");
 const clinetUserSchema = require("../../../client/model/user");
+const userModel = require("../../../model/user")
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatEmployee } = require("../../../utils/helperFunctions");
 
-const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, searchKey = "", employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
+const getEmployeeDetailsDetailsWithFilterFnNEW = async ({ page = 1, perPage = 10, searchKey = "", fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
-        console.log("hiiiiiiiiiiiiiittttttttttttttttt")
+
+        console.log("rolerolerole", role);
         const db = await getClientDatabaseConnection(clientId);
-        const Employee = await db.model("clientUsers", clinetUserSchema);
+        // const Employee = await db.model("clientUsers", clinetUserSchema);
+        
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
 
         //these are user for populating the data
@@ -18,36 +21,37 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
         const clientRoles = await db.model("clientRoles", clientRoleSchema);
         const user = await db.model("clientUsers", clinetUserSchema);
 
-        if (employeeId) {
-            const specificEmployee = await Employee.findOne({ _id: employeeId, deletedAt: null })
-                .populate("businessUnit", "_id name")
-                .populate("branch", "_id name")
-                .populate("role", "_id name")
-                .populate("createdBy", "_id firstName lastName")
-                .populate("updatedBy", "_id firstName lastName")
-                .populate("deletedBy", "_id firstName lastName")
-                .lean();
+        // if (!page || !perPage) {
+        //     const allEmployees = await Employee.find({ deletedAt: null })
+        //         .populate("businessUnit", "_id name")
+        //         .populate("branch", "_id name")
+        //         .populate("role", "_id name")
+        //         .populate("createdBy", "_id firstName lastName")
+        //         .populate("updatedBy", "_id firstName lastName")
+        //         .populate("deletedBy", "_id firstName lastName")
+        //         .lean();
 
-            if (!specificEmployee) {
-                return { status: false, message: "Employee not found" };
-            }
+        //     const formattedEmployees = allEmployees.map((employee) => formatEmployee(employee));
 
-            const formattedEmployee = formatEmployee(specificEmployee);
+        //     return {
+        //         status: true,
+        //         message: "All Departments retrieved successfully.",
+        //         data: {
+        //             employees: formattedEmployees,
+        //             metadata: {
+        //                 page: 1,
+        //                 perPage: allEmployees?.length,
+        //                 totalCount: allEmployees?.length,
+        //                 totalPages: 1
+        //             },
+        //         },
+        //     };
+        // };
 
-            return {
-                status: true,
-                message: "The Employee retrieved successfully.",
-                data: {
-                    employees: formattedEmployee,
-                    metadata: {
-                        page: 1,
-                        perPage: 1,
-                        totalCount: 1,
-                        totalPages: 1
-                    },
-                },
-            };
-        };
+        //.map((chair) => formatChair(chair))
+
+        //const chairsWithBussinessUnitId = await Chair.find({ deletedAt: null, isActive: true, businessUnit: bussinessUnitId });
+        //const chairsWithbranchId = chairsWithBussinessUnitId.includes({ branch: branchId });
 
         let searchQuery = {};
         if (searchKey) {
@@ -97,18 +101,17 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
 
 
         if (!page || !perPage) {
-            const allEmployees = await Employee.find({
-                roleId :{$ne : 17},
-                // ...searchQuery,
-                // ...businessSearchKey,
-                // ...branchIdSearchKey,
-                // ...dateSearchKey,
-                // ...roleSearchKey,
-                // ...createdUserSearchKey,
-                // ...updatedUserSearchKey,
-                // ...deletedUserSearchKey,
+            const allEmployees = await userModel.find({
+                ...searchQuery,
+                ...businessSearchKey,
+                ...branchIdSearchKey,
+                ...dateSearchKey,
+                ...roleSearchKey,
+                ...createdUserSearchKey,
+                ...updatedUserSearchKey,
+                ...deletedUserSearchKey,
                 deletedAt: null,
-            }).sort({ createdAt: -1 })
+            })
                 .populate("businessUnit", "_id name")
                 .populate("branch", "_id name")
                 .populate("role", "_id name")
@@ -136,8 +139,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
 
 
         // Query the database
-        let query = Employee.find({
-            roleId :{$ne : 17},
+        let query = userModel.find({
             ...searchQuery,
             ...businessSearchKey,
             ...branchIdSearchKey,
@@ -147,7 +149,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,
             deletedAt: null,
-        }).sort({ createdAt: -1 })
+        })
             .populate("businessUnit", "_id name")
             .populate("branch", "_id name")
             .populate("role", "_id name")
@@ -164,13 +166,12 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
 
         // Fetch data
         const employees = await query.skip(skip).limit(perPage);
-        console.log("employeesemployees=>>>",employees);
 
 
         const formattedEmployees = employees.map((employee) => formatEmployee(employee));
 
         // Get total count properly
-        const totalCount = await Employee.countDocuments({
+        const totalCount = await userModel.countDocuments({
             ...searchQuery,
             ...businessSearchKey,
             ...branchIdSearchKey,
@@ -204,4 +205,4 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
     }
 }
 
-module.exports = getEmployeeDetailsDetailsWithFilterFn;
+module.exports = getEmployeeDetailsDetailsWithFilterFnNEW;

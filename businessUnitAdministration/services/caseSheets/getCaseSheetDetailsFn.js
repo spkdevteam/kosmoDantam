@@ -14,7 +14,7 @@ const { getClientDatabaseConnection } = require("../../../db/connection");
 const mongoose = require("mongoose");
 
 const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey="", page= null, perPage= null, clientId, patientId, branchId, buId,
-    createdBy, compId, clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId, updatedBy
+    createdBy, compId, clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId, updatedBy, caseSheetId
 }) => {
     try {
         let searchQuery = {};
@@ -150,6 +150,12 @@ const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey=
         if (invoiceId) {
             invoiceIdSearchKey = { "treatmentData3.service.service.invoiceId": invoiceId };
         }
+        let caseSheetIdSearchKey = {};
+        if (caseSheetId){
+            caseSheetIdSearchKey = { _id : caseSheetId}
+        }
+        console.log("caseSheetIdSearchKey==>>>",caseSheetIdSearchKey);
+        
         let query = caseSheets.find({
             ...searchQuery,
             // ...from_DateSearchKey,
@@ -172,6 +178,7 @@ const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey=
             ...procedIdSearchKey,
             ...invoiceIdSearchKey,
             ...updatedBySearchKey,
+            ...caseSheetIdSearchKey,
             deletedAt: null
         });
         const totalDocs = await caseSheets.countDocuments({
@@ -196,6 +203,7 @@ const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey=
             ...procedIdSearchKey,
             ...invoiceIdSearchKey,
             ...updatedBySearchKey,
+            ...caseSheetIdSearchKey,
             deletedAt: null
         });
         console.log("totalDocs==>>>", totalDocs);

@@ -8,7 +8,7 @@ const getPatientsDetailsctrl = async (req, res) => {
     try {
         const data = await sanitizeBody(req?.query);
         console.log("inputData==>>>", data);
-        const { from_Date, toDate, clientId, branchId, businessUnitId, mainPatientLinkedId, createdUser, updatedUser, status } = data;
+        const { from_Date, toDate, clientId, branchId, businessUnitId, mainPatientLinkedId, createdUser, updatedUser, status, patientId } = data;
         //from_Date, toDate,SearchKey, page, perPage, clientId,branchId, businessUnitId, mainPatientLinkedId, createdById
         const validation = [
             clientIdValidation({ clientId }),
@@ -35,6 +35,9 @@ const getPatientsDetailsctrl = async (req, res) => {
         if (updatedUser) {
             validation.push(mongoIdValidation({ _id: updatedUser, name: "updatedUser" }));
         }
+        if(patientId){
+            validation.push(mongoIdValidation({ _id: patientId, name: "patientId" }));
+        }
         const error = validation.filter((e) => e && e.status == false);
         // if (error.length > 0) return { status: false, message: error.map(e => e.message).join(", ") };
         if (error.length > 0) {
@@ -42,7 +45,7 @@ const getPatientsDetailsctrl = async (req, res) => {
             return res.status(httpStatusCode.BadRequest).send({
                 status: false,
                 message: error.map(e => e.message).join(", ")
-            });
+            });  
         }
         console.log("here");
         const cleanQuery = {
@@ -53,7 +56,7 @@ const getPatientsDetailsctrl = async (req, res) => {
         const { page, perPage, SearchKey } = cleanQuery;
         const result = await getPatientsDetailsFn({
             from_Date, toDate, SearchKey, page, perPage,
-            clientId, branchId, businessUnitId, mainPatientLinkedId, createdById: createdUser, updatedById: updatedUser, status
+            clientId, branchId, businessUnitId, mainPatientLinkedId, createdById: createdUser, updatedById: updatedUser, status, patientId
         });
         // console.log("result=>>>>", result)
         if (!result?.status) return res.status(httpStatusCode.InternalServerError).send({
