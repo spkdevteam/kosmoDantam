@@ -8,7 +8,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const clinetPatientSchema = require("../../../client/model/patient");
 const { formatAppointment } = require("../../../utils/helperFunctions");
 
-const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchKey, appointmentId, fromDate, toDate, buId, branchId, dutyDoctorId, specialistDoctorId, dentalAssistant, patientId, caseSheetId, caseId, createdUser, updatedUser, clientId }) => {
+const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchKey, chairId, appointmentId, fromDate, toDate, buId, branchId, dutyDoctorId, specialistDoctorId, dentalAssistant, patientId, caseSheetId, caseId, createdUser, updatedUser, clientId }) => {
     try {
         const db = await getClientDatabaseConnection(clientId);
         const Appointment = await db.model('Appointment', appointmentSchema);
@@ -29,7 +29,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
                 .populate("branchId", "_id name")
                 .populate("dutyDoctorId", "_id firstName lastName")
                 .populate("specialistDoctorId", "_id firstName lastName")
-                .populate("patientId", "_id firstName phone email")
+                .populate("patientId", "_id firstName lastName phone email")
                 .populate("caseSheetId", "_id displayId")
                 .populate("chairId", "_id chairNumber")
                 .populate("caseId", "_id displayId")
@@ -99,6 +99,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
           if (buId) filterQuery.buId = buId;
           if (branchId) filterQuery.branchId = branchId;
           if (dutyDoctorId) filterQuery.dutyDoctorId = dutyDoctorId;
+          if (chairId) filterQuery.chairId = chairId;
           if (specialistDoctorId) filterQuery.specialistDoctorId = specialistDoctorId;
           if (patientId) filterQuery.patientId = patientId;
           if (dentalAssistant) filterQuery.dentalAssistant = dentalAssistant;
@@ -137,7 +138,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
                 .populate("branchId", "_id name")
                 .populate("dutyDoctorId", "_id firstName lastName")
                 .populate("specialistDoctorId", "_id firstName lastName")
-                .populate("patientId", "_id firstName phone email")
+                .populate("patientId", "_id firstName lastName phone email")
                 .populate("caseSheetId", "_id displayId")
                 .populate("chairId", "_id chairNumber")
                 .populate("caseId", "_id displayId")
@@ -184,7 +185,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
             .populate("branchId", "_id name")
             .populate("dutyDoctorId", "_id firstName lastName")
             .populate("specialistDoctorId", "_id firstName lastName")
-            .populate("patientId", "_id firstName phone email")
+            .populate("patientId", "_id firstName lastName phone email")
             .populate("caseSheetId", "_id displayId")
             .populate("chairId", "_id chairNumber")
             .populate("caseId", "_id displayId")
