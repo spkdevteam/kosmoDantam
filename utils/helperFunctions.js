@@ -217,7 +217,7 @@ function formatAppointment(appointment) {
         slotFrom: appointment.slotFrom,
         slotTo: appointment.slotTo,
         chairId: appointment.chairId ? { _id: appointment.chairId._id, chairNumber: appointment.chairId.chairNumber } : null,
-        patientId: appointment.patientId ? { _id: appointment.patientId._id, firstName: appointment.patientId.firstName } : null,
+        patientId: appointment.patientId ? { _id: appointment.patientId._id, firstName: appointment.patientId.firstName, phone: appointment.patientId.phone, email: appointment.patientId.email } : null,
         status: appointment.status,
         chiefComplaint: appointment.chiefComplaint,
         isActive: appointment.isActive ? true : false,

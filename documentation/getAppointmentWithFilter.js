@@ -55,7 +55,7 @@
  *           example: ""
  *         description: User who last updated the appointment.
  *       - in: query
- *         name: businessUnit
+ *         name: buId
  *         schema:
  *           type: string
  *           example: ""
