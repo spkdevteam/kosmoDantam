@@ -76,35 +76,56 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
         }
 
         //apply filters only if parameters exist
-        const businessSearchKey = businessUnitId ? { businessUnit: businessUnitId } : {};
-        const branchIdSearchKey = branchId ? { branch: branchId } : {};
-        //const statusSearchKey = statusForSearchKey ? { status: statusForSearchKey } : {};
-        const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
-        const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
-        const deletedUserSearchKey = deletedUser ? { deletedBy: deletedUser } : {};
+        // const businessSearchKey = businessUnitId ? { businessUnit: businessUnitId } : {};
+        // const branchIdSearchKey = branchId ? { branch: branchId } : {};
+        // //const statusSearchKey = statusForSearchKey ? { status: statusForSearchKey } : {};
+        // const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
+        // const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
+        // const deletedUserSearchKey = deletedUser ? { deletedBy: deletedUser } : {};
+
+        const filterQuery = {
+            deletedAt: null,
+            ...searchQuery,
+          };
+          
+          if (businessUnitId) filterQuery.businessUnit = businessUnitId;
+          if (branchId) filterQuery.branch = branchId;
+          if (status) filterQuery.status = status;
+          if (createdUser) filterQuery.createdBy = createdUser;
+          if (updatedUser) filterQuery.updatedBy = updatedUser;
+          if (deletedUser) filterQuery.deletedBy = deletedUser;
+          
+          if (fromDate || toDate) {
+            filterQuery.createdAt = {};
+            if (fromDate) filterQuery.createdAt.$gte = new Date(fromDate);
+            if (toDate) filterQuery.createdAt.$lte = new Date(toDate);
+          }
+          
 
 
         //apply date filters
-        let dateSearchKey = {};
-        if (fromDate || toDate) {
-            dateSearchKey = { createdAt: {} };
-            if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
-            if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
-        };
+        // let dateSearchKey = {};
+        // if (fromDate || toDate) {
+        //     dateSearchKey = { createdAt: {} };
+        //     if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
+        //     if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
+        // };
+
+        // {
+        //     ...searchQuery,
+        //     ...businessSearchKey,
+        //     //...statusSearchKey,
+        //     ...branchIdSearchKey,
+        //     ...dateSearchKey,
+        //     ...createdUserSearchKey,
+        //     ...updatedUserSearchKey,
+        //     ...deletedUserSearchKey,
+        //     deletedAt: null,
+        // }
 
 
         if (!page || !perPage) {
-            const allChairs = await Chair.find({
-                ...searchQuery,
-                ...businessSearchKey,
-                //...statusSearchKey,
-                ...branchIdSearchKey,
-                ...dateSearchKey,
-                ...createdUserSearchKey,
-                ...updatedUserSearchKey,
-                ...deletedUserSearchKey,
-                deletedAt: null,
-            })
+            const allChairs = await Chair.find(filterQuery)
                 .populate("businessUnit", "_id name")
                 .populate("branch", "_id name")
                 .populate("activePatientId", "_id firstName lastName")
@@ -133,17 +154,7 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
 
 
         //query the database
-        let query = Chair.find({
-            ...searchQuery,
-            ...businessSearchKey,
-            //...statusSearchKey,
-            ...branchIdSearchKey,
-            ...dateSearchKey,
-            ...createdUserSearchKey,
-            ...updatedUserSearchKey,
-            ...deletedUserSearchKey,
-            deletedAt: null,
-        })
+        let query = Chair.find(filterQuery)
             .populate("businessUnit", "_id name")
             .populate("branch", "_id name")
             .populate("activePatientId", "_id firstName lastName")
@@ -162,21 +173,10 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
         // Fetch data
         const chairs = await query.skip(skip).limit(perPage);
 
-
         const formattedChairs = chairs.map((chair) => formatChair(chair));
 
         // Get total count properly
-        const totalCount = await Chair.countDocuments({
-            ...searchQuery,
-            ...businessSearchKey,
-            //...statusSearchKey,
-            ...branchIdSearchKey,
-            ...dateSearchKey,
-            ...createdUserSearchKey,
-            ...updatedUserSearchKey,
-            ...deletedUserSearchKey,
-            deletedAt: null,
-        });
+        const totalCount = await Chair.countDocuments(filterQuery);
 
         // Calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);
@@ -200,6 +200,5 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
         return { status: false, message: error?.message }
     }
 }
-
 
 module.exports = getChairDetailsWithFiltersFn;

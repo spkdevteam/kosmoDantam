@@ -29,7 +29,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
                 .populate("branchId", "_id name")
                 .populate("dutyDoctorId", "_id firstName lastName")
                 .populate("specialistDoctorId", "_id firstName lastName")
-                .populate("patientId", "_id firstName lastName")
+                .populate("patientId", "_id firstName phone email")
                 .populate("caseSheetId", "_id displayId")
                 .populate("chairId", "_id chairNumber")
                 .populate("caseId", "_id displayId")
@@ -79,26 +79,49 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
         };
 
         // Apply filters only if parameters exist
-        const businessSearchKey = buId ? { buId } : {};
-        const branchIdSearchKey = branchId ? { branchId } : {};
-        const dutyDoctorIdSearchKey = dutyDoctorId ? { dutyDoctorId } : {};
-        const specialistDoctorIdSearchKey = specialistDoctorId ? { specialistDoctorId } : {};
-        const patientIdSearchKey = patientId ? { patientId } : {};
-        const dentalAssistantIdSearchKey = dentalAssistant ? { dentalAssistant } : {};
-        const caseSheetIdSearchKey = caseSheetId ? { caseSheetId } : {};
-        const caseIdSearchKey = caseId ? { caseId } : {};
-        const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
-        const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
+        // const businessSearchKey = buId ? { buId } : {};
+        // const branchIdSearchKey = branchId ? { branchId } : {};
+        // const dutyDoctorIdSearchKey = dutyDoctorId ? { dutyDoctorId } : {};
+        // const specialistDoctorIdSearchKey = specialistDoctorId ? { specialistDoctorId } : {};
+        // const patientIdSearchKey = patientId ? { patientId } : {};
+        // const dentalAssistantIdSearchKey = dentalAssistant ? { dentalAssistant } : {};
+        // const caseSheetIdSearchKey = caseSheetId ? { caseSheetId } : {};
+        // const caseIdSearchKey = caseId ? { caseId } : {};
+        // const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
+        // const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
         //const deletedUserSearchKey = deletedUser ? { deletedBy: deletedUser } : {};
+
+        const filterQuery = {
+            deletedAt: null,
+            ...searchQuery,
+          };
+          
+          if (buId) filterQuery.buId = buId;
+          if (branchId) filterQuery.branchId = branchId;
+          if (dutyDoctorId) filterQuery.dutyDoctorId = dutyDoctorId;
+          if (specialistDoctorId) filterQuery.specialistDoctorId = specialistDoctorId;
+          if (patientId) filterQuery.patientId = patientId;
+          if (dentalAssistant) filterQuery.dentalAssistant = dentalAssistant;
+          if (caseSheetId) filterQuery.caseSheetId = caseSheetId;
+          if (caseId) filterQuery.caseId = caseId;
+          if (createdUser) filterQuery.createdBy = createdUser;
+          if (updatedUser) filterQuery.updatedBy = updatedUser;
+
+          if (fromDate || toDate) {
+            filterQuery.createdAt = {};
+            if (fromDate) filterQuery.createdAt.$gte = new Date(fromDate);
+            if (toDate) filterQuery.createdAt.$lte = new Date(toDate);
+          }
+          
 
 
         // Apply date filters
-        let dateSearchKey = {};
-        if (fromDate || toDate) {
-            dateSearchKey = { createdAt: {} };
-            if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
-            if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
-        }
+        // let dateSearchKey = {};
+        // if (fromDate || toDate) {
+        //     dateSearchKey = { createdAt: {} };
+        //     if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
+        //     if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
+        // }
 
 
         // if (slotFrom || slotTo) {
@@ -109,25 +132,12 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
 
 
         if (!page || !perPage) {
-            const allAppointment = await Appointment.find({
-                ...searchQuery,
-                ...businessSearchKey,
-                ...branchIdSearchKey,
-                ...dutyDoctorIdSearchKey,
-                ...specialistDoctorIdSearchKey,
-                ...patientIdSearchKey,
-                ...dentalAssistantIdSearchKey,
-                ...caseSheetIdSearchKey,
-                ...caseIdSearchKey,
-                ...createdUserSearchKey,
-                ...updatedUserSearchKey,
-                deletedAt: null,
-            })
+            const allAppointment = await Appointment.find(filterQuery)
                 .populate("buId", "_id name")
                 .populate("branchId", "_id name")
                 .populate("dutyDoctorId", "_id firstName lastName")
                 .populate("specialistDoctorId", "_id firstName lastName")
-                .populate("patientId", "_id firstName lastName")
+                .populate("patientId", "_id firstName phone email")
                 .populate("caseSheetId", "_id displayId")
                 .populate("chairId", "_id chairNumber")
                 .populate("caseId", "_id displayId")
@@ -153,27 +163,28 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
             };
         };
 
+        // {
+        //     ...searchQuery,
+        //     ...businessSearchKey,
+        //     ...branchIdSearchKey,
+        //     ...dutyDoctorIdSearchKey,
+        //     ...specialistDoctorIdSearchKey,
+        //     ...patientIdSearchKey,
+        //     ...dentalAssistantIdSearchKey,
+        //     ...caseSheetIdSearchKey,
+        //     ...caseIdSearchKey,
+        //     ...createdUserSearchKey,
+        //     ...updatedUserSearchKey,
+        //     deletedAt: null,
+        // }
 
         // Query the database
-        let query = Appointment.find({
-            ...searchQuery,
-            ...businessSearchKey,
-            ...branchIdSearchKey,
-            ...dutyDoctorIdSearchKey,
-            ...specialistDoctorIdSearchKey,
-            ...patientIdSearchKey,
-            ...dentalAssistantIdSearchKey,
-            ...caseSheetIdSearchKey,
-            ...caseIdSearchKey,
-            ...createdUserSearchKey,
-            ...updatedUserSearchKey,
-            deletedAt: null,
-        })
+        let query = Appointment.find(filterQuery)
             .populate("buId", "_id name")
             .populate("branchId", "_id name")
             .populate("dutyDoctorId", "_id firstName lastName")
             .populate("specialistDoctorId", "_id firstName lastName")
-            .populate("patientId", "_id firstName lastName")
+            .populate("patientId", "_id firstName phone email")
             .populate("caseSheetId", "_id displayId")
             .populate("chairId", "_id chairNumber")
             .populate("caseId", "_id displayId")
@@ -196,20 +207,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
         const formattedAppointments = appointments.map((appointment) => formatAppointment(appointment));
 
         // Get total count properly
-        const totalCount = await Appointment.countDocuments({
-            ...searchQuery,
-            ...businessSearchKey,
-            ...branchIdSearchKey,
-            ...dutyDoctorIdSearchKey,
-            ...specialistDoctorIdSearchKey,
-            ...patientIdSearchKey,
-            ...dentalAssistantIdSearchKey,
-            ...caseSheetIdSearchKey,
-            ...caseIdSearchKey,
-            ...createdUserSearchKey,
-            ...updatedUserSearchKey,
-            deletedAt: null,
-        });
+        const totalCount = await Appointment.countDocuments(filterQuery);
 
         // Calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);

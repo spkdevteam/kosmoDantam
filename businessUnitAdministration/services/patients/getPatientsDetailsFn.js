@@ -168,7 +168,7 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
             .populate('businessUnit', 'name emailContact contactNumber')
             .populate('mainPatientLinkedid', 'firstName lastName email phone')
             .populate('createdBy', 'firstName lastName email phone')
-            .populate('updatedBy', 'firstName lastName email phone')
+            .populate('updatedBy', 'firstName lastName email phone').sort({createdAt: -1});
         // console.log("fetchedPatient=>>>", fetchedPatient);
         if (!fetchedPatient) return { status: false, message: "Patients can't be fetched!!" };
 
