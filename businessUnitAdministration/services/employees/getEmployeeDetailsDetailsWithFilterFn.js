@@ -82,7 +82,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
         const businessSearchKey = businessUnit ? { businessUnit } : {};
         const branchIdSearchKey = branch ? { branch } : {};
         const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
-        const roleSearchKey = role ? { role: role } : {};
+        const roleSearchKey = role ? { roleId: role } : {};
         const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
         const deletedUserSearchKey = deletedUser ? { deletedBy: deletedUser } : {};
 
