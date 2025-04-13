@@ -67,7 +67,7 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
         if (req.file?.filename) {
             profileUpdates.profileImage = req.file.filename;
         }
-        const newPatient = await patientService.create(clientId, { ...profileUpdates });
+        const newPatient = await patientService.create(clientId, { ...profileUpdates,isActive:true });
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         let profileUpdates2 = {
             displayId: displayId,
@@ -90,7 +90,7 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
         if (req.file?.filename) {
             profileUpdates2.profileImage = req.file.filename;
         }
-        const newPatientInstance = await Patient.create({ ...profileUpdates2 })
+        const newPatientInstance = await Patient.create({ ...profileUpdates2,isActive:true })
         return res.status(statusCode.OK).send({
             message: message.lblPatientCreatedSuccess,
             data: { patientId: newPatient._id },
