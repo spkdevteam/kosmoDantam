@@ -219,7 +219,7 @@ function formatAppointment(appointment) {
         slotFrom: appointment.slotFrom,
         slotTo: appointment.slotTo,
         chairId: appointment.chairId ? { _id: appointment.chairId._id, chairNumber: appointment.chairId.chairNumber } : null,
-        patientId: appointment.patientId ? { _id: appointment.patientId._id, firstName: appointment.patientId.firstName, lastName: appointment.patientId.lastName, phone: appointment.patientId.phone, email: appointment.patientId.email } : null,
+        patientId: appointment.patientId ? { _id: appointment.patientId._id, firstName: appointment.patientId.firstName, lastName: appointment.patientId.lastName, phone: appointment.patientId.phone, email: appointment.patientId.email,age: appointment.patientId.age,gender:appointment.patientId.gender,bloodGroup :appointment.patientId.bloodGroup } : null,
         status: appointment.status,
         chiefComplaint: appointment.chiefComplaint,
         isActive: appointment.isActive ? true : false,

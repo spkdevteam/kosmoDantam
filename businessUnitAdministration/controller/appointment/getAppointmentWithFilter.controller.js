@@ -63,6 +63,7 @@ const getAppointmentWithFilter = async (req, res, next) => {
         // if (slotFrom && !isValidDate({ value: slotFrom }).status) return { status: false, message: "Invalid slot from date" };
         // if (slotTo && !isValidDate({ value: slotTo }).status) return { status: false, message: "Invalid slot to date" };
         const result = await getAppointmentWithFilterFn({ page, perPage, searchKey, chairId, appointmentId, fromDate, toDate, buId, branchId, dutyDoctorId, specialistDoctorId, dentalAssistant, patientId, caseSheetId, caseId ,createdUser, updatedUser, clientId });
+        console.log(result?.data?.appointments,'<<<<<<<<<appointments')
         return res.status(200).json({ status: result?.status, message: result?.message, data: result?.data });
     } catch (error) {
         next(error);

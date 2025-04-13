@@ -13,7 +13,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
         const db = await getClientDatabaseConnection(clientId);
         const Appointment = await db.model('Appointment', appointmentSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
-
+console.log('helllooooooooooooooooo')
         //these are user for populating the data
         const businessUnit = await db.model("businessUnit", clinetBusinessUnitSchema);
         const branch = await db.model("branch", clinetBranchSchema);
@@ -29,7 +29,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
                 .populate("branchId", "_id name")
                 .populate("dutyDoctorId", "_id firstName lastName")
                 .populate("specialistDoctorId", "_id firstName lastName")
-                .populate("patientId", "_id firstName lastName phone email")
+                .populate("patientId", "_id firstName lastName bloodGroup phone email age gender ")
                 .populate("caseSheetId", "_id displayId")
                 .populate("chairId", "_id chairNumber")
                 .populate("caseId", "_id displayId")
@@ -138,7 +138,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
                 .populate("branchId", "_id name")
                 .populate("dutyDoctorId", "_id firstName lastName")
                 .populate("specialistDoctorId", "_id firstName lastName")
-                .populate("patientId", "_id firstName lastName phone email")
+                .populate("patientId", "_id firstName lastName bloodGroup phone email age gender")
                 .populate("caseSheetId", "_id displayId")
                 .populate("chairId", "_id chairNumber")
                 .populate("caseId", "_id displayId")
@@ -180,12 +180,13 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
         // }
 
         // Query the database
+        console.log('reched Here at General Query ')
         let query = Appointment.find(filterQuery)
             .populate("buId", "_id name")
             .populate("branchId", "_id name")
             .populate("dutyDoctorId", "_id firstName lastName")
             .populate("specialistDoctorId", "_id firstName lastName")
-            .populate("patientId", "_id firstName lastName phone email")
+            .populate("patientId", "_id firstName lastName bloodGroup phone email age gender")
             .populate("caseSheetId", "_id displayId")
             .populate("chairId", "_id chairNumber")
             .populate("caseId", "_id displayId")
@@ -203,7 +204,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
 
         // Fetch data
         const appointments = await query.skip(skip).limit(perPage);
-
+        
 
         const formattedAppointments = appointments.map((appointment) => formatAppointment(appointment));
 
