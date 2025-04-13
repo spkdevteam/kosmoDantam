@@ -154,9 +154,11 @@ exports.updatePatientByBusinessUnit = async (req, res, next) => {
                 message: message.lblPatientIdRequired,
             });
         }
+        console.log(patientId,'patientIdpatientId')
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const patient = await Patient.findById(patientId);
+        console.log(patient,'<<<<<<<<<<<<<patient')
         if (!patient) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblPatientNotFound,
@@ -184,7 +186,7 @@ exports.updatePatientByBusinessUnit = async (req, res, next) => {
             dataObject.profileImage = req.file.filename;
         }
         if (!patient.isChainedWithMainPatient) {
-            await patientService.update(clientId, patient.email, dataObject);
+            // await patientService.update(clientId, patient.email, dataObject);
         }
         Object.assign(patient, dataObject);
         await patient.save()
