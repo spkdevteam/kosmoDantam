@@ -414,12 +414,12 @@ exports.softDeletePatient = async (req, res) => {
                 message: message.lblPatientNotFound,
             });
         }
-        if (!patient.isChainedWithMainPatient) {
-            await patientService.deleteOne(clientId, patient.email, {
-                deletedAt: new Date(),
-                deletedBy: mainUser?._id
-            });
-        }
+        // if (!patient.isChainedWithMainPatient) {
+        //     await patientService.deleteOne(clientId, patient.email, {
+        //         deletedAt: new Date(),
+        //         deletedBy: mainUser?._id
+        //     });
+         // }
         Object.assign(patient, {
             deletedAt: new Date()
         });

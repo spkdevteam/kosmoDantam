@@ -83,7 +83,8 @@ function formatProcedure(procedure) {
         services: procedure.services
             ? procedure.services.map(service => ({
                 _id: service._id,
-                serviceName: service.serviceName
+                serviceName: service.serviceName,
+                departmentId:service.departmentId
             }))
             : [],
         procedureName: procedure.procedureName,
