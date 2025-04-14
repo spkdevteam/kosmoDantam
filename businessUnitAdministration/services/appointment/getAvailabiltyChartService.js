@@ -10,9 +10,18 @@ const generateAvailabiltyChart = async (input) => {
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
-        const db = await getClientDatabaseConnection(input?.clientId)
-        const appointment = await db.model('appointment', appointmentSchema)
-        const leaveRegister = db.model('leaveRegister', leaveRegisterSchema)
+        const db = await getClientDatabaseConnection(input?.clientId);
+        const appointment = await db.model('appointment', appointmentSchema);
+        const leaveRegister = db.model('leaveRegister', leaveRegisterSchema);
+
+        console.log("inside the fn")
+
+
+        const bookedDoctors = new Set();
+        const bookedChairs = new Set();
+        const bookedAssistants = new Set();
+        const bookedSpecialist = new Set();
+        const absentees = new Set();
 
         //const query = { isActive: true, deletedAt: null };
         // if (input?.branchId) query.branchId = input.branchId;
@@ -30,6 +39,9 @@ const generateAvailabiltyChart = async (input) => {
         // if (orConditions.length > 0) {
         //     query.$or = orConditions;
         // }
+        console.log(new Date(input.bookingDate), "booking date");
+        console.log(new Date(input.startTime), "starting time");
+        console.log(new Date(input.endTime), "ending time");
 
         const out = await appointment.aggregate([
             {
@@ -37,13 +49,15 @@ const generateAvailabiltyChart = async (input) => {
                     isActive: true,
                     deletedAt: null,
                     date: new Date(input.bookingDate),
-                    $or: [
+                    $and: [
                         {
                             slotFrom: {
-                                $gte: new Date(input.endTime),
+                                $lte: new Date(input.startTime),
+                                $lte: new Date(input.endTime),
                             },
                             slotTo: {
                                 $gte: new Date(input.startTime),
+                                $gte: new Date(input.endTime)
                             }
                         }
                     ]
@@ -51,18 +65,17 @@ const generateAvailabiltyChart = async (input) => {
             }
         ]);
 
+        console.log(out, "outtttttttttttttttttttttt");
 
 
-        const bookedDoctors = new Set()
-        const bookedChairs = new Set()
-        const bookedAssistants = new Set()
-        const bookedSpecialist = new Set()
         out?.map((item) => {
-            bookedDoctors.add(item.dutyDoctorId.toString())
-            bookedChairs.add(item.chairId.toString())
-            bookedAssistants.add(item.dentalAssistant.toString())
+            bookedDoctors.add(item?.dutyDoctorId.toString())
+            bookedChairs.add(item?.chairId.toString())
+            bookedAssistants.add(item?.dentalAssistant.toString())
             //  bookedSpecialist.add(JSON.stringify(item.specialistDoctorId).slice(1,JSON.stringify( item.specialistDoctorId)?.length-1)) 
         })
+
+        console.log(bookedDoctors, bookedChairs, bookedAssistants, bookedSpecialist, "otherssssssssssssssssssssss")
 
 
         //to get number of absentees
@@ -78,14 +91,16 @@ const generateAvailabiltyChart = async (input) => {
         }
         if (input?.startTime) query1.startTime = { $lte: input?.startTime };
         if (input?.endTime) query1.endTime = { $gte: input?.endTime };
-        console.log(query1, 'query1')
 
-        const absentees = new Set();
+
+        
         const engagedList = await leaveRegister.find({ ...query1 });
         engagedList?.map((item) => {
             absentees.add(item.employeeId.toString());
         });
-        console.log(absentees, 'engagedListengagedList');
+
+        console.log(absentees,  "absenteessssssssssssssssss")
+        //console.log(absentees, 'engagedListengagedList');
         // .populate('employeeId', 'name email')
         // .populate('branchId', '
         return { bookedDoctors, bookedChairs, bookedAssistants, bookedSpecialist, absentees };

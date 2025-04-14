@@ -10,7 +10,7 @@ bookingRoutes
        .post('/create', appointment.postcreateBooking)
        .get('/BookingByDate',appointment.getBookingByDate)
        .get('/BookingByDateNonTabular',appointment.getBookingByDateNonTabular)
-       .get('/getAvailability', appointment.getAvailability) //, getAvailabilityChartCtrl
+       .get('/getAvailability', getAvailabilityChartCtrl) //, getAvailabilityChartCtrl
        .delete('/delete', appointment.delete)
        .get('/createToken',appointment.createToken)
        .post('/changeAppointmentStatus',appointment.changeBookingStatus)
