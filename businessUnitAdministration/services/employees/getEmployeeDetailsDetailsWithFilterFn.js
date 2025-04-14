@@ -5,7 +5,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatEmployee } = require("../../../utils/helperFunctions");
 
-const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, searchKey = "", employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
+const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = false, page = 1, perPage = 10, searchKey = "", employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
         console.log("hiiiiiiiiiiiiiittttttttttttttttt")
         const db = await getClientDatabaseConnection(clientId);
@@ -80,7 +80,12 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
 
         // Apply filters only if parameters exist
         const businessSearchKey = businessUnit ? { businessUnit } : {};
-        const branchIdSearchKey = branch ? { branch } : {};
+        // const branchIdSearchKey = branch ? { branch } : {};
+        const branchIdSearchKey = branch
+            ? { branch }
+            : includeAdmin
+                ? {}
+                : { branch: { $ne: null } };
         const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
         const roleSearchKey = role ? { roleId: role } : {};
         const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
@@ -98,7 +103,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
 
         if (!page || !perPage) {
             const allEmployees = await Employee.find({
-                roleId :{$ne : 17},
+                roleId: { $ne: 17 },
                 // ...searchQuery,
                 // ...businessSearchKey,
                 // ...branchIdSearchKey,
@@ -137,7 +142,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
 
         // Query the database
         let query = Employee.find({
-            roleId :{$ne : 17},
+            roleId: { $ne: 17 },
             ...searchQuery,
             ...businessSearchKey,
             ...branchIdSearchKey,
@@ -164,13 +169,14 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
 
         // Fetch data
         const employees = await query.skip(skip).limit(perPage);
-        console.log("employeesemployees=>>>",employees);
+        // console.log("employeesemployees=>>>", employees);
 
 
         const formattedEmployees = employees.map((employee) => formatEmployee(employee));
 
         // Get total count properly
         const totalCount = await Employee.countDocuments({
+            roleId: { $ne: 17 },
             ...searchQuery,
             ...businessSearchKey,
             ...branchIdSearchKey,
@@ -181,6 +187,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ page = 1, perPage = 10, s
             ...deletedUserSearchKey,
             deletedAt: null,
         });
+        console.log("skip,perPage,totalCount==>>", skip, perPage, totalCount)
 
         // Calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);
