@@ -53,9 +53,9 @@ exports.getAvailability = async (req, res, next) => {
         const chairList = await getchairList({roleId:3, clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[]
         const specialist = await listEmployeeByRole({ roleId:15, clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[]
         
-        // taking the engaged list of doctors , chairs ,dental Assistant 
+        // taking the engaged list of doctors, chairs, dental Assistant
         const result = await appointmentServices.generateAvailabiltyChart(data)
-        const {bookedDoctors, bookedChairs, bookedAssistants,bookedSpecialist,absentees } = result;
+        const {bookedDoctors, bookedChairs, bookedAssistants, bookedSpecialist, absentees } = result;
         //console.log(bookedDoctors, bookedChairs, bookedAssistants,bookedSpecialist,'bookedDoctors, bookedChairs, bookedAssistants ' )
         
         //comparing the enagaed one with all details and return available list 

@@ -237,7 +237,7 @@ exports.filterLeaveApplication = async (input) => {
         // .populate('employeeId', 'name email')
         // .populate('branchId', '
         
-        return  absentees  
+        return  absentees;
     } catch (error) {
 
     }
