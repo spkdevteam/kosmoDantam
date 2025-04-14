@@ -12,9 +12,8 @@ const generateAvailabiltyChart = async (input) => {
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(input?.clientId);
         const appointment = await db.model('appointment', appointmentSchema);
-        const leaveRegister = db.model('leaveRegister', leaveRegisterSchema);
+        const leaveRegister = await db.model('leaveRegister', leaveRegisterSchema);
 
-        console.log("inside the fn")
 
 
         const bookedDoctors = new Set();
@@ -22,26 +21,6 @@ const generateAvailabiltyChart = async (input) => {
         const bookedAssistants = new Set();
         const bookedSpecialist = new Set();
         const absentees = new Set();
-
-        //const query = { isActive: true, deletedAt: null };
-        // if (input?.branchId) query.branchId = input.branchId;
-        // if (input?.bookingDate) {
-        //     query.date = new Date(input.bookingDate + 'T00:00:00.000Z');
-        //     console.log(new Date(input.bookingDate + 'T00:00:00.000Z'));
-        // }
-        // console.log(new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z'));
-        // const orConditions = [];
-        // if (input?.startTime) query.slotFrom = { $gte: new Date(input.bookingDate + 'T' + input.startTime + ':00.000Z'), $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z') };
-        // if (input?.endTime) query.slotTo = { $gte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z'), $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z') };
-        // if (input?.chairId) orConditions.push({ chairId: input.chairId });
-        // if (input?.doctorId) orConditions.push({ dutyDoctorId: input.doctorId });
-        // if (input?.dentalAssistantId) orConditions.push({ dentalAssistant: input.dentalAssistantId });
-        // if (orConditions.length > 0) {
-        //     query.$or = orConditions;
-        // }
-        console.log(new Date(input.bookingDate), "booking date");
-        console.log(new Date(input.startTime), "starting time");
-        console.log(new Date(input.endTime), "ending time");
 
         const out = await appointment.aggregate([
             {
@@ -53,10 +32,8 @@ const generateAvailabiltyChart = async (input) => {
                         {
                             slotFrom: {
                                 $lte: new Date(input.startTime),
-                                $lte: new Date(input.endTime),
                             },
                             slotTo: {
-                                $gte: new Date(input.startTime),
                                 $gte: new Date(input.endTime)
                             }
                         }
@@ -65,13 +42,12 @@ const generateAvailabiltyChart = async (input) => {
             }
         ]);
 
-        console.log(out, "outtttttttttttttttttttttt");
 
 
         out?.map((item) => {
-            bookedDoctors.add(item?.dutyDoctorId.toString())
-            bookedChairs.add(item?.chairId.toString())
-            bookedAssistants.add(item?.dentalAssistant.toString())
+            bookedDoctors.add(item?.dutyDoctorId)
+            bookedChairs.add(item?.chairId)
+            bookedAssistants.add(item?.dentalAssistant)
             //  bookedSpecialist.add(JSON.stringify(item.specialistDoctorId).slice(1,JSON.stringify( item.specialistDoctorId)?.length-1)) 
         })
 
@@ -103,7 +79,13 @@ const generateAvailabiltyChart = async (input) => {
         //console.log(absentees, 'engagedListengagedList');
         // .populate('employeeId', 'name email')
         // .populate('branchId', '
-        return { bookedDoctors, bookedChairs, bookedAssistants, bookedSpecialist, absentees };
+        return {
+            bookedDoctors,
+            bookedChairs,
+            bookedAssistants,
+            bookedSpecialist,
+            absentees
+          };
     } catch (error) {
         return { status: false, message: error.message };
     }
