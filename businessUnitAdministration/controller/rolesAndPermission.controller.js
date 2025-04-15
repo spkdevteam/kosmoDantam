@@ -161,10 +161,12 @@ exports.listRolesAndPermission = async (req, res) => {
 
         const clientId = req.query.clientId;
         const keyword = req.query.keyword;
-        const page = req.query.page;
-        const perPage = req.query.perPage
+        const page = req.query.page??1;
+        const perPage = req.query.perPage??10
+        console.log(page,perPage,'page,perPage')
         let whereCondition = {
             deletedAt: null,
+            id:{$ne:17},
             ...(keyword && {
                 $or: [
                     { name: { $regex: keyword.trim(), $options: "i" } },
@@ -192,7 +194,13 @@ exports.listRolesAndPermission = async (req, res) => {
         //     RolesAndpermission.find(whereCondition).select("name id createdBy isActive").sort({ _id: -1 }),
         // ]);
         const [roles] = await Promise.all([
-            RolesAndpermission.find(whereCondition).select("name id createdBy isActive capability").sort({ _id: -1 }),//capability added extra
+            RolesAndpermission.find(whereCondition).select("name id createdBy isActive capability").sort({ _id: -1 })
+            ?.skip((page-1) * perPage)?.limit(perPage),//capability added extra
+        ]);
+
+        const [totalCount] = await Promise.all([
+            RolesAndpermission.find(whereCondition).select("name id createdBy isActive capability").sort({ _id: -1 })
+            ,//capability added extra
         ]);
         // console.log("roles=>>",roles);
         //updatation of capability
@@ -267,9 +275,15 @@ exports.listRolesAndPermission = async (req, res) => {
         }
 
         //
+        console.log({
+            message: 'List of all roles!',
+            listOfRoles: roles,
+            totalData :totalCount
+        })
         return res.json({
             message: 'List of all roles!',
             listOfRoles: roles,
+            totalData :totalCount?.length
         });
     } catch (error) {
         return res.status(statusCode.InternalServerError).send({
@@ -351,6 +365,7 @@ exports.getRolesList = async (req, res) => {
         return res.json({
             message: 'List of all roles!',
             listOfRoles: pataintentExcluded,
+             
         });
     } catch (error) {
         return res.status(statusCode.InternalServerError).send({
