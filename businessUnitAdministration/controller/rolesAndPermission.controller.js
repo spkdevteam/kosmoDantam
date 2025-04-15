@@ -161,6 +161,8 @@ exports.listRolesAndPermission = async (req, res) => {
 
         const clientId = req.query.clientId;
         const keyword = req.query.keyword;
+        const page = req.query.page;
+        const perPage = req.query.perPage
         let whereCondition = {
             deletedAt: null,
             ...(keyword && {

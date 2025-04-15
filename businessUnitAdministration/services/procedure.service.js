@@ -216,7 +216,7 @@ const editProcedure = async (input) => {
         ) {
             return { status: false, message: 'No Changes Found to Update ', statusCode: 200 };
         }
-
+        console.log(input,'<<<<<<<<<<<<<<<input')
         // Update the procedure if changes exist
         const newRecord = {
             deptId: input?.deptId,
