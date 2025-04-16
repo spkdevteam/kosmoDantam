@@ -2404,7 +2404,7 @@ const updateTreatment = async (clientId, caseSheetId, treatmentData) => {
         const branchObj = await Branch.findOne({ _id: existing?.branchId }).lean();
         if (!branchObj) return { status: false, message: 'Error fetching Branch of case sheet overview!!' };
         // console.log("branchObjbranchObj=>>",branchObj);
-        console.log("hittttt");
+
         
         for (const toothEntry of treatmentData) {
             for (const serviceArrObj of toothEntry?.service) {
