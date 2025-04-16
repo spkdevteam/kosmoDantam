@@ -9,7 +9,6 @@ const complaintSchema = require("../../client/model/complaint");
 
 
 
-
 // create
 exports.create = async (req, res) => {
     try {

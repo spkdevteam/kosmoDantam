@@ -5,8 +5,10 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatEmployee } = require("../../../utils/helperFunctions");
 
-const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = false, page = 1, perPage = 10, searchKey = "", employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
+const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', page = 1, perPage = 10, searchKey = "", employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
+        const booleanIncludeAdmin = includeAdmin === 'true' ? true : false;
+
         const db = await getClientDatabaseConnection(clientId);
         const Employee = await db.model("clientUsers", clinetUserSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
@@ -100,7 +102,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = false, pag
 
           
           if (businessUnit) filterQuery.businessUnit = businessUnit;
-          if (!includeAdmin) filterQuery.branch = branch;
+          if(!booleanIncludeAdmin) filterQuery.branch = !branch ? {$ne:null}:branch;
           //if (status) filterQuery.status = status;
           if(role) filterQuery.role = role;
           if (createdUser) filterQuery.createdBy = createdUser;
@@ -112,6 +114,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = false, pag
             if (fromDate) filterQuery.createdAt.$gte = new Date(fromDate);
             if (toDate) filterQuery.createdAt.$lte = new Date(toDate);
           }
+
 
 
         // Apply date filters

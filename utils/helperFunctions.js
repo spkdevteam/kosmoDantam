@@ -157,7 +157,7 @@ function formatEmployee(employee) {
         role: employee.role ? { _id: employee.role._id, name: employee.role.name } : null,
         branch: employee.branch ? { _id: employee.branch._id, name: employee.branch.name } : null,
         businessUnit: employee.businessUnit ? { _id: employee.businessUnit._id, name: employee.businessUnit.name } : null,
-        roleId: employee.roleId ? { _id: employee.roleId._id, name: employee.roleId.name } : null,
+        roleId: employee.roleId,
         firstName: employee.firstName ? employee.firstName : "",
         lastName: employee.lastName ? employee.lastName : "",
         email: employee.email ? employee.email : "",
