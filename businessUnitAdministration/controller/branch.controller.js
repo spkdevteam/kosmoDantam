@@ -49,7 +49,7 @@ exports.createBranchByBusinessUnit = async (req, res) => {
         const displayId = await getserialNumber('branch', clientId, "", businessUnit);
 
         const dataObject = {
-            displayId: displayId, branchPrefix: branchPrefix, clientId, name, emailContact, contactNumber, country, state, city : city[0], ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId, createdBy: mainUser?._id
+            displayId: displayId, isActive:true , branchPrefix: branchPrefix, clientId, name, emailContact, contactNumber, country, state, city : city[0], ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId, createdBy: mainUser?._id
         }
 
         if (req.file?.filename) {
