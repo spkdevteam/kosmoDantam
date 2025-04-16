@@ -91,6 +91,7 @@ function formatProcedure(procedure) {
         displayId: procedure.displayId,
         buId: procedure.buId ? { _id: procedure.buId._id, name: procedure.buId.name } : null,
         branchId: procedure.branchId ? { _id: procedure.branchId._id, name: procedure.branchId.name } : null,
+        description:procedure?.description,
         isActive: procedure.isActive,
         createdBy: procedure.createdBy
             ? { _id: procedure.createdBy._id, firstName: procedure.createdBy.firstName, lastName: procedure.createdBy.lastName }

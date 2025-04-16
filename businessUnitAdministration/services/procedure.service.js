@@ -7,7 +7,7 @@ const { validateObjectId } = require("./validate.serialNumber")
 const createProcedure = async (input) => {
 
     try {
-        console.log(input,input)
+        console.log(input,'<<<<<<<<<<<<<<<input>>>>>>>>>>>>>>>')
         if (!input?.clientId) return { status: false, message: message.lblUnauthorizeUser, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
@@ -31,7 +31,7 @@ const createProcedure = async (input) => {
             if (isExist) return { status: false, message: message.lblProcedureAlreadyExists, statusCode: httpStatusCode.Conflict }
             input.displayId = await getserialNumber('procedure', input?.clientId, input?.branchId, input?.buId)
         }
-
+         
         const newRecord = {
             deptId: input?.deptId,
             services: input?.services || [],
@@ -63,7 +63,7 @@ const deleteProcedure = async (input) => {
         const db = await getClientDatabaseConnection(input.clientId)
         const procedures = await db.model('procedure', procedureSchema)
         const isExit = await procedures.findOne({ _id: input?.procedureId, deletedAt: null })
-        console.log(isExit, 'isExit')
+         
         if (!isExit || isExit.deletedAt) return { status: false, message: message.lblProcedureNotFound, statusCode: 404 }
         const result = await procedures.updateOne({ _id: input?.procedureId }, { $set: { deletedAt: new Date(), deletedBy: input?.id } })
         if (result.modifiedCount) return { status: true, message: message.lblProcedureDeleted, statusCode: 200 }
@@ -99,7 +99,7 @@ const toggleProcedure = async (input) => {
             { _id: input?.procedureId },
             { $set: { isActive: !isExit.isActive, updatedBy: input?.id } }
         )
-        console.log(input, result)
+         
         if (result.modifiedCount)
             return {
                 status: true,
@@ -152,7 +152,7 @@ const toggleProcedure = async (input) => {
         
 //         const result = await procedures.updateOne({ _id: input?.procedureId }, { $set: newRecord })
 //         result.modifiedCount
-//         console.log(result,'result.modifiedCount')
+//          
 
 //         if (result.modifiedCount) return { status: true, message: message.lblProcedureModified, statusCode: 200, ...newRecord }
 //         else if (result.upsertedCount) return { status: true, message: message.lblProcedureCreated, statusCode: 201, ...newRecord }
@@ -201,12 +201,9 @@ const editProcedure = async (input) => {
         }
 
         // Check if all values are the same
-        console.log(existingProcedure.services,input?.services ,'existingProcedure.services,input?.services ')
+         
         const areServicesEqual = JSON.stringify(existingProcedure.services.sort()) === JSON.stringify((input?.services?.map((item)=>item?._id) || []).sort());
-        console.log(existingProcedure.deptId?.toString() === input?.deptId?.toString() ,
-        existingProcedure.procedureName === input?.procedureName ,
-        existingProcedure.description === input?.description ,
-        existingProcedure.branchId?.toString() === input?.branchId?.toString() ,areServicesEqual,'99999999999999999999999999' )
+       
         if (
             existingProcedure.deptId?.toString() === input?.deptId?.toString() &&
             existingProcedure.procedureName === input?.procedureName &&
@@ -216,7 +213,7 @@ const editProcedure = async (input) => {
         ) {
             return { status: false, message: 'No Changes Found to Update ', statusCode: 200 };
         }
-        console.log(input,'<<<<<<<<<<<<<<<input')
+         
         // Update the procedure if changes exist
         const newRecord = {
             deptId: input?.deptId,
