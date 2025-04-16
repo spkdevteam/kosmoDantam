@@ -7,7 +7,6 @@ const { formatEmployee } = require("../../../utils/helperFunctions");
 
 const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = false, page = 1, perPage = 10, searchKey = "", employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
-        console.log("hiiiiiiiiiiiiiittttttttttttttttt")
         const db = await getClientDatabaseConnection(clientId);
         const Employee = await db.model("clientUsers", clinetUserSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
@@ -78,18 +77,41 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = false, pag
             }
         }
 
+        
         // Apply filters only if parameters exist
-        const businessSearchKey = businessUnit ? { businessUnit } : {};
-        // const branchIdSearchKey = branch ? { branch } : {};
-        const branchIdSearchKey = branch
-            ? { branch }
-            : includeAdmin
-                ? {}
-                : { branch: { $ne: null } };
-        const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
-        const roleSearchKey = role ? { roleId: role } : {};
-        const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
-        const deletedUserSearchKey = deletedUser ? { deletedBy: deletedUser } : {};
+        // const businessSearchKey = businessUnit ? { businessUnit } : {};
+        // // const branchIdSearchKey = branch ? { branch } : {};
+        // const branchIdSearchKey = branch
+        //     ? { branch }
+        //     : includeAdmin
+        //         ? {}
+        //         : { branch: { $ne: null } };
+        // const createdUserSearchKey = createdUser ? { createdBy: createdUser } : {};
+        // const roleSearchKey = role ? { roleId: role } : {};
+        // const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
+        // const deletedUserSearchKey = deletedUser ? { deletedBy: deletedUser } : {};
+        
+        
+        
+        const filterQuery = {
+            deletedAt: null,
+            ...searchQuery,
+        }
+
+          
+          if (businessUnit) filterQuery.businessUnit = businessUnit;
+          if (!includeAdmin) filterQuery.branch = branch;
+          //if (status) filterQuery.status = status;
+          if(role) filterQuery.role = role;
+          if (createdUser) filterQuery.createdBy = createdUser;
+          if (updatedUser) filterQuery.updatedBy = updatedUser;
+          if (deletedUser) filterQuery.deletedBy = deletedUser;
+          
+          if (fromDate || toDate) {
+            filterQuery.createdAt = {};
+            if (fromDate) filterQuery.createdAt.$gte = new Date(fromDate);
+            if (toDate) filterQuery.createdAt.$lte = new Date(toDate);
+          }
 
 
         // Apply date filters
@@ -102,7 +124,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = false, pag
 
 
         if (!page || !perPage) {
-            const allEmployees = await Employee.find({
+            const allEmployees = await Employee.find(filterQuery,{
                 roleId: { $ne: 17 },
                 // ...searchQuery,
                 // ...businessSearchKey,
@@ -112,7 +134,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = false, pag
                 // ...createdUserSearchKey,
                 // ...updatedUserSearchKey,
                 // ...deletedUserSearchKey,
-                deletedAt: null,
+                //deletedAt: null,
             }).sort({ createdAt: -1 })
                 .populate("businessUnit", "_id name")
                 .populate("branch", "_id name")
@@ -143,15 +165,16 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = false, pag
         // Query the database
         let query = Employee.find({
             roleId: { $ne: 17 },
-            ...searchQuery,
-            ...businessSearchKey,
-            ...branchIdSearchKey,
-            ...dateSearchKey,
-            ...roleSearchKey,
-            ...createdUserSearchKey,
-            ...updatedUserSearchKey,
-            ...deletedUserSearchKey,
-            deletedAt: null,
+            ...filterQuery,
+            // ...searchQuery,
+            // ...businessSearchKey,
+            // ...branchIdSearchKey,
+            // ...dateSearchKey,
+            // ...roleSearchKey,
+            // ...createdUserSearchKey,
+            // ...updatedUserSearchKey,
+            // ...deletedUserSearchKey,
+            // deletedAt: null,
         }).sort({ createdAt: -1 })
             .populate("businessUnit", "_id name")
             .populate("branch", "_id name")
@@ -177,17 +200,17 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = false, pag
         // Get total count properly
         const totalCount = await Employee.countDocuments({
             roleId: { $ne: 17 },
-            ...searchQuery,
-            ...businessSearchKey,
-            ...branchIdSearchKey,
-            ...dateSearchKey,
-            ...roleSearchKey,
-            ...createdUserSearchKey,
-            ...updatedUserSearchKey,
-            ...deletedUserSearchKey,
-            deletedAt: null,
+            ...filterQuery,
+            // ...searchQuery,
+            // ...businessSearchKey,
+            // ...branchIdSearchKey,
+            // ...dateSearchKey,
+            // ...roleSearchKey,
+            // ...createdUserSearchKey,
+            // ...updatedUserSearchKey,
+            // ...deletedUserSearchKey,
+            // deletedAt: null,
         });
-        console.log("skip,perPage,totalCount==>>", skip, perPage, totalCount)
 
         // Calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);

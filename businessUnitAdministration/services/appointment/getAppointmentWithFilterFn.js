@@ -13,7 +13,8 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
         const db = await getClientDatabaseConnection(clientId);
         const Appointment = await db.model('Appointment', appointmentSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
-console.log('helllooooooooooooooooo')
+
+        
         //these are user for populating the data
         const businessUnit = await db.model("businessUnit", clinetBusinessUnitSchema);
         const branch = await db.model("branch", clinetBranchSchema);
