@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /api/client/bu/activityLog/getActivityLogDetailsByFilter:
+ * /api/client/bu/activityLog/getActivityLogDetailsWithFilter:
  *   get:
  *     summary: Get activity logs by filters
  *     description: Retrieve activity logs based on various optional filters such as date range, user, patient, branch, and more, with pagination support.
