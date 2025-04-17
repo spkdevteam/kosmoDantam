@@ -79,7 +79,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
             }
         }
 
-        
+
         // Apply filters only if parameters exist
         // const businessSearchKey = businessUnit ? { businessUnit } : {};
         // // const branchIdSearchKey = branch ? { branch } : {};
@@ -92,28 +92,45 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
         // const roleSearchKey = role ? { roleId: role } : {};
         // const updatedUserSearchKey = updatedUser ? { updatedBy: updatedUser } : {};
         // const deletedUserSearchKey = deletedUser ? { deletedBy: deletedUser } : {};
-        
-        
-        
+
+
+
         const filterQuery = {
             deletedAt: null,
             ...searchQuery,
         }
 
-          
-          if (businessUnit) filterQuery.businessUnit = businessUnit;
-          if(!booleanIncludeAdmin) filterQuery.branch = !branch ? {$ne:null}:branch;
-          //if (status) filterQuery.status = status;
-          if(role) filterQuery.role = role;
-          if (createdUser) filterQuery.createdBy = createdUser;
-          if (updatedUser) filterQuery.updatedBy = updatedUser;
-          if (deletedUser) filterQuery.deletedBy = deletedUser;
-          
-          if (fromDate || toDate) {
+
+        if (businessUnit) filterQuery.businessUnit = businessUnit;
+        if (!booleanIncludeAdmin) filterQuery.branch = !branch ? { $ne: null } : branch;
+        //if (status) filterQuery.status = status;
+        //   if(role) filterQuery.role = role;
+        // if (role) filterQuery.roleId = { $in: role };
+        if (role) {
+            let roleArray = [];
+
+            if (Array.isArray(role)) {
+                roleArray = role;
+            } else {
+                try {
+                    roleArray = JSON.parse(role);
+                } catch (err) {
+                    roleArray = [role];
+                }
+            }
+            if (roleArray.length > 0) {
+                filterQuery.roleId = { $in: roleArray };
+            }
+        }
+        if (createdUser) filterQuery.createdBy = createdUser;
+        if (updatedUser) filterQuery.updatedBy = updatedUser;
+        if (deletedUser) filterQuery.deletedBy = deletedUser;
+
+        if (fromDate || toDate) {
             filterQuery.createdAt = {};
             if (fromDate) filterQuery.createdAt.$gte = new Date(fromDate);
             if (toDate) filterQuery.createdAt.$lte = new Date(toDate);
-          }
+        }
 
 
 
@@ -127,7 +144,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
 
 
         if (!page || !perPage) {
-            const allEmployees = await Employee.find(filterQuery,{
+            const allEmployees = await Employee.find(filterQuery, {
                 roleId: { $ne: 17 },
                 // ...searchQuery,
                 // ...businessSearchKey,
@@ -164,7 +181,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
             };
         };
 
-
+        console.log("filterQuery==>>", filterQuery)
         // Query the database
         let query = Employee.find({
             roleId: { $ne: 17 },
