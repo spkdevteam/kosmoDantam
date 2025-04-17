@@ -102,7 +102,12 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
 
 
         if (businessUnit) filterQuery.businessUnit = businessUnit;
-        if (!booleanIncludeAdmin) filterQuery.branch = !branch ? { $ne: null } : branch;
+        if (!booleanIncludeAdmin) {
+            filterQuery.branch = !branch ? { $ne: null } : branch;
+        }
+        else {
+            filterQuery.branch = { $in: [branch, null] };
+        }
         //if (status) filterQuery.status = status;
         //   if(role) filterQuery.role = role;
         // if (role) filterQuery.roleId = { $in: role };
