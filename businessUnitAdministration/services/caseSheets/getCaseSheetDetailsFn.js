@@ -13,7 +13,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const mongoose = require("mongoose");
 
-const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey="", page= null, perPage= null, clientId, patientId, branchId, buId,
+const getCaseSheetDetailsFn = async ({ from_Date = null, toDate = null, SearchKey = "", page = null, perPage = null, clientId, patientId, branchId, buId,
     createdBy, compId, clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId, updatedBy, caseSheetId
 }) => {
     try {
@@ -71,15 +71,15 @@ const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey=
         //db connection :
         const db = await getClientDatabaseConnection(clientId);
         const caseSheets = await db.model('casesheets', caseSheetSchema);
-        const patientModel = await db.model('patient',clinetPatientSchema);
-        const branchModel = await db.model('branch',clinetBranchSchema);
-        const businessUnitModel = await db.model('businessUnit',clinetBusinessUnitSchema);
+        const patientModel = await db.model('patient', clinetPatientSchema);
+        const branchModel = await db.model('branch', clinetBranchSchema);
+        const businessUnitModel = await db.model('businessUnit', clinetBusinessUnitSchema);
         const clientUsersModel = await db.model('clientUsers', clinetUserSchema);
-        const complaintModel = db?.model?.complaint || await db.model('complaint',cheifComplaintSchema);
-        const patientFindingModel = await db.model('patientFinding',patientFindingsSchema);
-        const medicalCaseModel = await db.model('medicalCase',medicalCasesSchema);
-        const departmentModel = await db.model('department',departmentSchema);
-        const servicesModel = await db.model('services',serviceSchema);
+        const complaintModel = db?.model?.complaint || await db.model('complaint', cheifComplaintSchema);
+        const patientFindingModel = await db.model('patientFinding', patientFindingsSchema);
+        const medicalCaseModel = await db.model('medicalCase', medicalCasesSchema);
+        const departmentModel = await db.model('department', departmentSchema);
+        const servicesModel = await db.model('services', serviceSchema);
         const procedureModel = await db.model('procedure', procedureSchema);
 
         let patientIdSearchKey = {};
@@ -150,12 +150,40 @@ const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey=
         if (invoiceId) {
             invoiceIdSearchKey = { "treatmentData3.service.service.invoiceId": invoiceId };
         }
-        let caseSheetIdSearchKey = {};
-        if (caseSheetId){
-            caseSheetIdSearchKey = { _id : caseSheetId}
+        // let caseSheetIdSearchKey = {};
+        // if (caseSheetId) {
+        //     caseSheetIdSearchKey = { _id: caseSheetId }
+        // }
+        // console.log("caseSheetIdSearchKey==>>>", caseSheetIdSearchKey);
+
+        if (caseSheetId) {
+            const fetchedCaseSheet = await caseSheets.find({ _id: caseSheetId, deletedAt: null })
+                .populate("patientId", "firstName lastName displayId patientGroup")
+                .populate("branchId", "name displayId businessUnit branchHead bookingContact incorporationName cinNumber gstNumber branchPrefix branchLogo emailContact contactNumber")
+                .populate("buId", "name")
+                .populate("createdBy", "firstName lastName")
+                .populate("updatedBy", "firstName lastName")
+                .populate("cheifComplaints.complaints.compId", "complaintName discription")
+                .populate("clinicalFindings.findings.findId", "findingsName discription")
+                .populate("medicalHistory.medicals.medId", "caseName remark")//where is collection
+                .populate("services.department.deptId", "deptName")
+                .populate("services.service.servId", "serviceName")
+                .populate("procedures.procedure.procedId", "procedureName")
+                .lean();
+            const metaData = {
+                currentPage: 1,
+                perPage: 1,
+                SearchKey: null,
+                totalDocs: 1,
+                totalPages: 1,
+            }
+            if (!fetchedCaseSheet) {
+                return { status: false, data: [], metaData: {}, message: "CaseSheet could Not be found or deleted already!" }
+            }
+            return { status: true, data: fetchedCaseSheet, metaData: metaData, message: "CaseSheets details retrieved successfully." }
+
         }
-        console.log("caseSheetIdSearchKey==>>>",caseSheetIdSearchKey);
-        
+
         let query = caseSheets.find({
             ...searchQuery,
             // ...from_DateSearchKey,
@@ -178,7 +206,7 @@ const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey=
             ...procedIdSearchKey,
             ...invoiceIdSearchKey,
             ...updatedBySearchKey,
-            ...caseSheetIdSearchKey,
+            // ...caseSheetIdSearchKey,
             deletedAt: null
         });
         const totalDocs = await caseSheets.countDocuments({
@@ -203,7 +231,7 @@ const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey=
             ...procedIdSearchKey,
             ...invoiceIdSearchKey,
             ...updatedBySearchKey,
-            ...caseSheetIdSearchKey,
+            // ...caseSheetIdSearchKey,
             deletedAt: null
         });
         console.log("totalDocs==>>>", totalDocs);
@@ -219,7 +247,7 @@ const getCaseSheetDetailsFn = async ({ from_Date= null, toDate= null, SearchKey=
         }
         const fetchedCaseSheets = await query
             .populate("patientId", "firstName lastName displayId patientGroup")
-            .populate("branchId", "name")
+            .populate("branchId", "name displayId businessUnit branchHead bookingContact incorporationName cinNumber gstNumber branchPrefix branchLogo emailContact contactNumber")
             .populate("buId", "name")
             .populate("createdBy", "firstName lastName")
             .populate("updatedBy", "firstName lastName")
