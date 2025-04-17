@@ -127,6 +127,8 @@ exports.createSubPatientByBusinessUnit = async (req, res, next) => {
             });
         }
 
+         
+
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const newPatientInstance = await Patient.create({
             firstName,

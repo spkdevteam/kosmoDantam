@@ -41,6 +41,8 @@ exports.create = async (req, res) => {
                 },
             ],
         );
+        
+
         return res.status(statusCode.OK).send({
             message: message.lblChiefComplaintCreated,
             data: newComplaint 

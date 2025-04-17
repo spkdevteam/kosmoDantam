@@ -9,10 +9,17 @@ const swaggerOptions = {
         description: 'API for managing clients, users, and admin operations',
       },
       servers: [
-        {
-          url: 'http://localhost:8089',
-          description: 'Local server',
-        },
+         
+          {
+            url: 'http://localhost:8089',
+            description: 'Local server',
+          },
+          {
+            url: 'https://api.dantam.app',
+            description: 'Live Aws  server',
+          },
+           
+        
          
       ],
        components: {
