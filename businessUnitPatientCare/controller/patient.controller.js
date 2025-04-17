@@ -78,7 +78,7 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
             gender, age, bloodGroup, patientGroup, referedBy,
             branch: branchId,
             businessUnit: businessUnit,
-            createdBy: mainUser._id,
+            createdBy: mainUser?._id,
         }
 
         if(gender !== ""){
@@ -90,7 +90,13 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
         if (req.file?.filename) {
             profileUpdates2.profileImage = req.file.filename;
         }
-        const newPatientInstance = await Patient.create({ ...profileUpdates2,isActive:true })
+        const newPatientInstance = await Patient.create({ ...profileUpdates2,isActive:true });
+
+
+
+        //saving the activity of creating a patient
+        //await saveActivityLogFn({ patientId: newPatientInstance?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress, sourceLink: req.headers['x-frontend-route'], activity: "Created a patient", description: "Creating the patient, and saving activity log for it", data: newPatientInstance, status: true, dateTime: new Date() });
+
         return res.status(statusCode.OK).send({
             message: message.lblPatientCreatedSuccess,
             data: { patientId: newPatient._id },
@@ -191,7 +197,11 @@ exports.updatePatientByBusinessUnit = async (req, res, next) => {
             // await patientService.update(clientId, patient.email, dataObject);
         }
         Object.assign(patient, dataObject);
-        await patient.save()
+        const savedPatient = await patient.save();
+
+        //await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress, sourceLink: req.headers['x-frontend-route'], activity: "Updated details of a patient", description: "Updating a patient, and saving activity log for it", data: savedPatient, status: true, dateTime: new Date() });
+
+        
         return res.status(statusCode.OK).send({
             message: message.lblPatientUpdatedSuccess,
         });
@@ -383,7 +393,12 @@ exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
             isActive: status === "1",
             updatedBy: mainUser?._id
         });
-        await patient.save();
+        const savedPatient = await patient.save();
+
+
+        // await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress, sourceLink: req.headers['x-frontend-route'], activity: "Toggling status of a patient", description: "Toggling a patient, and saving activity log for it", data: savedPatient, status: true, dateTime: new Date() });
+
+
         this.listPatient(req, res)
     } catch (error) {
         next(error);
@@ -425,7 +440,11 @@ exports.softDeletePatient = async (req, res) => {
         Object.assign(patient, {
             deletedAt: new Date()
         });
-        await patient.save();
+        const savedPatient = await patient.save();
+
+        // await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress, sourceLink: req.headers['x-frontend-route'], activity: "Deleting a patient", description: "Deleting a patient, and saving activity log for it", data: savedPatient, status: true, dateTime: new Date() });
+
+
         this.listPatient(req, res)
     } catch (error) {
         console.error("Error in deleting the patient :", error);
@@ -456,6 +475,7 @@ exports.getPatientRoleId = async (req, res, next) => {
 const CustomError = require("../../utils/customeError");
 const getserialNumber = require("../../model/services/getserialNumber");
 const { default: mongoose } = require("mongoose");
+const saveActivityLogFn = require("../../businessUnitAdministration/services/activityLog/saveActivityLogFn");
 
 
 const commonIdCheck = async (data) => {
