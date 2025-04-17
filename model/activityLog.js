@@ -18,4 +18,3 @@ const activityLogSchema = new mongoose.Schema({
 const ActivityLogModel = mongoose.model("activityLog", activityLogSchema);
 
 module.exports = { ActivityLogModel, activityLogSchema };
-
