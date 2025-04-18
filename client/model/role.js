@@ -65,6 +65,8 @@ const clientRoleSchema = new mongoose.Schema({
     createdBy: { type: ObjectId, ref: "clientUsers", default: null, index: true },
     isActive: { type: Number, default: 1 },
     deletedAt: { type: Date, default: null, index: true }, // Index for soft-delete functionality
+    updatedBy: { type: ObjectId, ref: "clientUsers", default: null, index: true }, // Index for admin/user relationships
+    deletedBy: { type: ObjectId, ref: "clientUsers", default: null, index: true }, // Index for admin/user relationships
 }, { timestamps: true });
 
 
