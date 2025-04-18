@@ -102,22 +102,76 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
 
 
         if (businessUnit) filterQuery.businessUnit = businessUnit;
-        if (!booleanIncludeAdmin) filterQuery.branch = !branch ? { $ne: null } : branch;
+        if (!booleanIncludeAdmin) {
+            filterQuery.branch = !branch ? { $ne: null } : branch;
+        }
+        else {
+            if(branch){
+                filterQuery.branch = { $in: [branch, null] };
+            }
+        }
+        console.log("filterQuery.branch==>>",filterQuery.branch)
         //if (status) filterQuery.status = status;
         //   if(role) filterQuery.role = role;
         // if (role) filterQuery.roleId = { $in: role };
+        // if (role) {
+        //     let roleArray = [];
+
+        //     if (Array.isArray(role)) {
+        //         roleArray = role;
+        //     } else {
+        //         try {
+        //             roleArray = JSON.parse(role);
+        //         } catch (err) {
+        //             roleArray = [role];
+        //         }
+        //     }
+        //     if (roleArray.length > 0) {
+        //         filterQuery.roleId = { $in: roleArray };
+        //     }
+        // }
+        // if (role) {
+        //     let roleArray = [];
+
+        //     if (Array.isArray(role)) {
+        //         roleArray = role;
+        //     } else if (typeof role === 'string') {
+        //         try {
+        //             roleArray = JSON.parse(role);
+        //         } catch (err) {
+        //             // If it's a comma-separated string like "15,4", split and parse
+        //             roleArray = role.split(',').map(r => Number(r.trim()));
+        //         }
+        //     }
+
+        //     // Optional: Filter out NaN values (invalid numbers)
+        //     roleArray = roleArray.filter(r => !isNaN(r));
+
+        //     if (roleArray.length > 0) {
+        //         filterQuery.roleId = { $in: roleArray };
+        //     }
+        // }
         if (role) {
             let roleArray = [];
 
             if (Array.isArray(role)) {
                 roleArray = role;
-            } else {
+            } else if (typeof role === 'number') {
+                roleArray = [role];
+            } else if (typeof role === 'string') {
                 try {
-                    roleArray = JSON.parse(role);
+                    // Try to parse JSON array string
+                    const parsed = JSON.parse(role);
+                    roleArray = Array.isArray(parsed) ? parsed : [parsed];
                 } catch (err) {
-                    roleArray = [role];
+                    // If not JSON, fallback to comma-separated string
+                    roleArray = role.split(',').map(r => Number(r.trim()));
                 }
             }
+
+            // Optional: Filter out NaN
+            roleArray = roleArray.filter(r => !isNaN(r));
+
             if (roleArray.length > 0) {
                 filterQuery.roleId = { $in: roleArray };
             }
