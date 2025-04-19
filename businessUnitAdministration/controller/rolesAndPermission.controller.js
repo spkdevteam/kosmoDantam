@@ -157,7 +157,7 @@ exports.getParticularRoleAndPermissionByBusinessUnit = async (req, res) => {
 exports.listRolesAndPermission = async (req, res) => {
     try {
         const admin = req.user;
-        console.log("admin", admin);
+        console.log(" req.query",  req.query);
 
         const clientId = req.query.clientId;
         const keyword = req.query.keyword;
