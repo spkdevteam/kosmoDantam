@@ -64,14 +64,20 @@
  *         name: patientId
  *         schema:
  *           type: string
- *           example: ""
+ *           example: "678643a2e5226e57fc1607b8"
  *         description: Patient ID to filter logs.
  *       - in: query
  *         name: userId
  *         schema:
  *           type: string
- *           example: ""
+ *           example: "67820851a840f3a7bf1a3077"
  *         description: User ID to filter logs.
+ *       - in: query
+ *         name: month
+ *         schema:
+ *           type: string
+ *           example: "january"
+ *         description: Filter logs by month.
  *       - in: query
  *         name: year
  *         schema:

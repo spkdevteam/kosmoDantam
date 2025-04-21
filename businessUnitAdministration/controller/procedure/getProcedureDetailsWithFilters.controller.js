@@ -4,7 +4,6 @@ const getProcedureDetailsWithFiltersFn = require("../../services/procedure/getPr
 
 const getProcedureDetailsWithFilters = async (req, res, next) => {
     try {
-
         const { page = null, perPage = null, searchKey, procedureId, deptId, serviceId, buId, branchId, createdUser, updatedUser, deletedUser, fromDate, toDate, clientId } = await sanitizeBody(req.query);
         const validation = [
             clientIdValidation({ clientId })

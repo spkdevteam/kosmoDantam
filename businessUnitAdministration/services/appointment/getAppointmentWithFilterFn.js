@@ -32,7 +32,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
                 .populate("specialistDoctorId", "_id firstName lastName")
                 .populate("patientId", "_id firstName lastName bloodGroup phone email age gender ")
                 .populate("caseSheetId", "_id displayId")
-                .populate("chairId", "_id chairNumber")
+                .populate("chairId", "_id chairNumber chairLocation")
                 .populate("caseId", "_id displayId")
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
@@ -74,7 +74,6 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
                         { displayId: { $regex: word, $options: "i" } },
                         { status: { $regex: word, $options: "i" } },
                         { chiefComplaint: { $regex: word, $options: "i" } },
-
                     ]),
                 };
             };
@@ -142,7 +141,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
                 .populate("specialistDoctorId", "_id firstName lastName")
                 .populate("patientId", "_id firstName lastName bloodGroup phone email age gender")
                 .populate("caseSheetId", "_id displayId")
-                .populate("chairId", "_id chairNumber")
+                .populate("chairId", "_id chairNumber chairLocation")
                 .populate("caseId", "_id displayId")
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
@@ -191,7 +190,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
             .populate("specialistDoctorId", "_id firstName lastName")
             .populate("patientId", "_id firstName lastName bloodGroup phone email age gender")
             .populate("caseSheetId", "_id displayId")
-            .populate("chairId", "_id chairNumber")
+            .populate("chairId", "_id chairNumber chairLocation")
             .populate("caseId", "_id displayId")
             .populate("createdBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")

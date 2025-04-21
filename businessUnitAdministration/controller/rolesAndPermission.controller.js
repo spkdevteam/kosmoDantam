@@ -8,7 +8,7 @@ const message = require("../../utils/message");
 const { getClientDatabaseConnection } = require("../../db/connection");
 const clientRoleSchema = require("../../client/model/role");
 const { defaultPersmissionsList } = require("../../utils/constant"); 
-const togglePermissionStatus = require("../services/roleandPermission/togglePermissionStatus");
+const togglePermissionStatus = require("../services/rolesAndPermission/togglePermissionStatus");
 
 
 
@@ -157,13 +157,13 @@ exports.getParticularRoleAndPermissionByBusinessUnit = async (req, res) => {
 exports.listRolesAndPermission = async (req, res) => {
     try {
         const admin = req.user;
-        console.log("admin", admin);
+        console.log(" req.query",  req.query);
 
         const clientId = req.query.clientId;
         const keyword = req.query.keyword;
         const page = req.query.page??1;
         const perPage = req.query.perPage??10
-        console.log(page,perPage,'page,perPage')
+        console.log(page,perPage,'page,perPage');
         let whereCondition = {
             deletedAt: null,
             id:{$ne:17},
