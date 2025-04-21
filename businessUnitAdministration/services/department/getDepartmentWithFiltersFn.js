@@ -24,6 +24,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             if (!specificDepartment) {
@@ -99,6 +100,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             const formattedDepartments = allDepartments.map((department) => formatDepartment(department));
@@ -136,6 +138,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
             .populate("createdBy", "_id firstName lastName")
             .populate("deletedBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")
+            .sort({ createdAt: -1 })
             .lean();
 
         // Apply pagination only if page & perPage are provided

@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const clinetBranchSchema = require("../../../client/model/branch");
 const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
 const clientRoleSchema = require("../../../client/model/role");
@@ -5,7 +6,7 @@ const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const { formatEmployee } = require("../../../utils/helperFunctions");
 
-const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', page = 1, perPage = 10, searchKey = "", employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
+const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', page , perPage, searchKey = "", employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
         const booleanIncludeAdmin = includeAdmin === 'true' ? true : false;
 
@@ -20,6 +21,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
         const user = await db.model("clientUsers", clinetUserSchema);
 
         if (employeeId) {
+            console.log("thereeeeeee");
             const specificEmployee = await Employee.findOne({ _id: employeeId, deletedAt: null })
                 .populate("businessUnit", "_id name")
                 .populate("branch", "_id name")
@@ -27,6 +29,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             if (!specificEmployee) {
@@ -95,22 +98,27 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
 
 
 
+        // const filterQuery = {
+        //     deletedAt: null,
+        //     ...searchQuery,
+        // }
         const filterQuery = {
             deletedAt: null,
-            ...searchQuery,
+            // ...searchQuery,
         }
 
 
-        if (businessUnit) filterQuery.businessUnit = businessUnit;
+
+        if (businessUnit) filterQuery.businessUnit = new mongoose.Types.ObjectId(businessUnit);
         if (!booleanIncludeAdmin) {
-            filterQuery.branch = !branch ? { $ne: null } : branch;
+            filterQuery.branch = !branch ? { $ne: null } : new mongoose.Types.ObjectId(branch);
         }
         else {
-            if(branch){
-                filterQuery.branch = { $in: [branch, null] };
+            if (branch) {
+                filterQuery.branch = { $in: [new mongoose.Types.ObjectId(branch), null] };
             }
         }
-        console.log("filterQuery.branch==>>",filterQuery.branch)
+        console.log("filterQuery.branch==>>", filterQuery.branch)
         //if (status) filterQuery.status = status;
         //   if(role) filterQuery.role = role;
         // if (role) filterQuery.roleId = { $in: role };
@@ -176,9 +184,9 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
                 filterQuery.roleId = { $in: roleArray };
             }
         }
-        if (createdUser) filterQuery.createdBy = createdUser;
-        if (updatedUser) filterQuery.updatedBy = updatedUser;
-        if (deletedUser) filterQuery.deletedBy = deletedUser;
+        if (createdUser) filterQuery.createdBy = new mongoose.Types.ObjectId(createdUser);
+        if (updatedUser) filterQuery.updatedBy = new mongoose.Types.ObjectId(updatedUser);
+        if (deletedUser) filterQuery.deletedBy = new mongoose.Types.ObjectId(deletedUser);
 
         if (fromDate || toDate) {
             filterQuery.createdAt = {};
@@ -195,6 +203,189 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
             if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
             if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
         }
+        //aggregation by rahul:
+        const queryPipeline = [];
+        queryPipeline.push({
+            $match: {
+                deletedAt: null,
+                roleId: { $ne: 17 },
+                ...(filterQuery || {}), // fromDate, toDate, businessUnit, branch, etc.
+            }
+        });
+        // Lookups starts here
+        queryPipeline.push(
+            // Role
+            {
+                $lookup: {
+                    from: "clientroles",
+                    localField: "role",
+                    foreignField: "_id",
+                    as: "role"
+                }
+            },
+            { $unwind: { path: "$role", preserveNullAndEmptyArrays: true } },
+
+            // Business Unit
+            {
+                $lookup: {
+                    from: "businessunits",
+                    localField: "businessUnit",
+                    foreignField: "_id",
+                    as: "businessUnit"
+                }
+            },
+            { $unwind: { path: "$businessUnit", preserveNullAndEmptyArrays: true } },
+
+            // Branch
+            {
+                $lookup: {
+                    from: "branches",
+                    localField: "branch",
+                    foreignField: "_id",
+                    as: "branch"
+                }
+            },
+            { $unwind: { path: "$branch", preserveNullAndEmptyArrays: true } },
+
+            // createdBy
+            {
+                $lookup: {
+                    from: "clientusers",
+                    localField: "createdBy",
+                    foreignField: "_id",
+                    as: "createdBy"
+                }
+            },
+            { $unwind: { path: "$createdBy", preserveNullAndEmptyArrays: true } },
+
+            // updatedBy
+            {
+                $lookup: {
+                    from: "clientusers",
+                    localField: "updatedBy",
+                    foreignField: "_id",
+                    as: "updatedBy"
+                }
+            },
+            { $unwind: { path: "$updatedBy", preserveNullAndEmptyArrays: true } },
+
+            // deletedBy
+            {
+                $lookup: {
+                    from: "clientusers",
+                    localField: "deletedBy",
+                    foreignField: "_id",
+                    as: "deletedBy"
+                }
+            },
+            { $unwind: { path: "$deletedBy", preserveNullAndEmptyArrays: true } }
+        );
+        // lookup ends here
+        if (searchKey && searchKey.trim()) {
+            const regex = new RegExp(searchKey.trim(), "i");
+
+            queryPipeline.push({
+                $match: {
+                    $or: [
+                        { firstName: { $regex: regex } },
+                        { lastName: { $regex: regex } },
+                        { email: { $regex: regex } },
+                        { phone: { $regex: regex } },
+                        { gender: { $regex: regex } },
+                        { bloodGroup: { $regex: regex } },
+                        { panNumber: { $regex: regex } },
+                        { adharNumber: { $regex: regex } },
+                        { city: { $regex: regex } },
+                        { state: { $regex: regex } },
+                        { country: { $regex: regex } },
+                        { ZipCode: { $regex: regex } },
+                        { displayId: { $regex: regex } },
+                        { description: { $regex: regex } },
+                        { "role.name": { $regex: regex } }
+                    ]
+                }
+            });
+        }
+        //sorting
+        queryPipeline.push({
+            $sort: { createdAt: -1 }
+        });
+        if (!page || !perPage) {
+            // No pagination — return all data and add a separate $facet for consistent structure
+            queryPipeline.push({
+                $facet: {
+                    metadata: [
+                        {
+                            $count: "total"
+                        },
+                        {
+                            $addFields: {
+                                page: 1,
+                                perPage: 1
+                            }
+                        }
+                    ],
+                    data: [
+                        // No $skip or $limit → return all matching docs
+                    ]
+                }
+            });
+        }
+        else {
+            queryPipeline.push({
+                $facet: {
+                    metadata: [
+                        { $count: "total" },
+                        {
+                            $addFields: {
+                                page: Number(page),
+                                perPage: Number(perPage),
+                            },
+                        },
+                    ],
+                    data: [
+                        { $skip: (Number(page) - 1) * Number(perPage) },
+                        { $limit: Number(perPage) }
+                    ]
+                }
+            });
+        }
+
+        // if (page && perPage) {
+        //     // Add pagination only if both are present
+
+        // } else {
+
+        // }
+        console.log("queryPipeline==>>", queryPipeline)
+        const result = await Employee.aggregate(queryPipeline);
+        // return {
+        //     status : true,
+        //     data : queryPipeline
+        // } 
+        console.log("resultresult==>>>>>", result)
+        // Extract data
+        const employeesNew = result[0]?.data || [];
+        const meta = result[0]?.metadata[0] || {
+            total: employeesNew.length,
+            page: 1,
+            perPage: 1
+        };
+
+        return {
+            status: employeesNew?.length > 0 ? true : false,
+            message: meta.total < 1 ? "No employees found" : "Employee details retrieved successfully.",
+            data: {
+                employees: employeesNew ? employeesNew.map(emp => formatEmployee(emp)) : [],
+                metadata: {
+                    page: meta.page,
+                    perPage: meta.perPage,
+                    totalCount: meta.total,
+                    totalPages: page && perPage ? Math.ceil(meta.total / meta.perPage) : 1
+                },
+            },
+        };
+
 
 
         if (!page || !perPage) {
@@ -304,7 +495,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
         };
         //return { status: true, data: result };
     } catch (error) {
-        return { status: false, message: error.message };
+        return { status: false, message: error.message, data: {} };
     }
 }
 

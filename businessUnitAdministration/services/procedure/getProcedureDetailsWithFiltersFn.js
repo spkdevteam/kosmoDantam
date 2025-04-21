@@ -27,6 +27,7 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             if (!specificProcedure) {
@@ -107,6 +108,7 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             const formattedProcedure = allProcedure.map((procedure) => formatProcedure(procedure));
@@ -146,6 +148,7 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
             .populate("createdBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")
             .populate("deletedBy", "_id firstName lastName")
+            .sort({ createdAt: -1 })
             .lean();
 
 

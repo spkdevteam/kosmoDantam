@@ -37,6 +37,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             if (!specificAppointment) {
@@ -146,6 +147,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
 
@@ -194,6 +196,7 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
             .populate("createdBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")
             .populate("deletedBy", "_id firstName lastName")
+            .sort({ createdAt: -1 })
             .lean();
 
 

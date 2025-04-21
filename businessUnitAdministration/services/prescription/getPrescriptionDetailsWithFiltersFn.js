@@ -31,6 +31,7 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             if (!specificPrescription) {
@@ -130,6 +131,7 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
 
@@ -171,6 +173,7 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
             .populate("createdBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")
             .populate("deletedBy", "_id firstName lastName")
+            .sort({ createdAt: -1 })
             .lean();
 
 

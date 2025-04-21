@@ -193,13 +193,14 @@ exports.listRolesAndPermission = async (req, res) => {
         // const [roles] = await Promise.all([
         //     RolesAndpermission.find(whereCondition).select("name id createdBy isActive").sort({ _id: -1 }),
         // ]);
+        //rahul: changed the soring from .sort({ _id: -1 }) to .sort({ createdAt: -1 })
         const [roles] = await Promise.all([
-            RolesAndpermission.find(whereCondition).select("name id createdBy isActive capability").sort({ _id: -1 })
+            RolesAndpermission.find(whereCondition).select("name id createdBy isActive capability").sort({ createdAt: -1 })
             ?.skip((page-1) * perPage)?.limit(perPage),//capability added extra
         ]);
 
         const [totalCount] = await Promise.all([
-            RolesAndpermission.find(whereCondition).select("name id createdBy isActive capability").sort({ _id: -1 })
+            RolesAndpermission.find(whereCondition).select("name id createdBy isActive capability").sort({ createdAt: -1 })
             ,//capability added extra
         ]);
         // console.log("roles=>>",roles);
@@ -346,7 +347,8 @@ exports.getRolesList = async (req, res) => {
         const RolesAndPermission = clientConnection.model('clientRoles', clientRoleSchema);
         const roles = await RolesAndPermission.find({ deletedAt: null })
             .select("name id createdBy isActive _id")
-            .sort({ _id: -1 });
+            // .sort({ _id: -1 });
+            .sort({ _id: -1 });//sorting logic changed by rahul
 
         const filterRoles = (roles, roleId) => {
             if (roleId === 1) {

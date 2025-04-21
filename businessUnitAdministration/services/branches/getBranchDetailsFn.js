@@ -121,6 +121,7 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
             .populate('createdBy', 'firstName lastName')
             .populate('updatedBy', 'firstName lastName')
             .populate('deletedBy', 'firstName lastName')
+            .sort({ createdAt: -1 })
             .lean();//createdBy, updatedBy
         console.log("fetchedBranch=>>>", fetchedBranch);
         if (!fetchedBranch) return { status: false, message: "Branches can't be fetched!!" };

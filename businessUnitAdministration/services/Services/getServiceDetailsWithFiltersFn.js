@@ -26,6 +26,7 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             if (!specificService) {
@@ -86,9 +87,9 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
         //apply date filters
         let dateSearchKey = {};
         if (fromDate || toDate) {
-            dateSearchKey = { createdAt: {} };
-            if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
-            if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
+            dateSearchKey = { date: {} };
+            if (fromDate) dateSearchKey.date.$gte = fromDate ? new Date(fromDate) : null;
+            if (toDate) dateSearchKey.date.$lte = toDate ? new Date(toDate) : null;
         };
 
 
@@ -111,6 +112,7 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             const formattedServices = allService.map((service) => formatService(service));
@@ -149,6 +151,7 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
             .populate("createdBy", "_id firstName lastName")
             .populate("deletedBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")
+            .sort({ createdAt: -1 })
             .lean();
 
         //apply pagination only if page & perPage are provided
