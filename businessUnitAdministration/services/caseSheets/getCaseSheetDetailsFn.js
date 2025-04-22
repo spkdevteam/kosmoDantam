@@ -170,6 +170,7 @@ const getCaseSheetDetailsFn = async ({ from_Date = null, toDate = null, SearchKe
                 .populate("services.department.deptId", "deptName")
                 .populate("services.service.servId", "serviceName")
                 .populate("procedures.procedure.procedId", "procedureName")
+                .sort({ createdAt: -1 })
                 .lean();
             const metaData = {
                 currentPage: 1,
@@ -258,6 +259,7 @@ const getCaseSheetDetailsFn = async ({ from_Date = null, toDate = null, SearchKe
             .populate("services.department.deptId", "deptName")
             .populate("services.service.servId", "serviceName")
             .populate("procedures.procedure.procedId", "procedureName")
+            .sort({ createdAt: -1 })
             .lean();
         // .populate("invoiceId", "")
         // console.log("fetchedCaseSheet=>>>", fetchedCaseSheets);

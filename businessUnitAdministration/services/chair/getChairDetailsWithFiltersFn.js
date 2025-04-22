@@ -35,6 +35,7 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
             .populate("createdBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")
             .populate("deletedBy", "_id firstName lastName")
+            .sort({ createdAt: -1 })
             .lean();
 
             if(!specificChair){
@@ -134,6 +135,7 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             const formattedChairs = allChairs.map((chair) => formatChair(chair));
@@ -163,6 +165,7 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
             .populate("createdBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")
             .populate("deletedBy", "_id firstName lastName")
+            .sort({ createdAt: -1 })
             .lean();
 
         //apply pagination only if page & perPage are provided
