@@ -19,7 +19,7 @@ const getCaseSheetDetailsFn = async ({ from_Date = null, toDate = null, SearchKe
 }) => {
     try {
         let searchQuery = {};
-        if (SearchKey) {
+        if (SearchKey) { 
             if (SearchKey.trim()) {
                 const words = SearchKey.trim().split(/\s+/)//spiltting by space
                     .map(word =>
@@ -27,20 +27,21 @@ const getCaseSheetDetailsFn = async ({ from_Date = null, toDate = null, SearchKe
                     );
                 // const escapedSearchKey = SearchKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 searchQuery = {
-                    // $or: words.flatMap(word => [//case insensitive searching and searching from anywhere of the target field
-                    //     { name: { $regex: word, $options: "i" } },
-                    //     { incorporationName: { $regex: word, $options: "i" } },
-                    //     { cinNumber: { $regex: word, $options: "i" } },
-                    //     { gstNumber: { $regex: word, $options: "i" } },
-                    //     { branchPrefix: { $regex: word, $options: "i" } },
-                    //     { emailContact: { $regex: word, $options: "i" } },
-                    //     { contactNumber: { $regex: word, $options: "i" } },
-                    //     { city: { $regex: word, $options: "i" } },
-                    //     { state: { $regex: word, $options: "i" } },
-                    //     { country: { $regex: word, $options: "i" } },
-                    //     { ZipCode: { $regex: word, $options: "i" } },
-                    //     { address: { $regex: word, $options: "i" } },
-                    // ])
+                    $or: words.flatMap(word => [//case insensitive searching and searching from anywhere of the target field
+                        // { name: { $regex: word, $options: "i" } },
+                        // { incorporationName: { $regex: word, $options: "i" } },
+                        // { cinNumber: { $regex: word, $options: "i" } },
+                        // { gstNumber: { $regex: word, $options: "i" } },
+                        // { branchPrefix: { $regex: word, $options: "i" } },
+                        // { emailContact: { $regex: word, $options: "i" } },
+                        // { contactNumber: { $regex: word, $options: "i" } },
+                        // { city: { $regex: word, $options: "i" } },
+                        // { state: { $regex: word, $options: "i" } },
+                        // { country: { $regex: word, $options: "i" } },
+                        // { ZipCode: { $regex: word, $options: "i" } },
+                        // { address: { $regex: word, $options: "i" } },
+                        { displayId: { $regex: word, $options: "i" } }
+                    ])
                 }
             }
         }
