@@ -7,9 +7,8 @@ const clinetBranchSchema = require("../../../client/model/branch");
 const caseSheetSchema = require("../../../client/model/caseSheet");
 const clinetUserSchema = require("../../../client/model/user");
 const clinetPatientSchema = require("../../../client/model/patient");
-const { formatAppointment } = require("../../../utils/helperFunctions");
+const { formatAppointment } = require("../../../utils/helperFunctions"); 
 const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
-
 
 const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchKey, chairId, appointmentId, fromDate, toDate, buId, branchId, dutyDoctorId, specialistDoctorId, dentalAssistant, patientId, caseSheetId, caseId, createdUser, updatedUser, clientId }) => {
     try {
