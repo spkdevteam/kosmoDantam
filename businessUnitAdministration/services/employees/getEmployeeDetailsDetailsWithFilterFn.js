@@ -4,7 +4,7 @@ const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
 const clientRoleSchema = require("../../../client/model/role");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
-const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy.js");
 const { formatEmployee } = require("../../../utils/helperFunctions");
 
 const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', page , perPage, searchKey = "", employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
