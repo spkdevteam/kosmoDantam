@@ -5,7 +5,7 @@ const clinetPatientSchema = require("../../../client/model/patient");
 const prescriptionSchema = require("../../../client/model/prescription");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
-const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy.js");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstNameOfCreatedAndEditedByNew");
 const { formatPrescription } = require("../../../utils/helperFunctions");
 
 const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, prescriptionId, fromDate, toDate, buId, branchId, doctorId, patientId, caseSheetId, nextVisitDate, createdUser, updatedUser, deletedUser, clientId }) => {
