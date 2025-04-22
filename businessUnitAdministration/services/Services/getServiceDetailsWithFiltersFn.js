@@ -4,6 +4,7 @@ const departmentSchema = require("../../../client/model/department");
 const serviceSchema = require("../../../client/model/service");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
 const { formatService } = require("../../../utils/helperFunctions");
 
 const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, serviceId, fromDate, toDate, departmentId, branchId, buId, createdUser, updatedUser, deletedUser, clientId }) => {
@@ -179,6 +180,9 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
         //calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);
 
+        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(services);
+
+
         return {
             status: true,
             message: totalCount < 1 ? "No Services found" : "Service details retrieved successfully.",
@@ -189,6 +193,8 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
                     perPage,
                     totalCount,
                     totalPages,
+                    createdBy: createdByFirstNames,
+                    editedBy: updatedByFirstNames
                 },
             },
         };

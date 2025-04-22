@@ -3,6 +3,7 @@ const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
 const clientRoleSchema = require("../../../client/model/role");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
 const { formatEmployee } = require("../../../utils/helperFunctions");
 
 const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', page = 1, perPage = 10, searchKey = "", employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
@@ -110,6 +111,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
                 filterQuery.branch = { $in: [branch, null] };
             }
         }
+
         console.log("filterQuery.branch==>>",filterQuery.branch)
         //if (status) filterQuery.status = status;
         //   if(role) filterQuery.role = role;
@@ -289,6 +291,9 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
         // Calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);
 
+        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(employees);
+        
+
         return {
             status: true,
             message: totalCount < 1 ? "No employees found" : "Employee details retrieved successfully.",
@@ -299,6 +304,8 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
                     perPage,
                     totalCount,
                     totalPages,
+                    createdBy: createdByFirstNames,
+                    editedBy: updatedByFirstNames
                 },
             },
         };

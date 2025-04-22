@@ -207,6 +207,13 @@
  *                   perPage: 2
  *                   totalCount: 53
  *                   totalPages: 27
+ *                   createdBy:
+ *                     - _id: "67820851a840f3a7bf1a3077"
+ *                       firstName: "kasif"
+ *                   editedBy:
+ *                     - _id: "67820851a840f3a7bf1a3077"
+ *                       firstName: "kasif"
+ * 
  *       400:
  *         description: Validation error or missing data.
  *         content:

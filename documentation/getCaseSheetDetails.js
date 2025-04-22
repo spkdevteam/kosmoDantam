@@ -153,8 +153,13 @@
  *                 metaData:
  *                   currentPage: 1
  *                   perPage: 10
- *                   totalDocs: 15
- *                   totalPages: 2
+ *                   SearchKey: ""
+ *                   totalDocs: 1
+ *                   totalPages: 1
+ *                   createdBy:
+ *                     - _id: "67eb886ac31f4280a4268ae0"
+ *                       firstName: "avishek"
+ *                   editedBy: []
  *       400:
  *         description: Missing or invalid input parameters.
  *         content:

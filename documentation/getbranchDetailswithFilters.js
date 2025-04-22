@@ -78,29 +78,50 @@
  *         content:
  *           application/json:
  *             example:
- *               status: true
  *               message: "Branch details retrieved successfully."
  *               data:
  *                 branches:
- *                   - _id: "67820c87a840f3a7bf1a3114"
- *                     displayId: "KC-BU-2024-BR1000001"
+ *                   - _id: "67eb95a9c9afec7c3b5f7f32"
+ *                     displayId: "KC-bnch-2024-BR1000001"
  *                     businessUnit:
- *                       _id: "67820851a840f3a7bf1a307a"
- *                       name: "kasif unit two Business Unit"
- *                     name: "Kosmo Dental Clinic Branch one"
- *                     emailContact: "kasifbu2bnch1@yopmail.com"
- *                     contactNumber: "9999999101"
- *                     city: "Asansol"
+ *                       _id: "67eb886ac31f4280a4268ae3"
+ *                       name: "avishek G Businsenss Unit"
+ *                     branchHead: null
+ *                     bookingContact: "7907441232"
+ *                     name: "Oral Care Clinic"
+ *                     incorporationName: "AGJDYG7293AJDDW"
+ *                     cinNumber: ""
+ *                     gstNumber: ""
+ *                     branchPrefix: "ORC"
+ *                     branchLogo: "1743493529408_sree-dental-hospital-logo-1.png"
+ *                     emailContact: "oralcare@yopmail.com"
+ *                     contactNumber: "9098898997"
+ *                     city: "Kolkata"
  *                     state: "West Bengal"
  *                     country: "India"
+ *                     ZipCode: "700089"
+ *                     address: ""
  *                     isActive: true
- *                     createdAt: "2025-01-11T06:15:35.615Z"
- *                     updatedAt: "2025-01-11T06:15:38.372Z"
+ *                     createdBy: null
+ *                     deletedAt: null
+ *                     createdAt: "2025-04-01T07:28:41.175Z"
+ *                     updatedAt: "2025-04-19T11:12:22.112Z"
+ *                     __v: 0
+ *                     updatedBy:
+ *                       _id: "67eb886ac31f4280a4268ae0"
+ *                       firstName: "avishek"
+ *                       lastName: "G"
  *                 metaData:
  *                   currentPage: 1
- *                   perPage: 3
- *                   totalDocs: 3
+ *                   perPage: 10
+ *                   SearchKey: ""
+ *                   totalDocs: 1
  *                   totalPages: 1
+ *                   createdBy: []
+ *                   editedBy:
+ *                     - _id: "67eb886ac31f4280a4268ae0"
+ *                       firstName: "avishek"
+ *               status: true
  *       400:
  *         description: Missing or invalid input parameters.
  *         content:

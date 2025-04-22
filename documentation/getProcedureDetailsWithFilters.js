@@ -32,8 +32,8 @@
  *         name: procedureId
  *         schema:
  *           type: string
- *           example: ""
- *         description: procedure ID to filter procedure (optional).
+ *         required: false
+ *         description: Procedure ID to filter procedures.
  *       - in: query
  *         name: clientId
  *         schema:
@@ -48,7 +48,6 @@
  *           format: date
  *         required: false
  *         description: Start date for filtering procedures.
- *         example: ""
  *       - in: query
  *         name: toDate
  *         schema:
@@ -56,49 +55,42 @@
  *           format: date
  *         required: false
  *         description: End date for filtering procedures.
- *         example: ""
  *       - in: query
  *         name: buId
  *         schema:
  *           type: string
  *         required: false
  *         description: Unique identifier for the business unit.
- *         example: ""
  *       - in: query
  *         name: branchId
  *         schema:
  *           type: string
  *         required: false
  *         description: Unique identifier for the branch.
- *         example: ""
  *       - in: query
  *         name: createdUser
  *         schema:
  *           type: string
  *         required: false
  *         description: ID of the user who created the procedure record.
- *         example: ""
  *       - in: query
  *         name: updatedUser
  *         schema:
  *           type: string
  *         required: false
  *         description: ID of the user who last updated the procedure record.
- *         example: ""
  *       - in: query
  *         name: deletedUser
  *         schema:
  *           type: string
  *         required: false
  *         description: ID of the user who deleted the procedure record.
- *         example: ""
  *       - in: query
  *         name: serviceId
  *         schema:
  *           type: string
  *         required: false
  *         description: Unique identifier for the service.
- *         example: ""
  *     responses:
  *       200:
  *         description: Procedure details retrieved successfully.
@@ -109,167 +101,92 @@
  *               message: "Procedure details retrieved successfully."
  *               data:
  *                 procedures:
- *                   - _id: "67a6f4ed6b54d7e951d696de"
- *                     services:
- *                       - _id: "67a6f2d8301e33bb9ce6c958"
- *                         serviceName: "All ceramic crown"
- *                       - _id: "67a6f2d8301e33bb9ce6c95c"
- *                         serviceName: "Laminate preparation"
- *                       - _id: "67a6f2d8301e33bb9ce6c95e"
- *                         serviceName: "Metal Ceramic crown"
- *                       - _id: "67a6f2d8301e33bb9ce6c962"
- *                         serviceName: "Zirconia crown"
- *                     procedureName: "Final cementation"
- *                     displayId: "KC-BU-2024-PC1006670"
- *                     buId:
- *                       _id: "67820851a840f3a7bf1a307a"
- *                       name: "kasif unit two Business Unit"
- *                     branchId:
- *                       _id: "67820c87a840f3a7bf1a3114"
- *                       name: "Kosmo Dental Clinic Branch one"
- *                     isActive: true
- *                     createdBy: null
- *                     deletedBy: null
- *                     updatedBy: null
- *                     deletedAt: null
- *                     createdAt: "2025-02-08T06:08:45.722Z"
- *                     updatedAt: "2025-02-16T02:22:02.609Z"
- *                     __v: 0
  *                   - _id: "67a6f4ed6b54d7e951d696dc"
  *                     services:
  *                       - _id: "67a6f2d8301e33bb9ce6c958"
- *                         serviceName: "All ceramic crown"
+ *                         serviceName: "All  ceramic crown "
+ *                         departmentId: "67a6edb65f984dad91cd02d2"
  *                       - _id: "67a6f2d8301e33bb9ce6c95c"
  *                         serviceName: "Laminate preparation"
+ *                         departmentId: "67a6edb65f984dad91cd02d2"
  *                       - _id: "67a6f2d8301e33bb9ce6c95e"
- *                         serviceName: "Metal Ceramic crown"
+ *                         serviceName: "Metal  Ceramic crown "
+ *                         departmentId: "67a6edb65f984dad91cd02d2"
  *                       - _id: "67a6f2d8301e33bb9ce6c962"
- *                         serviceName: "Zirconia crown"
+ *                         serviceName: "Zirconia crown "
+ *                         departmentId: "67a6edb65f984dad91cd02d2"
  *                     procedureName: "Digital Scan"
  *                     displayId: "KC-BU-2024-PC1006667"
  *                     buId:
  *                       _id: "67820851a840f3a7bf1a307a"
- *                       name: "kasif unit two Business Unit"
+ *                       name: "kasif unit two Businsenss Unit"
  *                     branchId:
  *                       _id: "67820c87a840f3a7bf1a3114"
  *                       name: "Kosmo Dental Clinic Branch one"
- *                     isActive: true
+ *                     isActive: false
  *                     createdBy: null
  *                     deletedBy: null
- *                     updatedBy: null
+ *                     updatedBy:
+ *                       _id: "67820851a840f3a7bf1a3077"
+ *                       firstName: "kasif"
+ *                       lastName: "unit two"
  *                     deletedAt: null
  *                     createdAt: "2025-02-08T06:08:45.721Z"
- *                     updatedAt: "2025-02-08T06:08:46.178Z"
- *                     __v: 0
- *                   - _id: "67a6f4ed6b54d7e951d696d6"
- *                     services:
- *                       - _id: "67a6f2d8301e33bb9ce6c958"
- *                         serviceName: "All ceramic crown"
- *                       - _id: "67a6f2d8301e33bb9ce6c95c"
- *                         serviceName: "Laminate preparation"
- *                       - _id: "67a6f2d8301e33bb9ce6c95e"
- *                         serviceName: "Metal Ceramic crown"
- *                       - _id: "67a6f2d8301e33bb9ce6c962"
- *                         serviceName: "Zirconia crown"
- *                     procedureName: "Bisque try in"
- *                     displayId: "KC-BU-2024-PC1006666"
- *                     buId:
- *                       _id: "67820851a840f3a7bf1a307a"
- *                       name: "kasif unit two Business Unit"
- *                     branchId:
- *                       _id: "67820c87a840f3a7bf1a3114"
- *                       name: "Kosmo Dental Clinic Branch one"
- *                     isActive: true
- *                     createdBy: null
- *                     deletedBy: null
- *                     updatedBy: null
- *                     deletedAt: null
- *                     createdAt: "2025-02-08T06:08:45.720Z"
- *                     updatedAt: "2025-02-08T06:08:45.880Z"
+ *                     updatedAt: "2025-04-12T18:53:59.904Z"
  *                     __v: 0
  *                   - _id: "67a6f4ed6b54d7e951d696da"
- *                     services:
- *                       - _id: "67a6f2d8301e33bb9ce6c958"
- *                         serviceName: "All ceramic crown"
- *                       - _id: "67a6f2d8301e33bb9ce6c95c"
- *                         serviceName: "Laminate preparation"
- *                       - _id: "67a6f2d8301e33bb9ce6c95e"
- *                         serviceName: "Metal Ceramic crown"
- *                       - _id: "67a6f2d8301e33bb9ce6c962"
- *                         serviceName: "Zirconia crown"
  *                     procedureName: "Crown preparation"
  *                     displayId: "KC-BU-2024-PC1006684"
  *                     buId:
  *                       _id: "67820851a840f3a7bf1a307a"
- *                       name: "kasif unit two Business Unit"
+ *                       name: "kasif unit two Businsenss Unit"
  *                     branchId:
  *                       _id: "67820c87a840f3a7bf1a3114"
  *                       name: "Kosmo Dental Clinic Branch one"
  *                     isActive: true
  *                     createdBy: null
  *                     deletedBy: null
- *                     updatedBy: null
+ *                     updatedBy:
+ *                       _id: "67820851a840f3a7bf1a3077"
+ *                       firstName: "kasif"
+ *                       lastName: "unit two"
  *                     deletedAt: null
  *                     createdAt: "2025-02-08T06:08:45.721Z"
- *                     updatedAt: "2025-02-08T06:08:46.059Z"
+ *                     updatedAt: "2025-04-07T12:07:55.428Z"
  *                     __v: 0
- *                   - _id: "67a6f4ed6b54d7e951d696e0"
  *                     services:
- *                       - _id: "67a6f2d8301e33bb9ce6c958"
- *                         serviceName: "All ceramic crown"
- *                       - _id: "67a6f2d8301e33bb9ce6c95c"
- *                         serviceName: "Laminate preparation"
- *                       - _id: "67a6f2d8301e33bb9ce6c95e"
- *                         serviceName: "Metal Ceramic crown"
- *                       - _id: "67a6f2d8301e33bb9ce6c962"
- *                         serviceName: "Zirconia crown"
- *                     procedureName: "Rubber base impression"
- *                     displayId: "KC-BU-2024-PC1006668"
- *                     buId:
- *                       _id: "67820851a840f3a7bf1a307a"
- *                       name: "kasif unit two Business Unit"
- *                     branchId:
- *                       _id: "67820c87a840f3a7bf1a3114"
- *                       name: "Kosmo Dental Clinic Branch one"
- *                     isActive: true
- *                     createdBy: null
- *                     deletedBy: null
- *                     updatedBy: null
- *                     deletedAt: null
- *                     createdAt: "2025-02-08T06:08:45.722Z"
- *                     updatedAt: "2025-02-08T06:08:46.355Z"
- *                     __v: 0
+ *                       # same as above...
  *                   - _id: "67a6f4ed6b54d7e951d696d8"
- *                     services:
- *                       - _id: "67a6f2d8301e33bb9ce6c958"
- *                         serviceName: "All ceramic crown"
- *                       - _id: "67a6f2d8301e33bb9ce6c95c"
- *                         serviceName: "Laminate preparation"
- *                       - _id: "67a6f2d8301e33bb9ce6c95e"
- *                         serviceName: "Metal Ceramic crown"
- *                       - _id: "67a6f2d8301e33bb9ce6c962"
- *                         serviceName: "Zirconia crown"
- *                     procedureName: "Bite registration"
+ *                     procedureName: "Bite registation"
  *                     displayId: "KC-BU-2024-PC1006665"
  *                     buId:
  *                       _id: "67820851a840f3a7bf1a307a"
- *                       name: "kasif unit two Business Unit"
+ *                       name: "kasif unit two Businsenss Unit"
  *                     branchId:
  *                       _id: "67820c87a840f3a7bf1a3114"
  *                       name: "Kosmo Dental Clinic Branch one"
  *                     isActive: true
  *                     createdBy: null
  *                     deletedBy: null
- *                     updatedBy: null
+ *                     updatedBy:
+ *                       _id: "67820851a840f3a7bf1a3077"
+ *                       firstName: "kasif"
+ *                       lastName: "unit two"
  *                     deletedAt: null
  *                     createdAt: "2025-02-08T06:08:45.721Z"
- *                     updatedAt: "2025-02-08T06:08:45.970Z"
+ *                     updatedAt: "2025-04-09T08:59:13.465Z"
  *                     __v: 0
+ *                     services:
+ *                       # same as above...
  *                 metadata:
  *                   page: 1
  *                   perPage: 10
- *                   totalCount: 6
+ *                   totalCount: 3
  *                   totalPages: 1
+ *                   createdBy: []
+ *                   editedBy:
+ *                     - _id: "67820851a840f3a7bf1a3077"
+ *                       firstName: "kasif"
  *       500:
  *         description: Internal server error.
  *         content:

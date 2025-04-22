@@ -6,6 +6,7 @@ const clinetPatientSchema = require("../../../client/model/patient");
 const clinetUserSchema = require("../../../client/model/user");
 
 const { getClientDatabaseConnection } = require("../../../db/connection");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
 const { formatChair } = require("../../../utils/helperFunctions");
 const statusConversion = require("../../../utils/statusConversion");
 
@@ -181,6 +182,9 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
         // Calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);
 
+
+        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(chairs);
+
         return {
             status: true,
             message: totalCount < 1 ? "No Chairs found" : "Chair details retrieved successfully.",
@@ -191,6 +195,8 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
                     perPage,
                     totalCount,
                     totalPages,
+                    createdBy: createdByFirstNames,
+                    editedBy: updatedByFirstNames
                 },
             },
         };

@@ -5,6 +5,7 @@ const clinetPatientSchema = require("../../../client/model/patient");
 const prescriptionSchema = require("../../../client/model/prescription");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
 const { formatPrescription } = require("../../../utils/helperFunctions");
 
 const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, prescriptionId, fromDate, toDate, buId, branchId, doctorId, patientId, caseSheetId, nextVisitDate, createdUser, updatedUser, deletedUser, clientId }) => {
@@ -203,6 +204,9 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
         // Calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);
 
+        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(prescriptions);
+        
+
         return {
             status: true,
             message: totalCount < 1 ? "No Prescriptions found" : "Precription details retrieved successfully.",
@@ -213,6 +217,8 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
                     perPage,
                     totalCount,
                     totalPages,
+                    createdBy: createdByFirstNames,
+                    editedBy: updatedByFirstNames
                 },
             },
         };

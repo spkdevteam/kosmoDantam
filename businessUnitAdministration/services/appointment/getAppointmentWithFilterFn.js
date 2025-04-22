@@ -7,6 +7,7 @@ const caseSheetSchema = require("../../../client/model/caseSheet");
 const clinetUserSchema = require("../../../client/model/user");
 const clinetPatientSchema = require("../../../client/model/patient");
 const { formatAppointment } = require("../../../utils/helperFunctions");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
 
 const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchKey, chairId, appointmentId, fromDate, toDate, buId, branchId, dutyDoctorId, specialistDoctorId, dentalAssistant, patientId, caseSheetId, caseId, createdUser, updatedUser, clientId }) => {
     try {
@@ -214,6 +215,9 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
         // Calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);
 
+        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(appointments);
+        
+
         return {
             status: true,
             message: totalCount < 1 ? "No Appointments found" : "Appointment details retrieved successfully.",
@@ -224,6 +228,8 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
                     perPage,
                     totalCount,
                     totalPages,
+                    createdBy: createdByFirstNames,
+                    editedBy: updatedByFirstNames
                 },
             },
         };

@@ -3,6 +3,7 @@ const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
 const clinetPatientSchema = require("../../../client/model/patient");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
 
 const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey = "", page = null,
     perPage = null, clientId, branchId, businessUnitId, mainPatientLinkedId, createdById, updatedById, status, patientId }) => {
@@ -172,6 +173,11 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
         // console.log("fetchedPatient=>>>", fetchedPatient);
         if (!fetchedPatient) return { status: false, message: "Patients can't be fetched!!" };
 
+
+        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(fetchedPatient);
+        
+
+
         let metaData = {};
         if (page && perPage) {
             const totalPages = Math.ceil(totalDocs / paginationObj?.perPageNumber);
@@ -181,6 +187,8 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
                 SearchKey,
                 totalDocs,
                 totalPages,
+                createdBy: createdByFirstNames,
+                editedBy: updatedByFirstNames
             }
             if (fetchedPatient?.length > 0)
                 return { status: true, data: fetchedPatient, metaData: metaData, message: "Patients details retrieved successfully." }

@@ -3,6 +3,7 @@ const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
 const departmentSchema = require("../../../client/model/department");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
 const { formatDepartment } = require("../../../utils/helperFunctions");
 
 const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchKey, departmentId, fromDate, toDate, buId, branchId, createdUser, updatedUser, deletedUser, clientId, status }) => {
@@ -80,8 +81,6 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
             if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
             if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
         }
-
-
 
         if (!page || !perPage) {
             const allDepartments = await Department.find({
@@ -166,6 +165,11 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
         // Calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);
 
+        console.log("before creating createdby")
+
+        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(departments);
+
+
         return {
             status: true,
             message: totalCount < 1 ? "No departments found" : "Department details retrieved successfully.",
@@ -176,6 +180,8 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
                     perPage,
                     totalCount,
                     totalPages,
+                    createdBy: createdByFirstNames,
+                    editedBy: updatedByFirstNames
                 },
             },
         };

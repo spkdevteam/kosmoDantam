@@ -5,6 +5,7 @@ const procedureSchema = require("../../../client/model/procedure");
 const serviceSchema = require("../../../client/model/service");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
 const { formatProcedure } = require("../../../utils/helperFunctions");
 
 const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, procedureId, deptId, serviceId, buId, branchId, createdUser, updatedUser, deletedUser, fromDate, toDate, clientId }) => {
@@ -177,6 +178,10 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
         // Calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);
 
+
+        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(procedures);
+        
+
         return {
             status: true,
             message: totalCount < 1 ? "No Procedures found" : "Procedure details retrieved successfully.",
@@ -187,6 +192,8 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
                     perPage,
                     totalCount,
                     totalPages,
+                    createdBy: createdByFirstNames,
+                    editedBy: updatedByFirstNames
                 },
             },
         };
