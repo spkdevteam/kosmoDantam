@@ -258,8 +258,8 @@ exports.getBookingChartNonTabular = async (input) => {
         const booking = await this.getDateWiseBookidDetails(input) || [];
         const daystatus = [...absentees?.data, ...booking.data];
         const doctors = await listEmployeeByRole({ ...input, roleId: 3 });
-        const chairs = await getchairList(input)
-        const assistant = await listEmployeeByRole({ ...input, roleId: 4 })
+        const chairs = await getchairList(input);
+        const assistant = await listEmployeeByRole({ ...input, roleId: 4 });
 
         return { chairs, doctors, daystatus, assistant, timeSlots };
     } catch (error) {
