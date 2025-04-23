@@ -3,7 +3,7 @@ const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const mongoose = require("mongoose");
-const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy.js");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstNameOfCreatedAndEditedByNew");
 const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey = "", page = null, perPage = null,
     clientId, businessUnitId = null, createdBy, updatedBy, branchId }) => {
     try {
@@ -141,8 +141,8 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
                 SearchKey,
                 totalDocs,
                 totalPages,
-                createdBy: createdByFirstNames,
-                editedBy: updatedByFirstNames
+                // createdBy: createdByFirstNames,
+                // editedBy: updatedByFirstNames
             }
             if (fetchedBranch?.length > 0)
                 return { status: true, data: fetchedBranch, metaData: metaData, message: "Branch details retrieved successfully." }

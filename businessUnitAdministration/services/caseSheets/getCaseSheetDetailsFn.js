@@ -12,7 +12,7 @@ const serviceSchema = require("../../../client/model/service");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const mongoose = require("mongoose");
-const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy.js");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstNameOfCreatedAndEditedByNew");
 
 const getCaseSheetDetailsFn = async ({ from_Date = null, toDate = null, SearchKey = "", page = null, perPage = null, clientId, patientId, branchId, buId,
     createdBy, compId, clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId, updatedBy, caseSheetId
@@ -267,7 +267,7 @@ const getCaseSheetDetailsFn = async ({ from_Date = null, toDate = null, SearchKe
         if (!fetchedCaseSheets) return { status: false, message: "CaseSheets can't be fetched!!" };
 
 
-        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(fetchedCaseSheets);
+       const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(fetchedCaseSheets);
 
 
 
@@ -280,8 +280,8 @@ const getCaseSheetDetailsFn = async ({ from_Date = null, toDate = null, SearchKe
                 SearchKey,
                 totalDocs,
                 totalPages,
-                createdBy: createdByFirstNames,
-                editedBy: updatedByFirstNames
+                // createdBy: createdByFirstNames,
+                // editedBy: updatedByFirstNames
             }
             if (fetchedCaseSheets?.length > 0)
                 return { status: true, data: fetchedCaseSheets, metaData: metaData, message: "CaseSheets details retrieved successfully." }
