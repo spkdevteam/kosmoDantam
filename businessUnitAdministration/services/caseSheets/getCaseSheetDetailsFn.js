@@ -280,8 +280,8 @@ const getCaseSheetDetailsFn = async ({ from_Date = null, toDate = null, SearchKe
                 SearchKey,
                 totalDocs,
                 totalPages,
-                // createdBy: createdByFirstNames,
-                // editedBy: updatedByFirstNames
+                createdBy: createdByFirstNames,
+                editedBy: updatedByFirstNames
             }
             if (fetchedCaseSheets?.length > 0)
                 return { status: true, data: fetchedCaseSheets, metaData: metaData, message: "CaseSheets details retrieved successfully." }
