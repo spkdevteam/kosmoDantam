@@ -457,8 +457,8 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
         // const totalPages = Math.ceil(totalCount / perPage); 
 
         const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(appointmentNew);
-        meta.createdByFirstNames = createdByFirstNames ? createdByFirstNames : [];
-        meta.updatedByFirstNames = updatedByFirstNames ? updatedByFirstNames : [];
+        meta.createdBy = createdByFirstNames ? createdByFirstNames : [];
+        meta.editedBy = updatedByFirstNames ? updatedByFirstNames : [];
 
         return {
             status: true,

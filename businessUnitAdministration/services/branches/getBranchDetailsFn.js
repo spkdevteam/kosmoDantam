@@ -141,8 +141,8 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
                 SearchKey,
                 totalDocs,
                 totalPages,
-                // createdBy: createdByFirstNames,
-                // editedBy: updatedByFirstNames
+                createdBy: createdByFirstNames,
+                editedBy: updatedByFirstNames
             }
             if (fetchedBranch?.length > 0)
                 return { status: true, data: fetchedBranch, metaData: metaData, message: "Branch details retrieved successfully." }
@@ -167,7 +167,7 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
 
     }
     catch (error) {
-        return { status: false, message: error.message || "Branches can't be fetched!!" };
+        return { status: false, message: error.message || "Branches can't be fetched!!", data: [], metaData: {} };
     }
 
 }
