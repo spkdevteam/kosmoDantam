@@ -7,7 +7,7 @@ const { getClientDatabaseConnection } = require("../../../db/connection");
 const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy.js");
 const { formatEmployee } = require("../../../utils/helperFunctions");
 
-const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', page , perPage, searchKey = "", employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
+const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', page, perPage, searchKey = "", employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId }) => {
     try {
         const booleanIncludeAdmin = includeAdmin === 'true' ? true : false;
 
@@ -372,6 +372,8 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
             page: 1,
             perPage: 1
         };
+        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(employeesNew);
+
 
         return {
             status: employeesNew?.length > 0 ? true : false,
@@ -382,7 +384,9 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
                     page: meta.page,
                     perPage: meta.perPage,
                     totalCount: meta.total,
-                    totalPages: page && perPage ? Math.ceil(meta.total / meta.perPage) : 1
+                    totalPages: page && perPage ? Math.ceil(meta.total / meta.perPage) : 1,
+                    createdBy: createdByFirstNames ? createdByFirstNames : [],
+                    editedBy: updatedByFirstNames ? updatedByFirstNames : []
                 },
             },
         };
@@ -481,8 +485,8 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
         // Calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);
 
-        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(employees);
-        
+        // const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(employees);
+
 
         return {
             status: true,

@@ -111,7 +111,7 @@ exports.createBusinessUnit = async (req, res) => {
     const clientRole = clientConnection.model('clientRoles', clientRoleSchema);
     const roles = clientRoles;
 
-    
+
 
     // insert fixed
     const createdRole = await clientRole.insertMany(roles);
@@ -160,7 +160,13 @@ exports.createBusinessUnit = async (req, res) => {
     await SerialNumber.insertMany(serialNumber);
 
     // insert cheif complaints
-    const Complaint = clientConnection.model('complaint', complaintSchema);
+    // const Complaint = clientConnection.model('complaint', complaintSchema);
+    let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+    try {
+      Complaint = clientConnection.model('complaint');
+    } catch (e) {
+      Complaint = clientConnection.model('complaint', complaintSchema);
+    }
     const data1 = cheifComplaints;
     await Complaint.insertMany(data1);
 
@@ -328,7 +334,7 @@ exports.listBusinessUnit = async (req, res) => {
 
     let whereCondition = {
       deletedAt: null,
-      roleId : 4,
+      roleId: 4,
     };
 
     if (searchText) {
