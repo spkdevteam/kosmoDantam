@@ -3,7 +3,7 @@ const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
 const departmentSchema = require("../../../client/model/department");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
-const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy.js");
 const { formatDepartment } = require("../../../utils/helperFunctions");
 
 const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchKey, departmentId, fromDate, toDate, buId, branchId, createdUser, updatedUser, deletedUser, clientId, status }) => {

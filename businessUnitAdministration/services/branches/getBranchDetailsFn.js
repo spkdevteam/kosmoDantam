@@ -3,7 +3,7 @@ const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const mongoose = require("mongoose");
-const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy.js");
 const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey = "", page = null, perPage = null,
     clientId, businessUnitId = null, createdBy, updatedBy, branchId }) => {
     try {

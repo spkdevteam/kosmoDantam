@@ -5,7 +5,7 @@ const procedureSchema = require("../../../client/model/procedure");
 const serviceSchema = require("../../../client/model/service");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
-const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy.js");
 const { formatProcedure } = require("../../../utils/helperFunctions");
 
 const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, procedureId, deptId, serviceId, buId, branchId, createdUser, updatedUser, deletedUser, fromDate, toDate, clientId }) => {
