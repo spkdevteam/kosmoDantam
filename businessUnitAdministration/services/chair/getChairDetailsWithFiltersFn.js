@@ -6,7 +6,7 @@ const clinetPatientSchema = require("../../../client/model/patient");
 const clinetUserSchema = require("../../../client/model/user");
 
 const { getClientDatabaseConnection } = require("../../../db/connection");
-const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstNameOfCreatedAndEditedByNew");
 const { formatChair } = require("../../../utils/helperFunctions");
 const statusConversion = require("../../../utils/statusConversion");
 

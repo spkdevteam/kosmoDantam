@@ -12,14 +12,14 @@ const serviceSchema = require("../../../client/model/service");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const mongoose = require("mongoose");
-const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstNameOfCreatedAndEditedByNew");
 
 const getCaseSheetDetailsFn = async ({ from_Date = null, toDate = null, SearchKey = "", page = null, perPage = null, clientId, patientId, branchId, buId,
     createdBy, compId, clinicalFindingsFindId, diagnosisFindId, medicalHistoryFindId, deptId, servId, procedId, invoiceId, updatedBy, caseSheetId
 }) => {
     try {
         let searchQuery = {};
-        if (SearchKey) { 
+        if (SearchKey) {
             if (SearchKey.trim()) {
                 const words = SearchKey.trim().split(/\s+/)//spiltting by space
                     .map(word =>
@@ -77,7 +77,13 @@ const getCaseSheetDetailsFn = async ({ from_Date = null, toDate = null, SearchKe
         const branchModel = await db.model('branch', clinetBranchSchema);
         const businessUnitModel = await db.model('businessUnit', clinetBusinessUnitSchema);
         const clientUsersModel = await db.model('clientUsers', clinetUserSchema);
-        const complaintModel = db?.model?.complaint || await db.model('complaint', cheifComplaintSchema);
+        // const complaintModel = db?.model?.complaint || await db.model('complaint', cheifComplaintSchema);
+        let complaintModel; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            complaintModel = db.model('complaint');
+        } catch (e) {
+            complaintModel = db.model('complaint', complaintSchema);
+        }
         const patientFindingModel = await db.model('patientFinding', patientFindingsSchema);
         const medicalCaseModel = await db.model('medicalCase', medicalCasesSchema);
         const departmentModel = await db.model('department', departmentSchema);
@@ -267,7 +273,7 @@ const getCaseSheetDetailsFn = async ({ from_Date = null, toDate = null, SearchKe
         if (!fetchedCaseSheets) return { status: false, message: "CaseSheets can't be fetched!!" };
 
 
-       const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(fetchedCaseSheets);
+        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(fetchedCaseSheets);
 
 
 
@@ -280,8 +286,8 @@ const getCaseSheetDetailsFn = async ({ from_Date = null, toDate = null, SearchKe
                 SearchKey,
                 totalDocs,
                 totalPages,
-                // createdBy: createdByFirstNames,
-                // editedBy: updatedByFirstNames
+                createdBy: createdByFirstNames,
+                editedBy: updatedByFirstNames
             }
             if (fetchedCaseSheets?.length > 0)
                 return { status: true, data: fetchedCaseSheets, metaData: metaData, message: "CaseSheets details retrieved successfully." }

@@ -3,7 +3,7 @@ const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const mongoose = require("mongoose");
-const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstnameOfCreatedAndEditedBy");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstNameOfCreatedAndEditedByNew");
 const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey = "", page = null, perPage = null,
     clientId, businessUnitId = null, createdBy, updatedBy, branchId }) => {
     try {
@@ -167,7 +167,7 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
 
     }
     catch (error) {
-        return { status: false, message: error.message || "Branches can't be fetched!!" };
+        return { status: false, message: error.message || "Branches can't be fetched!!", data: [], metaData: {} };
     }
 
 }

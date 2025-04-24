@@ -4,18 +4,19 @@ const fnToExtractFirstNameOfCreatedAndEditedBy = (collection) => {
         users
             .filter(user => user?._id && user?.firstName)
             .forEach(user => {
-                if (!map.has(user._id)) {
-                    map.set(user._id, {
-                        _id: user._id,
-                        firstName: user.firstName
+                const idStr = user?._id?.toString();
+                if (!map.has(idStr)) {
+                    map.set(idStr, {
+                        _id: user?._id,
+                        firstName: user?.firstName
                     });
                 }
             });
         return Array.from(map.values());
     };
 
-    const createdByFirstNames = getUniqueUsers(collection.map(e => e.createdBy));
-    const updatedByFirstNames = getUniqueUsers(collection.map(e => e.updatedBy));
+    const createdByFirstNames = getUniqueUsers(collection.map(e => e?.createdBy));
+    const updatedByFirstNames = getUniqueUsers(collection.map(e => e?.updatedBy));
 
     return { createdByFirstNames, updatedByFirstNames };
 };
