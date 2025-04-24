@@ -93,9 +93,8 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
         const newPatientInstance = await Patient.create({ ...profileUpdates2,isActive:true });
 
 
-
         //saving the activity of creating a patient
-        //await saveActivityLogFn({ patientId: newPatientInstance?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress, sourceLink: req.headers['x-frontend-route'], activity: "Created a patient", description: "Creating the patient, and saving activity log for it", data: newPatientInstance, status: true, dateTime: new Date() });
+        await saveActivityLogFn({ patientId: newPatientInstance?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Created a patient", description: "Creating the patient, and saving activity log for it", data: newPatientInstance, status: true, dateTime: new Date(), clientId });
 
         return res.status(statusCode.OK).send({
             message: message.lblPatientCreatedSuccess,
@@ -199,7 +198,8 @@ exports.updatePatientByBusinessUnit = async (req, res, next) => {
         Object.assign(patient, dataObject);
         const savedPatient = await patient.save();
 
-        //await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress, sourceLink: req.headers['x-frontend-route'], activity: "Updated details of a patient", description: "Updating a patient, and saving activity log for it", data: savedPatient, status: true, dateTime: new Date() });
+        //saving the activity of updating a patient
+        await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Updated details of a patient", description: "Updating a patient, and saving activity log for it", data: savedPatient, status: true, dateTime: new Date(), clientId });
 
         
         return res.status(statusCode.OK).send({
@@ -396,7 +396,8 @@ exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
         const savedPatient = await patient.save();
 
 
-        // await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress, sourceLink: req.headers['x-frontend-route'], activity: "Toggling status of a patient", description: "Toggling a patient, and saving activity log for it", data: savedPatient, status: true, dateTime: new Date() });
+        // saving the activity of activating or deactivating a patient
+        await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId: savedPatient?.branch, buId: savedPatient?.businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Toggling status of a patient", description: "Toggling a patient, and saving activity log for it", data: savedPatient, status: true, dateTime: new Date(), clientId });
 
 
         this.listPatient(req, res)
@@ -442,7 +443,9 @@ exports.softDeletePatient = async (req, res) => {
         });
         const savedPatient = await patient.save();
 
-        // await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress, sourceLink: req.headers['x-frontend-route'], activity: "Deleting a patient", description: "Deleting a patient, and saving activity log for it", data: savedPatient, status: true, dateTime: new Date() });
+
+        //saving the activity of deleting a patient
+        await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId: savedPatient?.branch, buId: savedPatient?.businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Deleting a patient", description: "Deleting a patient, and saving activity log for it", data: savedPatient, status: true, dateTime: new Date(), clientId });
 
 
         this.listPatient(req, res)
@@ -563,7 +566,14 @@ exports.createMinimalPatient = async (req, res, next) => {
             businessUnit: businessUnit,
 
         }
-        const newPatientInstance = await Patient.create({ ...profileUpdates2 })
+        const newPatientInstance = await Patient.create({ ...profileUpdates2 });
+
+
+
+        //saving the activity of creating a patient
+        await saveActivityLogFn({ patientId: newPatientInstance?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Created a patient", description: "Creating the patient, and saving activity log for it", data: newPatientInstance, status: true, dateTime: new Date(), clientId });
+
+
         return res.status(statusCode.OK).send({
             message: message.lblPatientCreatedSuccess,
             status: true,
