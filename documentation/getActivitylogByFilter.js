@@ -33,100 +33,130 @@
  *         schema:
  *           type: string
  *           format: date
- *           example: "2025-01-01"
+ *           example: ""
  *         description: Start date for filtering logs.
  *       - in: query
  *         name: toDate
  *         schema:
  *           type: string
  *           format: date
- *           example: "2025-03-01"
+ *           example: ""
  *         description: End date for filtering logs.
  *       - in: query
  *         name: buId
  *         schema:
  *           type: string
- *           example: "67820851a840f3a7bf1a307a"
+ *           example: ""
  *         description: Business Unit ID to filter logs.
  *       - in: query
  *         name: searchKey
  *         schema:
  *           type: string
- *           example: "Invoice"
- *         description: Keyword to search activity or description.
+ *           example: ""
+ *         description: Keyword to search activity, description, or within data.
  *       - in: query
  *         name: branchId
  *         schema:
  *           type: string
- *           example: "67820e34a840f3a7bf1a312d"
+ *           example: ""
  *         description: Branch ID to filter logs.
  *       - in: query
  *         name: patientId
  *         schema:
  *           type: string
- *           example: "678643a2e5226e57fc1607b8"
+ *           example: ""
  *         description: Patient ID to filter logs.
  *       - in: query
  *         name: userId
  *         schema:
  *           type: string
- *           example: "67820851a840f3a7bf1a3077"
+ *           example: ""
  *         description: User ID to filter logs.
  *       - in: query
- *         name: month
+ *         name: createdUser
  *         schema:
  *           type: string
- *           example: "january"
- *         description: Filter logs by month.
+ *           example: ""
+ *         description: Filter by creator user ID.
  *       - in: query
- *         name: year
+ *         name: updatedUser
  *         schema:
  *           type: string
- *           example: "2025"
- *         description: Filter logs by year.
+ *           example: ""
+ *         description: Filter by updater user ID.
  *     responses:
  *       200:
- *         description: Activity logs retrieved successfully.
+ *         description: Activity Logs details retrieved successfully.
  *         content:
  *           application/json:
  *             example:
  *               status: true
- *               message: "Activity logs retrieved successfully."
+ *               message: "Activity Logs details retrieved successfully."
  *               data:
  *                 activityLogs:
- *                   - _id: "67a821c491c03f67d6c5fd53"
+ *                   - _id: "680a04783d0cd89533bec8ef"
+ *                     patientId:
+ *                       _id: "680a04783d0cd89533bec8ed"
+ *                       firstName: "forActivityLog"
+ *                       lastName: "forActivityLog"
+ *                     module: "patient"
  *                     branchId:
  *                       _id: "67820e34a840f3a7bf1a312d"
  *                       name: "Kosmo Dental Clinic Branch two"
  *                     buId:
  *                       _id: "67820851a840f3a7bf1a307a"
  *                       name: "kasif unit two Businsenss Unit"
- *                     userId:
- *                       _id: "67871f6a7bb6b5c411365ff7"
- *                       firstName: "sandeep"
- *                       lastName: "p"
- *                     sourceLink: "dantam.app/invoice"
- *                     activity: "Invoice Created"
- *                     description: ""
- *                     data: {}
- *                     status: false
- *                     datetime: "12/05/1988T00:10:51.000z"
+ *                     userId: null
+ *                     ipAddress: "::1"
+ *                     activity: "Created a patient"
+ *                     description: "Creating the patient, and saving activity log for it"
+ *                     data:
+ *                       displayId: "KC-bnch-2024-PT1000054"
+ *                       branch: "67820e34a840f3a7bf1a312d"
+ *                       businessUnit: "67820851a840f3a7bf1a307a"
+ *                       mainPatientLinkedid: null
+ *                       isChainedWithMainPatient: false
+ *                       relation: null
+ *                       firstName: "forActivityLog"
+ *                       lastName: "forActivityLog"
+ *                       profileImage: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+ *                       email: "foractivityl3og@yopmail.com"
+ *                       phone: "1236547898"
+ *                       gender: "Male"
+ *                       age: 22
+ *                       bloodGroup: ""
+ *                       patientGroup: ""
+ *                       referedBy: ""
+ *                       city: ""
+ *                       state: ""
+ *                       country: ""
+ *                       ZipCode: ""
+ *                       address: ""
+ *                       isActive: true
+ *                       createdBy: "67820851a840f3a7bf1a3077"
+ *                       deletedAt: null
+ *                       updatedBy: null
+ *                       deletedBy: null
+ *                       _id: "680a04783d0cd89533bec8ed"
+ *                       medicalHistory: []
+ *                       createdAt: "2025-04-24T09:29:28.496Z"
+ *                       updatedAt: "2025-04-24T09:29:28.496Z"
+ *                       __v: 0
+ *                     status: true
+ *                     dateTime: "2025-04-24T09:29:28.779Z"
  *                     createdBy:
  *                       _id: "67820851a840f3a7bf1a3077"
  *                       firstName: "kasif"
  *                       lastName: "unit two"
- *                     updatedBy:
- *                       _id: "67820851a840f3a7bf1a3077"
- *                       firstName: "kasif"
- *                       lastName: "unit two"
+ *                     updatedBy: null
  *                     deletedBy: null
  *                     deletedAt: null
- *                     createdAt: "2025-02-09T03:32:20.392Z"
- *                     updatedAt: "2025-02-09T16:31:46.329Z"
+ *                     createdAt: "2025-04-24T09:29:28.785Z"
+ *                     updatedAt: "2025-04-24T09:29:28.785Z"
  *                     __v: 0
  *                 metadata:
  *                   page: 1
- *                   perPage: 1
+ *                   perPage: 10
  *                   totalCount: 1
  *                   totalPages: 1
  *       400:

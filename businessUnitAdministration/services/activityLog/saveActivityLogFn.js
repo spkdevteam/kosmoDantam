@@ -19,14 +19,16 @@ const saveActivityLogFn = async ({ patientId, module, branchId, buId, userId, ip
             description,
             data,
             status,
-            dateTime
+            dateTime,
+            createdBy: userId,
         });
 
         const savedActivity = await ActivityLog.save();
 
-        console.log("This is the saved activity-->", savedActivity);
+        return { status: true, message: "Activity log saved succesfully", data: savedActivity };
     } catch (error) {
         console.log("error while saving activity log-->",error.message);
+        return { status: false, message: error.message };
     }
 }
 

@@ -1,130 +1,49 @@
+const sanitizeBody = require("../../../utils/sanitizeBody");
+const { clientIdValidation, mongoIdValidation, isValidDate } = require("../../../utils/validation");
+const getActivitylogFn = require("../../services/activityLog/getActivitylogFn");
+
 const activityLog = async (req, res, next) => {
     try {
-        return res.status(200).json({
-            "status": true,
-            "message": "Activity logs retrieved successfully.",
-            "data": {
-              "activityLogs": [
-                {
-                  "_id": "67a821c491c03f67d6c5fd53",
-                  "branchId": {
-                    "_id": "67820e34a840f3a7bf1a312d",
-                    "name": "Kosmo Dental Clinic Branch two"
-                  },
-                  "buId": {
-                    "_id": "67820851a840f3a7bf1a307a",
-                    "name": "kasif unit two Businsenss Unit"
-                  },
-                  "userId": {
-                    "_id": "67871f6a7bb6b5c411365ff7",
-                    "firstName": "Abhisek",
-                    "lastName": "K"
-                  },
-                  "sourceLink": "dantam.app/invoice",
-                  "activity": "Invoice Created",
-                  "description": "",
-                  "data": {},
-                  "status": false,
-                  "datetime": "12/05/1988T00:10:51.000z",
-                  "createdBy": {
-                    "_id": "67820851a840f3a7bf1a3077",
-                    "firstName": "kasif",
-                    "lastName": "unit two"
-                  },
-                  "updatedBy": {
-                    "_id": "67820851a840f3a7bf1a3077",
-                    "firstName": "kasif",
-                    "lastName": "unit two"
-                  },
-                  "deletedBy": null,
-                  "deletedAt": null,
-                  "createdAt": "2025-02-09T03:32:20.392Z",
-                  "updatedAt": "2025-02-09T16:31:46.329Z",
-                  "__v": 0
-                },
-                {
-                  "_id": "67a821c491c03f67d6c5fd53",
-                  "branchId": {
-                    "_id": "67820e34a840f3a7bf1a312d",
-                    "name": "Kosmo Dental Clinic Branch two"
-                  },
-                  "buId": {
-                    "_id": "67820851a840f3a7bf1a307a",
-                    "name": "kasif unit two Businsenss Unit"
-                  },
-                  "userId": {
-                    "_id": "67871f6a7bb6b5c411365ff7",
-                    "firstName": "Ayan",
-                    "lastName": "S"
-                  },
-                  "sourceLink": "dantam.app/invoice",
-                  "activity": "Invoice Created",
-                  "description": "",
-                  "data": {},
-                  "status": false,
-                  "datetime": "12/05/1988T00:10:51.000z",
-                  "createdBy": {
-                    "_id": "67820851a840f3a7bf1a3077",
-                    "firstName": "kasif",
-                    "lastName": "unit two"
-                  },
-                  "updatedBy": {
-                    "_id": "67820851a840f3a7bf1a3077",
-                    "firstName": "kasif",
-                    "lastName": "unit two"
-                  },
-                  "deletedBy": null,
-                  "deletedAt": null,
-                  "createdAt": "2025-02-09T03:32:20.392Z",
-                  "updatedAt": "2025-02-09T16:31:46.329Z",
-                  "__v": 0
-                },
-                {
-                  "_id": "67a821c491c03f67d6c5fd53",
-                  "branchId": {
-                    "_id": "67820e34a840f3a7bf1a312d",
-                    "name": "Kosmo Dental Clinic Branch two"
-                  },
-                  "buId": {
-                    "_id": "67820851a840f3a7bf1a307a",
-                    "name": "kasif unit two Businsenss Unit"
-                  },
-                  "userId": {
-                    "_id": "67871f6a7bb6b5c411365ff7",
-                    "firstName": "sandeep",
-                    "lastName": "p"
-                  },
-                  "sourceLink": "dantam.app/invoice",
-                  "activity": "Invoice Created",
-                  "description": "",
-                  "data": {},
-                  "status": false,
-                  "datetime": "12/05/1988T00:10:51.000z",
-                  "createdBy": {
-                    "_id": "67820851a840f3a7bf1a3077",
-                    "firstName": "kasif",
-                    "lastName": "unit two"
-                  },
-                  "updatedBy": {
-                    "_id": "67820851a840f3a7bf1a3077",
-                    "firstName": "kasif",
-                    "lastName": "unit two"
-                  },
-                  "deletedBy": null,
-                  "deletedAt": null,
-                  "createdAt": "2025-02-09T03:32:20.392Z",
-                  "updatedAt": "2025-02-09T16:31:46.329Z",
-                  "__v": 0
-                },
-              ],
-              "metadata": {
-                "page": 1,
-                "perPage": 1,
-                "totalCount": 3,
-                "totalPages": 1
-              }
-            }
-          });
+      const { activityId, page, perPage, searchKey, fromDate, toDate, userId, buId, branchId, patientId, createdUser, updatedUser, clientId } = await sanitizeBody(req.query);
+
+      const validation = [
+          clientIdValidation({ clientId })
+      ];
+      if(activityId){
+          validation.push(mongoIdValidation({_id: activityId, name: "activityId"}));
+      }
+      if(buId){
+          validation.push(mongoIdValidation({_id: buId, name: "businessUnitId"}));
+      }
+      if(branchId){
+          validation.push(mongoIdValidation({_id: branchId, name: "branchId"}));
+      }
+      if(userId){
+          validation.push(mongoIdValidation({_id: userId, name: "userId"}));
+      }
+      if(createdUser){
+          validation.push(mongoIdValidation({_id: createdUser, name: "createdUser"}));
+      }
+      if(updatedUser){
+          validation.push(mongoIdValidation({_id: updatedUser, name: "updatedUser"}));
+      }
+      if(patientId){
+          validation.push(mongoIdValidation({_id: patientId, name: "patientId"}));
+      }
+      // if(status){
+      //     validation.push(validateStatus({ value: status }));
+      // }
+
+      const errors = validation.filter((e)=> !e.status);
+      if(errors.length > 0) return res.status(400).json({status: false, message: errors.map((e)=> e.message).join(", ")})
+
+      if (page && (isNaN(page) || page < 1)) return { status: false, message: "Invalid page number" };
+      if (perPage && (isNaN(perPage) || perPage < 1)) return { status: false, message: "Invalid per page number" };
+
+      if (fromDate && !isValidDate({ value: fromDate }).status) return { status: false, message: "Invalid from date" };
+      if (toDate && !isValidDate({ value: toDate }).status) return { status: false, message: "Invalid to date" };
+      const result = await getActivitylogFn({ activityId, page, perPage, searchKey, fromDate, toDate, userId, buId, branchId, patientId, createdUser, updatedUser, clientId });
+      return res.status(200).json({ status: result?.status, message: result?.message, data: result?.data });
     } catch (error) {
         next(error);
     }

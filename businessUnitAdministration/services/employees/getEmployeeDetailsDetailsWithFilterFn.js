@@ -366,6 +366,7 @@ const getEmployeeDetailsDetailsWithFilterFn = async ({ includeAdmin = 'false', p
         // } 
         console.log("resultresult==>>>>>", result)
         // Extract data
+        
         const employeesNew = result[0]?.data || [];
         const meta = result[0]?.metadata[0] || {
             total: employeesNew.length,
