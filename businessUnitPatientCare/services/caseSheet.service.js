@@ -3298,6 +3298,7 @@ const appointmentsWithCase = async ({ clientId, patientId, caseSheetId }) => {
             .populate('chairId')
             .populate('patientId', 'firstName lastName displayId')
             .populate('caseSheetId')
+            .populate('specialistDoctorId', 'firstName lastName')
             .sort({ createdAt: -1 })
             .exec();
 

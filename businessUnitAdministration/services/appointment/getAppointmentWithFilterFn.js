@@ -113,8 +113,8 @@ const getAppointmentWithFilterFn = async ({ page = null, perPage = null, searchK
 
         if (fromDate || toDate) {
             filterQuery.date = {};
-            if (fromDate) filterQuery.date.$gte = new Date(fromDate);
-            if (toDate) filterQuery.date.$lte = new Date(toDate);
+            if (fromDate) filterQuery.date.$gte =  new Date(`${fromDate}T00:00:00.000Z`);
+            if (toDate) filterQuery.date.$lte = new Date(`${toDate}T23:59:59.999Z`);
         }
         //aggregation by rahul:
         const queryPipeline = [];
