@@ -32,8 +32,9 @@
  *         name: employeeId
  *         schema:
  *           type: string
- *           example: ""
+ *         required: false
  *         description: employee ID to filter employee (optional).
+ *         example: ""
  *       - in: query
  *         name: clientId
  *         schema:
@@ -62,7 +63,7 @@
  *         schema:
  *           type: string
  *         required: false
- *         description: ID of the user who created the employee record.
+ *         description: ID of the role of the employee.
  *         example: ""
  *       - in: query
  *         name: createdUser
@@ -84,14 +85,12 @@
  *           type: string
  *         required: false
  *         description: Unique identifier for the business unit.
- *         example: ""
  *       - in: query
  *         name: branch
  *         schema:
  *           type: string
  *         required: false
  *         description: Unique identifier for the branch.
- *         example: ""
  *     responses:
  *       200:
  *         description: Employee details retrieved successfully.
@@ -102,60 +101,23 @@
  *               message: "Employee details retrieved successfully."
  *               data:
  *                 employees:
- *                   - _id: "67820851a840f3a7bf1a3077"
+ *                   - _id: "68008bd96ac640edae5c9fe1"
+ *                     displayId: "KC-bnch-2024-EM1000034"
+ *                     rid: 15
  *                     role:
- *                       _id: "6782084da840f3a7bf1a2f83"
- *                       name: "Business Unit"
- *                     branch: null
- *                     businessUnit: null
- *                     roleId: {}
- *                     firstName: "kasif"
- *                     lastName: "unit two"
- *                     email: "kasifbu2@yopmail.com"
- *                     phone: "9999999905"
- *                     tc: true
- *                     isUserVerified: true
- *                     isActive: true
- *                     gender: "Prefer not to say"
- *                     age: null
- *                     bloodGroup: null
- *                     patientGroup: null
- *                     referedBy: null
- *                     profileImage: ""
- *                     profileCreated: false
- *                     panNumber: ""
- *                     adharNumber: ""
- *                     city: ""
- *                     state: ""
- *                     country: ""
- *                     ZipCode: ""
- *                     address: ""
- *                     dateOfBirth: null
- *                     optionalEmail: ""
- *                     emergencyPhone: ""
- *                     activePatientId: null
- *                     createdBy: null
- *                     deletedBy: null
- *                     updatedBy: null
- *                     deletedAt: null
- *                     createdAt: "2025-01-11T05:57:37.094Z"
- *                     updatedAt: "2025-01-11T05:57:37.094Z"
- *                     __v: 0
- *                   - _id: "6786505de5226e57fc1618db"
- *                     role:
- *                       _id: "6782084da840f3a7bf1a2f92"
- *                       name: "Duty Doctor"
+ *                       _id: "6782084da840f3a7bf1a3046"
+ *                       name: "Specialist"
  *                     branch:
  *                       _id: "67820e34a840f3a7bf1a312d"
  *                       name: "Kosmo Dental Clinic Branch two"
  *                     businessUnit:
  *                       _id: "67820851a840f3a7bf1a307a"
  *                       name: "kasif unit two Businsenss Unit"
- *                     roleId: {}
- *                     firstName: "dr1"
- *                     lastName: "br2"
- *                     email: "dr1@yopmail.com"
- *                     phone: "7907441232"
+ *                     roleId: 15
+ *                     firstName: "Abhik"
+ *                     lastName: "pal"
+ *                     email: "abk@gmail.com"
+ *                     phone: "6546959545"
  *                     tc: true
  *                     isUserVerified: true
  *                     isActive: true
@@ -168,11 +130,11 @@
  *                     profileCreated: false
  *                     panNumber: ""
  *                     adharNumber: ""
- *                     city: ""
- *                     state: "Kerala"
+ *                     city: "Kolkata"
+ *                     state: "West Bengal"
  *                     country: "India"
- *                     ZipCode: "673016"
- *                     address: "Pachat House\nThekkum Kai Meethal"
+ *                     ZipCode: "265956"
+ *                     address: "dssdf"
  *                     dateOfBirth: null
  *                     optionalEmail: ""
  *                     emergencyPhone: ""
@@ -184,14 +146,19 @@
  *                     deletedBy: null
  *                     updatedBy: null
  *                     deletedAt: null
- *                     createdAt: "2025-01-14T11:54:05.628Z"
- *                     updatedAt: "2025-02-10T05:15:51.600Z"
+ *                     createdAt: "2025-04-17T05:04:25.942Z"
+ *                     updatedAt: "2025-04-17T05:04:25.942Z"
  *                     __v: 0
  *                 metadata:
  *                   page: 1
- *                   perPage: 2
- *                   totalCount: 8
- *                   totalPages: 4
+ *                   perPage: 10
+ *                   totalCount: 1
+ *                   totalPages: 1
+ *                   createdBy:
+ *                     - _id: "67820851a840f3a7bf1a3077"
+ *                       firstName: "kasif"
+ *                   editedBy: []
+ *               includeAdmin: "false"
  *       500:
  *         description: Internal server error.
  *         content:

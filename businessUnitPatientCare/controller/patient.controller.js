@@ -67,7 +67,7 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
         if (req.file?.filename) {
             profileUpdates.profileImage = req.file.filename;
         }
-        const newPatient = await patientService.create(clientId, { ...profileUpdates });
+        const newPatient = await patientService.create(clientId, { ...profileUpdates,isActive:true });
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         let profileUpdates2 = {
             displayId: displayId,
@@ -78,7 +78,7 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
             gender, age, bloodGroup, patientGroup, referedBy,
             branch: branchId,
             businessUnit: businessUnit,
-            createdBy: mainUser._id,
+            createdBy: mainUser?._id,
         }
 
         if(gender !== ""){
@@ -90,7 +90,12 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
         if (req.file?.filename) {
             profileUpdates2.profileImage = req.file.filename;
         }
-        const newPatientInstance = await Patient.create({ ...profileUpdates2 })
+        const newPatientInstance = await Patient.create({ ...profileUpdates2,isActive:true });
+
+
+        //saving the activity of creating a patient
+        await saveActivityLogFn({ patientId: newPatientInstance?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Created a patient", description: "Creating the patient, and saving activity log for it", data: newPatientInstance, status: true, dateTime: new Date(), clientId });
+
         return res.status(statusCode.OK).send({
             message: message.lblPatientCreatedSuccess,
             data: { patientId: newPatient._id },
@@ -120,6 +125,8 @@ exports.createSubPatientByBusinessUnit = async (req, res, next) => {
                 message: message.lblPatientIdRequired,
             });
         }
+
+         
 
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const newPatientInstance = await Patient.create({
@@ -154,9 +161,11 @@ exports.updatePatientByBusinessUnit = async (req, res, next) => {
                 message: message.lblPatientIdRequired,
             });
         }
+        console.log(patientId,'patientIdpatientId')
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const patient = await Patient.findById(patientId);
+        console.log(patient,'<<<<<<<<<<<<<patient')
         if (!patient) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblPatientNotFound,
@@ -184,10 +193,15 @@ exports.updatePatientByBusinessUnit = async (req, res, next) => {
             dataObject.profileImage = req.file.filename;
         }
         if (!patient.isChainedWithMainPatient) {
-            await patientService.update(clientId, patient.email, dataObject);
+            // await patientService.update(clientId, patient.email, dataObject);
         }
         Object.assign(patient, dataObject);
-        await patient.save()
+        const savedPatient = await patient.save();
+
+        //saving the activity of updating a patient
+        await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Updated details of a patient", description: "Updating a patient, and saving activity log for it", data: savedPatient, status: true, dateTime: new Date(), clientId });
+
+        
         return res.status(statusCode.OK).send({
             message: message.lblPatientUpdatedSuccess,
         });
@@ -348,6 +362,7 @@ exports.searchPatients = async (req, res, next) => {
 // active inactive Patient by business unit
 exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
     try {
+        // console.log(" req.body===>>>>", req.body)
         const mainUser = req.user;
         const { status, patientId, clientId, keyword, page, perPage } = req.body;
         req.query.clientId = clientId;
@@ -362,21 +377,29 @@ exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const patient = await Patient.findById(patientId);
+        
         if (!patient) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblPatientNotFound,
             });
         }
-        if (!patient.isChainedWithMainPatient) {
-            await patientService.activeInactive(clientId, patient.email, {
-                isActive: status === "1",
-            });
-        }
+        // console.log("patientpatient==>>",patient)
+        // if (!patient.isChainedWithMainPatient) {
+        //     await patientService.activeInactive(clientId, patient.email, {
+        //         isActive: status === "1",
+        //     });
+        // }
         Object.assign(patient, {
             isActive: status === "1",
             updatedBy: mainUser?._id
         });
-        await patient.save();
+        const savedPatient = await patient.save();
+
+
+        // saving the activity of activating or deactivating a patient
+        await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId: savedPatient?.branch, buId: savedPatient?.businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Toggling status of a patient", description: "Toggling a patient, and saving activity log for it", data: savedPatient, status: true, dateTime: new Date(), clientId });
+
+
         this.listPatient(req, res)
     } catch (error) {
         next(error);
@@ -409,16 +432,22 @@ exports.softDeletePatient = async (req, res) => {
                 message: message.lblPatientNotFound,
             });
         }
-        if (!patient.isChainedWithMainPatient) {
-            await patientService.deleteOne(clientId, patient.email, {
-                deletedAt: new Date(),
-                deletedBy: mainUser?._id
-            });
-        }
+        // if (!patient.isChainedWithMainPatient) {
+        //     await patientService.deleteOne(clientId, patient.email, {
+        //         deletedAt: new Date(),
+        //         deletedBy: mainUser?._id
+        //     });
+         // }
         Object.assign(patient, {
             deletedAt: new Date()
         });
-        await patient.save();
+        const savedPatient = await patient.save();
+
+
+        //saving the activity of deleting a patient
+        await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId: savedPatient?.branch, buId: savedPatient?.businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Deleting a patient", description: "Deleting a patient, and saving activity log for it", data: savedPatient, status: true, dateTime: new Date(), clientId });
+
+
         this.listPatient(req, res)
     } catch (error) {
         console.error("Error in deleting the patient :", error);
@@ -449,6 +478,7 @@ exports.getPatientRoleId = async (req, res, next) => {
 const CustomError = require("../../utils/customeError");
 const getserialNumber = require("../../model/services/getserialNumber");
 const { default: mongoose } = require("mongoose");
+const saveActivityLogFn = require("../../businessUnitAdministration/services/activityLog/saveActivityLogFn");
 
 
 const commonIdCheck = async (data) => {
@@ -481,6 +511,8 @@ const commonIdCheck = async (data) => {
 exports.createMinimalPatient = async (req, res, next) => {
     try {
         const { clientId, branchId, roleId, businessUnit, email, firstName, lastName, phone, gender, age, bloodGroup, patientGroup, referedBy } = req.body;
+        
+        console.log(  email,'email', age,'Age',  )
         const mainUser = req.user;
         await commonIdCheck({ clientId, branchId, businessUnit });
         if (!firstName || !phone || !roleId) {
@@ -534,7 +566,14 @@ exports.createMinimalPatient = async (req, res, next) => {
             businessUnit: businessUnit,
 
         }
-        const newPatientInstance = await Patient.create({ ...profileUpdates2 })
+        const newPatientInstance = await Patient.create({ ...profileUpdates2 });
+
+
+
+        //saving the activity of creating a patient
+        await saveActivityLogFn({ patientId: newPatientInstance?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Created a patient", description: "Creating the patient, and saving activity log for it", data: newPatientInstance, status: true, dateTime: new Date(), clientId });
+
+
         return res.status(statusCode.OK).send({
             message: message.lblPatientCreatedSuccess,
             status: true,

@@ -16,11 +16,11 @@ const getProcedureDetailsWithFilters = async (req, res, next) => {
         if (branchId) {
             validation.push(mongoIdValidation({ _id: branchId, name: "branchId" }));
         }
-
+        
         if (procedureId) {
             validation.push(mongoIdValidation({ _id: procedureId, name: "procedureId" }));
         }
-
+        
         if (deptId) {
             validation.push(mongoIdValidation({ _id: deptId, name: "deptId" }));
         }
@@ -40,9 +40,10 @@ const getProcedureDetailsWithFilters = async (req, res, next) => {
         if (deletedUser) {
             validation.push(mongoIdValidation({ _id: deletedUser, name: "deletedUser" }));
         }
-
+        
         const errors = validation.filter((e) => !e.status);
         if (errors.length > 0) return res.status(400).json({ status: false, message: errors.map((e) => e.message).join(", ") });
+        console.log( 'reached Backend')
 
         if (page && (isNaN(page) || page < 1)) return { status: false, message: "Invalid page number" };
         if (perPage && (isNaN(perPage) || perPage < 1)) return { status: false, message: "Invalid per page number" };

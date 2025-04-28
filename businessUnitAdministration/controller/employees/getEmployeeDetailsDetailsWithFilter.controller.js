@@ -4,18 +4,14 @@ const getEmployeeDetailsDetailsWithFilterFn = require("../../services/employees/
 
 const getEmployeeDetailsDetailsWithFilter = async (req, res, next) => {
     try{
-        const { page = 1, perPage = 10, searchKey = "", employeeId, fromDate , toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId } = await sanitizeBody(req.query);
-        if(typeof fromDate === "undefined"){
-            fromDate = "";
-        }
+        const { page = 1, perPage = 10, searchKey = "", employeeId, fromDate , toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId, includeAdmin } = await sanitizeBody(req.query);
 
-        console.log(page, perPage, searchKey, fromDate , toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId)
 
         const validation = [
             clientIdValidation({ clientId })
         ];
         if (businessUnit) {
-            validation.push(mongoIdValidation({ _id: businessUnit, name: "businessUnitId" }));
+            validation.push(mongoIdValidation({ _id: businessUnit, name: "businessUnit" }));
         }
         if (branch) {
             validation.push(mongoIdValidation({ _id: branch, name: "branch" }));
@@ -41,8 +37,8 @@ const getEmployeeDetailsDetailsWithFilter = async (req, res, next) => {
 
         if (fromDate && !isValidDate({ value: fromDate }).status) return { status: false, message: "Invalid from date" };
         if (toDate && !isValidDate({ value: toDate }).status) return { status: false, message: "Invalid to date" };
-        const result = await getEmployeeDetailsDetailsWithFilterFn({ page, perPage, searchKey, employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId });
-        return res.status(200).json({ status: result?.status, message: result?.message, data: result?.data });
+        const result = await getEmployeeDetailsDetailsWithFilterFn({ includeAdmin, page, perPage, searchKey, employeeId, fromDate, toDate, role, businessUnit, branch, createdUser, updatedUser, deletedUser, clientId });
+        return res.status(200).json({ status: result?.status, message: result?.message, data: result?.data, includeAdmin });
     }catch(error){
         next(error);
     }

@@ -55,7 +55,7 @@
  *           example: ""
  *         description: User who last updated the appointment.
  *       - in: query
- *         name: businessUnit
+ *         name: buId
  *         schema:
  *           type: string
  *           example: ""
@@ -66,6 +66,12 @@
  *           type: string
  *           example: ""
  *         description: Keyword to search appointments by a specific case, chief complaint, etc.
+ *       - in: query
+ *         name: branchId
+ *         schema:
+ *           type: string
+ *           example: ""
+ *         description: branch unit identifier.
  *       - in: query
  *         name: caseId
  *         schema:
@@ -201,6 +207,13 @@
  *                   perPage: 2
  *                   totalCount: 53
  *                   totalPages: 27
+ *                   createdBy:
+ *                     - _id: "67820851a840f3a7bf1a3077"
+ *                       firstName: "kasif"
+ *                   editedBy:
+ *                     - _id: "67820851a840f3a7bf1a3077"
+ *                       firstName: "kasif"
+ * 
  *       400:
  *         description: Validation error or missing data.
  *         content:

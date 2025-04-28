@@ -3,6 +3,7 @@ const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
 const departmentSchema = require("../../../client/model/department");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstNameOfCreatedAndEditedByNew");
 const { formatDepartment } = require("../../../utils/helperFunctions");
 
 const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchKey, departmentId, fromDate, toDate, buId, branchId, createdUser, updatedUser, deletedUser, clientId, status }) => {
@@ -24,6 +25,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             if (!specificDepartment) {
@@ -81,8 +83,6 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
             if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
         }
 
-
-
         if (!page || !perPage) {
             const allDepartments = await Department.find({
                 ...searchQuery,
@@ -99,6 +99,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             const formattedDepartments = allDepartments.map((department) => formatDepartment(department));
@@ -136,6 +137,7 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
             .populate("createdBy", "_id firstName lastName")
             .populate("deletedBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")
+            .sort({ createdAt: -1 })
             .lean();
 
         // Apply pagination only if page & perPage are provided
@@ -166,6 +168,11 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
         // Calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);
 
+        console.log("before creating createdby")
+
+        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(departments);
+
+
         return {
             status: true,
             message: totalCount < 1 ? "No departments found" : "Department details retrieved successfully.",
@@ -176,6 +183,8 @@ const getDepartmentWithFiltersFn = async ({ page = null, perPage = null, searchK
                     perPage,
                     totalCount,
                     totalPages,
+                    createdBy: createdByFirstNames,
+                    editedBy: updatedByFirstNames
                 },
             },
         };

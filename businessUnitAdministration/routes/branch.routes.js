@@ -58,9 +58,9 @@ router.put('/updateBranch', entityAuth.authorizeEntity("Administration", "Branch
     });
 }, businessUnitBranchContrller.updateBranchByBusinessUnit);
 
-router.get('/branch/:clientId/:branchId', entityAuth.authorizeEntity("Administration", "Branch", "view"), businessUnitBranchContrller.getParticularBranchByBusinessUnit);
+router.get('/branch/:clientId/:branchId', businessUnitBranchContrller.getParticularBranchByBusinessUnit);// entityAuth.authorizeEntity("Administration", "Branch", "view")
 
-router.get('/listBranch', entityAuth.authorizeEntity("Administration", "Branch", "view"), businessUnitBranchContrller.listBranch);
+router.get('/listBranch',  businessUnitBranchContrller.listBranch); // entityAuth.authorizeEntity("Administration", "Branch", "view")
 
 router.post("/activeInactiveBranch", entityAuth.authorizeEntity("Administration", "Branch", "update"), businessUnitBranchContrller.activeinactiveBranchByBusinessUnit);
 

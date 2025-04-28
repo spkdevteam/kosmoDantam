@@ -52,7 +52,8 @@ async function createPrescription(input) {
         // Save the prescription
         const newPrescription = new Prescription(prescriptionData);
         const savedPrescription = await newPrescription.save();
-
+        
+        
         return {
             status: true,
             message: "Prescription created successfully",

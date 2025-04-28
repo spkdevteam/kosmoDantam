@@ -3,6 +3,7 @@ const clinetBusinessUnitSchema = require("../../../client/model/businessUnit");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const mongoose = require("mongoose");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstNameOfCreatedAndEditedByNew");
 const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey = "", page = null, perPage = null,
     clientId, businessUnitId = null, createdBy, updatedBy, branchId }) => {
     try {
@@ -121,9 +122,14 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
             .populate('createdBy', 'firstName lastName')
             .populate('updatedBy', 'firstName lastName')
             .populate('deletedBy', 'firstName lastName')
+            .sort({ createdAt: -1 })
             .lean();//createdBy, updatedBy
         console.log("fetchedBranch=>>>", fetchedBranch);
         if (!fetchedBranch) return { status: false, message: "Branches can't be fetched!!" };
+
+
+        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(fetchedBranch);
+        
 
 
         let metaData = {};
@@ -135,6 +141,8 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
                 SearchKey,
                 totalDocs,
                 totalPages,
+                createdBy: createdByFirstNames,
+                editedBy: updatedByFirstNames
             }
             if (fetchedBranch?.length > 0)
                 return { status: true, data: fetchedBranch, metaData: metaData, message: "Branch details retrieved successfully." }
@@ -159,7 +167,7 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
 
     }
     catch (error) {
-        return { status: false, message: error.message || "Branches can't be fetched!!" };
+        return { status: false, message: error.message || "Branches can't be fetched!!", data: [], metaData: {} };
     }
 
 }

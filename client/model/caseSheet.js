@@ -255,6 +255,7 @@ const caseSheetSchema = new mongoose.Schema({
                                 estimateId: { type: String, default: null },
                                 opptedOrCompleted: { type: Boolean, default: false },
                                 invoiceId: { type: mongoose.Schema.ObjectId, ref: "invoices", default: null },
+                                invoiceNumber : { type: String, default : null },//rahul
                                 prposedDate: { type: Date, default: null },
                                 updatedAt: { type: Date, default: null, index: true },
                                 departmentId : {type:mongoose.Schema.ObjectId, ref: "department"}

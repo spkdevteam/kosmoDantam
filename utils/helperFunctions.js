@@ -83,13 +83,15 @@ function formatProcedure(procedure) {
         services: procedure.services
             ? procedure.services.map(service => ({
                 _id: service._id,
-                serviceName: service.serviceName
+                serviceName: service.serviceName,
+                departmentId:service.departmentId
             }))
             : [],
         procedureName: procedure.procedureName,
         displayId: procedure.displayId,
         buId: procedure.buId ? { _id: procedure.buId._id, name: procedure.buId.name } : null,
         branchId: procedure.branchId ? { _id: procedure.branchId._id, name: procedure.branchId.name } : null,
+        description:procedure?.description,
         isActive: procedure.isActive,
         createdBy: procedure.createdBy
             ? { _id: procedure.createdBy._id, firstName: procedure.createdBy.firstName, lastName: procedure.createdBy.lastName }
@@ -150,10 +152,12 @@ function formatPrescription(prescription) {
 function formatEmployee(employee) {
     return {
         _id: employee._id,
+        displayId : employee?.displayId ? employee?.displayId : null,
+        rid : employee?.roleId ? employee?.roleId : null,
         role: employee.role ? { _id: employee.role._id, name: employee.role.name } : null,
         branch: employee.branch ? { _id: employee.branch._id, name: employee.branch.name } : null,
         businessUnit: employee.businessUnit ? { _id: employee.businessUnit._id, name: employee.businessUnit.name } : null,
-        roleId: employee.roleId ? { _id: employee.roleId._id, name: employee.roleId.name } : null,
+        roleId: employee.roleId,
         firstName: employee.firstName ? employee.firstName : "",
         lastName: employee.lastName ? employee.lastName : "",
         email: employee.email ? employee.email : "",
@@ -216,8 +220,8 @@ function formatAppointment(appointment) {
         : null,
         slotFrom: appointment.slotFrom,
         slotTo: appointment.slotTo,
-        chairId: appointment.chairId ? { _id: appointment.chairId._id, chairNumber: appointment.chairId.chairNumber } : null,
-        patientId: appointment.patientId ? { _id: appointment.patientId._id, firstName: appointment.patientId.firstName } : null,
+        chairId: appointment.chairId ? { _id: appointment.chairId._id, chairNumber: appointment.chairId.chairNumber, chairLocation: appointment.chairId.chairLocation } : null,
+        patientId: appointment.patientId ? { _id: appointment.patientId._id, firstName: appointment.patientId.firstName, lastName: appointment.patientId.lastName, phone: appointment.patientId.phone, email: appointment.patientId.email,age: appointment.patientId.age,gender:appointment.patientId.gender,bloodGroup :appointment.patientId.bloodGroup } : null,
         status: appointment.status,
         chiefComplaint: appointment.chiefComplaint,
         isActive: appointment.isActive ? true : false,

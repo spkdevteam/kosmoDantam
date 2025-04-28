@@ -32,8 +32,9 @@
  *         name: prescriptionId
  *         schema:
  *           type: string
- *           example: ""
- *         description: prescription ID to filter prescription (optional).
+ *         required: false
+ *         description: Prescription ID to filter prescription (optional).
+ *         example: ""
  *       - in: query
  *         name: clientId
  *         schema:
@@ -92,7 +93,7 @@
  *         required: false
  *         description: Unique identifier for the casesheet.
  *         example: ""
-  *       - in: query
+ *       - in: query
  *         name: nextVisitDate
  *         schema:
  *           type: string
@@ -128,7 +129,7 @@
  *           application/json:
  *             example:
  *               status: true
- *               message: "Prescription details retrieved successfully."
+ *               message: "Precription details retrieved successfully."
  *               data:
  *                 prescriptions:
  *                   - _id: "67a821c491c03f67d6c5fd53"
@@ -139,14 +140,16 @@
  *                       name: "Kosmo Dental Clinic Branch two"
  *                     buId:
  *                       _id: "67820851a840f3a7bf1a307a"
- *                       name: "kasif unit two Business Unit"
+ *                       name: "kasif unit two Businsenss Unit"
  *                     doctorId:
  *                       _id: "67871f6a7bb6b5c411365ff7"
  *                       firstName: "dr2br2"
  *                       lastName: "Doctor"
+ *                     caseSheetId: null
  *                     drugArray:
  *                       - _id: "67a883492fa30006f21429a1"
  *                         drugName: "Service 3"
+ *                         drug: ""
  *                         dosage: "2"
  *                         freequency: "0-0-1"
  *                         duration: "3"
@@ -155,15 +158,27 @@
  *                         timing: "once (night)"
  *                       - _id: "67a821c4a72092e6b5d4c0f4"
  *                         drugName: "Paracetamol"
+ *                         drug: ""
  *                         dosage: "2"
  *                         freequency: "0-1-0"
  *                         duration: "1"
  *                         instruction: "before food"
  *                         note: ""
  *                         timing: "once (afternoon)"
- *                     createdBy: null
+ *                     patientId:
+ *                       _id: "678b230cd6ef2ca20e1f98f5"
+ *                       firstName: "patient 1"
+ *                       lastName: "Patient last Name"
+ *                     createdBy:
+ *                       _id: "67820851a840f3a7bf1a3077"
+ *                       firstName: "kasif"
+ *                       lastName: "unit two"
+ *                     deletedBy: null
+ *                     updatedBy: null
+ *                     deletedAt: null
  *                     createdAt: "2025-02-09T03:32:20.392Z"
  *                     updatedAt: "2025-02-09T16:31:46.329Z"
+ *                     __v: 0
  *                   - _id: "67a98be4a4dd6cf0299e0ce1"
  *                     displayId: "KC-bnch-2024-PR1000021"
  *                     additionalAdvice: null
@@ -172,28 +187,42 @@
  *                       name: "Kosmo Dental Clinic Branch two"
  *                     buId:
  *                       _id: "67820851a840f3a7bf1a307a"
- *                       name: "kasif unit two Business Unit"
+ *                       name: "kasif unit two Businsenss Unit"
  *                     doctorId:
  *                       _id: "6786505de5226e57fc1618db"
  *                       firstName: "dr1"
  *                       lastName: "br2"
+ *                     caseSheetId: null
  *                     drugArray:
  *                       - _id: "67a98be2e82fc4e4f553dc4d"
  *                         drugName: "Paracetamol"
+ *                         drug: ""
  *                         dosage: "20"
  *                         freequency: "0-1-0"
  *                         duration: "12"
  *                         instruction: "before food"
  *                         note: "s"
  *                         timing: "once (afternoon)"
+ *                     patientId:
+ *                       _id: "6788bab11907bfd0d62b1073"
+ *                       firstName: "sister"
+ *                       lastName: "9858474747"
  *                     createdBy: null
+ *                     deletedBy: null
+ *                     updatedBy: null
+ *                     deletedAt: null
  *                     createdAt: "2025-02-10T05:17:22.506Z"
  *                     updatedAt: "2025-02-10T05:17:22.506Z"
+ *                     __v: 0
  *                 metadata:
  *                   page: 1
  *                   perPage: 5
  *                   totalCount: 2
  *                   totalPages: 1
+ *                   createdBy:
+ *                     - _id: "67820851a840f3a7bf1a3077"
+ *                       firstName: "kasif"
+ *                   editedBy: []
  *       500:
  *         description: Internal server error.
  *         content:

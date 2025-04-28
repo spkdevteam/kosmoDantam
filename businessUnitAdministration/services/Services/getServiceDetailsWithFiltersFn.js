@@ -4,6 +4,7 @@ const departmentSchema = require("../../../client/model/department");
 const serviceSchema = require("../../../client/model/service");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstNameOfCreatedAndEditedByNew");
 const { formatService } = require("../../../utils/helperFunctions");
 
 const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, serviceId, fromDate, toDate, departmentId, branchId, buId, createdUser, updatedUser, deletedUser, clientId }) => {
@@ -26,6 +27,7 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             if (!specificService) {
@@ -86,9 +88,9 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
         //apply date filters
         let dateSearchKey = {};
         if (fromDate || toDate) {
-            dateSearchKey = { createdAt: {} };
-            if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
-            if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
+            dateSearchKey = { date: {} };
+            if (fromDate) dateSearchKey.date.$gte = fromDate ? new Date(fromDate) : null;
+            if (toDate) dateSearchKey.date.$lte = toDate ? new Date(toDate) : null;
         };
 
 
@@ -111,6 +113,7 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             const formattedServices = allService.map((service) => formatService(service));
@@ -149,6 +152,7 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
             .populate("createdBy", "_id firstName lastName")
             .populate("deletedBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")
+            .sort({ createdAt: -1 })
             .lean();
 
         //apply pagination only if page & perPage are provided
@@ -179,6 +183,9 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
         //calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);
 
+        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(services);
+
+
         return {
             status: true,
             message: totalCount < 1 ? "No Services found" : "Service details retrieved successfully.",
@@ -189,6 +196,8 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
                     perPage,
                     totalCount,
                     totalPages,
+                    createdBy: createdByFirstNames,
+                    editedBy: updatedByFirstNames
                 },
             },
         };

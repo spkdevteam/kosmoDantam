@@ -258,8 +258,8 @@ exports.getBookingChartNonTabular = async (input) => {
         const booking = await this.getDateWiseBookidDetails(input) || [];
         const daystatus = [...absentees?.data, ...booking.data];
         const doctors = await listEmployeeByRole({ ...input, roleId: 3 });
-        const chairs = await getchairList(input)
-        const assistant = await listEmployeeByRole({ ...input, roleId: 4 })
+        const chairs = await getchairList(input);
+        const assistant = await listEmployeeByRole({ ...input, roleId: 4 });
 
         return { chairs, doctors, daystatus, assistant, timeSlots };
     } catch (error) {
@@ -283,7 +283,7 @@ const filterAppointment = async (input) => {
             query.date = new Date(input.bookingDate + 'T00:00:00.000Z');
             console.log(new Date(input.bookingDate + 'T00:00:00.000Z'));
         }
-        console.log(new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z'))
+        console.log(new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z'));
         const orConditions = [];
         if (input?.startTime) query.slotFrom = { $gte: new Date(input.bookingDate + 'T' + input.startTime + ':00.000Z'), $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z') };
         if (input?.endTime) query.slotTo = { $gte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z'), $lte: new Date(input.bookingDate + 'T' + input.endTime + ':00.000Z') };
@@ -335,7 +335,7 @@ exports.generateAvailabiltyChart = async (input) => {
     const absentees = await filterLeaveApplication(input);
     const booking = await filterAppointment(input);
     const daystatus = { ...booking, absentees };
-    return daystatus
+    return daystatus;
 }
 
 

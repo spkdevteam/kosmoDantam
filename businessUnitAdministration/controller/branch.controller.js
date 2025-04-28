@@ -19,7 +19,7 @@ exports.createBranchByBusinessUnit = async (req, res) => {
         // asd
         const mainUser = req.user;
         const { clientId, name, emailContact, branchPrefix, contactNumber, country, state, city, ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit, branchHeadId } = req.body;
-        
+
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
@@ -49,7 +49,7 @@ exports.createBranchByBusinessUnit = async (req, res) => {
         const displayId = await getserialNumber('branch', clientId, "", businessUnit);
 
         const dataObject = {
-            displayId: displayId, branchPrefix: branchPrefix, clientId, name, emailContact, contactNumber, country, state, city : city[0], ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId, createdBy: mainUser?._id
+            displayId: displayId, isActive: true, branchPrefix: branchPrefix, clientId, name, emailContact, contactNumber, country, state, city: city[0], ZipCode, address, incorporationName, cinNumber, gstNumber, businessUnit: businessUnit, branchHead: branchHeadId, createdBy: mainUser?._id
         }
 
         if (req.file?.filename) {
@@ -175,7 +175,7 @@ exports.updateBranchByBusinessUnit = async (req, res) => {
 exports.getParticularBranchByBusinessUnit = async (req, res) => {
     try {
         const { clientId, branchId } = req.params; // Extract clientId and branchId from request params
-        console.log(req.params,'saaasasasasasasa')
+        console.log(req.params, 'saaasasasasasasa')
         // Validate inputs
         if (!clientId || !branchId) {
             return res.status(400).send({

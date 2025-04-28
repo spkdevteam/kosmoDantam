@@ -28,8 +28,13 @@ const checkOngoing = async (clientId, patientId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>Cannot overwrite `complaint` model once compiled."
-
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>Cannot overwrite `complaint` model once compiled."
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const existing = await CaseSheet.find({
             patientId: patientId,
             drafted: false,
@@ -53,8 +58,13 @@ const create = async (clientId, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
-
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const newCheifComplaint = await CaseSheet.create(data);
         const populatedCaseSheet = await CaseSheet.findById(newCheifComplaint._id).populate({
             path: 'cheifComplaints.complaints.compId',
@@ -74,8 +84,13 @@ const update = async (clientId, caseSheetId, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
-
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const existing = await CaseSheet.findById(caseSheetId);
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
@@ -100,8 +115,13 @@ const deleteCheifComplaints = async (clientId, caseSheetId, cheifComplaintId) =>
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
-
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const existing = await CaseSheet.findById(caseSheetId);
         if (!existing) {
             throw new CustomError(statusCode.NotFound, message.lblCaseSheetNotFound);
@@ -484,8 +504,8 @@ const updateOtherAttachment = async (clientId, caseSheetId, dataObject) => {
     }
 };
 //api made by rahul for other attachment:
-const getPopulatedOtherAttachment = async(clientId, caseSheetId)=>{
-    try{
+const getPopulatedOtherAttachment = async (clientId, caseSheetId) => {
+    try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
         const Service = clientConnection.model('services', serviceSchema);
@@ -501,7 +521,7 @@ const getPopulatedOtherAttachment = async(clientId, caseSheetId)=>{
         });
         return populatedCaseSheet
     }
-    catch(error){
+    catch (error) {
         throw new CustomError(error.statusCode || 500, `Error fetching other attachment of case sheet: ${error.message}`);
     }
 }
@@ -550,7 +570,13 @@ const createService = async (clientId, isDrafted, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const Department = clientConnection.model('department', departmentSchema);
         const Service = clientConnection.model('services', serviceSchema);
 
@@ -634,7 +660,13 @@ const createServiceNew = async (clientId, isDrafted, data, services) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const Department = clientConnection.model('department', departmentSchema);
         const Service = clientConnection.model('services', serviceSchema);
 
@@ -871,7 +903,13 @@ const updateService = async (clientId, caseSheetId, isDrafted, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const Department = clientConnection.model('department', departmentSchema);
         const Service = clientConnection.model('services', serviceSchema);
 
@@ -931,10 +969,10 @@ const updateService = async (clientId, caseSheetId, isDrafted, data) => {
 
             // newServices.forEach(serviceItem => {
             for (const serviceItem of newServices) {//fix->replaced forEach with for-of as async needed 
-                let { tooth, service, rate, department, prposedDate,discount } = serviceItem;
+                let { tooth, service, rate, department, prposedDate, discount } = serviceItem;
                 const teethCount = parseInt(serviceItem?.tooth?.length);
-                if(teethCount == 0) return {status : false, message: "Atleast one tooth is required" };
-                const discountForEachTooth = (discount/teethCount);
+                if (teethCount == 0) return { status: false, message: "Atleast one tooth is required" };
+                const discountForEachTooth = (discount / teethCount);
                 // tooth.forEach(t => {
                 for (const t of tooth) {//fix->replaced forEach with for-of as async needed 
                     if (treatmentMap[t]) {
@@ -964,10 +1002,10 @@ const updateService = async (clientId, caseSheetId, isDrafted, data) => {
                                     serviceId: service.servId?._id,//fix
                                     finished: "Proposed",//in code it was 'In Progress'
                                     unitPrice: rate,
-                                    discount :  parseFloat(discountForEachTooth.toFixed(2)),
+                                    discount: parseFloat(discountForEachTooth.toFixed(2)),
                                     updatedAt: new Date(),
-                                    prposedDate : prposedDate,
-                                    departmentId : department?.deptId
+                                    prposedDate: prposedDate,
+                                    departmentId: department?.deptId
                                 }
                             };
                             //
@@ -1003,9 +1041,9 @@ const updateService = async (clientId, caseSheetId, isDrafted, data) => {
                                     finished: "Proposed",//in code it was 'In Progress'
                                     updatedAt: new Date(),
                                     unitPrice: rate,
-                                    discount :  parseFloat(discountForEachTooth.toFixed(2)),
-                                    prposedDate : prposedDate,
-                                    departmentId : department?.deptId
+                                    discount: parseFloat(discountForEachTooth.toFixed(2)),
+                                    prposedDate: prposedDate,
+                                    departmentId: department?.deptId
                                 }
                             }
                             ],
@@ -1044,7 +1082,13 @@ const updateServiceNew = async (clientId, caseSheetId, isDrafted, data, services
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const Department = clientConnection.model('department', departmentSchema);
         const Service = clientConnection.model('services', serviceSchema);
 
@@ -1140,7 +1184,13 @@ const editServiceService = async (clientId, caseSheetId, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const Department = clientConnection.model('department', departmentSchema);
         const Service = clientConnection.model('services', serviceSchema);
 
@@ -1216,7 +1266,13 @@ const updateProcedure = async (clientId, caseSheetId, isDrafted, data) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const Department = clientConnection.model('department', departmentSchema);
         const Service = clientConnection.model('services', serviceSchema);
         const procedures = clientConnection.model('procedure', procedureSchema)
@@ -2077,7 +2133,13 @@ const listDrafted = async (clientId, filters = {}) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const [caseSheets] = await Promise.all([
             CaseSheet.find(filters).sort({ _id: -1 }).populate({
@@ -2105,7 +2167,13 @@ const getById = async (clientId, caseSheetId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);
@@ -2147,9 +2215,9 @@ const getById = async (clientId, caseSheetId) => {
                 select: 'procedureName _id'
             })
             .populate({
-                path : "procedures.service.servId",
-                modle : Service,
-                select : "serviceName _id"
+                path: "procedures.service.servId",
+                modle: Service,
+                select: "serviceName _id"
             })
 
         if (!caseSheet) {
@@ -2241,7 +2309,13 @@ const getCaseDetail = async (clientId, caseSheetId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);
@@ -2333,7 +2407,13 @@ const updateTreatmentProcedure = async (clientId, caseSheetId, procedureId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const existing = await CaseSheet.findById(caseSheetId).populate({
             path: 'cheifComplaints.complaints.compId',
             model: Complaint,
@@ -2361,7 +2441,13 @@ const updateTreatment = async (clientId, caseSheetId, treatmentData) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint =  clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>Cannot overwrite `complaint` model once compiled." =>clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema)
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>Cannot overwrite `complaint` model once compiled." =>clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema)
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);
@@ -2404,8 +2490,8 @@ const updateTreatment = async (clientId, caseSheetId, treatmentData) => {
         const branchObj = await Branch.findOne({ _id: existing?.branchId }).lean();
         if (!branchObj) return { status: false, message: 'Error fetching Branch of case sheet overview!!' };
         // console.log("branchObjbranchObj=>>",branchObj);
-        console.log("hittttt");
-        
+
+
         for (const toothEntry of treatmentData) {
             for (const serviceArrObj of toothEntry?.service) {
                 // console.log(toothEntry.tooth,"->>",serviceArrObj?.service?.finished,"tooth, finished");
@@ -2443,7 +2529,13 @@ const updateTreatmentAndCloseCase = async (clientId, caseSheetId, treatmentData)
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);
@@ -2493,7 +2585,13 @@ const closeCase = async (clientId, caseSheetId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);
@@ -2545,7 +2643,13 @@ const markedCompleted = async (clientId, caseSheetId) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const Finding = clientConnection.model('patientFinding', patientFindingsSchema);
         const Medical = clientConnection.model('medical', medicalSchema);
         const Department = clientConnection.model('department', departmentSchema);
@@ -2707,10 +2811,10 @@ const updateDraft = async (clientId, caseSheetId, data) => {
         });
 
         newServices.forEach(serviceItem => {
-            let { tooth, service, rate, department, prposedDate,discount } = serviceItem;
+            let { tooth, service, rate, department, prposedDate, discount } = serviceItem;
             const teethCount = parseInt(serviceItem?.tooth?.length);
-            if(teethCount == 0) return {status : false, message: "Atleast one tooth is required" };
-            const discountForEachTooth = (discount/teethCount);
+            if (teethCount == 0) return { status: false, message: "Atleast one tooth is required" };
+            const discountForEachTooth = (discount / teethCount);
             tooth.forEach(t => {
                 if (treatmentMap[t]) {
                     // Update existing tooth services
@@ -2731,10 +2835,10 @@ const updateDraft = async (clientId, caseSheetId, data) => {
                                 serviceId: service.servId?._id,//fix
                                 finished: "Proposed",//in code it was 'In Progress'
                                 unitPrice: rate,
-                                discount :  parseFloat(discountForEachTooth.toFixed(2)),
+                                discount: parseFloat(discountForEachTooth.toFixed(2)),
                                 updatedAt: new Date(),
-                                prposedDate : prposedDate ? prposedDate : null,
-                                departmentId : department?.deptId
+                                prposedDate: prposedDate ? prposedDate : null,
+                                departmentId: department?.deptId
                             }
                         };
                         treatmentMap[t].service.push(newPush);
@@ -2757,9 +2861,9 @@ const updateDraft = async (clientId, caseSheetId, data) => {
                                 finished: "Proposed",//in code it was 'In Progress'
                                 updatedAt: new Date(),
                                 unitPrice: rate,
-                                discount :  parseFloat(discountForEachTooth.toFixed(2)),
-                                prposedDate : prposedDate ? prposedDate : null,
-                                departmentId : department?.deptId
+                                discount: parseFloat(discountForEachTooth.toFixed(2)),
+                                prposedDate: prposedDate ? prposedDate : null,
+                                departmentId: department?.deptId
                             }
                         }
                             // {
@@ -2999,7 +3103,13 @@ const listAllCases = async (clientId, filters = {}) => {
     try {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
         const User = clientConnection.model('clientUsers', clinetUserSchema);
@@ -3040,7 +3150,13 @@ const listAllCasesOfPatient = async (clientId, filters = {}, options = { page: 1
         const CaseSheet = clientConnection.model('caseSheet', caseSheetSchema);
         const Patient = clientConnection.model('patient', clinetPatientSchema);
         const Branch = clientConnection.model('branch', clinetBranchSchema);
-        const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        // const Complaint = clientConnection.models.complaint || clientConnection.model('complaint', complaintSchema);//rahul_error=>
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const User = clientConnection.model('clientUsers', clinetUserSchema);
         const { page, limit } = options;
         const skip = (page - 1) * limit;
@@ -3182,6 +3298,7 @@ const appointmentsWithCase = async ({ clientId, patientId, caseSheetId }) => {
             .populate('chairId')
             .populate('patientId', 'firstName lastName displayId')
             .populate('caseSheetId')
+            .populate('specialistDoctorId', 'firstName lastName')
             .sort({ createdAt: -1 })
             .exec();
 
@@ -3287,7 +3404,7 @@ module.exports = {
     createOtherAttachment,
     updateOtherAttachment,
     getPopulatedOtherAttachment,
-    
+
     createInvestigation,
     updateInvestigation,
 

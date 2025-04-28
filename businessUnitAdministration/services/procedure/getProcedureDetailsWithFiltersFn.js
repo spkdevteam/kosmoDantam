@@ -5,6 +5,7 @@ const procedureSchema = require("../../../client/model/procedure");
 const serviceSchema = require("../../../client/model/service");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
+const fnToExtractFirstNameOfCreatedAndEditedBy = require("../../../utils/fnToExtractFIrstNameOfCreatedAndEditedByNew");
 const { formatProcedure } = require("../../../utils/helperFunctions");
 
 const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, searchKey, procedureId, deptId, serviceId, buId, branchId, createdUser, updatedUser, deletedUser, fromDate, toDate, clientId }) => {
@@ -12,7 +13,6 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
         const db = await getClientDatabaseConnection(clientId);
         const Procedure = await db.model('procedure', procedureSchema);
         //, clinetBusinessUnitSchema, clinetBranchSchema, clinetUserSchema
-
         //these are user for populating the data
         const businessUnit = await db.model("businessUnit", clinetBusinessUnitSchema);
         const branch = await db.model("branch", clinetBranchSchema);
@@ -24,11 +24,11 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
             const specificProcedure = await Procedure.findOne({ _id: procedureId, deletedAt: null })
                 .populate("buId", "_id name")
                 .populate("branchId", "_id name")
-                .populate("services", "_id serviceName")
-                .populate("deptId", "_id deptName")
+                .populate('services', 'serviceName departmentId')
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             if (!specificProcedure) {
@@ -104,11 +104,12 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
             })
                 .populate("buId", "_id name")
                 .populate("branchId", "_id name")
-                .populate("services", "_id serviceName")
+                .populate('services', 'serviceName departmentId')
                 .populate("deptId", "_id deptName")
                 .populate("createdBy", "_id firstName lastName")
                 .populate("updatedBy", "_id firstName lastName")
                 .populate("deletedBy", "_id firstName lastName")
+                .sort({ createdAt: -1 })
                 .lean();
 
             const formattedProcedure = allProcedure.map((procedure) => formatProcedure(procedure));
@@ -143,11 +144,12 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
         })
             .populate("buId", "_id name")
             .populate("branchId", "_id name")
-            .populate("services", "_id serviceName")
+            .populate('services', 'serviceName departmentId')
             .populate("deptId", "_id deptName")
             .populate("createdBy", "_id firstName lastName")
             .populate("updatedBy", "_id firstName lastName")
             .populate("deletedBy", "_id firstName lastName")
+            .sort({ createdAt: -1 })
             .lean();
 
 
@@ -179,6 +181,10 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
         // Calculate total pages
         const totalPages = Math.ceil(totalCount / perPage);
 
+
+        const { createdByFirstNames, updatedByFirstNames } = fnToExtractFirstNameOfCreatedAndEditedBy(procedures);
+        
+
         return {
             status: true,
             message: totalCount < 1 ? "No Procedures found" : "Procedure details retrieved successfully.",
@@ -189,6 +195,8 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
                     perPage,
                     totalCount,
                     totalPages,
+                    createdBy: createdByFirstNames,
+                    editedBy: updatedByFirstNames
                 },
             },
         };

@@ -25,6 +25,7 @@ const reverseUpdateCaseSheetWithInvoiceNumberFn = async ({ clientId, invoiceId, 
                 const servInd = indexObj[ind];
                 for (const i of servInd) {
                     fetchedCaseSheet.treatmentData3[ind].service[i].service.invoiceId = null;
+                    fetchedCaseSheet.treatmentData3[ind].service[i].service.invoiceNumber = null;
                 }
             }
             const updatedCasesheet = await fetchedCaseSheet.save();

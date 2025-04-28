@@ -9,7 +9,6 @@ const complaintSchema = require("../../client/model/complaint");
 
 
 
-
 // create
 exports.create = async (req, res) => {
     try {
@@ -25,7 +24,13 @@ exports.create = async (req, res) => {
             });
         }
         const clientConnection = await getClientDatabaseConnection(clientId);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        // const Complaint = clientConnection.model('complaint', complaintSchema);
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const existing = await Complaint.findOne({
             $or: [{ complaintName: complaintName }],
         });
@@ -42,9 +47,11 @@ exports.create = async (req, res) => {
                 },
             ],
         );
+
+
         return res.status(statusCode.OK).send({
             message: message.lblChiefComplaintCreated,
-            data: newComplaint 
+            data: newComplaint
         });
     } catch (error) {
         console.error("Error in:", error);
@@ -57,20 +64,26 @@ exports.create = async (req, res) => {
 
 exports.getAllActive = async (req, res) => {
     try {
-        const { clientId } = req.params; 
+        const { clientId } = req.params;
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
             });
         }
         const clientConnection = await getClientDatabaseConnection(clientId);
-        const Complaint = clientConnection.model('complaint', complaintSchema);
+        // const Complaint = clientConnection.model('complaint', complaintSchema);
+        let Complaint; // rahul_error => Cannot overwrite `complaint` model once compiled.
+        try {
+            Complaint = clientConnection.model('complaint');
+        } catch (e) {
+            Complaint = clientConnection.model('complaint', complaintSchema);
+        }
         const complaints = await Complaint.find({
-            isActive : true
+            isActive: true
         })
         return res.status(statusCode.OK).send({
             message: message.lblCheifComplaintsFoundSucessfully,
-            data: complaints 
+            data: complaints
         });
     } catch (error) {
         console.error("Error in:", error);

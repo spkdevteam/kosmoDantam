@@ -3,13 +3,14 @@ const express = require('express')
 const appointment = require('../controller/appointment.controller')
 const getAppointmentWithFilter = require('../controller/appointment/getAppointmentWithFilter.controller')
 const { tempAuthorizeEntity } = require('../../middleware/authorization/commonEntityAuthorization/tempUserValidation')
+const getAvailabilityChartCtrl = require('../controller/appointment/getAvailabilityChart.controller')
 const bookingRoutes = express.Router()
 
 bookingRoutes
        .post('/create', appointment.postcreateBooking)
        .get('/BookingByDate',appointment.getBookingByDate)
        .get('/BookingByDateNonTabular',appointment.getBookingByDateNonTabular)
-       .get('/getAvailability',appointment.getAvailability)
+       .get('/getAvailability', getAvailabilityChartCtrl) //, getAvailabilityChartCtrl
        .delete('/delete', appointment.delete)
        .get('/createToken',appointment.createToken)
        .post('/changeAppointmentStatus',appointment.changeBookingStatus)

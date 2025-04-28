@@ -27,6 +27,7 @@ const updateCaseSheetWithInvoiceNumberFn = async ({ clientId, invoice, branchId 
                         });
                         if (treatmentIndexContainer !== -1 && serviceIndexContainer !== -1) {
                             fetchedCaseSheet.treatmentData3[treatmentIndexContainer].service[serviceIndexContainer].service.invoiceId = invoice?._id;
+                            fetchedCaseSheet.treatmentData3[treatmentIndexContainer].service[serviceIndexContainer].service.invoiceNumber = invoice?.invoiceDetails?.displayId
                             console.log("changed=>>",fetchedCaseSheet.treatmentData3[treatmentIndexContainer].service[serviceIndexContainer].service);
                             const updatePath = `treatmentData3.${treatmentIndexContainer}.service.${serviceIndexContainer}.service.invoiceId`;
                             const updatedCaseSheet = await CaseSheetModelObj.findByIdAndUpdate(

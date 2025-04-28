@@ -76,7 +76,7 @@ const clinetBranchSchema = new Schema(
             trim: true,
         },
 
-        isActive: { type: Boolean, default: false },
+        isActive: { type: Boolean, default: true },
 
         // handlign created by
         createdBy: { type: ObjectId, ref: "clientUsers", default:null, index: true }, // Index for admin/user relationships
