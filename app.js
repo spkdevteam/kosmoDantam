@@ -94,6 +94,7 @@ const utilsRouter = require("./businessUnitAdministration/routes/utils.routes.js
 const humanRouter = require("./HumanResource/router.js");
 const businessUnitRouter = require("./businessUnitAdministration/routes/businessUnit.routes.js");
 const activityLogRouter = require("./businessUnitAdministration/routes/activityLog.routes.js");
+const dashboardRouter = require("./businessUnitAdministration/routes/dashboardRouter.routes.js");
 
 const corsOptions = {
     origin: '*',
@@ -160,6 +161,7 @@ app.use('/initialise',utilsRouter)
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 app.use('/api/client/bu/businessUnit', businessUnitRouter.router)
 app.use('/api/client/bu/activityLog', activityLogRouter);
+app.use('/api/client/bu/dashboard', dashboardRouter)
 
 
 // insert role

@@ -7,7 +7,7 @@ const message = require("../../utils/message");
 
 const { getClientDatabaseConnection } = require("../../db/connection");
 const clientRoleSchema = require("../../client/model/role");
-const { defaultPersmissionsList } = require("../../utils/constant"); 
+const { defaultPersmissionsList } = require("../../utils/constant");
 const togglePermissionStatus = require("../services/rolesAndPermission/togglePermissionStatus");
 
 
@@ -48,7 +48,8 @@ exports.createRolesAndPermissionByBusinessUnit = async (req, res) => {
 
 
         if (role) {
-            return res.status(200).send({status:false,
+            return res.status(200).send({
+                status: false,
                 message: message.lblBusinessUnitRoleAlreadyExists,
             });
         }
@@ -60,7 +61,7 @@ exports.createRolesAndPermissionByBusinessUnit = async (req, res) => {
             ],
         );
         return res.status(statusCode.OK).send({
-            status:true,
+            status: true,
             message: message.lblBusinessUnitRoleCreatedSuccessfully,
             data: { roleId: newRole[0]._id, roleName: newRole[0].name, capability: newRole[0].capability },
         });
@@ -113,7 +114,7 @@ exports.updateRoleAndPermissionByBusinessUnit = async (req, res) => {
         }
         await role.save();
         return res.status(statusCode.OK).send({
-            message: !capability ? 'Role name modified ' : 'User permission modified' ,
+            message: !capability ? 'Role name modified ' : 'User permission modified',
             data: { roleId: role._id, name: role.name },
         });
     } catch (error) {
@@ -157,16 +158,16 @@ exports.getParticularRoleAndPermissionByBusinessUnit = async (req, res) => {
 exports.listRolesAndPermission = async (req, res) => {
     try {
         const admin = req.user;
-        console.log(" req.query",  req.query);
+        console.log(" req.query", req.query);
 
         const clientId = req.query.clientId;
         const keyword = req.query.keyword;
-        const page = req.query.page??1;
-        const perPage = req.query.perPage??10
-        console.log(page,perPage,'page,perPage');
+        const page = req.query.page ?? 1;
+        const perPage = req.query.perPage ?? 10
+        console.log(page, perPage, 'page,perPage');
         let whereCondition = {
             deletedAt: null,
-            id:{$ne:17},
+            id: { $ne: 17 },
             ...(keyword && {
                 $or: [
                     { name: { $regex: keyword.trim(), $options: "i" } },
@@ -196,7 +197,7 @@ exports.listRolesAndPermission = async (req, res) => {
         //rahul: changed the soring from .sort({ _id: -1 }) to .sort({ createdAt: -1 })
         const [roles] = await Promise.all([
             RolesAndpermission.find(whereCondition).select("name id createdBy isActive capability").sort({ createdAt: -1 })
-            ?.skip((page-1) * perPage)?.limit(perPage),//capability added extra
+                ?.skip((page - 1) * perPage)?.limit(perPage),//capability added extra
         ]);
 
         const [totalCount] = await Promise.all([
@@ -262,8 +263,38 @@ exports.listRolesAndPermission = async (req, res) => {
                     for (element of notExistObj) {
                         const pushMenu = defaultPersmissionsList[1].menu[element?.index];
                         pushMenu.access = true;
-                         console.log("PatientpushMenu=>>>",pushMenu);
-                         
+                        console.log("PatientpushMenu=>>>", pushMenu);
+
+                        cap.menu.push(pushMenu);
+                        isUpdated = true;
+                    }
+                }
+                //if name Dashboard exists in DB
+                if (String(cap.name) == "Dashboard") {
+                    const constArray = [];
+                    for (def of defaultPersmissionsList[2].menu) {
+                        constArray.push(def.name);
+                    }
+                    // console.log("constArray=>",constArray);
+                    const dbArray = [];
+                    for (const m of cap.menu) {
+                        dbArray.push(m?.name);
+                    }
+                    // console.log("dbArray=>",dbArray);
+                    // const notExistObj = constArray.map((num, index) => ({ num, index })).filter(({ num }) => !dbArray.some(el => String(el) === String(num)));
+                    const notExistObj = constArray
+                        .map((num, index) => ({ num, index }))
+                        .filter(({ num }) =>
+                            !dbArray.some(el =>
+                                el.toLowerCase().trim() === num.toLowerCase().trim()
+                            )
+                        );
+                    // console.log("notExistObj=>>",notExistObj);
+                    for (element of notExistObj) {
+                        const pushMenu = defaultPersmissionsList[2].menu[element?.index];
+                        pushMenu.access = true;
+                        console.log("DashboardpushMenu=>>>", pushMenu);
+
                         cap.menu.push(pushMenu);
                         isUpdated = true;
                     }
@@ -274,17 +305,38 @@ exports.listRolesAndPermission = async (req, res) => {
                 // console.log(`Updated document ID: ${r?._id}`);
             }
         }
-
+        //if the capability.name=Dashboard doesnt exist in db at all
+        for (const r of roles) {
+            let isUpdated = false
+            const hasDashboard = r.capability.some(item => item.name === "Dashboard");
+            if (!hasDashboard) {
+                const pushMenu = [...defaultPersmissionsList[2].menu]
+                for (const m of pushMenu){
+                    m.access = true
+                }
+                const pushObj = {
+                    name: "Dashboard",
+                    access: false,
+                    menu: pushMenu
+                }
+                
+                r.capability.push(pushObj)
+                isUpdated = true;
+            }
+            if (isUpdated) {
+                await r.save();
+            }
+        }
         //
         console.log({
             message: 'List of all roles!',
             listOfRoles: roles,
-            totalData :totalCount
+            totalData: totalCount
         })
         return res.json({
             message: 'List of all roles!',
             listOfRoles: roles,
-            totalData :totalCount?.length
+            totalData: totalCount?.length
         });
     } catch (error) {
         return res.status(statusCode.InternalServerError).send({
@@ -318,10 +370,10 @@ exports.softDeleteRolesAndPermissionByBusinesssUnit = async (req, res) => {
         if (softDelete == "1") {
             role.deletedAt = new Date();
             await role.save()
-            res.json ({status:true,message:'Role deleted successfully  '})
+            res.json({ status: true, message: 'Role deleted successfully  ' })
         } else {
             await RolesAndpermission.deleteOne({ _id: roleId });
-            res.json ({status:true,message:'Role deleted successfully  '})
+            res.json({ status: true, message: 'Role deleted successfully  ' })
         }
         // this.listRolesAndPermission(req, res);
     } catch (error) {
@@ -367,7 +419,7 @@ exports.getRolesList = async (req, res) => {
         return res.json({
             message: 'List of all roles!',
             listOfRoles: pataintentExcluded,
-             
+
         });
     } catch (error) {
         return res.status(statusCode.InternalServerError).send({

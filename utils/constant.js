@@ -211,7 +211,56 @@ const defaultPersmissionsList = [
                 }
             },
         ]
+    },
+    {
+        name: "Dashboard",
+        access: false,
+        menu: [
+            {
+                name : "Admin Dashboard",
+                displayName : "All Admin Dashboard",
+                access : false,
+                subMenus: {
+                    // list: { id: 99, access: false, api: "/demo/path" },
+                    create: { id: 100, access: false, api: "/demo/path" },
+                    view: { id: 101, access: false, api: "/demo/path" },
+                    update: { id: 102, access: false, api: "/demo/path" },
+                    softDelete: { id: 103, access: false, api: "/demo/path" },
+                    // hardDelete: { id: 104, access: false, api: "/demo/path" },
+                    // activeActive: { id: 105, access: false, api: "/demo/path" },
+                }
+            },
+            {
+                name : "Patient Dashboard",
+                displayName : "All Patient Dashboard",
+                access : false,
+                subMenus: {
+                    // list: { id: 106, access: false, api: "/demo/path" },
+                    create: { id: 107, access: false, api: "/demo/path" },
+                    view: { id: 108, access: false, api: "/demo/path" },
+                    update: { id: 109, access: false, api: "/demo/path" },
+                    softDelete: { id: 110, access: false, api: "/demo/path" },
+                    // hardDelete: { id: 111, access: false, api: "/demo/path" },
+                    // activeActive: { id: 112, access: false, api: "/demo/path" },
+                }
+            },
+            {
+                name : "Reception Dashboard",
+                displayName : "All Reception Dashboard",
+                access : false,
+                subMenus: {
+                    // list: { id: 113, access: false, api: "/demo/path" },
+                    create: { id: 114, access: false, api: "/demo/path" },
+                    view: { id: 115, access: false, api: "/demo/path" },
+                    update: { id: 116, access: false, api: "/demo/path" },
+                    softDelete: { id: 117, access: false, api: "/demo/path" },
+                    // hardDelete: { id: 118, access: false, api: "/demo/path" },
+                    // activeActive: { id: 119, access: false, api: "/demo/path" },
+                }
+            }
+        ]
     }
+
 ];
 
 
