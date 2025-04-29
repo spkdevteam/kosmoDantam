@@ -47,7 +47,7 @@ exports.creatAppointment = async (input) => {
             date: input?.date ? new Date(input.date.includes('T') ? input.date.split('T')[0] + 'T00:00:00.000Z' : input.date + 'T00:00:00.000Z') : null,
             caseSheetId: input?.caseId || null,
             dutyDoctorId: input?.dutyDoctorId,
-            specialistDoctorId:input?.specialistDoctorId,
+            specialistDoctorId: input?.specialistDoctorId,
             dentalAssistant: input?.dentalAssistant && mongoose.isValidObjectId(input.dentalAssistant) ? input.dentalAssistant : null,
             chiefComplaint: input?.chiefComplaint,
             slotFrom: input?.slotFrom,
@@ -105,7 +105,7 @@ exports.getDateWiseBookidDetails = async (input) => {
             .populate('chairId', 'chairNumber chairLocation')
             .populate('specialistDoctorId', 'firstName ')
 
-        
+
 
         const bookings = bookingdetails?.map((item) => {
 
@@ -493,18 +493,18 @@ exports.dailyBookingWithPagination = async (input) => {
 exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
 
     try {
-    
-        const {clientId,fromDate,toDate,keyword='',page=1,perPage=1000} = input
+
+        const { clientId, fromDate, toDate, keyword = '', page = 1, perPage = 1000 } = input
         // clientId, buId, bookingDate, page, perPage, branchId======>>>>>  input 
-        console.log(input?.branchId ,'input?.branchId input?.branchId input?.branchId ')
-        
+        console.log(input?.branchId, 'input?.branchId input?.branchId input?.branchId ')
+
         if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         // if (! await validateObjectId({ clientid: clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
 
         const db = await getClientDatabaseConnection(clientId)
         const appointment = await db.model('appointment', appointmentSchema)
         const query = { isActive: true, deletedAt: null };
- 
+
         const out = await appointment.aggregate([
             // Match the base fields in the `appointment` collection
             {
@@ -516,7 +516,7 @@ exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
                         $gte: new Date(fromDate + 'T00:00:00.000Z'),
                         $lte: new Date(toDate + 'T00:00:00.000Z')
                     },
-                     ...(input?.branchId ? { branchId:new mongoose.Types.ObjectId(input?.branchId)  } : {})
+                    ...(input?.branchId ? { branchId: new mongoose.Types.ObjectId(input?.branchId) } : {})
 
                 }
             },
@@ -628,10 +628,10 @@ exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
                 $limit: parseInt(perPage)
             }
         ]);
-       
+
         return { status: true, message: 'Success', data: out }
     } catch (error) {
-        return { status: false, message: error.message}
+        return { status: false, message: error.message }
     }
 }
 
@@ -639,7 +639,7 @@ exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
 
 exports.filterPatientBookingWithfromToDateAndKeyWord = async (input) => {
     try {
-        console.log(input,'My input string ')
+        console.log(input, 'My input string ')
         // clientId, buId, bookingDate, page, perPage, branchId======>>>>>  input 
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
         if (! await validateObjectId({ clientid: input?.clientId, objectId: input?.buId, collectionName: 'businessunit' })) return { status: false, message: message.lblBusinessUnitNotFound, statusCode: httpStatusCode.Unauthorized }
@@ -648,28 +648,30 @@ exports.filterPatientBookingWithfromToDateAndKeyWord = async (input) => {
         const appointment = await db.model('appointment', appointmentSchema)
         const query = { isActive: true, deletedAt: null };
 
-         
+
 
         const out = await appointment.find({
-            patientId:new mongoose.Types.ObjectId( input?.patientId),
+            patientId: new mongoose.Types.ObjectId(input?.patientId),
             isActive: true,
             deletedAt: null,
-            ...(input.fromDate && input.toDate &&{ date:
-            {
-                $gte: new Date(input.fromDate + 'T00:00:00.000Z'),
-                $lte: new Date(input.toDate + 'T00:00:00.000Z')
-            }}),
+            ...(input.fromDate && input.toDate && {
+                date:
+                {
+                    $gte: new Date(input.fromDate + 'T00:00:00.000Z'),
+                    $lte: new Date(input.toDate + 'T00:00:00.000Z')
+                }
+            }),
             ...(input?.branchId ? { branchId: new mongoose.Types.ObjectId(input?.branchId) } : {})
 
         })
-        .populate('dutyDoctorId')
-        .populate('chairId')
-        .populate('patientId')
-        .populate('branchId')
-        
-       // const out = []
+            .populate('dutyDoctorId')
+            .populate('chairId')
+            .populate('patientId')
+            .populate('branchId')
+
+        // const out = []
         console.log(input, 'input')
-        console.log(out,  'outoutout')
+        console.log(out, 'outoutout')
         return { status: true, message: 'Success', data: out }
     } catch (error) {
 
@@ -711,10 +713,15 @@ exports.changeBookingStatus = async ({ date, clientId, branchId, buId, appointme
         if (! await validateObjectId({ clientid: clientId, objectId: branchId, collectionName: 'branch' })) return { status: false, message: message.lblBranchNotFound, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(clientId)
         const appointment = await db.model('appointment', appointmentSchema)
+        const updateData = { status: status }
+        if (status == "Arrived") {
+            updateData.arrivedAt = date
+        }
         const result = await appointment.
             findOneAndUpdate(
                 { _id: appointmentId, branchId: branchId, isActive: true, deletedAt: null },
-                { $set: { status: status } },
+                // { $set: { status: status } },
+                { $set: updateData },//date inserted by rahul
                 { returnDocument: 'after', new: true })
         if (result) {
             return { status: true, message: 'status Updated', statusCode: httpStatusCode.OK, data: result?._doc }
