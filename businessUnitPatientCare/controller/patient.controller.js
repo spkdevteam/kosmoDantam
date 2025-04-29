@@ -93,8 +93,11 @@ exports.createMainPatientByBusinessUnit = async (req, res, next) => {
         const newPatientInstance = await Patient.create({ ...profileUpdates2,isActive:true });
 
 
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const branch = await Branch.findById(newPatientInstance.branch);
+
         //saving the activity of creating a patient
-        await saveActivityLogFn({ patientId: newPatientInstance?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Created a patient", description: "Creating the patient, and saving activity log for it", data: newPatientInstance, status: true, dateTime: new Date(), clientId });
+        await saveActivityLogFn({ patientId: newPatientInstance?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Created a patient", description: `Patient registered at ${branch?.name} on ${formatDateForActivityLog(new Date())} at ${formatTimeForActivityLog(new Date())}`, data: newPatientInstance, status: true, dateTime: new Date(), clientId });
 
         return res.status(statusCode.OK).send({
             message: message.lblPatientCreatedSuccess,
@@ -198,8 +201,10 @@ exports.updatePatientByBusinessUnit = async (req, res, next) => {
         Object.assign(patient, dataObject);
         const savedPatient = await patient.save();
 
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const branch = await Branch.findById(savedPatient?.branch);
         //saving the activity of updating a patient
-        await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Updated details of a patient", description: "Updating a patient, and saving activity log for it", data: savedPatient, status: true, dateTime: new Date(), clientId });
+        await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId, buId: businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Updated details of a patient", description: `Updating a patient at ${branch?.name} on ${formatDateForActivityLog(new Date)} at ${formatTimeForActivityLog(new Date())}`, data: savedPatient, status: true, dateTime: new Date(), clientId });
 
         
         return res.status(statusCode.OK).send({
@@ -396,8 +401,12 @@ exports.activeinactivePatientByBusinessUnit = async (req, res, next) => {
         const savedPatient = await patient.save();
 
 
+
+        const Branch = clientConnection.model('branch', clinetBranchSchema);
+        const branch = await Branch.findById(savedPatient.branch);
+
         // saving the activity of activating or deactivating a patient
-        await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId: savedPatient?.branch, buId: savedPatient?.businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Toggling status of a patient", description: "Toggling a patient, and saving activity log for it", data: savedPatient, status: true, dateTime: new Date(), clientId });
+        await saveActivityLogFn({ patientId: savedPatient?._id, module: "patient", branchId: savedPatient?.branch, buId: savedPatient?.businessUnit, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Toggling status of a patient", description: `Toggling a patient at ${branch?.name} on ${formatDateForActivityLog(new Date())} at ${formatTimeForActivityLog(new Date())}`, data: savedPatient, status: true, dateTime: new Date(), clientId });
 
 
         this.listPatient(req, res)
@@ -479,6 +488,8 @@ const CustomError = require("../../utils/customeError");
 const getserialNumber = require("../../model/services/getserialNumber");
 const { default: mongoose } = require("mongoose");
 const saveActivityLogFn = require("../../businessUnitAdministration/services/activityLog/saveActivityLogFn");
+const formatDateForActivityLog = require("../../utils/formatDateForActivityLog");
+const formatTimeForActivityLog = require("../../utils/formatTimeForActivityLog");
 
 
 const commonIdCheck = async (data) => {
