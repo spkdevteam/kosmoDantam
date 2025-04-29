@@ -24,44 +24,27 @@ const getCaseSheetDashboardFN = async ({ clientId, buId, branchId, day }) => {
                 count: { $sum: 1 }
             }
         });
-        // queryPipeline.push({
-        //     $facet: {
-        //         statusCounts: [
-        //             {
-        //                 $project: {
-        //                     status: "$_id",
-        //                     count: 1,
-        //                     _id: 0
-        //                 }
-        //             }
-        //         ],
-        //         totalCount: [
-        //             {
-        //                 $group: {
-        //                     _id: null,
-        //                     total: { $sum: "$count" }
-        //                 }
-        //             }
-        //         ]
-        //     }
-        // });
-        // 2. Group by status
         queryPipeline.push({
-            $group: {
-                _id: "$status",
-                count: { $sum: 1 }
+            $facet: {
+                statusCounts: [
+                    {
+                        $project: {
+                            status: "$_id",
+                            count: 1,
+                            _id: 0
+                        }
+                    }
+                ],
+                totalCount: [
+                    {
+                        $group: {
+                            _id: null,
+                            total: { $sum: "$count" }
+                        }
+                    }
+                ]
             }
         });
-
-        // 3. Project to clean up
-        queryPipeline.push({
-            $project: {
-                Type: "$_id",
-                value: "$count",
-                _id: 0
-            }
-        });
-
         console.log("queryPipeline==>>", queryPipeline)
         const result = await caseSheets.aggregate(queryPipeline);
         // return {
@@ -71,50 +54,53 @@ const getCaseSheetDashboardFN = async ({ clientId, buId, branchId, day }) => {
         // } 
         console.log("resultresult==>>>>>", result)
         const fetchedCaseSheets = result[0]?.statusCounts || [];
-        if (!result || result[0]?.length < 1) {
+        if ( !result || result[0]?.length < 1) {
             return {
                 status: false,
                 message: "CaseSheets Count can't be fetched!!",
-                data: {},
+                data: [],
                 metadata: {},
             }
         }
-        //
-        const expectedStatuses = ['In Progress', 'Cancelled', 'Completed', 'Proposed'];
-        const dataMap = {};
-
-        // map existing results
-        result.forEach(item => {
-            dataMap[item.Type] = item.value;
-        });
-
-        // build final data array
-        const finalData = [];
-
-        // push expected statuses
-        expectedStatuses.forEach(status => {
-            finalData.push({
-                Type: status,
-                value: dataMap[status] || 0
-            });
-        });
-
-        // calculate total
-        const total = finalData.reduce((acc, curr) => acc + curr.value, 0);
-
-        // push total
-        finalData.push({
-            Type: 'Total Cases',
-            value: total
-        });
-
-
-        //
-        return { status: true, message: "CaseSheet counts fethced successfully!", data: finalData, metaData: {} }
+        returnData = [
+            {
+                Type:'Total Cases',
+                value: 0
+            },
+            {
+                Type:'Proposed',
+                value: 0
+            },
+            {
+                Type:'In Progress',
+                value: 0
+            },
+            {
+                Type:'Completed',
+                value: 0
+            },
+            {
+                Type:'Cancelled',
+                value: 0
+            },
+        ]
+        for (const r of returnData){
+            const index = result[0]?.statusCounts.findIndex(item => String(item.status) == String(r.Type))
+            if(index >-1 ){
+                r.value = result[0]?.statusCounts[index]?.count
+            }
+        }
+        // console.log("result[0]?.totalCount?.total",result[0]?.totalCount[0].total)
+        returnData[0].value = result[0]?.totalCount[0].total
+        const metaData = {
+            day : day ? day : null,
+            totalCount: returnData[0].value
+        }
+        return {status : true , message : "CaseSheet counts fethced successfully!" , data : returnData, metaData : metaData}
     }
     catch (error) {
         console.log("error", error?.message)
-        return { status: false, message: error?.message }
+        return { status: false, message: error?.message, data: [], metadata: {} }
     }
 }
 module.exports = getCaseSheetDashboardFN;
