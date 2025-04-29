@@ -8,8 +8,7 @@ const bcrypt = require("bcrypt");
 const { upsertTeeth } = require("./client/model/tooth.js");
 const { Server } = require('socket.io');
 const errorHandler = require("./middleware/errorHandler/errorHandler.js");
-
-const swaggerDocs = require("./documentation/swagger.js");
+ 
 const swaggerUi = require('swagger-ui-express');
 
 
