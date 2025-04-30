@@ -416,7 +416,7 @@ exports.updateChairStatusInprogress = async (req, res, next) => {
             res.json({ ...updateChairStatus });
         }
         else {
-            const updateAppointStatus = await updatePatientStatustoInprogress({ appointmentId: data?.appointmentId, clientId: data?.clientId, patientId: data?.patientId })
+            const updateAppointStatus = await updatePatientStatustoInprogress({ appointmentId: data?.appointmentId, clientId: data?.clientId, patientId: data?.patientId, date : data?.date })//date added by rahul
             if (!updateAppointStatus?.status) res.json({ ...updateAppointStatus })
                 else {
                     console.log(updateChairStatus,updateAppointStatus, '----------------------');
@@ -446,7 +446,7 @@ exports.updateChairCleared = async (req, res, next) => {
             res.json({ ...updateChairStatus })
         }
         else {
-            const updateAppointStatus = await updatePatientBookingCompleted({ appointmentId: data?.appointmentId, clientId: data?.clientId, patientId: data?.patientId })
+            const updateAppointStatus = await updatePatientBookingCompleted({ appointmentId: data?.appointmentId, clientId: data?.clientId, patientId: data?.patientId,date: data?.date })//date added by rahul
             if (!updateAppointStatus?.status) res.json({ ...updateAppointStatus })
                 else {
                    

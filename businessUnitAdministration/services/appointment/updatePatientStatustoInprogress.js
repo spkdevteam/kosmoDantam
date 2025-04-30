@@ -4,7 +4,7 @@ const { getClientDatabaseConnection } = require("../../../db/connection")
 const { validateObjectId } = require("../validate.serialNumber")
 const appointmentSchema = require("../../../client/model/appointments")
 
-const updatePatientStatustoInprogress = async ({ clientId, patientId, appointmentId }) => {
+const updatePatientStatustoInprogress = async ({ clientId, patientId, appointmentId, date }) => {
     try {
         if (!clientId) return { status: false, message: 'clientId is not valid' }
         if (!appointmentId) return { status: false, message: 'Appointment  is not valid' }
@@ -20,8 +20,12 @@ const updatePatientStatustoInprogress = async ({ clientId, patientId, appointmen
         
         if (selectedAppointment.status != 'Chair ready' && !selectedAppointment?.token) return { status: false, message: 'patient has not arrived yet ' }
         // else if (selectedAppointment.status != 'Chair ready' && selectedAppointment?.token) return { status: false, message: 'patient already consulted the doctor  ' }
-
-        const updateAppoinment = await Appointment.updateOne({_id:new mongoose.Types.ObjectId(appointmentId)},{$set:{status:'In-Progress'}})
+        const updateData = {status : 'In-Progress'}//added by rahul
+        if(date){
+            updateData.occupiedAt = date;
+        }
+        // const updateAppoinment = await Appointment.updateOne({_id:new mongoose.Types.ObjectId(appointmentId)},{$set:{status:'In-Progress'}})
+        const updateAppoinment = await Appointment.updateOne({_id:new mongoose.Types.ObjectId(appointmentId)},{$set : updateData})
         console.log(updateAppoinment,'updateAppoinment')
         if (updateAppoinment?.modifiedCount){
             return { status: true, message: 'chair is ready for patient   ' }
