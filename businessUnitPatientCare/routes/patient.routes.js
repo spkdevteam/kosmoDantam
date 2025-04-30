@@ -15,6 +15,7 @@ const {
     uploadPatient, 
 } = require('../../utils/multer');
 const getPatientsDetailsctrl = require("../../businessUnitAdministration/controller/patients/getPatientsDetailsctrl");
+const createMainPatientByBusinessUnit = require("../controller/patient/createMainPatientByBusinessUnitFn");
 
 
 // # create, update, view, list, activate/inactive, delete Patient by business unit routes starts here
@@ -40,7 +41,7 @@ router.post('/createPatient',entityAuth.authorizeEntity("Patient", "Patient", "c
         }
         next();
     });
-}, businessUnitPatientContrller.createMainPatientByBusinessUnit);
+}, createMainPatientByBusinessUnit);
 
 router.post('/createSubPatient', entityAuth.authorizeEntity("Patient", "Patient", "create"), businessUnitPatientContrller.createSubPatientByBusinessUnit);
 
