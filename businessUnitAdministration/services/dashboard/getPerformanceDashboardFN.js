@@ -121,6 +121,8 @@ const getPerformanceDashboardFN = async ({ clientId, buId, branchId, fromDate, t
                 if (['cancelled', 'rescheduled', 'completed'].includes(element?.status?.toLowerCase())) {
                     arrivalTime = new Date(element?.arrivedAt);
                     depertureTime = new Date(element?.updatedAt);
+                    console.log("arrivalTime==>>",arrivalTime);
+                    console.log("depertureTime==>>>",depertureTime)
                     const differenceInMillis = depertureTime.getTime() - arrivalTime.getTime();
                     const differenceInMins = differenceInMillis / (1000 * 60);
                     totalDifferenceInMins += differenceInMins;

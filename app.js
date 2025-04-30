@@ -8,8 +8,7 @@ const bcrypt = require("bcrypt");
 const { upsertTeeth } = require("./client/model/tooth.js");
 const { Server } = require('socket.io');
 const errorHandler = require("./middleware/errorHandler/errorHandler.js");
-
-const swaggerDocs = require("./documentation/swagger.js");
+ 
 const swaggerUi = require('swagger-ui-express');
 
 
@@ -158,7 +157,7 @@ app.use("/api/client/bu/booking", bookingRoutes)
 app.use("/api/client/bu/leave", leaveRouter)
 app.use("/api/client/bu/prescription", priscriptionRouter)
 app.use('/initialise',utilsRouter)
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
+
 app.use('/api/client/bu/businessUnit', businessUnitRouter.router)
 app.use('/api/client/bu/activityLog', activityLogRouter);
 app.use('/api/client/bu/dashboard', dashboardRouter)

@@ -628,7 +628,7 @@ exports.filterBookingWithfromToDateAndKeyWord = async (input) => {
                 $limit: parseInt(perPage)
             }
         ]);
-
+        
         return { status: true, message: 'Success', data: out }
     } catch (error) {
         return { status: false, message: error.message }
