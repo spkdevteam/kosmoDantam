@@ -293,8 +293,6 @@ exports.activeinactiveBranchByBusinessUnit = async (req, res) => {
         req.query.page = page;
         req.query.perPage = perPage;
         req.query.clientId = clientId;
-
-
         // Validate inputs
         if (!clientId || !branchId) {
             return res.status(400).send({
