@@ -14,6 +14,7 @@ const caseSheetService = require("../services/caseSheet.service");
 const CustomError = require("../../utils/customeError");
 const { update } = require("../../businessUnitAdministration/controller/service.controller");
 const { default: mongoose } = require("mongoose");
+const devLogFaliure = require("../../middleware/devLog/devLogFaliure");
 
 
 
@@ -700,6 +701,17 @@ exports.createServices = async (req, res, next) => {
         const newCheifComplaint = await caseSheetService.createService(clientId, isDrafted, {
             patientId, branchId, businessUnitId, createdBy: mainUser?._id, services, displayId: serialNumber,
         });
+        if (newCheifComplaint?.status == false) {
+                    req.faliure = {}
+                    req.faliure.data = newCheifComplaint?.data;
+                    const rawIp =
+                        req.headers['x-forwarded-for']?.split(',').shift() ||
+                        req.socket?.remoteAddress ||
+                        req.ip;
+                    const userIp = rawIp == '::1' ? '127.0.0.1' : rawIp;
+                    req.faliure.ip = userIp;
+                    await devLogFaliure(req, res, () => { });
+                }
         return res.status(statusCode.OK).send({
             message: message.lblServicesCreatedSuccess,
             data: { services: newCheifComplaint.services, _id: newCheifComplaint._id, caseSheets: newCheifComplaint },

@@ -4,6 +4,7 @@ const serviceSchema = require("../../../client/model/service")
 const getUnbilledItemsFromCaseSheetFn = async ({ clientId, caseSheetId }) => {
     try {
         //db connection:
+        const faliureReturn = [];
         const db = await getClientDatabaseConnection(clientId);
         const CaseSheetModelObj = await db.model('caseSheet', caseSheetSchema);
         const ServiceModelObj = await db.model('service', serviceSchema);
@@ -18,54 +19,60 @@ const getUnbilledItemsFromCaseSheetFn = async ({ clientId, caseSheetId }) => {
                     //fix:=>
                     // const serviceDetails = await ServiceModelObj.findOne({ _id: serviceObj?.service?.serviceName?.servId, deletedAt: null });
                     const serviceDetails = await ServiceModelObj.findOne({ _id: serviceObj?.service?.serviceId, deletedAt: null });
-                    if (!serviceDetails) return { status: false, message: "Service doesn't exist or deleted!!" }
+                    if (!serviceDetails) {
+                        faliureReturn.push({
+                            tooth: toothEntry?.tooth,
+                            serviceName: serviceObj?.service?.serviceName,
+                            serviceEntryId: serviceObj?._id
+                        })
+                        return { status: false, message: "Service doesn't exist or deleted!!", faliure: faliureReturn }
+                    }
                     //console.log("serviceDetailsserviceDetails=>>", serviceDetails); //_id, serviceName
                     // Check if entry with all 3 params exists
                     const existingIndex = returnData.findIndex(
-                            (item) =>
-                                item.serviceId.toString() === serviceDetails._id.toString() &&
-                                item.unitPrice === serviceObj.service.unitPrice &&
-                                // item.discount === serviceObj.service.discount
-                                item.discount === parseFloat(serviceObj?.service?.discount?.toFixed(2))||0.00
+                        (item) =>
+                            item.serviceId.toString() === serviceDetails._id.toString() &&
+                            item.unitPrice === serviceObj.service.unitPrice &&
+                            // item.discount === serviceObj.service.discount
+                            item.discount === parseFloat(serviceObj?.service?.discount?.toFixed(2)) || 0.00
                     );
                     if (existingIndex !== -1) {//if found
-                       returnData[existingIndex].toothArray.push(toothEntry?.tooth);
-                       returnData[existingIndex].estimateNumber.push(serviceObj?.service?.estimateId);
-                      }
+                        returnData[existingIndex].toothArray.push(toothEntry?.tooth);
+                        returnData[existingIndex].estimateNumber.push(serviceObj?.service?.estimateId);
+                    }
                     else {
                         returnData.push({
                             serviceId: serviceDetails._id,
                             serviceName: serviceDetails.serviceName,
                             unitPrice: parseFloat(serviceObj.service.unitPrice.toFixed(2)),
                             // discount: serviceObj.service.discount,
-                            discount: parseFloat(serviceObj?.service?.discount?.toFixed(2))||0.00,
+                            discount: parseFloat(serviceObj?.service?.discount?.toFixed(2)) || 0.00,
                             //                         "_id": {
                             //     "$oid": "67a32f5a074ac38a6f71a928"    /////??????
                             //   }
-                            estimateNumber : [serviceObj?.service?.estimateId],
-                            toothArray : [toothEntry?.tooth],
-                            quantity : 0,//calculate dynamically outside
-                            taxableValue : 0,//hardcoded
-                            cgst : 0,//hardcoded
-                            sgst : 0,//hardcoded
-                            igst : 0,//hardcoded
-                            total : 0,//calculate dynamically outside
+                            estimateNumber: [serviceObj?.service?.estimateId],
+                            toothArray: [toothEntry?.tooth],
+                            quantity: 0,//calculate dynamically outside
+                            taxableValue: 0,//hardcoded
+                            cgst: 0,//hardcoded
+                            sgst: 0,//hardcoded
+                            igst: 0,//hardcoded
+                            total: 0,//calculate dynamically outside
 
                         });
-                      }
+                    }
                 }
             }
         }
         //calculting total :
-        for (const returnElement of returnData)
-        {   
+        for (const returnElement of returnData) {
             const totalAmt = (returnElement.unitPrice * returnElement.toothArray.length);
             const totalDiscount = (returnElement.discount * returnElement.toothArray.length);
             returnElement.total = parseFloat(totalAmt.toFixed(2)) - parseFloat(totalDiscount.toFixed(2));
             returnElement.quantity = returnElement.toothArray.length;
         }
         console.log("returnData=>>", returnData);
-        return {status : true, message : "Unbilled Items fetched successfully", itemKart : returnData}
+        return { status: true, message: "Unbilled Items fetched successfully", itemKart: returnData }
 
     }
     catch (error) {
