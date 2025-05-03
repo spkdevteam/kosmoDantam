@@ -25,6 +25,7 @@ const migrationIntoTreatmentData3 = require("../controller/caseSheet/migrationIn
 const updateCaseSheetWithInvoiceNumber = require("../controller/caseSheet/updateCaseSheetWithInvoiceNumber");
 const getCaseSheetDetailsctrl = require("../../businessUnitAdministration/controller/caseSheet/getCaseSheetDetailsctroler");
 const reverseUpdateCaseSheetWithInvoiceNumber = require("../controller/caseSheet/reverseUpdateCaseSheetWithInvoiceNumber");
+const { tempAuthorizeEntity } = require("../../middleware/authorization/commonEntityAuthorization/tempUserValidation");
 
 
 
@@ -160,6 +161,7 @@ router.post('/deleteProcedure', entityAuth.authorizeEntity("Patient", "Case Shee
 // remove from draft
 router.post('/removeAsDraft',
     // entityAuth.authorizeEntity("Patient", "Case Sheet", "create"),
+    tempAuthorizeEntity("Patient", "Case sheet", "create"),
     caseSheetController.removeAsDraft)//middleware
 router.post('/updateCaseSheet',entityAuth.authorizeEntity("Patient", "Case Sheet", "create"),caseSheetController.updateCaseSheet)
 

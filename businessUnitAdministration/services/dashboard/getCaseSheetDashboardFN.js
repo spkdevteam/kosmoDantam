@@ -85,16 +85,16 @@ const getCaseSheetDashboardFN = async ({ clientId, buId, branchId, day }) => {
             },
         ]
         for (const r of returnData){
-            const index = result[0]?.statusCounts.findIndex(item => String(item.status) == String(r.Type))
+            const index = result[0]?.statusCounts?.findIndex(item => String(item.status) == String(r.Type))
             if(index >-1 ){
                 r.value = result[0]?.statusCounts[index]?.count
             }
         }
         // console.log("result[0]?.totalCount?.total",result[0]?.totalCount[0].total)
-        returnData[0].value = result[0]?.totalCount[0].total
+        returnData[0].value = result[0]?.totalCount[0]?.total || 0
         const metaData = {
             day : day ? day : null,
-            totalCount: returnData[0].value
+            totalCount: returnData[0]?.value
         }
         return {status : true , message : "CaseSheet counts fethced successfully!" , data : returnData, metaData : metaData}
     }

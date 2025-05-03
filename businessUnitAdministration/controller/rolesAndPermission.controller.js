@@ -314,11 +314,26 @@ exports.listRolesAndPermission = async (req, res) => {
                 for (const m of pushMenu){
                     m.access = true
                 }
-                const pushObj = {
-                    name: "Dashboard",
-                    access: false,
-                    menu: pushMenu
+                let pushObj = {}
+                if(r.id == 2){
+                    pushObj = {
+                        name: "Dashboard",
+                        access: true,
+                        menu: pushMenu
+                    }
                 }
+                else{
+                    pushObj = {
+                        name: "Dashboard",
+                        access: false,
+                        menu: pushMenu
+                    }
+                }
+                // const pushObj = {
+                //     name: "Dashboard",
+                //     access: false,
+                //     menu: pushMenu
+                // }
                 
                 r.capability.push(pushObj)
                 isUpdated = true;

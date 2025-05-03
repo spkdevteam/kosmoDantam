@@ -15,9 +15,7 @@ const create = async (clientId, data) => {
         const clientConnection = await getClientDatabaseConnection(clientId);
         const User = clientConnection.model('clientUsers', clinetUserSchema);
         const existing = await User.findOne({
-            $or: [{ email: data.email },
-            { phone: data?.phone }
-            ],
+            $or: [{ phone: data?.phone }],
         });
         if (existing) {
             throw new CustomError(statusCode.Conflict, message.lblPatientAlreadyExists);

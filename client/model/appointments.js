@@ -22,6 +22,9 @@ const appointmentSchema = new mongoose.Schema({
     chiefComplaint: { type:String },
     isActive: { type: Boolean, default: true }, 
     deletedAt: { type: Date, default: null }, 
+    arrivedAt: { type: Date, default: null },//created by rahul
+    occupiedAt : { type: Date, default: null },//created by rahul
+    unOccupiedAt : { type: Date, default: null },//created by rahul
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "clientUsers", default: null, index: true },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "clientUsers", default: null, index: true },
     deletedBy: { type: mongoose.Schema.Types.ObjectId, ref: "clientUsers", default: null, index: true }

@@ -26,8 +26,17 @@ const {list} = require('../services/prescription.service')
 exports.createPrescription = async (req, res, next) => {
     try {
         const mainUser = req.user;
-        const data =await sanitizeBody(req.body)
+        const data = await sanitizeBody(req.body);
+    
         const result = await prescriptionService.create({...data, id: mainUser?._id });
+
+        const clientConnection = await getClientDatabaseConnection(data?.clientId);
+        const Branch = await clientConnection.model('branch', clinetBranchSchema);
+        const branch = await Branch.findById(result?.data?.branchId);
+
+
+        //saving the activity of creating a prescription
+        await saveActivityLogFn({ patientId: result?.data?.patientId, module: "Prescription", branchId: result?.data?.branchId, buId: result?.data?.buId, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Creating a prescription", description: `Prescription created at ${branch?.name} on ${formatDateForActivityLog(new Date())}`, data: result?.data, status: true, dateTime: new Date(), clientId: data?.clientId });
         res.json(result)
     } catch (error) {
         next(error)
@@ -153,6 +162,8 @@ exports.listPrescription = async (req, res, next) => {
 
 const CustomError = require("../../utils/customeError");
 const sanitizeBody = require("../../utils/sanitizeBody");
+const formatDateForActivityLog = require("../../utils/formatDateForActivityLog");
+const saveActivityLogFn = require("../../businessUnitAdministration/services/activityLog/saveActivityLogFn");
 
 
 const commonIdCheck = async (data) => {
