@@ -608,7 +608,15 @@ const createService = async (clientId, isDrafted, data) => {
             for (const serviceItem of newServices) {
                 let { tooth, service } = serviceItem;
                 const getServiceName = await Service.findOne({ _id: service?.servId, deletedAt: null });
-                if (!getServiceName) return { status: false, message: "Service doesn't exist!!" };
+                if (!getServiceName) {
+                    const errorReturn = [{
+                        newServices: newServices,
+                        data: data
+                    }
+                    ]
+                    return { status: false, data: errorReturn }
+                    // return { status: false, message: "Service doesn't exist!!" };
+                }
                 tooth.forEach(t => {
                     if (treatmentMap.has(t)) {
                         // Update existing tooth services
@@ -616,6 +624,14 @@ const createService = async (clientId, isDrafted, data) => {
                         // let serviceExists = existingToothData.service.some(s => s.service.serviceName === service.servId.serviceName);
                         let serviceExists = existingToothData.service.some(s => String(s.service.serviceName) === String(getServiceName?.serviceName));//fix
                         if (!serviceExists) {
+                            if (!getServiceName?.serviceName || !service?.servId) {//sending to devLog
+                                const errorReturn = [{
+                                    newServices: newServices,
+                                    data: data
+                                }
+                                ]
+                                return { status: false, data: errorReturn }
+                            }
                             existingToothData.service.push({
                                 // service: { serviceName: service.servId.serviceName },
                                 service: { serviceName: String(getServiceName?.serviceName), serviceId: service?.servId },//fix
@@ -625,6 +641,14 @@ const createService = async (clientId, isDrafted, data) => {
                         }
                     } else {
                         // Add new tooth entry
+                        if (!getServiceName?.serviceName || !service?.servId) {//sending to devLog
+                            const errorReturn = [{
+                                newServices: newServices,
+                                data: data
+                            }
+                            ]
+                            return { status: false, data: errorReturn }
+                        }
                         treatmentMap.set(t, {
                             tooth: t,
                             service: [
