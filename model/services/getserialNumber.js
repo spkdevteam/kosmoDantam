@@ -23,13 +23,21 @@ const getserialNumber = async (collection, clientId, branchId, buid) => {
         }
         else {//serialNumber document for the collectionName can't be found in DB so creating new one
             console.log(`serialNumber document for the collectionName : ' ${collection} ' can't be found in DB so creating new one`);
-            const insertNewResult = await serialNumber.insertOne(
+            const insertNewResult = await serialNumber.updateOne(
                 {
                     collectionName: collection,
-                    nextNum: 1000001,
-                    prefix: branchDetails?.branchPrefix
-                });
-            // console.log("after insertion=>>", insertNewResult);
+                },
+                {
+                    $set: {
+                        nextNum: 1000001,
+                        prefix: branchDetails?.branchPrefix
+                    }
+                },
+                {
+                    upsert:true
+                }
+            );
+             console.log("after insertion=>>", insertNewResult);
 
             if (insertNewResult) {
                 console.log("uopdate");
