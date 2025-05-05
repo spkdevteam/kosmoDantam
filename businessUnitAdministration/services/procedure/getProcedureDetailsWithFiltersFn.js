@@ -66,7 +66,8 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
                         { displayId: { $regex: word, $options: "i" } },
                     ]),
                 };
-            };
+            }
+            ;
         };
 
         // Apply filters only if parameters exist
