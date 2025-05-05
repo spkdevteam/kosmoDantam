@@ -84,13 +84,13 @@ const getPatientsDetailsFn = async ({ from_Date = null, toDate = null, SearchKey
         let dateSearchKey = {};
 
         if (from_Date || toDate) {
-            dateSearchKey.createdAt = {};
+            dateSearchKey = { createdAt: {} };
 
             if (from_Date) {
-                dateSearchKey.createdAt.$gte = new Date(from_Date);
+                dateSearchKey.createdAt.$gte = new Date(`${from_Date}T00:00:00.000Z`);
             }
             if (toDate) {
-                dateSearchKey.createdAt.$lte = new Date(toDate);
+                dateSearchKey.createdAt.$lte = new Date(`${toDate}T23:59:59.999Z`);
             }
         }
         //establishing db connection :

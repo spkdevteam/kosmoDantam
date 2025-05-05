@@ -105,8 +105,8 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
         let dateSearchKey = {};
         if (fromDate || toDate) {
             dateSearchKey = { createdAt: {} };
-            if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
-            if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
+            if (fromDate) dateSearchKey.createdAt.$gte = new Date(`${fromDate}T00:00:00.000Z`);
+            if (toDate) dateSearchKey.createdAt.$lte = new Date(`${toDate}T23:59:59.999Z`);
             if (nextVisitDate) dateSearchKey.nextVisitDateSearchKey = new Date(nextVisitDate);
         }
 
@@ -118,6 +118,7 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
                 ...branchIdSearchKey,
                 ...doctorIdSearchKey,
                 ...patientIdIdSearchKey,
+                ...dateSearchKey,
                 ...caseSheetIdSearchKey,
                 ...createdUserSearchKey,
                 ...updatedUserSearchKey,
@@ -160,6 +161,7 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
             ...branchIdSearchKey,
             ...doctorIdSearchKey,
             ...patientIdIdSearchKey,
+            ...dateSearchKey,
             ...caseSheetIdSearchKey,
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
@@ -197,6 +199,7 @@ const getPrescriptionDetailsWithFiltersFn = async ({ page = null, perPage = null
             ...branchIdSearchKey,
             ...doctorIdSearchKey,
             ...patientIdIdSearchKey,
+            ...dateSearchKey,
             ...caseSheetIdSearchKey,
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
