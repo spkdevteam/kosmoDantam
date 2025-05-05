@@ -89,8 +89,8 @@ const getMetricsDashboardFN = async ({ clientId, buId, branchId, day }) => {
         const filterQueryRegistrationToday = {
             deletedAt: null,
         };
-        if (buId) filterQueryRegistrationToday.buId = new mongoose.Types.ObjectId(buId);
-        if (branchId) filterQueryRegistrationToday.branchId = new mongoose.Types.ObjectId(branchId);
+        if (buId) filterQueryRegistrationToday.businessUnit = new mongoose.Types.ObjectId(buId);
+        if (branchId) filterQueryRegistrationToday.branch = new mongoose.Types.ObjectId(branchId);
         filterQueryRegistrationToday.createdAt = {};
         filterQueryRegistrationToday.createdAt.$gte = new Date(`${day}T00:00:00.000Z`);
         filterQueryRegistrationToday.createdAt.$lte = new Date(`${day}T23:59:59.999Z`);
@@ -101,8 +101,8 @@ const getMetricsDashboardFN = async ({ clientId, buId, branchId, day }) => {
         const filterQueryRegistrationMonth = {
             deletedAt: null,
         };
-        if (buId) filterQueryRegistrationMonth.buId = new mongoose.Types.ObjectId(buId);
-        if (branchId) filterQueryRegistrationMonth.branchId = new mongoose.Types.ObjectId(branchId);
+        if (buId) filterQueryRegistrationMonth.businessUnit = new mongoose.Types.ObjectId(buId);
+        if (branchId) filterQueryRegistrationMonth.branch = new mongoose.Types.ObjectId(branchId);
         filterQueryRegistrationMonth.createdAt = {};
         console.log("totalDaysInMonth==>>",totalDaysInMonth)
         filterQueryRegistrationMonth.createdAt.$gte = firstDayOfMonth.toISOString();

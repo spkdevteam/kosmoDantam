@@ -993,10 +993,12 @@ const updateService = async (clientId, caseSheetId, isDrafted, data) => {
 
             // newServices.forEach(serviceItem => {
             for (const serviceItem of newServices) {//fix->replaced forEach with for-of as async needed 
-                let { tooth, service, rate, department, prposedDate, discount } = serviceItem;
+                let { tooth, service, rate, department, prposedDate, discount, quaintity } = serviceItem;
                 const teethCount = parseInt(serviceItem?.tooth?.length);
-                if (teethCount == 0) return { status: false, message: "Atleast one tooth is required" };
-                const discountForEachTooth = (discount / teethCount);
+                // if (teethCount == 0) return { status: false, message: "Atleast one tooth is required" };
+                // const discountForEachTooth = (discount / teethCount);
+                if (quaintity < 1) return { status: false, message: "Atleast one tooth is required" };
+                const discountForEachTooth = (discount / quaintity);//as per client request(client is switching the values of no_of_teet and price)!!
                 // tooth.forEach(t => {
                 for (const t of tooth) {//fix->replaced forEach with for-of as async needed 
                     if (treatmentMap[t]) {
@@ -2835,10 +2837,13 @@ const updateDraft = async (clientId, caseSheetId, data) => {
         });
 
         newServices.forEach(serviceItem => {
-            let { tooth, service, rate, department, prposedDate, discount } = serviceItem;
+            let { tooth, service, rate, department, prposedDate, discount, quaintity } = serviceItem;
             const teethCount = parseInt(serviceItem?.tooth?.length);
-            if (teethCount == 0) return { status: false, message: "Atleast one tooth is required" };
-            const discountForEachTooth = (discount / teethCount);
+            // if (teethCount == 0) return { status: false, message: "Atleast one tooth is required" };
+            // const discountForEachTooth = (discount / teethCount);
+            if (quaintity < 1) return { status: false, message: "Atleast one tooth is required" };//as per client request(client is switching the values of no_of_teet and price)!!
+            const discountForEachTooth = (discount / quaintity);
+
             tooth.forEach(t => {
                 if (treatmentMap[t]) {
                     // Update existing tooth services
@@ -3263,12 +3268,14 @@ const caseSheetOverView = async ({ clientId, patientId }) => {
         const chair = db.model('chair', clinetChairSchema);
         const User = await db.model('clientUsers', clinetUserSchema);
         const patientregister = db.model('patient', clinetPatientSchema);
+        console.log(" clientId, patientId clientId, patientId clientId, patientId clientId, patientId clientId, patientId clientId, patientId clientId, patientId clientId, patientId clientId, patientId==>>", clientId, patientId)
         const result = await CaseSheet.findOne({
             patientId: new mongoose.Types.ObjectId(patientId),
             status: { $in: ['In Progress', 'Proposed'] },
             isActive: true,
             deletedAt: null,
         });
+        console.log("resultresultresult==>>>",result)
         const latestAppointment = await appointment.find({
             patientId: new mongoose.Types.ObjectId(patientId),
             isActive: true,
