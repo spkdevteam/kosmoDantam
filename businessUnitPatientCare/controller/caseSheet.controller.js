@@ -14,6 +14,9 @@ const caseSheetService = require("../services/caseSheet.service");
 const CustomError = require("../../utils/customeError");
 const { update } = require("../../businessUnitAdministration/controller/service.controller");
 const { default: mongoose } = require("mongoose");
+const saveActivityLogFn = require("../../businessUnitAdministration/services/activityLog/saveActivityLogFn");
+const caseSheetSchema = require("../../client/model/caseSheet");
+const formatDateForActivityLog = require("../../utils/formatDateForActivityLog");
 const devLogFaliure = require("../../middleware/devLog/devLogFaliure");
 
 
@@ -60,6 +63,18 @@ exports.markedAsCompletedCaseSheet = async (req, res, next) => {
         }
 
         const updated = await caseSheetService.markedCompleted(clientId, caseSheetId);
+
+        const clientConnection = await getClientDatabaseConnection(clientId);
+        //const casesheet = await CaseSheet.findById(caseSheetId);
+        const Branch = await clientConnection.model('branch', clinetBranchSchema);
+        const branch = await Branch.findById(updated?.branchId);
+
+
+
+        //saving the activity of completing a case sheet
+        await saveActivityLogFn({ patientId: updated?.patientId, module: "CaseSheet", branchId: updated?.branchId, buId: updated?.buId, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Completing a case sheet", description: `Casehseet completed at ${branch?.name} on ${formatDateForActivityLog(new Date())}`, data: updated, status: true, dateTime: new Date(), clientId });
+
+
         return res.status(statusCode.OK).send({
             message: "Last case sheet completed successfully",
             data: { caseSheets: updated._id },
@@ -975,6 +990,7 @@ exports.deleteProcedure = async (req, res, next) => {
 exports.removeAsDraft = async (req, res, next) => {
     try {
         const { clientId, caseSheetId } = req.body;
+        const mainUser = req?.user;
         if (!clientId) {
             return res.status(statusCode.BadRequest).send({
                 message: message.lblClinetIdIsRequired,
@@ -988,6 +1004,19 @@ exports.removeAsDraft = async (req, res, next) => {
         const update = await caseSheetService.updateDraft(clientId, caseSheetId, {
             drafted: false
         });
+
+
+
+        const db = await getClientDatabaseConnection(clientId);
+        const Branch = await db.model('branch', clinetBranchSchema);
+        const branch = await Branch.findById(update?.branchId);
+
+        console.log(update, "<---------updateeeeeee")
+
+        await saveActivityLogFn({ patientId: update?.patientId, module: "CaseSheet", branchId: update?.branchId, buId: update?.buId, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Proposing a casesheet", description: `Casesheet proposed at ${branch?.name} on ${formatDateForActivityLog(new Date())}`, data: update, status: true, dateTime: new Date(), clientId });
+
+
+
         return res.status(statusCode.OK).send({
             message: message.lblCaseSheetCreatedSuccess,
             data: { caseSheetId: update?._id }
@@ -1215,6 +1244,7 @@ exports.getParticularCaseSheetbyPatient = async (req, res, next) => {
 
 exports.deleteCaseSheet = async (req, res, next) => {
     try {
+        const mainUser = req?.user;
         const { clientId, caseSheetId } = req.params;
         if (!clientId || !caseSheetId) {
             return res.status(400).send({
@@ -1222,6 +1252,20 @@ exports.deleteCaseSheet = async (req, res, next) => {
             });
         }
         const caseSheet = await caseSheetService.deleteCaseSheet(clientId, caseSheetId);
+
+
+        // const db = await getClientDatabaseConnection(clientId);
+        // const CaseSheet = await db.model('caseSheet', caseSheetSchema);
+
+        // const CasesheetForActivityLog = await CaseSheet.findById(caseSheetId);
+        // const Branch = await db.model('branch', clinetBranchSchema);
+        // const branch = await Branch.findById(CasesheetForActivityLog?.branchId);
+
+
+
+        // //saving activity while deleting(cancelling) case sheet
+        // await saveActivityLogFn({ patientId: CasesheetForActivityLog?.patientId, module: "Casesheet", branchId: CasesheetForActivityLog?.branchId, buId: CasesheetForActivityLog?.buId, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Cancelling a casesheet", description: `Casesheet cancelled at ${branch?.name} on ${formatDateForActivityLog(new Date())}`, data: CasesheetForActivityLog, status: true, dateTime: new Date(), clientId });
+
         return res.status(200).send({
             message: message.lblCaseSheetFoundSucessfully,
             data: caseSheet,
@@ -1334,6 +1378,16 @@ exports.updateTreatmentAndCloseCaseSheet = async (req, res, next) => {
             });
         }
         const updated = await caseSheetService.updateTreatmentAndCloseCase(clientId, caseSheetId, treatmentData);
+
+        const db = await getClientDatabaseConnection(clientId);
+        const Branch = await db.model('branch', clinetBranchSchema);
+        const branch = await Branch.findById(updated?.branchId);
+
+
+        //saving the activity while completing a case sheet
+        await saveActivityLogFn({ patientId: updated?.patientId, module: "CaseSheet", branchId: updated?.branchId, buId: updated?.buId, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Completing a casesheet", description: `Casesheet completed at ${branch?.name} on ${formatDateForActivityLog(new Date())}`, data: updated, status: true, dateTime: new Date(), clientId });
+
+
         return res.status(statusCode.OK).send({
             message: message.lblProcedureUpdatedSuccess,
             data: { caseSheets: updated },
@@ -1360,6 +1414,15 @@ exports.closeCaseSheet = async (req, res, next) => {
             });
         }
         const updated = await caseSheetService.closeCase(clientId, caseSheetId);
+
+        const db = await getClientDatabaseConnection(clientId);
+        const Branch = await db.model('branch', clinetBranchSchema);
+        const branch = await Branch.findById(updated?.branchId);
+
+
+        //saving the activity while closing a case sheet
+        await saveActivityLogFn({ patientId: updated?.patientId, module: "CaseSheet", branchId: updated?.branchId, buId: updated?.buId, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "Completing a casesheet", description: `Casesheet completed at ${branch?.name} on ${formatDateForActivityLog(new Date())}`, data: updated, status: true, dateTime: new Date(), clientId });
+
         return res.status(statusCode.OK).send({
             message: message.lblProcedureUpdatedSuccess,
             data: { caseSheets: updated },

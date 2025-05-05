@@ -66,7 +66,8 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
                         { displayId: { $regex: word, $options: "i" } },
                     ]),
                 };
-            };
+            }
+            ;
         };
 
         // Apply filters only if parameters exist
@@ -83,9 +84,10 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
         let dateSearchKey = {};
         if (fromDate || toDate) {
             dateSearchKey = { createdAt: {} };
-            if (fromDate) dateSearchKey.createdAt.$gte = new Date(fromDate);
-            if (toDate) dateSearchKey.createdAt.$lte = new Date(toDate);
+            if (fromDate) dateSearchKey.createdAt.$gte = new Date(`${fromDate}T00:00:00.000Z`);
+            if (toDate) dateSearchKey.createdAt.$lte = new Date(`${toDate}T23:59:59.999Z`);
         }
+        console.log(dateSearchKey,'<<<<dateSearchKey')
 
 
 
@@ -96,6 +98,7 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
                 ...businessSearchKey,
                 ...branchIdSearchKey,
                 ...departmentSearchkey,
+                ...dateSearchKey,
                 ...serviceSearchKey,
                 ...createdUserSearchKey,
                 ...updatedUserSearchKey,
@@ -137,6 +140,7 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
             ...branchIdSearchKey,
             ...departmentSearchkey,
             ...serviceSearchKey,
+            ...dateSearchKey,
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,
@@ -172,6 +176,7 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
             ...branchIdSearchKey,
             ...departmentSearchkey,
             ...serviceSearchKey,
+            ...dateSearchKey,
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,

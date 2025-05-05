@@ -99,8 +99,8 @@ const getChairDetailsWithFiltersFn = async ({ page = null, perPage = null, searc
           
           if (fromDate || toDate) {
             filterQuery.createdAt = {};
-            if (fromDate) filterQuery.createdAt.$gte = new Date(fromDate);
-            if (toDate) filterQuery.createdAt.$lte = new Date(toDate);
+            if (fromDate) filterQuery.createdAt.$gte = new Date(`${fromDate}T00:00:00.000Z`);
+            if (toDate) filterQuery.createdAt.$lte = new Date(`${toDate}T23:59:59.999Z`);
           }
           
 

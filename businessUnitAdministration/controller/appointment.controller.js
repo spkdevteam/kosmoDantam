@@ -7,11 +7,27 @@ const { createToken } = require("../services/token.service")
 const httpStatusCode = require("../../utils/http-status-code")
 const message = require("../../utils/message")
 const { validateObjectId } = require("../services/validate.serialNumber")
+const { getClientDatabaseConnection } = require("../../db/connection")
+const clinetBranchSchema = require("../../client/model/branch")
+const formatDateForActivityLog = require("../../utils/formatDateForActivityLog")
+const saveActivityLogFn = require("../services/activityLog/saveActivityLogFn")
 
 exports.postcreateBooking = async (req, res, next) => {
     try {
+        const mainUser = req?.user;
         const data = await sanitizeBody(req.body)
-        const result = await appointmentServices.creatAppointment(data)
+        data.user = mainUser?._id;
+        const result = await appointmentServices.creatAppointment(data);
+
+
+        const db = await getClientDatabaseConnection(data?.clientId);
+        const Branch = await db.model('branch', clinetBranchSchema);
+        const branch = await Branch.findById(result?.data?.branchId);
+
+
+        await saveActivityLogFn({ patientId: result?.data?.patientId, module: "Appointment", branchId: result?.data?.branchId, buId: result?.data?.buId, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: "An appointment created", description: `Appointment created at ${branch?.name} on ${formatDateForActivityLog(new Date())}`, data: result?.data, status: true, dateTime: new Date(), clientId: data?.clientId });
+
+
         res.status(result?.statusCode).json(result)
     } catch (error) {
         next(error)
@@ -98,7 +114,9 @@ exports.getAvailability = async (req, res, next) => {
 
 exports.delete = async (req, res, next)=>{
     try {
+        const mainUser = req?.user;
         const data = await sanitizeBody(req.query)
+        data.user = mainUser?._id;
         const result = await appointmentServices.delete(data)
         res.status(200).json(result)
     } catch (error) {
@@ -144,8 +162,22 @@ exports.filterBookingDetails = async (req,res,next)=>{
 
 exports.changeBookingStatus = async (req, res, next)=>{
     try {
+        const mainUser = req?.user;
         const data = await sanitizeBody(req.body)
-        const result = await appointmentServices.changeBookingStatus(data)
+        data.user = mainUser?._id;
+        const result = await appointmentServices.changeBookingStatus(data);
+
+
+        const db = await getClientDatabaseConnection(data?.clientId);
+        const Branch = await db.model('branch', clinetBranchSchema);
+        const branch = await Branch.findById(result?.data?.branchId);
+
+
+        if(data?.status == 'Completed' || data?.status == 'Arrived'){
+        //saving the activity of completing a Treatment
+        await saveActivityLogFn({ patientId: result?.data?.patientId, module: "Appointment", branchId: result?.data?.branchId, buId: result?.data?.buId, userId: mainUser?._id, ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress, sourceLink: req.headers['x-frontend-path'], activity: data?.status == 'Completed' ? "Completing an appointment" : "Patient has arrived", description: data?.status == 'Completed' ? `Appointment completed at ${branch?.name} on ${formatDateForActivityLog(new Date())}` : `Patient has arrived ${branch?.name} on ${formatDateForActivityLog(new Date())}`, data: result?.data, status: true, dateTime: new Date(), clientId: data?.clientId });
+        }
+
         res.status(200).json(result)
         
     } catch (error) {

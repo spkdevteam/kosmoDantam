@@ -42,12 +42,16 @@ const generateAvailabiltyChart = async (input) => {
             }
         ]);
 
+        out?.map((e) => {
+            console.log(e, "<---fromgetAvaialabilityChart")
+        })
+
 
 
         out?.map((item) => {
-            bookedDoctors.add(item?.dutyDoctorId)
-            bookedChairs.add(item?.chairId)
-            bookedAssistants.add(item?.dentalAssistant)
+            bookedDoctors.add(item?.dutyDoctorId?.toString())
+            bookedChairs.add(item?.chairId?.toString())
+            bookedAssistants.add(item?.dentalAssistant?.toString())
             //  bookedSpecialist.add(JSON.stringify(item.specialistDoctorId).slice(1,JSON.stringify( item.specialistDoctorId)?.length-1)) 
         })
 

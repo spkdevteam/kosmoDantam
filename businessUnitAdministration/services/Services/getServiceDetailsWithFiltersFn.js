@@ -88,9 +88,9 @@ const getServiceDetailsWithFiltersFn = async ({ page = null, perPage = null, sea
         //apply date filters
         let dateSearchKey = {};
         if (fromDate || toDate) {
-            dateSearchKey = { date: {} };
-            if (fromDate) dateSearchKey.date.$gte = fromDate ? new Date(fromDate) : null;
-            if (toDate) dateSearchKey.date.$lte = toDate ? new Date(toDate) : null;
+            dateSearchKey = { createdAt: {} };
+            if (fromDate) dateSearchKey.createdAt.$gte = fromDate ? new Date(`${fromDate}T00:00:00.000Z`) : null;
+            if (toDate) dateSearchKey.createdAt.$lte = toDate ? new Date(`${toDate}T23:59:59.999Z`) : null;
         };
 
 

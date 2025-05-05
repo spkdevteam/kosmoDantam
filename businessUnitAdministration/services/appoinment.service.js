@@ -57,7 +57,7 @@ exports.creatAppointment = async (input) => {
             status: input?.status,
             isActive: input?.isActive || true,
             deletedAt: input?.deletedAt || null,
-            createdUser: input?.createdUser,
+            createdBy: input?.user,
         }
 
 
@@ -347,7 +347,7 @@ exports.delete = async (input) => {
         if (!input?.buId) return { status: false, message: message.lblBusinessUnitinValid, statusCode: httpStatusCode.Unauthorized }
         const db = await getClientDatabaseConnection(input?.clientId)
         const appointments = await db.model('appointment', appointmentSchema)
-        const result = await appointments.findOneAndUpdate({ _id: input.appointmentid }, { $set: { deletedAt: new Date() } }, { returnDocument: 'after', new: true })
+        const result = await appointments.findOneAndUpdate({ _id: input.appointmentid }, { $set: { deletedAt: new Date(), deletedBy: input?.user } }, { returnDocument: 'after', new: true })
         console.log(result.deletedAt)
         if (result.deletedAt) {
             return { status: true, message: message.lblAppointmentDeleted, data: result }
@@ -705,7 +705,7 @@ exports.updateBookingWithToken = async ({ tokenNumber, appointmentid, buId, bran
 }
 
 
-exports.changeBookingStatus = async ({ date, clientId, branchId, buId, appointmentId, status }) => {
+exports.changeBookingStatus = async ({ date, clientId, branchId, buId, appointmentId, status, user }) => {
     try {
         console.log({ appointmentId: appointmentId, buId: buId, branchId: branchId, clientId: clientId, status: status })
         if (! await validateObjectId({ clientid: clientId, objectId: clientId, collectionName: 'clientId' })) return { status: false, message: message.lblClinetIdInvalid, statusCode: httpStatusCode.Unauthorized }
@@ -719,9 +719,8 @@ exports.changeBookingStatus = async ({ date, clientId, branchId, buId, appointme
         }
         const result = await appointment.
             findOneAndUpdate(
-                { _id: appointmentId, branchId: branchId, isActive: true, deletedAt: null },
-                // { $set: { status: status } },
-                { $set: updateData },//date inserted by rahul
+                { _id: appointmentId, branchId: branchId, isActive: true, deletedAt: null  },
+                { $set: { status: status, updatedBy: user } },
                 { returnDocument: 'after', new: true })
         if (result) {
             return { status: true, message: 'status Updated', statusCode: httpStatusCode.OK, data: result?._doc }
