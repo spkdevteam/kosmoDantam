@@ -174,6 +174,7 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
             ...branchIdSearchKey,
             ...departmentSearchkey,
             ...serviceSearchKey,
+            ...dateSearchKey,
             ...createdUserSearchKey,
             ...updatedUserSearchKey,
             ...deletedUserSearchKey,
