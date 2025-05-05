@@ -87,6 +87,7 @@ const getProcedureDetailsWithFiltersFn = async ({ page = null, perPage = null, s
             if (fromDate) dateSearchKey.createdAt.$gte = new Date(`${fromDate}T00:00:00.000Z`);
             if (toDate) dateSearchKey.createdAt.$lte = new Date(`${toDate}T23:59:59.999Z`);
         }
+        console.log(dateSearchKey,'<<<<dateSearchKey')
 
 
 
