@@ -10,7 +10,7 @@ const getCaseSheetDashboardFN = async ({ clientId, buId, branchId, day }) => {
         const filterQuery = {
             deletedAt: null,
         };
-        if (buId) filterQuery.buId = new mongoose.Types.ObjectId(buId);
+        filterQuery.buId = new mongoose.Types.ObjectId(buId);
         if (branchId) filterQuery.branchId = new mongoose.Types.ObjectId(branchId);
         const queryPipeline = [];
         queryPipeline.push({
@@ -54,7 +54,7 @@ const getCaseSheetDashboardFN = async ({ clientId, buId, branchId, day }) => {
         // } 
         console.log("resultresult==>>>>>", result)
         const fetchedCaseSheets = result[0]?.statusCounts || [];
-        if ( !result || result[0]?.length < 1) {
+        if (!result || result[0]?.length < 1) {
             return {
                 status: false,
                 message: "CaseSheets Count can't be fetched!!",
@@ -64,39 +64,39 @@ const getCaseSheetDashboardFN = async ({ clientId, buId, branchId, day }) => {
         }
         returnData = [
             {
-                Type:'Total Cases',
+                Type: 'Total Cases',
                 value: 0
             },
             {
-                Type:'Proposed',
+                Type: 'Proposed',
                 value: 0
             },
             {
-                Type:'In Progress',
+                Type: 'In Progress',
                 value: 0
             },
             {
-                Type:'Completed',
+                Type: 'Completed',
                 value: 0
             },
             {
-                Type:'Cancelled',
+                Type: 'Cancelled',
                 value: 0
             },
         ]
-        for (const r of returnData){
+        for (const r of returnData) {
             const index = result[0]?.statusCounts?.findIndex(item => String(item.status) == String(r.Type))
-            if(index >-1 ){
+            if (index > -1) {
                 r.value = result[0]?.statusCounts[index]?.count
             }
         }
         // console.log("result[0]?.totalCount?.total",result[0]?.totalCount[0].total)
         returnData[0].value = result[0]?.totalCount[0]?.total || 0
         const metaData = {
-            day : day ? day : null,
+            day: day ? day : null,
             totalCount: returnData[0]?.value
         }
-        return {status : true , message : "CaseSheet counts fethced successfully!" , data : returnData, metaData : metaData}
+        return { status: true, message: "CaseSheet counts fethced successfully!", data: returnData, metaData: metaData }
     }
     catch (error) {
         console.log("error", error?.message)

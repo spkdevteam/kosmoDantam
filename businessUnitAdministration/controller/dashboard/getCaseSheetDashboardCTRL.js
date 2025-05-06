@@ -6,11 +6,9 @@ const getCaseSheetDashboardCTRL = async (req, res, next) => {
     try {
         const { clientId, buId, branchId, day } = await sanitizeBody(req?.query);//buId, branchId, day aren't mandatory..day isn't being used
         const validation = [
-            clientIdValidation({ clientId })
+            clientIdValidation({ clientId }),
+            mongoIdValidation({ _id: buId, name: "buId" })
         ];
-        if (buId) {
-            validation.push(mongoIdValidation({ _id: buId, name: "buId" }));
-        }
         if (branchId) {
             validation.push(mongoIdValidation({ _id: branchId, name: "BranchId" }));
         }
