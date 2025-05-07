@@ -7,6 +7,7 @@ const updateCaseSheetWithInvoiceNumberFn = async ({ clientId, invoice, branchId 
         const db = await getClientDatabaseConnection(clientId);
         const CaseSheetModelObj = await db.model('caseSheet', caseSheetSchema);
         const updatedCaseSheetList = [];
+        // console.log("invoiceinvoice==>>>", invoice)
         for (const itemKartObj of invoice?.itemKart) {
             if (itemKartObj?.estimateNumber) {
                 for (const estimateNo of itemKartObj?.estimateNumber) {
@@ -28,19 +29,25 @@ const updateCaseSheetWithInvoiceNumberFn = async ({ clientId, invoice, branchId 
                         if (treatmentIndexContainer !== -1 && serviceIndexContainer !== -1) {
                             fetchedCaseSheet.treatmentData3[treatmentIndexContainer].service[serviceIndexContainer].service.invoiceId = invoice?._id;
                             fetchedCaseSheet.treatmentData3[treatmentIndexContainer].service[serviceIndexContainer].service.invoiceNumber = invoice?.invoiceDetails?.displayId
-                            console.log("changed=>>",fetchedCaseSheet.treatmentData3[treatmentIndexContainer].service[serviceIndexContainer].service);
+                            console.log("changed=>>", fetchedCaseSheet.treatmentData3[treatmentIndexContainer].service[serviceIndexContainer].service);
                             const updatePath = `treatmentData3.${treatmentIndexContainer}.service.${serviceIndexContainer}.service.invoiceId`;
+                            const updatePath2 = `treatmentData3.${treatmentIndexContainer}.service.${serviceIndexContainer}.service.invoiceNumber`;
                             const updatedCaseSheet = await CaseSheetModelObj.findByIdAndUpdate(
                                 fetchedCaseSheet._id,
-                                { $set: { [updatePath]: invoice?._id } },
+                                {
+                                    $set: {
+                                        [updatePath]: invoice?._id,
+                                        [updatePath2]: invoice?.invoiceDetails?.displayId
+                                    }
+                                },
                                 { new: true }
                             );
                             // console.log("updatedCaseSheet=>>>>",updatedCaseSheet);
-                            if(!updatedCaseSheet){
+                            if (!updatedCaseSheet) {
                                 return { status: false, message: "Couldn't update Invoice of the caseSheet!!", data: [] };
                             }
-                            if(!updatedCaseSheetList.includes(String(updatedCaseSheet._id)))
-                            updatedCaseSheetList.push(String(updatedCaseSheet._id));
+                            if (!updatedCaseSheetList.includes(String(updatedCaseSheet._id)))
+                                updatedCaseSheetList.push(String(updatedCaseSheet._id));
                         }
                     }
                 }
@@ -52,7 +59,7 @@ const updateCaseSheetWithInvoiceNumberFn = async ({ clientId, invoice, branchId 
 
     }
     catch (error) {
-        return { status: false, message: error?.message || "Couldn't update CaseSheet", data : {} }
+        return { status: false, message: error?.message || "Couldn't update CaseSheet", data: {} }
     }
 }
 
