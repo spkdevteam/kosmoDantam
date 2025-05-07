@@ -32,7 +32,7 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
             console.log("fetchedAppointmentfetchedAppointment==>>>", fetchedAppointment)
             metaData.totalCount = fetchedAppointment && fetchedAppointment?.length > 0 ? fetchedAppointment?.length : 0;
             //daily:=>
-            if (String(viewType?.toLowerCase()) == String('daily').toLowerCase()) {//done working tested..all date are at the start of day thats why coming in same group otherwise okay
+            if (String(viewType?.toLowerCase()) == String('daily_not_required_right_now').toLowerCase()) {//done working tested..all date are at the start of day thats why coming in same group otherwise okay
                 const generateHourlyAppointmentCounts = (appointments) => {
                     const result = Array.from({ length: 24 }, (_, hour) => {
                         const labelStart = formatHour(hour);
@@ -67,7 +67,7 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
 
             }
             // weekly & monthly & custom:=>
-            else if (String(viewType?.toLowerCase()) == String('weekly').toLowerCase() || String(viewType?.toLowerCase()) == String('monthly').toLowerCase() || String(viewType?.toLowerCase()) == String('custom').toLowerCase()) {
+            else if (String(viewType?.toLowerCase()) == String('weekly').toLowerCase() || String(viewType?.toLowerCase()) == String('monthly').toLowerCase() || String(viewType?.toLowerCase()) == String('custom').toLowerCase() || String(viewType?.toLowerCase()) == String('daily').toLowerCase()) {
                 const groupByDateWithDay = (appointments, fromDate, toDate) => {
                     const groupedData = {};
 
@@ -115,24 +115,24 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
                     const startYear = new Date(fromDate).getFullYear();
                     const endYear = new Date(toDate).getFullYear();
 
-                    for (let year = startYear; year <= endYear; year++) {
-                        groupedData[year] = {
-                            year: year,
-                            count: 0
+                    for (let name = startYear; name <= endYear; name++) {//name is the year actually
+                        groupedData[name] = {
+                            name: name,
+                            value: 0
                         };
                     }
 
                     // Step 2: Count appointments per year
                     appointments.forEach(app => {
                         if (app?.date) {
-                            const year = new Date(app?.date).getFullYear();
-                            if (groupedData[year]) {
-                                groupedData[year].count += 1;
+                            const name = new Date(app?.date).getFullYear();
+                            if (groupedData[name]) {
+                                groupedData[name].value += 1;
                             }
                         }
                     });
 
-                    return Object.values(groupedData).sort((a, b) => a.year - b.year);
+                    return Object.values(groupedData).sort((a, b) => a.name - b.name);
                 };
                 const result = groupByYearRange(fetchedAppointment, fromDate, toDate)
 
@@ -159,7 +159,7 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
             console.log("fetchedRegistrationfetchedRegistration==>>>", fetchedRegistration)
             metaData.totalCount = fetchedRegistration && fetchedRegistration?.length > 0 ? fetchedRegistration?.length : 0;
             //daily:=>
-            if (String(viewType?.toLowerCase()) == String('daily').toLowerCase()) {//done working tested..all date are at the start of day thats why coming in same group otherwise okay
+            if (String(viewType?.toLowerCase()) == String('daily_not_required_right_now').toLowerCase()) {//done working tested..all date are at the start of day thats why coming in same group otherwise okay
                 const generateHourlyCounts = (data) => {
                     const result = Array.from({ length: 24 }, (_, hour) => {
                         const labelStart = formatHour(hour);
@@ -194,7 +194,7 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
 
             }
             // weekly & monthly & custom:=>
-            else if (String(viewType?.toLowerCase()) == String('weekly').toLowerCase() || String(viewType?.toLowerCase()) == String('monthly').toLowerCase() || String(viewType?.toLowerCase()) == String('custom').toLowerCase()) {
+            else if (String(viewType?.toLowerCase()) == String('weekly').toLowerCase() || String(viewType?.toLowerCase()) == String('monthly').toLowerCase() || String(viewType?.toLowerCase()) == String('custom').toLowerCase() || String(viewType?.toLowerCase()) == String('daily').toLowerCase()) {
                 const groupByDateWithDay = (data, fromDate, toDate) => {
                     const groupedData = {};
 
@@ -242,24 +242,24 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
                     const startYear = new Date(fromDate).getFullYear();
                     const endYear = new Date(toDate).getFullYear();
 
-                    for (let year = startYear; year <= endYear; year++) {
-                        groupedData[year] = {
-                            year: year,
-                            count: 0
+                    for (let name = startYear; name <= endYear; name++) {
+                        groupedData[name] = {
+                            name: name,
+                            value: 0
                         };
                     }
 
                     // Step 2: Count data per year
                     data.forEach(app => {
                         if (app?.createdAt) {
-                            const year = new Date(app?.createdAt).getFullYear();
-                            if (groupedData[year]) {
-                                groupedData[year].count += 1;
+                            const name = new Date(app?.createdAt).getFullYear();
+                            if (groupedData[name]) {
+                                groupedData[name].value += 1;
                             }
                         }
                     });
 
-                    return Object.values(groupedData).sort((a, b) => a.year - b.year);
+                    return Object.values(groupedData).sort((a, b) => a.name - b.name);
                 };
                 const result = groupByYearRange(fetchedRegistration, fromDate, toDate)
 
@@ -274,7 +274,7 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
         else {
 
         }
-        return { status: returnData?.status, message: returnData && returnData?.status ? "Graph data fetched successfully" : "Graph data could not be fetched!", data: returnData, metaData: metaData || {} }
+        return { status: returnData ? true : false, message: returnData && returnData?.status ? "Graph data fetched successfully" : "Graph data is zero or could not be fetched", data: returnData, metaData: metaData || {} }
 
 
     }
