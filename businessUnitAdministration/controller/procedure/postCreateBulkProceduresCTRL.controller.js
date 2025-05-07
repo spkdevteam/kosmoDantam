@@ -11,6 +11,6 @@ const postCreateBulkProceduresCTRL = async (req, res, next) => {
     console.log('reached Backend')
     const mainUser = req?.user;
     const result = await postCreateBulkProceduresFN({ clientId, buId, branchId, arrayObj : data, mainUser_id : mainUser?._id })
-    return res.status(200).json({ status: result?.status, message: result?.message, data: result?.data });
+    return res.status(result?.status ? 200 : 400).json({ status: result?.status, message: result?.message, data: result?.data || [] });
 }
 module.exports = postCreateBulkProceduresCTRL

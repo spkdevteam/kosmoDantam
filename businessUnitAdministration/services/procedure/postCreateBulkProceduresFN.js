@@ -79,7 +79,7 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
             //     }
             // }
             //DEPARTMENT(mandatory):=>
-            if (element?.Department && String(element?.Department)?.length() > 0) {
+            if (element?.Department && String(element?.Department)?.length > 0) {
                 const departmentFetch = await department.findOne({ deptName: String(element?.Department), buId: buId, branchId: branchId })
                 if (departmentFetch) {
                     id.departmentId = departmentFetch?._id
@@ -97,9 +97,11 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
                         isActive: true,
                         createdBy: mainUser_id
                     }
-                    const { acknowledged, insertedId } = await department.insertOne(insertNewDepartment)
-                    if (acknowledged && insertedId) {
-                        id.departmentId = insertedId;
+                    // const { acknowledged, insertedId } = await department.insertOne(insertNewDepartment)
+                    const newlyCreatedDepartment = await department.insertOne(insertNewDepartment)
+                    console.log("newlyCreatedDepartment==>>", newlyCreatedDepartment)
+                    if (newlyCreatedDepartment && newlyCreatedDepartment?._id) {
+                        id.departmentId = newlyCreatedDepartment?._id;
                         console.log("New department created")
                         returnResponse[count].message = returnResponse[count].message + " New department created.";
                     }
@@ -111,7 +113,7 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
                 }
                 if (id?.departmentId) {
                     //SERVICE(mandatory):=>
-                    if (element?.Services && String(element?.Services)?.length() > 0) {
+                    if (element?.Services && String(element?.Services)?.length > 0) {
                         // const serviceIdArr = [];
                         // for (const serv of element["Services"]) {
                         const serviceFindQuery = {
@@ -120,8 +122,10 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
                             serviceName: String(element?.Services),
                             departmentId: id?.departmentId
                         }
+                        console.log("serviceFindQuery==>>",serviceFindQuery)
                         // if (id?.departmentId) serviceFindQuery.departmentId = id?.departmentId
                         const serviceFetch = await service.findOne(serviceFindQuery)
+                        console.log("serviceFetch==>>", serviceFetch)
                         if (serviceFetch) {
                             id.serviceId = serviceFetch?._id
                             console.log("Existing service fetched successfully")
@@ -141,9 +145,11 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
                                 isActive: true,
                                 createdBy: mainUser_id,
                             }
-                            const { acknowledged, insertedId } = await service.insertOne(insertNewService)
-                            if (acknowledged && insertedId) {
-                                id.serviceId = insertedId;
+                            // const { acknowledged, insertedId } = await service.insertOne(insertNewService)
+                            const newlyCreatedService = await service.insertOne(insertNewService)
+                            console.log("newlyCreatedService=>>", newlyCreatedService)
+                            if (newlyCreatedService && newlyCreatedService?._id) {
+                                id.serviceId = newlyCreatedService?._id;
                                 console.log("New service created")
                                 returnResponse[count].message = returnResponse[count].message + " New service created.";
                                 // serviceIdArr?.push(new mongoose.Types.ObjectId(id?.serviceId))
@@ -155,11 +161,14 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
                         // }
                         if (id?.serviceId) {
                             //PROCEDURE(not mandatory):=>
-                            if (element?.Procedure && String(element?.Procedure)?.length() > 0) {
+                            if (element?.Procedure && String(element?.Procedure)?.length > 0) {
                                 const procedureFetch = await Procedure.findOne({ procedureName: String(element?.Procedure), buId: buId, branchId: branchId })
                                 if (procedureFetch) {
                                     id.procedureId = procedureFetch?._id
-                                    procedureFetch.services.push(new mongoose.Types.ObjectId(id?.serviceId));
+                                    if (!procedureFetch.services.includes(id?.serviceId)) {
+                                        procedureFetch.services.push(new mongoose.Types.ObjectId(id?.serviceId));
+                                    }
+                                    // procedureFetch.services.push(new mongoose.Types.ObjectId(id?.serviceId));
                                     procedureFetch.updatedBy = mainUser_id;
                                     const savedProcedure = await procedureFetch.save();
                                     if (savedProcedure) {
@@ -185,9 +194,11 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
                                         buId: buId,
                                         createdBy: mainUser_id
                                     }
-                                    const { acknowledged, insertedId } = await Procedure.insertOne(insertNewProcedure)
-                                    if (acknowledged && insertedId) {
-                                        id.procedureId = insertedId;
+                                    // const { acknowledged, insertedId } = await Procedure.insertOne(insertNewProcedure)
+                                    const newlySavedProcedure = await Procedure.insertOne(insertNewProcedure)
+                                    console.log("newlySavedProcedure==>>", newlySavedProcedure)
+                                    if (newlySavedProcedure && newlySavedProcedure?._id) {
+                                        id.procedureId = newlySavedProcedure?._id;
                                         console.log("New procedure created")
                                         returnResponse[count].message = returnResponse[count].message + " New procedure created.";
                                     }
@@ -202,7 +213,10 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
                                     const serviceFetch2 = await service.findOne({ _id: id?.serviceId })
                                     if (serviceFetch2) {
                                         if (id?.procedureId) {
-                                            serviceFetch2.procedures.push(new mongoose.Types.ObjectId(id?.procedureId))
+                                            if (!serviceFetch2.procedures.includes(id?.procedureId)) {
+                                                serviceFetch2.procedures.push(new mongoose.Types.ObjectId(id?.procedureId))
+                                            }
+                                            // serviceFetch2.procedures.push(new mongoose.Types.ObjectId(id?.procedureId))
                                             serviceFetch2.updatedBy = mainUser_id;
                                             const savedService2 = await serviceFetch2.save();
                                             if (savedService2) {
@@ -255,7 +269,7 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
             }
             count++;
         }
-        return {status: true, message: "test message", data: returnResponse || []}
+        return { status: true, message: "test message", data: returnResponse || [] }
     }
     catch (error) {
         console.log(error?.message)
