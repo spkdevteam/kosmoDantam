@@ -1,7 +1,7 @@
 const sanitizeBody = require("../../../utils/sanitizeBody");
 const { clientIdValidation } = require("../../../utils/validation");
 const postCreateBulkEmployeeFN = require("../../services/employees/postCreateBulkEmployeeFN");
-const postCreateBulkServiceFN = require("../../services/Services/postCreateBulkServiceFn");
+// const postCreateBulkServiceFN = require("../../services/Services/postCreateBulkServiceFn");
 
 const postCreateBulkEmployeeCTRL = async (req, res, next) =>{
     const {clientId, buId, branchId, data} = await sanitizeBody(req?.body) 
