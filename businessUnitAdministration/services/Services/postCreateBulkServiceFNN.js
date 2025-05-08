@@ -1,4 +1,4 @@
-const postCreateBulkServiceFN = async ({ clientId, buId, branchId, arrayObj, mainUser_id }) => {
+const postCreateBulkServiceFNN = async ({ clientId, buId, branchId, arrayObj, mainUser_id }) => {
     try {
       const results = [];
   
@@ -28,5 +28,5 @@ const postCreateBulkServiceFN = async ({ clientId, buId, branchId, arrayObj, mai
   };
 }
   
-  module.exports = postCreateBulkServiceFN;
+  module.exports = postCreateBulkServiceFNN;
   
