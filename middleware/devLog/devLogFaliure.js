@@ -7,7 +7,7 @@ const devLogFaliure = async (req, res, next) => {
         const LOG = clientConnection.model('devLog', devLogSchema);
 
         console.log("req.faliure==>>>>", req?.faliure);
-        const saving = await LOG.insertOne(req?.faliure)
+        const saving = await LOG.create(req?.faliure)
         if (saving) {
             console.log("error logged!!")
         }

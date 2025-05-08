@@ -76,7 +76,7 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
             //         isActive: true,
             //         createdBy: mainUser?._id,
             //     }
-            //     const { acknowledged, insertedId } = await branch.insertOne(insertNewBranch)
+            //     const { acknowledged, insertedId } = await branch.create(insertNewBranch)
             //     if (acknowledged && insertedId) {
             //         id.branchId = insertedId;
             //     }
@@ -113,8 +113,8 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
                                 isActive: true,
                                 createdBy: mainUser_id
                             }
-                            // const { acknowledged, insertedId } = await department.insertOne(insertNewDepartment)
-                            const newlyCreatedDepartment = await department.insertOne(insertNewDepartment)
+                            // const { acknowledged, insertedId } = await department.create(insertNewDepartment)
+                            const newlyCreatedDepartment = await department.create(insertNewDepartment)
                             // console.log("newlyCreatedDepartment==>>", newlyCreatedDepartment)
                             if (newlyCreatedDepartment && newlyCreatedDepartment?._id) {
                                 id.departmentId = newlyCreatedDepartment?._id;
@@ -163,8 +163,8 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
                                     isActive: true,
                                     createdBy: mainUser_id,
                                 }
-                                // const { acknowledged, insertedId } = await service.insertOne(insertNewService)
-                                const newlyCreatedService = await service.insertOne(insertNewService)
+                                // const { acknowledged, insertedId } = await service.create(insertNewService)
+                                const newlyCreatedService = await service.create(insertNewService)
                                 // console.log("newlyCreatedService=>>", newlyCreatedService)
                                 if (newlyCreatedService && newlyCreatedService?._id) {
                                     id.serviceId = newlyCreatedService?._id;
@@ -216,8 +216,8 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
                                             buId: buId,
                                             createdBy: mainUser_id
                                         }
-                                        // const { acknowledged, insertedId } = await Procedure.insertOne(insertNewProcedure)
-                                        const newlySavedProcedure = await Procedure.insertOne(insertNewProcedure)
+                                        // const { acknowledged, insertedId } = await Procedure.create(insertNewProcedure)
+                                        const newlySavedProcedure = await Procedure.create(insertNewProcedure)
                                         // console.log("newlySavedProcedure==>>", newlySavedProcedure)
                                         if (newlySavedProcedure && newlySavedProcedure?._id) {
                                             id.procedureId = newlySavedProcedure?._id;
