@@ -6,6 +6,7 @@ const deptController = require('../controller/department.controller')
 const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization")
 const getDepartmentWithFilters = require('../controller/department/getDepartmentWithFilters.controller')
 const { tempAuthorizeEntity } = require('../../middleware/authorization/commonEntityAuthorization/tempUserValidation')
+const postCreateBulkDepartmentCNTRL = require('../controller/department/postCreateBulkDepartmentCNTRL.controller')
 
 
 deptRouter
@@ -21,5 +22,7 @@ deptRouter
     .put('/toggleDepartmentWithPage', entityAuth.authorizeEntity("Administration", "Department", "update"), deptController.putToggleDepartmentsWithPage)
     .get('/getDepartmentById',deptController.getDepartmentById)
     .get('/getDepartmentDetailsWithFilters', getDepartmentWithFilters)
+    .post('/createBulkDepartment',postCreateBulkDepartmentCNTRL)
+
 
 module.exports = deptRouter

@@ -9,6 +9,7 @@ const businessUnitChairContrller = require("../controller/chair.controller");
 
 const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization");
 const getChairDetailsWithFilters = require("../controller/Chairs/getChairDetailsWithFilters.controller");
+const postCreateBulkChairCNTRL = require("../controller/Chairs/postCreateBulkChairCNTRL.controller");
 
 
 
@@ -35,6 +36,8 @@ router.patch('/updateChairStatusInProgress', entityAuth.authorizeEntity("Adminis
 router.patch('/updateChairCleared', entityAuth.authorizeEntity("Administration", "Chair", "update"), businessUnitChairContrller?.updateChairCleared)  
 router.patch('/CancelChairReadyStatus', entityAuth.authorizeEntity("Administration", "Chair", "update"), businessUnitChairContrller?.CancelChairReadyStatus) 
         .get("/getChairDetailsWithFilters", getChairDetailsWithFilters)
+        .post('/createBulkChair',postCreateBulkChairCNTRL)
+
 
 // # create, update, view, list, activate/inactive, delete Chair by business unit routes ends here
 
