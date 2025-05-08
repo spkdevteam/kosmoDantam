@@ -31,7 +31,7 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
             const fetchedAppointment = await Appointment.find({ ...(filterQuery || {}) });
             console.log("fetchedAppointmentfetchedAppointment==>>>", fetchedAppointment)
             metaData.totalCount = fetchedAppointment && fetchedAppointment?.length > 0 ? fetchedAppointment?.length : 0;
-            //daily:=>
+            //:=>
             if (String(viewType?.toLowerCase()) == String('daily_not_required_right_now').toLowerCase()) {//done working tested..all date are at the start of day thats why coming in same group otherwise okay
                 const generateHourlyAppointmentCounts = (appointments) => {
                     const result = Array.from({ length: 24 }, (_, hour) => {
@@ -66,7 +66,7 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
                 returnData.data = [...result];
 
             }
-            // weekly & monthly & custom:=>
+            // weekly & monthly & custom & daily:=>
             else if (String(viewType?.toLowerCase()) == String('weekly').toLowerCase() || String(viewType?.toLowerCase()) == String('monthly').toLowerCase() || String(viewType?.toLowerCase()) == String('custom').toLowerCase() || String(viewType?.toLowerCase()) == String('daily').toLowerCase()) {
                 const groupByDateWithDay = (appointments, fromDate, toDate) => {
                     const groupedData = {};
@@ -77,11 +77,20 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
                     while (current <= end) {
                         const dateStr = current.toISOString().split('T')[0];
                         const dayName = current.toLocaleDateString('en-US', { weekday: 'long' });
-                        groupedData[dateStr] = {
-                            date: dateStr,
-                            name: dayName,
-                            value: 0
-                        };
+                        if (String(viewType?.toLowerCase()) == String('monthly').toLowerCase() || String(viewType?.toLowerCase()) == String('custom').toLowerCase() || String(viewType?.toLowerCase()) == String('daily').toLowerCase()) {
+                            groupedData[dateStr] = {
+                                date: dayName,
+                                name: dateStr,
+                                value: 0
+                            };
+                        }
+                        else {
+                            groupedData[dateStr] = {
+                                date: dateStr,//2025-02-05
+                                name: dayName,//eg sunday
+                                value: 0
+                            };
+                        }
                         current.setDate(current.getDate() + 1);
                     }
 
@@ -142,6 +151,9 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
                 returnData.data = [...result];
 
             }
+            else {
+                return { status: false, message: "Invalid View Type", data: [], metaData: {} }
+            }
 
         }
 
@@ -158,7 +170,7 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
             const fetchedRegistration = await User.find({ ...(filterQuery || {}) })
             console.log("fetchedRegistrationfetchedRegistration==>>>", fetchedRegistration)
             metaData.totalCount = fetchedRegistration && fetchedRegistration?.length > 0 ? fetchedRegistration?.length : 0;
-            //daily:=>
+            //:=>
             if (String(viewType?.toLowerCase()) == String('daily_not_required_right_now').toLowerCase()) {//done working tested..all date are at the start of day thats why coming in same group otherwise okay
                 const generateHourlyCounts = (data) => {
                     const result = Array.from({ length: 24 }, (_, hour) => {
@@ -193,7 +205,7 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
                 returnData.data = [...result];
 
             }
-            // weekly & monthly & custom:=>
+            // weekly & monthly & custom & daily:=>
             else if (String(viewType?.toLowerCase()) == String('weekly').toLowerCase() || String(viewType?.toLowerCase()) == String('monthly').toLowerCase() || String(viewType?.toLowerCase()) == String('custom').toLowerCase() || String(viewType?.toLowerCase()) == String('daily').toLowerCase()) {
                 const groupByDateWithDay = (data, fromDate, toDate) => {
                     const groupedData = {};
@@ -204,11 +216,21 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
                     while (current <= end) {
                         const dateStr = current.toISOString().split('T')[0];
                         const dayName = current.toLocaleDateString('en-US', { weekday: 'long' });
-                        groupedData[dateStr] = {
-                            date: dateStr,
-                            name: dayName,
-                            value: 0
-                        };
+                        if (String(viewType?.toLowerCase()) == String('monthly').toLowerCase() || String(viewType?.toLowerCase()) == String('custom').toLowerCase() || String(viewType?.toLowerCase()) == String('daily').toLowerCase()) {
+                            groupedData[dateStr] = {
+                                date: dayName,
+                                name: dateStr,
+                                value: 0
+                            };
+                        }
+                        else {
+                            groupedData[dateStr] = {
+                                date: dateStr,
+                                name: dayName,
+                                value: 0
+                            };
+                        }
+
                         current.setDate(current.getDate() + 1);
                     }
 
@@ -267,16 +289,15 @@ const getGraphDashboardFN = async ({ clientId, buId, branchId, module, viewType,
                 returnData.message = fetchedRegistration && fetchedRegistration?.length > 0 ? 'Registration fetched' : 'Registration fetch failed!';
                 returnData.status = fetchedRegistration && fetchedRegistration?.length > 0 ? true : false;
                 returnData.data = [...result];
-
             }
-
+            else {
+                return { status: false, message: "Invalid View Type", data: [], metaData: {} }
+            }
         }
         else {
-
+            return { status: false, message: "Invalid module", data: [], metaData: {} }
         }
         return { status: returnData ? true : false, message: returnData && returnData?.status ? "Graph data fetched successfully" : "Graph data is zero or could not be fetched", data: returnData, metaData: metaData || {} }
-
-
     }
     catch (error) {
         console.log("error", error?.message)
