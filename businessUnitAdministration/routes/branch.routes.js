@@ -10,6 +10,7 @@ const businessUnitBranchContrller = require("../controller/branch.controller");
 const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization");
 const { uploadBranch } = require("../../utils/multer");
 const getBranchDetailsctrl = require("../controller/branches/getBranchDetailsctrl");
+const postCreateBulkBranchCTRL = require("../controller/branches/postCreateBulkBranch.controller");
 
 
 
@@ -70,6 +71,8 @@ router.post("/restoreBranch", entityAuth.authorizeEntity("Administration", "Bran
 
 router.get('/getAllActiveBranch',  businessUnitBranchContrller.getAllActiveBranch)
 router.get('/getBranchDetails', getBranchDetailsctrl)
+router.post('/createBulkBranch',postCreateBulkBranchCTRL)
+
 
 // # create, update, view, list, activate/inactive, delete Branch by business unit routes ends here
 

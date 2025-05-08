@@ -10,6 +10,7 @@ const employeeContrller = require("../controller/employee.controller");
 const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization");
 const getEmployeeDetailsDetailsWithFilter = require("../controller/employees/getEmployeeDetailsDetailsWithFilter.controller");
 const getEmployeeDetailsDetailsWithFilterNEW = require("../controller/employees/getEmployeeDetailsDetailsWithFilterNEW.controller");
+const postCreateBulkEmployeeCTRL = require("../controller/employees/postCreateBulkEmployeeCNTRL.controller");
 
 
 // # create, update, view, list, activate/inactive Employee routes starts here
@@ -28,6 +29,8 @@ router.post("/softDeleteEmployee", entityAuth.authorizeEntity("Administration", 
 router.get('/getEmployeelist/:clientId/:branchId/:role',  employeeContrller.listEmployeebyBranchId);
 router.get('/getEmployeeDetailsDetailsWithFilter',  getEmployeeDetailsDetailsWithFilter);
 router.get('/getEmployeeDetailsDetailsWithFilterNEW',  getEmployeeDetailsDetailsWithFilterNEW);
+router.post('/createBulkEmployee',postCreateBulkEmployeeCTRL)
+
 
 // # create, update, view, list, activate/inactive Employee routes ends here
 

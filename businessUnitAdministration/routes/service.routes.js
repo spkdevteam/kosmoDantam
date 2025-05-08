@@ -11,6 +11,7 @@ const serviceRouter = express.Router()
 const entityAuth = require("../../middleware/authorization/commonEntityAuthorization/commonEntityAuthorization")
 const getServiceDetailsWithFilters = require('../controller/Services/getServiceDetailsWithFilters.controller')
 const { tempAuthorizeEntity } = require('../../middleware/authorization/commonEntityAuthorization/tempUserValidation')
+const postCreateBulkServiceCTRL = require('../controller/Services/postCreateBulkService.controller')
 
 
 
@@ -27,6 +28,7 @@ serviceRouter
     .get('/serviceUnderDepartment', getServiceUnderDepartment)
     .get('/getServiceById', getServiceDetailsById)
     .get('/getServiceDetailsWithFilters', getServiceDetailsWithFilters)
+    .post('/createBulkServices',postCreateBulkServiceCTRL)
 
 
 module.exports = serviceRouter
