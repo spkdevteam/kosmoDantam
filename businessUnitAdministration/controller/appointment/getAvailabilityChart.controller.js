@@ -19,7 +19,7 @@ const getAvailabilityChartCtrl = async (req, res, next) => {
         const doctorsList = await listEmployeeByRole({ roleId:3, clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[];
         const assistantList   = await listEmployeeByRole({ roleId:4, clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[];
         const chairList = await getchairList({roleId:3, clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[];
-        const specialist = await listEmployeeByRole({ roleId:[6,15,16], clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[];
+        const specialist = await listEmployeeByRole({ roleId:[6,15,16,22], clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[];
         // taking the engaged list of doctors , chairs ,dental Assistant
         const result = await generateAvailabiltyChart(data);
         const {bookedDoctors, bookedChairs, bookedAssistants, bookedSpecialist, absentees } = result;

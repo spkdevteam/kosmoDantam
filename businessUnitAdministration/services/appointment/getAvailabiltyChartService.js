@@ -43,7 +43,7 @@ const generateAvailabiltyChart = async (input) => {
         //  console.log(out,'<<<<<<<<out')
 
         out?.map((e) => {
-            console.log(new Date(input.startTime),e.slotFrom,new Date(input.endTime),'|||||||<<<<<<<<<<<<<|||||||||||')
+            console.log( e._id,e?.specialistDoctorId, '|||||||<<<<<<<<<<<<<|||||||||||')
             // console.log(e.slotFrom,new Date(input.startTime),e.slotFrom > new Date(input.startTime)  ,e.slotTo,new Date(input.startTime),   e.slotTo< new Date(input.startTime), "<---fromgetAvaialabilityChart")
         })
 
@@ -51,9 +51,11 @@ const generateAvailabiltyChart = async (input) => {
 
         out?.map((item) => {
             bookedDoctors.add(item?.dutyDoctorId?.toString())
+            bookedDoctors.add(item?.specialistDoctorId?.toString())
+
             bookedChairs.add(item?.chairId?.toString())
             bookedAssistants.add(item?.dentalAssistant?.toString())
-            //   bookedSpecialist.add(JSON.stringify(item.specialistDoctorId).slice(1,JSON.stringify( item.specialistDoctorId)?.length-1)) 
+            bookedSpecialist.add((item?.specialistDoctorId?.toString())) 
         })
 
         
