@@ -21,29 +21,30 @@ const generateAvailabiltyChart = async (input) => {
         const bookedAssistants = new Set();
         const bookedSpecialist = new Set();
         const absentees = new Set();
-
+        console.log(new Date(input.startTime),new Date(input.endTime),'|||||||<<<<<<<<<<<<<|||||||||||')
         const out = await appointment.aggregate([
             {
                 $match: {
                     isActive: true,
                     deletedAt: null,
                     date: new Date(input.bookingDate),
-                    $and: [
-                        {
-                            slotFrom: {
-                                $lte: new Date(input.startTime),
-                            },
-                            slotTo: {
-                                $gte: new Date(input.endTime)
-                            }
-                        }
-                    ]
+                    $expr: {
+                        $and: [
+                            // slotTo should be after startTime
+                            { $gte: ["$slotTo", new Date(input.startTime)] },
+                            // slotFrom should be before endTime
+                            { $lte: ["$slotFrom", new Date(input.endTime)] }
+                        ]
+                    }
                 }
             }
         ]);
+        // console.log(input,'outoutout<<<<')
+        //  console.log(out,'<<<<<<<<out')
 
         out?.map((e) => {
-            console.log(e, "<---fromgetAvaialabilityChart")
+            console.log(new Date(input.startTime),e.slotFrom,new Date(input.endTime),'|||||||<<<<<<<<<<<<<|||||||||||')
+            // console.log(e.slotFrom,new Date(input.startTime),e.slotFrom > new Date(input.startTime)  ,e.slotTo,new Date(input.startTime),   e.slotTo< new Date(input.startTime), "<---fromgetAvaialabilityChart")
         })
 
 
@@ -55,8 +56,7 @@ const generateAvailabiltyChart = async (input) => {
             //  bookedSpecialist.add(JSON.stringify(item.specialistDoctorId).slice(1,JSON.stringify( item.specialistDoctorId)?.length-1)) 
         })
 
-        console.log(bookedDoctors, bookedChairs, bookedAssistants, bookedSpecialist, "otherssssssssssssssssssssss")
-
+        
 
         //to get number of absentees
         const query1 = {};
@@ -79,7 +79,7 @@ const generateAvailabiltyChart = async (input) => {
             absentees.add(item.employeeId.toString());
         });
 
-        console.log(absentees,  "absenteessssssssssssssssss")
+        // console.log(absentees,  "absenteessssssssssssssssss")
         //console.log(absentees, 'engagedListengagedList');
         // .populate('employeeId', 'name email')
         // .populate('branchId', '

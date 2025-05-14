@@ -29,8 +29,8 @@ const getAvailabilityChartCtrl = async (req, res, next) => {
             return res.status(200).json({ message:'available slots fetched', data: { doctorsAvailable: [],chairAvailable: [],assistantAvailable: [],specialistAvailable: []} , status:true });
         }
 
-        console.log(doctorsList, "<----doctorsList");
-        console.log(assistantList, "<----assistantList");
+        // console.log(doctorsList, "<----doctorsList");
+        // console.log(assistantList, "<----assistantList");
         
         //comparing the enagaed one with all details and return available list
         const doctorsAvailable = [...doctorsList,...specialist]?.filter((doc) => {
