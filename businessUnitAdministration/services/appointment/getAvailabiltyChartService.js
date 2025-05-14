@@ -53,7 +53,7 @@ const generateAvailabiltyChart = async (input) => {
             bookedDoctors.add(item?.dutyDoctorId?.toString())
             bookedChairs.add(item?.chairId?.toString())
             bookedAssistants.add(item?.dentalAssistant?.toString())
-            //  bookedSpecialist.add(JSON.stringify(item.specialistDoctorId).slice(1,JSON.stringify( item.specialistDoctorId)?.length-1)) 
+            //   bookedSpecialist.add(JSON.stringify(item.specialistDoctorId).slice(1,JSON.stringify( item.specialistDoctorId)?.length-1)) 
         })
 
         
