@@ -5,6 +5,7 @@ const getGraphDashboardCTRL = require("../controller/dashboard/getGraphDashboard
 const getPerformanceDashboardCTRL = require("../controller/dashboard/getPerformanceDashboardCTRL");
 const getRevenueSummaryCTRL = require("../controller/dashboard/getRevenueSummaryCTRL");
 const getcreditAgingCTRL = require("../controller/dashboard/getcreditAgingCTRL");
+const getEmployeegraphCTRL = require("../controller/dashboard/getEmployeegraphCTRL");
 
 const dashboardRouter = express.Router();
 
@@ -12,7 +13,6 @@ dashboardRouter.get("/caseSheet", getCaseSheetDashboardCTRL);
 dashboardRouter.get("/metrics", getMetricsDashboardCTRL);
 dashboardRouter.get("/graph", getGraphDashboardCTRL);
 dashboardRouter.get("/performance", getPerformanceDashboardCTRL)
-dashboardRouter.get('/revenueSummary', getRevenueSummaryCTRL)
-dashboardRouter.get('/creditaging', getcreditAgingCTRL)
+dashboardRouter.get('/employeegraph', getEmployeegraphCTRL)
 
 module.exports = dashboardRouter
