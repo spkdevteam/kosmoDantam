@@ -4,7 +4,7 @@ const serviceSchema = require("../../../client/model/service");
 const clinetUserSchema = require("../../../client/model/user");
 const { getClientDatabaseConnection } = require("../../../db/connection");
 const mongoose = require("mongoose");
-const getPerformanceDashboardFN = async ({ clientId, buId, branchId, fromDate, toDate }) => {
+const getPerformanceDashboardFN = async ({ clientId, buId, branchId, fromDate, toDate,roleId }) => {
     try {
         //db connection :
         const db = await getClientDatabaseConnection(clientId);
