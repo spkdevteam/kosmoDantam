@@ -17,7 +17,7 @@ const serialNumebrSchema = require("../../model/serialNumber");
 
 
 
-const { clientRoles, serialNumber, cheifComplaints, findings, medicalHistory } = require("../../utils/constant")
+const { clientRoles, serialNumber, cheifComplaints, findings, medicalHistory, defaultPersmissionsList } = require("../../utils/constant")
 
 
 
@@ -122,16 +122,67 @@ exports.createBusinessUnit = async (req, res) => {
 
     })
     //dashboard access for BU always true fix by Rahul starts
-    const buCapabilityFetch = await clientRole.findOne({ id: 2 });
-    if (buCapabilityFetch) {
-      for (const cap of buCapabilityFetch.capability) {
-        if (cap.name == "Dashboard") {
-          cap.access = true
+    let whereCondition2 = {
+      deletedAt: null
+      // ,
+      // id: { $ne: 17 },
+      // ...(keyword && {
+      //   $or: [
+      //     { name: { $regex: keyword.trim(), $options: "i" } },
+      //   ],
+      // }),
+    };
+    const [roles1] = await Promise.all([
+      clientRole.find(whereCondition2).select("name id createdBy isActive capability"),//capability added extra
+    ]);
+    for (const r of roles1) {
+      if (r.id == 2) {
+        let isUpdated = false
+        const hasDashboard = r.capability.some(item => item.name === "Dashboard");
+        if (!hasDashboard) {
+          const pushMenu = [...defaultPersmissionsList[2].menu]
+          for (const m of pushMenu) {
+            m.access = true
+          }
+          // let pushObj = {}
+          // if (r.id == 2) {
+          //   pushObj = {
+          //     name: "Dashboard",
+          //     access: true,
+          //     menu: pushMenu
+          //   }
+          // }
+          // else {
+          //   pushObj = {
+          //     name: "Dashboard",
+          //     access: false,
+          //     menu: pushMenu
+          //   }
+          // }
+          const pushObj = {
+            name: "Dashboard",
+            access: true,
+            menu: pushMenu
+          }
+
+          r.capability.push(pushObj)
+          isUpdated = true;
+        }
+        if (isUpdated) {
+          await r.save();
         }
       }
     }
+    // const buCapabilityFetch = await clientRole.findOne({ id: 2 });
+    // if (buCapabilityFetch) {
+    //   for (const cap of buCapabilityFetch.capability) {
+    //     if (cap.name == "Dashboard") {
+    //       cap.access = true
+    //     }
+    //   }
+    // }
     //rahul ends
-    await buCapabilityFetch.save();
+    // await buCapabilityFetch.save();
     //
 
     const clientUser = clientConnection.model('clientUsers', clinetUserSchema);
