@@ -111,10 +111,9 @@ const getEmployeegraphFn = async ({ clientId, buId, branchId, roleId, fromDate, 
             return acc;
         }, {});
 
+        console.log({ status: true, message:'success', data: Object.values(grouped)?.sort((a,b)=>new Date(a.name) - new Date(b.name) ) })
 
-
-        console.log(Object.values(grouped)?.sort((a,b)=> new Date(a.name) - new Date(b.name) ), "<<<<<<<<<<<<<<<<<resfffffffult>>>>>>>>>>>>>>")
-        return { status: true, message: error?.message, data: Object.values(grouped)?.sort((a,b)=>new Date(a.name) - new Date(b.name) ) }
+        return { status: true, message:'success', data: Object.values(grouped)?.sort((a,b)=>new Date(a.name) - new Date(b.name) ) }
     } catch (error) {
         return { status: false, message: error?.message }
     }
