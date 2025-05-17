@@ -19,7 +19,7 @@ const getAvailabilityChartCtrl = async (req, res, next) => {
         const doctorsList = await listEmployeeByRole({ roleId:3, clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[];
         const assistantList   = await listEmployeeByRole({ roleId:4, clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[];
         const chairList = await getchairList({roleId:3, clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[];
-        const specialist = await listEmployeeByRole({ roleId:[6,15,16], clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[];
+        const specialist = await listEmployeeByRole({ roleId:[6,15,16,22], clientId:data?.clientId, buId:data?.buId, branchId:data?.branchId })||[];
         // taking the engaged list of doctors , chairs ,dental Assistant
         const result = await generateAvailabiltyChart(data);
         const {bookedDoctors, bookedChairs, bookedAssistants, bookedSpecialist, absentees } = result;
@@ -29,8 +29,8 @@ const getAvailabilityChartCtrl = async (req, res, next) => {
             return res.status(200).json({ message:'available slots fetched', data: { doctorsAvailable: [],chairAvailable: [],assistantAvailable: [],specialistAvailable: []} , status:true });
         }
 
-        console.log(doctorsList, "<----doctorsList");
-        console.log(assistantList, "<----assistantList");
+        // console.log(doctorsList, "<----doctorsList");
+        // console.log(assistantList, "<----assistantList");
         
         //comparing the enagaed one with all details and return available list
         const doctorsAvailable = [...doctorsList,...specialist]?.filter((doc) => {
