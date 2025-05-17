@@ -20,9 +20,11 @@ deptRouter
     .patch('/activeInactiveDepartment', entityAuth.authorizeEntity("Administration", "Department", "update"), deptController.activeinactiveDepartment)
     .put('/revokeDepartment', entityAuth.authorizeEntity("Administration", "Department", "update"), deptController.revokeDepartment)
     .put('/toggleDepartmentWithPage', entityAuth.authorizeEntity("Administration", "Department", "update"), deptController.putToggleDepartmentsWithPage)
-    .get('/getDepartmentById',deptController.getDepartmentById)
+    .get('/getDepartmentById', deptController.getDepartmentById)
     .get('/getDepartmentDetailsWithFilters', getDepartmentWithFilters)
-    .post('/createBulkDepartment',postCreateBulkDepartmentCNTRL)
+    .post('/createBulkDepartment',
+        entityAuth.authorizeEntity("Administration", "Department", "bulkCreate"),
+        postCreateBulkDepartmentCNTRL)
 
 
 module.exports = deptRouter

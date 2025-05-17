@@ -17,6 +17,7 @@ const defaultPersmissionsList = [
                     view: { id: 3, access: false, api: "/demo/path" },
                     update: { id: 4, access: false, api: "/demo/path" },
                     softDelete: { id: 5, access: false, api: "/demo/path" },
+                    // bulkCreate: { id: 10001, access: false, api: "/demo/path" }//rahul
                     // hardDelete: { id: 6, access: false, api: "/demo/path" },
                     // activeActive: { id: 7, access: false, api: "/demo/path" },
                 }
@@ -31,6 +32,7 @@ const defaultPersmissionsList = [
                     view: { id: 10, access: false, api: "/demo/path" },
                     update: { id: 11, access: false, api: "/demo/path" },
                     softDelete: { id: 12, access: false, api: "/demo/path" },
+                    bulkCreate: { id: 10002, access: false, api: "/demo/path" }//rahul
                     // hardDelete: { id: 13, access: false, api: "/demo/path" },
                     // activeActive: { id: 14, access: false, api: "/demo/path" },
                 }
@@ -45,6 +47,7 @@ const defaultPersmissionsList = [
                     view: { id: 17, access: false, api: "/demo/path" },
                     update: { id: 18, access: false, api: "/demo/path" },
                     softDelete: { id: 19, access: false, api: "/demo/path" },
+                    bulkCreate: { id: 10003, access: false, api: "/demo/path" }//rahul
                     // hardDelete: { id: 20, access: false, api: "/demo/path" },
                     // activeActive: { id: 21, access: false, api: "/demo/path" },
                 }
@@ -59,6 +62,7 @@ const defaultPersmissionsList = [
                     view: { id: 24, access: false, api: "/demo/path" },
                     update: { id: 25, access: false, api: "/demo/path" },
                     softDelete: { id: 26, access: false, api: "/demo/path" },
+                    bulkCreate: { id: 10004, access: false, api: "/demo/path" }//rahul
                     // hardDelete: { id: 27, access: false, api: "/demo/path" },
                     // activeActive: { id: 28, access: false, api: "/demo/path" },
                 }
@@ -73,6 +77,7 @@ const defaultPersmissionsList = [
                     view: { id: 31, access: false, api: "/demo/path" },
                     update: { id: 32, access: false, api: "/demo/path" },
                     softDelete: { id: 33, access: false, api: "/demo/path" },
+                    bulkCreate: { id: 10005, access: false, api: "/demo/path" }//rahul
                     // hardDelete: { id: 34, access: false, api: "/demo/path" },
                     // activeActive: { id: 35, access: false, api: "/demo/path" },
                 }
@@ -87,6 +92,7 @@ const defaultPersmissionsList = [
                     view: { id: 38, access: false, api: "/demo/path" },
                     update: { id: 39, access: false, api: "/demo/path" },
                     softDelete: { id: 40, access: false, api: "/demo/path" },
+                    bulkCreate: { id: 10006, access: false, api: "/demo/path" }//rahul
                     // hardDelete: { id: 41, access: false, api: "/demo/path" },
                     // activeActive: { id: 42, access: false, api: "/demo/path" },
                 }
@@ -101,6 +107,7 @@ const defaultPersmissionsList = [
                     view: { id: 45, access: false, api: "/demo/path" },
                     update: { id: 46, access: false, api: "/demo/path" },
                     softDelete: { id: 47, access: false, api: "/demo/path" },
+                    bulkCreate: { id: 10007, access: false, api: "/demo/path" }//rahul
                     // hardDelete: { id: 48, access: false, api: "/demo/path" },
                     // activeActive: { id: 49, access: false, api: "/demo/path" },
                 }
@@ -125,7 +132,7 @@ const defaultPersmissionsList = [
                     // activeActive: { id: 56, access: false, api: "/demo/path" },
                 }
             },
-            
+
             {
                 name: "Appointment",
                 displayName: "All Appointment",
@@ -183,9 +190,9 @@ const defaultPersmissionsList = [
                 }
             },
             {
-                name : "Token",
-                displayName : "All Token",
-                access : false,
+                name: "Token",
+                displayName: "All Token",
+                access: false,
                 subMenus: {
                     // list: { id: 85, access: false, api: "/demo/path" },
                     create: { id: 86, access: false, api: "/demo/path" },
@@ -197,9 +204,9 @@ const defaultPersmissionsList = [
                 }
             },
             {
-                name : "Chair Dashboard",
-                displayName : "All Chair Dashboard",
-                access : false,
+                name: "Chair Dashboard",
+                displayName: "All Chair Dashboard",
+                access: false,
                 subMenus: {
                     // list: { id: 92, access: false, api: "/demo/path" },
                     create: { id: 93, access: false, api: "/demo/path" },
@@ -217,9 +224,9 @@ const defaultPersmissionsList = [
         access: false,
         menu: [
             {
-                name : "Admin Dashboard",
-                displayName : "All Admin Dashboard",
-                access : false,
+                name: "Admin Dashboard",
+                displayName: "All Admin Dashboard",
+                access: false,
                 subMenus: {
                     // list: { id: 99, access: false, api: "/demo/path" },
                     create: { id: 100, access: false, api: "/demo/path" },
@@ -231,9 +238,9 @@ const defaultPersmissionsList = [
                 }
             },
             {
-                name : "Patient Dashboard",
-                displayName : "All Patient Dashboard",
-                access : false,
+                name: "Patient Dashboard",
+                displayName: "All Patient Dashboard",
+                access: false,
                 subMenus: {
                     // list: { id: 106, access: false, api: "/demo/path" },
                     create: { id: 107, access: false, api: "/demo/path" },
@@ -245,9 +252,9 @@ const defaultPersmissionsList = [
                 }
             },
             {
-                name : "Reception Dashboard",
-                displayName : "All Reception Dashboard",
-                access : false,
+                name: "Reception Dashboard",
+                displayName: "All Reception Dashboard",
+                access: false,
                 subMenus: {
                     // list: { id: 113, access: false, api: "/demo/path" },
                     create: { id: 114, access: false, api: "/demo/path" },
@@ -476,64 +483,64 @@ const clientRoles = [
 // serial numbers data
 
 const serialNumber = [
-    { collectionName : "department", prefix: "DP"},
-    { collectionName : "service", prefix: "SV"},
-    { collectionName : "procedure", prefix: "PC"},
-    { collectionName : "mediCases", prefix: "MC"},
-    { collectionName : "findings", prefix: "FS"},
-    { collectionName : "cheifComplaint", prefix: "CC"},
-    { collectionName : "investigation", prefix: "IG"},
-    { collectionName : "leaveRegister", prefix: "LA"},
-    { collectionName : "employee", prefix: "EM"},
-    { collectionName : "branch", prefix: "BR"},
-    { collectionName : "chair", prefix: "CH"},
-    { collectionName : "patient", prefix: "PT"},
-    { collectionName : "caseSheet", prefix: "CS"},
-    { collectionName : "appointment", prefix: "AP"},
-    { collectionName : "prescription", prefix: "PR"},
+    { collectionName: "department", prefix: "DP" },
+    { collectionName: "service", prefix: "SV" },
+    { collectionName: "procedure", prefix: "PC" },
+    { collectionName: "mediCases", prefix: "MC" },
+    { collectionName: "findings", prefix: "FS" },
+    { collectionName: "cheifComplaint", prefix: "CC" },
+    { collectionName: "investigation", prefix: "IG" },
+    { collectionName: "leaveRegister", prefix: "LA" },
+    { collectionName: "employee", prefix: "EM" },
+    { collectionName: "branch", prefix: "BR" },
+    { collectionName: "chair", prefix: "CH" },
+    { collectionName: "patient", prefix: "PT" },
+    { collectionName: "caseSheet", prefix: "CS" },
+    { collectionName: "appointment", prefix: "AP" },
+    { collectionName: "prescription", prefix: "PR" },
 ]
 
 
 // cheif complaints data
 
 const cheifComplaints = [
-    { complaintName : "Swelling Large", discription: "Any description"},
-    { complaintName : "Toothache", discription: "Any description"},
-    { complaintName : "Bleeding Gums", discription: "Any description"},
-    { complaintName : "Pain in Tooth", discription: "Any description"},
-    { complaintName : "Consultation", discription: "Any description"},
-    { complaintName : "Faulty Crown", discription: "Any description"},
-    { complaintName : "Difficulty in Chewing", discription: "Any description"},
+    { complaintName: "Swelling Large", discription: "Any description" },
+    { complaintName: "Toothache", discription: "Any description" },
+    { complaintName: "Bleeding Gums", discription: "Any description" },
+    { complaintName: "Pain in Tooth", discription: "Any description" },
+    { complaintName: "Consultation", discription: "Any description" },
+    { complaintName: "Faulty Crown", discription: "Any description" },
+    { complaintName: "Difficulty in Chewing", discription: "Any description" },
 ]
 
 
 
 const findings = [
-    { findingsName : "Swelling Large", discription: "Any description"},
-    { findingsName : "Toothache", discription: "Any description"},
-    { findingsName : "Bleeding Gums", discription: "Any description"},
-    { findingsName : "Pain in Tooth", discription: "Any description"},
-    { findingsName : "Consultation", discription: "Any description"},
-    { findingsName : "Faulty Crown", discription: "Any description"},
-    { findingsName : "Difficulty in Chewing", discription: "Any description"},
+    { findingsName: "Swelling Large", discription: "Any description" },
+    { findingsName: "Toothache", discription: "Any description" },
+    { findingsName: "Bleeding Gums", discription: "Any description" },
+    { findingsName: "Pain in Tooth", discription: "Any description" },
+    { findingsName: "Consultation", discription: "Any description" },
+    { findingsName: "Faulty Crown", discription: "Any description" },
+    { findingsName: "Difficulty in Chewing", discription: "Any description" },
 ]
 
 
 const medicalHistory = [
-    { caseName : "Arthritis", remark: "Any remark"},
-    { caseName : "Migraine", remark: "Any remark"},
-    { caseName : "Asthma", remark: "Any remark"},
-    { caseName : "Cancer", remark: "Any remark"},
-    { caseName : "Blood Sugar", remark: "Any remark"},
-    { caseName : "Endocrinal", remark: "Any remark"},
-    { caseName : "Blood Pressure", remark: "Any remark"},
-    { caseName : "Bleeding Disorder", remark: "Any remark"},
-    { caseName : "Gastro Internal", remark: "Any remark"},
-    { caseName : "Fits / Faint / Epilepsy", remark: "Any remark"},
-    { caseName : "Congenital Discover", remark: "Any remark"},
-    { caseName : "HIV / HBV / Jaundice", remark: "Any remark"},
-    { caseName : "Genito Urinal", remark: "Any remark"},
-    { caseName : "Cardio Respiration", remark: "Any remark"},
+    { caseName: "Arthritis", remark: "Any remark" },
+    { caseName: "Migraine", remark: "Any remark" },
+    { caseName: "Asthma", remark: "Any remark" },
+    { caseName: "Cancer", remark: "Any remark" },
+    { caseName: "Blood Sugar", remark: "Any remark" },
+    { caseName: "Endocrinal", remark: "Any remark" },
+    { caseName: "Blood Pressure", remark: "Any remark" },
+    { caseName: "Bleeding Disorder", remark: "Any remark" },
+    { caseName: "Gastro Internal", remark: "Any remark" },
+    { caseName: "Fits / Faint / Epilepsy", remark: "Any remark" },
+    { caseName: "Congenital Discover", remark: "Any remark" },
+    { caseName: "HIV / HBV / Jaundice", remark: "Any remark" },
+    { caseName: "Genito Urinal", remark: "Any remark" },
+    { caseName: "Cardio Respiration", remark: "Any remark" },
 ]
 
 

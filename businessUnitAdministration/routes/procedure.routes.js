@@ -31,6 +31,6 @@ procedureRouter
     .get('/procedureUnderService', getProcedureUnderService)
     .get('/getProcedureDetailsWithFilters', getProcedureDetailsWithFilters)
     .post('/createBulkProcedures',
-        // tempAuthorizeEntity("Administration", "Procedures", "create"),
+        tempAuthorizeEntity("Administration", "Procedures", "bulkCreate"),
         postCreateBulkProceduresCTRL)
 module.exports = procedureRouter;

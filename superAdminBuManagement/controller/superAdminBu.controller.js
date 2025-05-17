@@ -121,6 +121,18 @@ exports.createBusinessUnit = async (req, res) => {
       return item?.id == 2
 
     })
+    //dashboard access for BU always true fix by Rahul starts
+    const buCapabilityFetch = await clientRole.findOne({ id: 2 });
+    if (buCapabilityFetch) {
+      for (const cap of buCapabilityFetch.capability) {
+        if (cap.name == "Dashboard") {
+          cap.access = true
+        }
+      }
+    }
+    //rahul ends
+    await buCapabilityFetch.save();
+    //
 
     const clientUser = clientConnection.model('clientUsers', clinetUserSchema);
 

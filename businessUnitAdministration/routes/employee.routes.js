@@ -26,10 +26,12 @@ router.get('/listEmployee', entityAuth.authorizeEntity("Administration", "Employ
 router.post("/activeInactiveEmployee", entityAuth.authorizeEntity("Administration", "Employee", "update"), employeeContrller.activeinactiveEmployee);
 
 router.post("/softDeleteEmployee", entityAuth.authorizeEntity("Administration", "Employee", "softDelete"), employeeContrller.softDeleteEmployee);
-router.get('/getEmployeelist/:clientId/:branchId/:role',  employeeContrller.listEmployeebyBranchId);
-router.get('/getEmployeeDetailsDetailsWithFilter',  getEmployeeDetailsDetailsWithFilter);
-router.get('/getEmployeeDetailsDetailsWithFilterNEW',  getEmployeeDetailsDetailsWithFilterNEW);
-router.post('/createBulkEmployee',postCreateBulkEmployeeCTRL)
+router.get('/getEmployeelist/:clientId/:branchId/:role', employeeContrller.listEmployeebyBranchId);
+router.get('/getEmployeeDetailsDetailsWithFilter', getEmployeeDetailsDetailsWithFilter);
+router.get('/getEmployeeDetailsDetailsWithFilterNEW', getEmployeeDetailsDetailsWithFilterNEW);
+router.post('/createBulkEmployee',
+    entityAuth.authorizeEntity("Administration", "Employee", "bulkCreate"),
+    postCreateBulkEmployeeCTRL)
 
 
 // # create, update, view, list, activate/inactive Employee routes ends here

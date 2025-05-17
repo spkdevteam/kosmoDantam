@@ -43,6 +43,11 @@ const clientRoleSchema = new mongoose.Schema({
                                     access: { type: Boolean, default: false },
                                     api: { type: String, default: null },
                                 },
+                                bulkCreate: {//optional field added by rahul
+                                    id: Number,
+                                    access: Boolean,
+                                    api: String
+                                }
                                 // hardDelete: {
                                 //     id: { type: Number, require: true },
                                 //     access: { type: Boolean, default: false },

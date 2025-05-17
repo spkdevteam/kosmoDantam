@@ -72,7 +72,7 @@ router.post("/restoreBranch", entityAuth.authorizeEntity("Administration", "Bran
 router.get('/getAllActiveBranch', businessUnitBranchContrller.getAllActiveBranch)
 router.get('/getBranchDetails', getBranchDetailsctrl)
 router.post('/createBulkBranch',
-    // entityAuth.authorizeEntity("Administration", "Branch", "create"),
+    entityAuth.authorizeEntity("Administration", "Branch", "bulkCreate"),
     postCreateBulkBranchCTRL)
 
 // # create, update, view, list, activate/inactive, delete Branch by business unit routes ends here
