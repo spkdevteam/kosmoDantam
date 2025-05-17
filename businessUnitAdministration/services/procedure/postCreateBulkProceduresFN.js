@@ -8,7 +8,7 @@ const { getClientDatabaseConnection } = require("../../../db/connection");
 const getserialNumber = require("../../../model/services/getserialNumber");
 const { default: mongoose } = require("mongoose");
 
-const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, mainUser_id }) => {
+const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, mainUser_id, stream }) => {
     //take clientId from frontend its mandatory and important
     //take single BU from frontEnd its mandatory and important
     // mainUser?._id from middleeare its mandatory
@@ -38,6 +38,9 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
         } else {
             branchArr.push(branchId)
         }
+        // Track progress
+        let processed = 0;
+        const total = arrayObj?.length;
         for (const element of arrayObj) {
 
 
@@ -94,6 +97,7 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
                     // })
                     const id = {};
                     let atLeastOneInsert = false;
+                    //ensured that duplication doesnt happen for Department, service, procedure
                     //DEPARTMENT(mandatory):=>
                     if (element?.Department && String(element?.Department)?.length > 0 && element?.Services && String(element?.Services)?.length > 0) {//DEPARTMENT &SERVICE are mandatory checking
                         const departmentFetch = await department.findOne({ deptName: String(element?.Department), buId: buId, branchId: currentBranchId, deletedAt: null })
@@ -301,13 +305,24 @@ const postCreateBulkProceduresFN = async ({ clientId, buId, branchId, arrayObj, 
             else {
                 return { status: false, message: 'No branch exists!!' }
             }
-
+            // Increment progress counter
+            processed++;
+            const percentage = parseFloat((processed / total) * 100)?.toFixed(0);
+            //Send progress update via SSE
+            if (stream && stream.write) {
+                stream.write(`event: progress\ndata: ${JSON.stringify({ percentage })}\n\n`);
+            }
 
         }
+        // Final response
         return { status: count && count > 0 ? true : false, message: `${count} rows inserted` }
     }
     catch (error) {
         console.log(error?.message)
+        //Send error through SSE
+        if (stream && stream.write) {
+            stream.write(`event: error\ndata: ${JSON.stringify({ status: false, message: error?.message })}\n\n`);
+        }
         return { status: false, message: error?.message }
     }
 }

@@ -2,9 +2,9 @@
 const express = require('express')
 const { createServices, getReadActiveServicesbyPage,
     editService, deleteService, readActiveServices,
-    toggleService, getServiceUnderDepartment, create, update, listServices,activeinactiveService,softDeleteService,
-    putToggleServiceByPage, 
-    getServiceDetailsById} = require('../controller/service.controller')
+    toggleService, getServiceUnderDepartment, create, update, listServices, activeinactiveService, softDeleteService,
+    putToggleServiceByPage,
+    getServiceDetailsById } = require('../controller/service.controller')
 
 const serviceRouter = express.Router()
 
@@ -28,7 +28,9 @@ serviceRouter
     .get('/serviceUnderDepartment', getServiceUnderDepartment)
     .get('/getServiceById', getServiceDetailsById)
     .get('/getServiceDetailsWithFilters', getServiceDetailsWithFilters)
-    .post('/createBulkServices',postCreateBulkServiceCTRL)
+    .post('/createBulkServices',
+        entityAuth.authorizeEntity("Administration", "Services", "bulkCreate"),
+        postCreateBulkServiceCTRL)
 
 
 module.exports = serviceRouter

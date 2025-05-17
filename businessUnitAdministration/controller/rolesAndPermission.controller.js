@@ -232,7 +232,7 @@ exports.listRolesAndPermission = async (req, res) => {
                     for (let key of notExistObj) {
                         if (String(key) === "index") {
                             const pushMenu = defaultPersmissionsList[0].menu[notExistObj[key]];
-                            pushMenu.access = true;
+                            // pushMenu.access = true;//default access is false
                             // console.log("AdministrationpushMenu=>>>>",pushMenu);
                             cap.menu.push(pushMenu);
                             isUpdated = true;
@@ -311,18 +311,18 @@ exports.listRolesAndPermission = async (req, res) => {
             const hasDashboard = r.capability.some(item => item.name === "Dashboard");
             if (!hasDashboard) {
                 const pushMenu = [...defaultPersmissionsList[2].menu]
-                for (const m of pushMenu){
+                for (const m of pushMenu) {
                     m.access = true
                 }
                 let pushObj = {}
-                if(r.id == 2){
+                if (r.id == 2) {
                     pushObj = {
                         name: "Dashboard",
                         access: true,
                         menu: pushMenu
                     }
                 }
-                else{
+                else {
                     pushObj = {
                         name: "Dashboard",
                         access: false,
@@ -334,7 +334,7 @@ exports.listRolesAndPermission = async (req, res) => {
                 //     access: false,
                 //     menu: pushMenu
                 // }
-                
+
                 r.capability.push(pushObj)
                 isUpdated = true;
             }
@@ -343,11 +343,78 @@ exports.listRolesAndPermission = async (req, res) => {
             }
         }
         //
-        console.log({
-            message: 'List of all roles!',
-            listOfRoles: roles,
-            totalData: totalCount
-        })
+
+        //bulkUpload access:RAHUL starts
+        const constArray = [];
+        for (def of defaultPersmissionsList[0].menu) {
+            if ("bulkCreate" in def.subMenus) {
+                constArray.push(
+                    { [def.name]: def.subMenus.bulkCreate }
+                );
+            }
+        }
+        console.log("constArray==>>", constArray)
+        const [roles1] = await Promise.all([
+            RolesAndpermission.find(whereCondition).select("name id createdBy isActive capability"),//capability added extra
+        ]);
+        for (const r of roles1) {
+            let isUpdated = false
+            for (const cap of r.capability) {
+                if (cap.name == "Administration") {
+                    for (const m of cap.menu) {
+
+                        const subMenusObj = m.subMenus.toObject ? m.subMenus.toObject() : m.subMenus;
+                        // console.log("m.subMenus==>>", m.name, m.subMenus)
+                        // if (Object.prototype.hasOwnProperty.call(subMenusObj, "bulkCreate")) {
+                        if (Object.values(subMenusObj?.bulkCreate).length != 0) {
+                            // console.log("hit")
+                            // m.subMenus.bulkCreate.access = false;
+                            // isUpdated = true;
+                        }
+                        else {
+                            const index = constArray.findIndex(obj => m.name in obj);
+                            let bulkPermission = {};
+                            if (index !== -1) {
+                                console.log("constArray[index]", constArray[index])
+                                const key = Object.keys(constArray[index])[0];
+                                bulkPermission = constArray[index][key];
+                                if (r?.id == 2) {//remove this block when frontend added
+                                    console.log("bu hit")
+                                    bulkPermission.access = true
+                                }
+                                console.log("Key:", key);
+                                console.log("Value:", bulkPermission);
+                            }
+
+                            if (index !== -1 && bulkPermission) {
+                                m.subMenus.bulkCreate = bulkPermission
+                                // m.subMenus.set("bulkCreate", bulkPermission);
+                                isUpdated = true;
+                                console.log("rsolved m.subMenus==>>>", m.subMenus)
+                            }
+                        }
+
+                    }
+                }
+            }
+            if (isUpdated) {
+                await r.save();
+            }
+        }
+        // for (const r of roles1) {
+        //     if (r.name = "Administration") {
+        //         for (const m of r.menu) {
+        //             // if(m.)
+        //         }
+        //     }
+        // }
+        // RAHUL endss
+        //
+        // console.log({
+        //     message: 'List of all roles!',
+        //     listOfRoles: roles,
+        //     totalData: totalCount
+        // })
         return res.json({
             message: 'List of all roles!',
             listOfRoles: roles,

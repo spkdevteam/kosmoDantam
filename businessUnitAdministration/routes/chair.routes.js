@@ -32,11 +32,13 @@ router.post("/softDeleteChair", entityAuth.authorizeEntity("Administration", "Ch
 router.post("/restoreChair", entityAuth.authorizeEntity("Administration", "Chair", "update"), businessUnitChairContrller.restoreChairByBusinessUnit);
 
 router.patch('/updateChairStatusReady', entityAuth.authorizeEntity("Administration", "Chair", "update"), businessUnitChairContrller?.updateChairStatusReady)
-router.patch('/updateChairStatusInProgress', entityAuth.authorizeEntity("Administration", "Chair", "update"),  businessUnitChairContrller?.updateChairStatusInprogress)
-router.patch('/updateChairCleared', entityAuth.authorizeEntity("Administration", "Chair", "update"), businessUnitChairContrller?.updateChairCleared)  
-router.patch('/CancelChairReadyStatus', entityAuth.authorizeEntity("Administration", "Chair", "update"), businessUnitChairContrller?.CancelChairReadyStatus) 
+router.patch('/updateChairStatusInProgress', entityAuth.authorizeEntity("Administration", "Chair", "update"), businessUnitChairContrller?.updateChairStatusInprogress)
+router.patch('/updateChairCleared', entityAuth.authorizeEntity("Administration", "Chair", "update"), businessUnitChairContrller?.updateChairCleared)
+router.patch('/CancelChairReadyStatus', entityAuth.authorizeEntity("Administration", "Chair", "update"), businessUnitChairContrller?.CancelChairReadyStatus)
         .get("/getChairDetailsWithFilters", getChairDetailsWithFilters)
-        .post('/createBulkChair',postCreateBulkChairCNTRL)
+        .post('/createBulkChair',
+                entityAuth.authorizeEntity("Administration", "Chair", "bulkCreate"), 
+                postCreateBulkChairCNTRL)
 
 
 // # create, update, view, list, activate/inactive, delete Chair by business unit routes ends here
