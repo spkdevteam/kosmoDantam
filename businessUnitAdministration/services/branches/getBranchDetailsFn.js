@@ -17,6 +17,7 @@ const getBranchDetailsFn = async ({ from_Date = null, toDate = null, SearchKey =
                 // const escapedSearchKey = SearchKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 searchQuery = {
                     $or: words.flatMap(word => [//case insensitive searching and searching from anywhere of the target field
+                        { displayId: { $regex: word, $options: "i" } },
                         { name: { $regex: word, $options: "i" } },
                         { incorporationName: { $regex: word, $options: "i" } },
                         { bookingContact : { $regex: word, $options: "i" } }, 
